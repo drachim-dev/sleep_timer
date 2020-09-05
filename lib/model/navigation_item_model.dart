@@ -4,14 +4,14 @@ class NavigationItemController {
   VoidCallback onClickFAB;
 }
 
-class NavigationItem {
+class NavigationModel {
   final NavigationItemController controller;
   final Widget page;
   final String title;
   final Icon icon;
   final Icon fabIcon;
 
-  NavigationItem({
+  NavigationModel({
     @required this.controller,
     @required this.page,
     @required this.title,

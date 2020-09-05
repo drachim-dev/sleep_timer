@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="sleep_timer"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -72,6 +71,16 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+        <!-- Timer Widget -->
+        <receiver 
+            android:name=".TimerWidget"
+            android:label= "sleep_timer">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_info" />
         </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

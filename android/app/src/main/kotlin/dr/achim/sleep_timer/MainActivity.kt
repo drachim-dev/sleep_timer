@@ -44,6 +44,10 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         this.result = result
 
         when(call.method) {
+            "initialize" -> {
+                if (call.arguments == null) return
+                WidgetHelper.setHandle(this, call.arguments as Long)
+            }
             "showNotification" -> {
                 val id = call.argument<Int>("id")
                 val title = call.argument<String>("title")
@@ -64,10 +68,9 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 val id = call.argument<Int>("id")
                 val title = call.argument<String>("title")
                 val subtitle = call.argument<String>("subtitle")
-                val seconds = call.argument<Int>("seconds")
                 val actionTitle1 = call.argument<String>("actionTitle1")
 
-                val success = pauseNotification(id, title, subtitle, seconds, actionTitle1)
+                val success = pauseNotification(id, title, subtitle, actionTitle1)
                 
                 if(success) {
                     result.success(true)
@@ -122,17 +125,17 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 .setContentIntent(openIntent)
                 .addAction(android.R.drawable.ic_media_pause, "Pause".toUpperCase(), pauseIntent)
 
-        if(actionTitle1 != null) builder.addAction(R.drawable.ic_more_time, actionTitle1?.toUpperCase(), extendIntent)
-        if(actionTitle2 != null) builder.addAction(R.drawable.ic_more_time, actionTitle2?.toUpperCase(), extendIntent)
+        if(actionTitle1 != null) builder.addAction(R.drawable.ic_more_time, actionTitle1.toUpperCase(), extendIntent)
+        if(actionTitle2 != null) builder.addAction(R.drawable.ic_more_time, actionTitle2.toUpperCase(), extendIntent)
         if(seconds != null) builder.setWhen(System.currentTimeMillis() + seconds * 1000)
         if(title != null) builder.setContentTitle(title)
         if(subtitle != null) builder.setContentText(subtitle)
 
-        NotificationManagerCompat.from(context).notify(id ?: NOTIFICATION_ID, builder.build())
-        return true;
+        NotificationManagerCompat.from(context).notify(id, builder.build())
+        return true
     }
 
-    private fun pauseNotification(id: Int?, title: String?, subtitle: String?, seconds: Int?, actionTitle1: String?): Boolean{
+    private fun pauseNotification(id: Int?, title: String?, subtitle: String?, actionTitle1: String?): Boolean{
         val id = id ?: NOTIFICATION_ID
 
         createNotificationChannel()
@@ -153,7 +156,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         if(subtitle != null) builder.setContentText(subtitle)
 
         NotificationManagerCompat.from(context).notify(id, builder.build())
-        return true;
+        return true
     }
 
     private fun cancelNotification(id: Int?): Boolean {
@@ -162,7 +165,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         createNotificationChannel()
         
         NotificationManagerCompat.from(context).cancel(id)
-        return true;
+        return true
     }
 
     private fun createNotificationChannel() {

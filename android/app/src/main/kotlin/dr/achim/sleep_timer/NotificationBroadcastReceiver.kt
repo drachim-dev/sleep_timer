@@ -19,7 +19,6 @@ const val NOTIF_ACTION_EXTEND = "NOTIF_ACTION_EXTEND"
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        FlutterMain.ensureInitializationComplete(context, null)
         val engine = FlutterEngine(context)
         val entrypoint: DartEntrypoint = createDefault()
         engine.dartExecutor.executeDartEntrypoint(entrypoint)
