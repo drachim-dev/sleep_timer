@@ -8,7 +8,7 @@ class TimerModel {
 
   int get initialTimeInSeconds => _initialTimeInSeconds;
   List<ActionModel> get actions => _actions;
-  ActionModel get musicAction =>
+  ActionModel get mediaAction =>
       _actions.singleWhere((action) => action.id == ActionType.MEDIA);
   ActionModel get wifiAction =>
       _actions.singleWhere((action) => action.id == ActionType.WIFI);

@@ -4,10 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.Build
+import android.provider.Settings
+import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.flutter.embedding.android.FlutterActivity
@@ -22,10 +23,14 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
     private val NOTIF_CHANNEL_ID: String = "0"
     private val REQUEST_CODE_NOTIF_OPEN = 100
     private val REQUEST_CODE_NOTIF_CANCEL = 110
+    private val REQUEST_CODE_NOTIF_DISMISS = 115
     private val REQUEST_CODE_NOTIF_PAUSE = 120
     private val REQUEST_CODE_NOTIF_CONTINUE = 130
-    private val REQUEST_CODE_NOTIF_EXTEND = 140
+    private val REQUEST_CODE_NOTIF_EXTEND_5 = 140
+    private val REQUEST_CODE_NOTIF_EXTEND_20 = 141
+    private val REQUEST_CODE_NOTIF_RESTART = 150
     private val REQUEST_CODE_ENABLE_ADMIN = 200
+    private val REQUEST_CODE_NOTIF_SETTINGS_ACCESS = 300
 
     private lateinit var channel: MethodChannel
     private var result: MethodChannel.Result? = null
@@ -33,46 +38,66 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
     private lateinit var deviceManager: DevicePolicyManager
     private lateinit var deviceAdmin: ComponentName
 
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var notificationChannel: NotificationChannel
 
+    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
         this.channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_NAME)
         this.channel.setMethodCallHandler(this)
+        initNotificationChannel()
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        this.result = result
+        this.result = result;
 
         when(call.method) {
-            "initialize" -> {
+            "initMainActivityEntry" -> {
                 if (call.arguments == null) return
-                WidgetHelper.setHandle(this, call.arguments as Long)
+                EntryPointCallbackHelper.setHandle(this, call.arguments as Long)
             }
-            "showNotification" -> {
+            "showRunningNotification" -> {
                 val id = call.argument<Int>("id")
                 val title = call.argument<String>("title")
                 val subtitle = call.argument<String>("subtitle")
                 val seconds = call.argument<Int>("seconds")
                 val actionTitle1 = call.argument<String>("actionTitle1")
                 val actionTitle2 = call.argument<String>("actionTitle2")
+                val actionTitle3 = call.argument<String>("actionTitle3")
 
-                val success = showNotification(id, title, subtitle, seconds, actionTitle1, actionTitle2)
+                val success = showRunningNotification(id, title, subtitle, seconds, actionTitle1, actionTitle2, actionTitle3)
 
-                if(success) {
+                if (success) {
                     result.success(true)
                 } else {
                     result.error("UNAVAILABLE", "Not supported by platform", null)
                 }
             }
-            "pauseNotification" -> {
+            "showPauseNotification" -> {
                 val id = call.argument<Int>("id")
                 val title = call.argument<String>("title")
                 val subtitle = call.argument<String>("subtitle")
                 val actionTitle1 = call.argument<String>("actionTitle1")
+                val actionTitle2 = call.argument<String>("actionTitle2")
 
-                val success = pauseNotification(id, title, subtitle, actionTitle1)
-                
-                if(success) {
+                val success = showPauseNotification(id, title, subtitle, actionTitle1, actionTitle2)
+
+                if (success) {
+                    result.success(true)
+                } else {
+                    result.error("UNAVAILABLE", "Not supported by platform", null)
+                }
+            }
+            "showElapsedNotification" -> {
+                val id = call.argument<Int>("id")
+                val title = call.argument<String>("title")
+                val subtitle = call.argument<String>("subtitle")
+                val actionTitle1 = call.argument<String>("actionTitle1")
+                val actionTitle2 = call.argument<String>("actionTitle2")
+
+                val success = showElapsedNotification(id, title, subtitle, actionTitle1, actionTitle2)
+
+                if (success) {
                     result.success(true)
                 } else {
                     result.error("UNAVAILABLE", "Not supported by platform", null)
@@ -81,7 +106,7 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
             "cancelNotification" -> {
                 val id = call.argument<Int>("id")
 
-                if(cancelNotification(id)) {
+                if (cancelNotification(id)) {
                     result.success(true)
                 } else {
                     result.error("UNAVAILABLE", "Not supported by platform", null)
@@ -99,20 +124,29 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                     result.error("UNAVAILABLE", "Not supported by platform", null)
                 }
             }
+            "isNotificationSettingsAccessActive" -> {
+                result.success(isNotificationSettingsAccessActive())
+            }
+            "toggleNotificationSettingsAccess" -> {
+                val enabled = call.argument<Boolean>("enabled")
+
+                if (enabled != null) {
+                    toggleNotificationSettingsAccess(enabled)
+                } else {
+                    result.error("UNAVAILABLE", "Not supported by platform", null)
+                }
+            }
             else -> result.notImplemented()
         }
     }
 
-    private fun showNotification(id: Int?, title: String?, subtitle: String?, seconds: Int?, actionTitle1: String?, actionTitle2: String?): Boolean {
+    private fun showRunningNotification(id: Int?, title: String?, subtitle: String?, seconds: Int?, actionTitle1: String?, actionTitle2: String?, actionTitle3: String?): Boolean {
         val id = id ?: NOTIFICATION_ID
 
-        createNotificationChannel()
-
-        //val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-        //val className = launchIntent?.component!!.className
         val openIntent = createNotificationIntent(id, NOTIF_ACTION_OPEN, REQUEST_CODE_NOTIF_OPEN)
         val pauseIntent = createNotificationIntent(id, NOTIF_ACTION_PAUSE, REQUEST_CODE_NOTIF_PAUSE)
-        val extendIntent = createNotificationIntent(id, NOTIF_ACTION_EXTEND, REQUEST_CODE_NOTIF_EXTEND)
+        val extendIntent5 = createNotificationIntent(id, NOTIF_ACTION_EXTEND_5, REQUEST_CODE_NOTIF_EXTEND_5)
+        val extendIntent20 = createNotificationIntent(id, NOTIF_ACTION_EXTEND_20, REQUEST_CODE_NOTIF_EXTEND_20)
 
         val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID)
                 .setShowWhen(true)
@@ -123,10 +157,10 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setContentIntent(openIntent)
-                .addAction(android.R.drawable.ic_media_pause, "Pause".toUpperCase(), pauseIntent)
 
-        if(actionTitle1 != null) builder.addAction(R.drawable.ic_more_time, actionTitle1.toUpperCase(), extendIntent)
-        if(actionTitle2 != null) builder.addAction(R.drawable.ic_more_time, actionTitle2.toUpperCase(), extendIntent)
+        if(actionTitle1 != null) builder.addAction(R.drawable.ic_baseline_pause_24, actionTitle1.toUpperCase(), pauseIntent)
+        if(actionTitle2 != null) builder.addAction(R.drawable.ic_baseline_replay_5_24, actionTitle2.toUpperCase(), extendIntent5)
+        if(actionTitle3 != null) builder.addAction(R.drawable.ic_baseline_replay_10_24, actionTitle3.toUpperCase(), extendIntent20)
         if(seconds != null) builder.setWhen(System.currentTimeMillis() + seconds * 1000)
         if(title != null) builder.setContentTitle(title)
         if(subtitle != null) builder.setContentText(subtitle)
@@ -135,10 +169,8 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         return true
     }
 
-    private fun pauseNotification(id: Int?, title: String?, subtitle: String?, actionTitle1: String?): Boolean{
+    private fun showPauseNotification(id: Int?, title: String?, subtitle: String?, actionTitle1: String?, actionTitle2: String?): Boolean{
         val id = id ?: NOTIFICATION_ID
-
-        createNotificationChannel()
 
         val openIntent = createNotificationIntent(id, NOTIF_ACTION_OPEN, REQUEST_CODE_NOTIF_OPEN)
         val cancelIntent = createNotificationIntent(id, NOTIF_ACTION_CANCEL, REQUEST_CODE_NOTIF_CANCEL)
@@ -149,9 +181,31 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
                 .setUsesChronometer(false)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setContentIntent(openIntent)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancel".toUpperCase(), cancelIntent)
 
-        if(actionTitle1 != null) builder.addAction(android.R.drawable.ic_media_play, "Continue".toUpperCase(), continueIntent)
+        if(actionTitle1 != null) builder.addAction(R.drawable.ic_baseline_clear_24, actionTitle1.toUpperCase(), cancelIntent)
+        if(actionTitle2 != null) builder.addAction(R.drawable.ic_baseline_play_arrow_24, actionTitle2.toUpperCase(), continueIntent)
+        if(title != null) builder.setContentTitle(title)
+        if(subtitle != null) builder.setContentText(subtitle)
+
+        NotificationManagerCompat.from(context).notify(id, builder.build())
+        return true
+    }
+
+    private fun showElapsedNotification(id: Int?, title: String?, subtitle: String?, actionTitle1: String?, actionTitle2: String?): Boolean{
+        val id = id ?: NOTIFICATION_ID
+
+        val openIntent = createNotificationIntent(id, NOTIF_ACTION_OPEN, REQUEST_CODE_NOTIF_OPEN)
+        val dismissIntent = createNotificationIntent(id, NOTIF_ACTION_CANCEL, REQUEST_CODE_NOTIF_DISMISS)
+        val restartIntent = createNotificationIntent(id, NOTIF_ACTION_CONTINUE, REQUEST_CODE_NOTIF_RESTART)
+
+        val builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID)
+                .setShowWhen(false)
+                .setUsesChronometer(false)
+                .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setContentIntent(openIntent)
+
+        if(actionTitle1 != null) builder.addAction(R.drawable.ic_baseline_clear_24, actionTitle1.toUpperCase(), dismissIntent)
+        if(actionTitle2 != null) builder.addAction(R.drawable.ic_baseline_replay_24, actionTitle2.toUpperCase(), restartIntent)
         if(title != null) builder.setContentTitle(title)
         if(subtitle != null) builder.setContentText(subtitle)
 
@@ -161,27 +215,24 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
 
     private fun cancelNotification(id: Int?): Boolean {
         val id = id ?: NOTIFICATION_ID
-
-        createNotificationChannel()
-        
         NotificationManagerCompat.from(context).cancel(id)
         return true
     }
 
-    private fun createNotificationChannel() {
+    private fun initNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(NOTIF_CHANNEL_ID, "Active timer", importance)
-            channel.description = "Notify about running or pausing timers"
-            // Register the channel with the system
-            NotificationManagerCompat.from(context).createNotificationChannel(channel)
+            notificationChannel = NotificationChannel(NOTIF_CHANNEL_ID, "Active timer", importance).apply {
+                description = "Notify about running or pausing timers"
+            }
+            NotificationManagerCompat.from(context).createNotificationChannel(notificationChannel)
         }
     }
 
     private fun createNotificationIntent(id: Int, action: String, requestCode: Int): PendingIntent {
-        val intent = Intent(context, NotificationBroadcastReceiver::class.java).apply{
+        val intent = Intent(context, NotificationReceiver::class.java).apply{
             this.action = action
             putExtra("id", id)
         }
@@ -210,12 +261,46 @@ class MainActivity: FlutterActivity(), MethodChannel.MethodCallHandler {
         return true
     }
 
+    private fun isNotificationSettingsAccessActive() : Boolean {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.isNotificationPolicyAccessGranted
+    }
+
+    private fun toggleNotificationSettingsAccess(enabled: Boolean) {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+        startActivityForResult(intent, REQUEST_CODE_NOTIF_SETTINGS_ACCESS)
+
+        val filter = IntentFilter(NotificationManager.ACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED)
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val active = isNotificationSettingsAccessActive()
+                val success = enabled == active
+
+                if(active) {
+                    Toast.makeText(context, "Enabled", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Disabled", Toast.LENGTH_SHORT).show()
+                }
+
+                result?.success(success)
+            }
+        }
+        registerReceiver(receiver, filter)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_CODE_ENABLE_ADMIN -> {
                 if (resultCode == RESULT_OK) {
                     result?.success(true)
+                }
+            }
+            REQUEST_CODE_NOTIF_SETTINGS_ACCESS -> {
+                if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(context, "onActivityResult", Toast.LENGTH_SHORT).show()
                 }
             }
         }

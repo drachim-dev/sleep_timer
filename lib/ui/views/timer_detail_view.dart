@@ -1,12 +1,12 @@
-import 'dart:async';
 import 'dart:ui';
 
-import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:sleep_timer/common/constants.dart';
-import 'package:sleep_timer/model/action_model.dart';
+import 'package:flutter_native_admob/flutter_native_admob.dart';
+import 'package:flutter_native_admob/native_admob_controller.dart';
+import 'package:flutter_native_admob/native_admob_options.dart';
+import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -14,53 +14,6 @@ import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
 
 import 'timer_detail_viewmodel.dart';
-
-Future<bool> showNotification(
-    {@required int initialTime, @required int remainingTime}) async {
-  try {
-    bool success = await kMethodChannel.invokeMethod("showNotification", {
-      "id": kNotificationId,
-      "title": "Sleep timer running",
-      "subtitle": "Timer set for ${Utils.secondsToString(initialTime)} minutes",
-      "seconds": remainingTime,
-      "actionTitle1": "+5",
-      "actionTitle2": "+20",
-    });
-
-    return success;
-  } on PlatformException catch (e) {
-    print(e.message);
-    return false;
-  }
-}
-
-Future<bool> pauseNotification(int remainingTime) async {
-  try {
-    bool success = await kMethodChannel.invokeMethod("pauseNotification", {
-      "id": kNotificationId,
-      "title": "Sleep timer pausing",
-      "subtitle": "Time left: ${Utils.secondsToString(remainingTime)}",
-      "seconds": remainingTime,
-      "actionTitle1": "Continue",
-    });
-    return success;
-  } on PlatformException catch (e) {
-    print(e.message);
-    return false;
-  }
-}
-
-Future<bool> cancelNotification() async {
-  try {
-    bool success = await kMethodChannel.invokeMethod("cancelNotification", {
-      "id": kNotificationId,
-    });
-    return success;
-  } on PlatformException catch (e) {
-    print(e.message);
-    return false;
-  }
-}
 
 class TimerDetailView extends StatefulWidget {
   final TimerModel timer;
@@ -73,7 +26,14 @@ class TimerDetailView extends StatefulWidget {
 
 class _TimerDetailViewState extends State<TimerDetailView>
     with TickerProviderStateMixin {
-  ScrollController _scrollController = ScrollController();
+  final targetingInfo = MobileAdTargetingInfo(
+      testDevices: AdManager.testDeviceId != null
+          ? <String>[AdManager.testDeviceId]
+          : null);
+
+  final _controller = NativeAdmobController();
+
+  final _scrollController = ScrollController();
   AnimationController _hideFabAnimController;
   AnimationController _fabAnimController;
   Animation<Color> _colorAnimation;
@@ -84,11 +44,11 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
   @override
   void initState() {
-    AndroidAlarmManager.initialize();
+    super.initState();
 
     initAnimations();
-
-    super.initState();
+    FirebaseAdMob.instance.initialize(appId: AdManager.appId);
+    _controller.setTestDeviceIds([AdManager.testDeviceId]);
   }
 
   void initAnimations() {
@@ -104,35 +64,13 @@ class _TimerDetailViewState extends State<TimerDetailView>
       ..addListener(() => setState(() {}));
   }
 
-  void _startTimer() {
-    _fabAnimController.reverse();
-
-    model.startTimer();
-
-    showNotification(
-        initialTime: model.initialTime, remainingTime: model.remainingTime);
-  }
-
-  void _cancelTimer() {
-    model.stopTimer();
-    AndroidAlarmManager.cancel(kAlarmId);
-    cancelNotification();
-  }
-
-  void _pauseTimer() {
-    _fabAnimController.forward();
-    model.stopTimer();
-    AndroidAlarmManager.cancel(kAlarmId);
-    pauseNotification(model.remainingTime);
-  }
-
   @override
   void dispose() {
-    super.dispose();
-
     _scrollController.dispose();
     _hideFabAnimController.dispose();
     _fabAnimController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -157,7 +95,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
         });
   }
 
-  Widget _buildyBody(ThemeData theme) {
+  Widget _buildyBody(final ThemeData theme) {
     return Column(
       children: [
         SizedBox(height: 56),
@@ -183,7 +121,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
               ExpansionTile(
                   title: Text("Common actions"),
                   initiallyExpanded: true,
-                  children: _buildCommonActions()),
+                  children: _buildCommonActions(theme)),
               ExpansionTile(
                   title: Text("More"),
                   initiallyExpanded: model.timerModel.actions.any((action) {
@@ -227,59 +165,84 @@ class _TimerDetailViewState extends State<TimerDetailView>
         }).toList());
   }
 
-  List<SwitchListTile> _buildCommonActions() {
+  List<Widget> _buildCommonActions(final ThemeData theme) {
     return [
       SwitchListTile(
-        secondary: Icon(Icons.music_off_outlined),
-        title: Text(model.timerModel.musicAction.title),
-        subtitle: Text(model.timerModel.musicAction.description),
-        value: model.timerModel.musicAction.value,
-        onChanged: (value) => model.onChangeMusic,
+        secondary: Icon(Icons.music_note),
+        title: Text(model.timerModel.mediaAction.title),
+        subtitle: Text(model.timerModel.mediaAction.description),
+        value: model.timerModel.mediaAction.value,
+        onChanged: model.onChangeMedia,
       ),
+      _buildAd(theme),
       SwitchListTile(
-        secondary: Icon(Icons.wifi_off_outlined),
+        secondary: Icon(Icons.wifi),
         title: Text(model.timerModel.wifiAction.title),
         subtitle: Text(model.timerModel.wifiAction.description),
         value: model.timerModel.wifiAction.value,
-        onChanged: (value) => model.onChangeWifi,
+        onChanged: model.onChangeWifi,
       ),
       SwitchListTile(
-          secondary: Icon(Icons.bluetooth_disabled_outlined),
+          secondary: Icon(Icons.bluetooth),
           title: Text(model.timerModel.bluetoothAction.title),
           subtitle: Text(model.timerModel.bluetoothAction.description),
           value: model.timerModel.bluetoothAction.value,
-          onChanged: (value) => model.onChangeBluetooth),
+          onChanged: model.onChangeBluetooth),
     ];
+  }
+
+  Container _buildAd(ThemeData theme) {
+    return Container(
+      height: 80,
+      padding: EdgeInsets.only(left: 16, right: 32, top: 8, bottom: 8),
+      margin: EdgeInsets.only(bottom: 16),
+      child: NativeAdmob(
+        adUnitID: AdManager.nativeAdUnitId,
+        loading: Center(child: CircularProgressIndicator()),
+        error: Text("Failed to load the ad"),
+        controller: _controller,
+        type: NativeAdmobType.banner,
+        options: NativeAdmobOptions(
+          ratingColor: Colors.red,
+          headlineTextStyle:
+              NativeTextStyle(color: theme.textTheme.subtitle1.color),
+          advertiserTextStyle:
+              NativeTextStyle(color: theme.textTheme.caption.color),
+          storeTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
+          priceTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
+        ),
+      ),
+    );
   }
 
   List<SwitchListTile> _buildMoreActions() {
     return [
       SwitchListTile(
-        secondary: Icon(Icons.tv_off_outlined),
+        secondary: Icon(Icons.tv),
         title: Text(model.timerModel.screenAction.title),
         subtitle: Text(model.timerModel.screenAction.description),
         value: model.timerModel.screenAction.value,
-        onChanged: (value) => model.onChangeScreen,
+        onChanged: model.onChangeScreen,
       ),
       SwitchListTile(
-          secondary: Icon(Icons.volume_down_outlined),
+          secondary: Icon(Icons.volume_down),
           title: Text(model.timerModel.volumeAction.title),
           subtitle: Text(model.timerModel.volumeAction.description),
           value: model.timerModel.volumeAction.value,
-          onChanged: (value) => model.onChangeVolume),
+          onChanged: model.onChangeVolume),
       SwitchListTile(
-        secondary: Icon(Icons.lightbulb_outlined),
+        secondary: Icon(Icons.lightbulb_outline),
         title: Text(model.timerModel.lightAction.title),
         subtitle: Text(model.timerModel.lightAction.description),
         value: model.timerModel.lightAction.value,
-        onChanged: (value) => model.onChangeLight,
+        onChanged: model.onChangeLight,
       ),
       SwitchListTile(
         secondary: Icon(Icons.close),
         title: Text(model.timerModel.appAction.title),
         subtitle: Text(model.timerModel.appAction.description),
         value: model.timerModel.appAction.value,
-        onChanged: (value) => model.onChangeApp,
+        onChanged: model.onChangeApp,
       ),
     ];
   }
@@ -303,7 +266,13 @@ class _TimerDetailViewState extends State<TimerDetailView>
             style: textStyle,
           ),
           onPressed: () {
-            model.isActive ? _pauseTimer() : _startTimer();
+            if (model.isActive) {
+              _fabAnimController.forward();
+              model.pauseTimer();
+            } else {
+              _fabAnimController.reverse();
+              model.startTimer();
+            }
           }),
     );
   }

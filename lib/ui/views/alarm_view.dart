@@ -23,8 +23,6 @@ class _AlarmViewState extends State<AlarmView> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
     return ViewModelBuilder<AlarmViewModel>.reactive(
         viewModelBuilder: () => AlarmViewModel(),
         onModelReady: (model) => this.model = model,
@@ -33,7 +31,7 @@ class _AlarmViewState extends State<AlarmView> {
             physics: ScrollPhysics(),
             children: [
               Icon(
-                Icons.alarm_outlined,
+                Icons.alarm,
                 size: 80,
               )
             ],

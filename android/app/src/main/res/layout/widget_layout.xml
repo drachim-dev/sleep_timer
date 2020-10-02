@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@android:color/black">
+    android:orientation="horizontal"
+    android:layout_width="200dp"
+    android:layout_height="40dp"
+    android:background="#aa1F1929">
 
     <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:text="Hier sollen Daten angezeigt werden, die von dem Flutter-Teil geladen wurden." />
+        android:id="@+id/tv_timer_duration"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="Start timer for 30 min"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/button_app"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Open app" />
-
-    <Button
-        android:id="@+id/button_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Settings" />
+    <ImageButton
+        android:id="@+id/btn_timer_start"
+        android:layout_width="56dp"
+        android:layout_height="match_parent"
+        android:background="@android:drawable/ic_media_play"
+        android:backgroundTint="@android:color/white"
+        android:contentDescription="Start timer" />
 
 </LinearLayout>

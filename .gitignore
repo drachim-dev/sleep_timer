@@ -39,3 +39,9 @@ app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+
+# confidential
+google-services.json
+key.properties
+secrets.xml
+.env*

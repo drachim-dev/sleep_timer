@@ -9,11 +9,12 @@ class ThemeService with ReactiveServiceMixin {
     listenToReactiveValues([_myTheme]);
   }
 
-  RxValue<MyTheme> _myTheme = RxValue<MyTheme>(initial: themeList[1]);
+  final RxValue<MyTheme> _myTheme = RxValue<MyTheme>(initial: themeList[1]);
   MyTheme get myTheme => _myTheme.value;
 
-  void updateTheme(String value) {
-    _myTheme.value =
-        themeList.singleWhere((MyTheme theme) => theme.title == value);
+  void updateTheme(final String value) {
+    if (themeList.contains(value)) {
+      _myTheme.value = themeList.singleWhere((theme) => theme.title == value);
+    }
   }
 }

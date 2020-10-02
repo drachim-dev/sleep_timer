@@ -15,19 +15,19 @@ class TimerViewModel extends BaseViewModel {
       id: ActionType.MEDIA,
       title: "Media",
       description: "Stop media playback",
-      value: true,
+      value: false,
     ),
     ActionModel(
       id: ActionType.WIFI,
       title: "Wifi",
       description: "Turn off wifi",
-      value: true,
+      value: false,
     ),
     ActionModel(
       id: ActionType.BLUETOOTH,
       title: "Bluetooth",
       description: "Turn off bluetooth",
-      value: true,
+      value: false,
     ),
     ActionModel(
       id: ActionType.SCREEN,
@@ -40,7 +40,7 @@ class TimerViewModel extends BaseViewModel {
       id: ActionType.VOLUME,
       title: "Volume",
       description: "Set media volume to 10",
-      value: false,
+      value: true,
       common: false,
     ),
     ActionModel(
@@ -69,11 +69,8 @@ class TimerViewModel extends BaseViewModel {
 
   void updateTime(int value) {
     setTime(value);
-
     notifyListeners();
   }
 
-  void setTime(int value) {
-    _initialTime = value;
-  }
+  void setTime(int value) => _initialTime = value;
 }

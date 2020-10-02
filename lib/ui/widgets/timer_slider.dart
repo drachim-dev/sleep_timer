@@ -7,7 +7,7 @@ class TimerSlider extends StatelessWidget {
   final int maxValue;
   final bool hasHandle;
   final TextStyle labelStyle;
-  final Function(int) onChange;
+  final Function(double) onChange;
   final String Function(int) onUpdateLabel;
 
   const TimerSlider({
@@ -66,6 +66,6 @@ class TimerSlider extends StatelessWidget {
               dotColor: handleColor,
             )),
         onChange: hasHandle ? (_) {} : null,
-        onChangeEnd: (value) => onChange(value.round()));
+        onChangeEnd: hasHandle ? onChange : null);
   }
 }

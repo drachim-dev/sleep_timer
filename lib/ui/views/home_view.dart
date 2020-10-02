@@ -32,15 +32,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         page: TimerView(controller: _timerController),
         controller: _timerController,
         title: "Timer",
-        icon: Icon(Icons.snooze_outlined),
-        fabIcon: Icon(Icons.play_arrow_outlined),
+        icon: Icon(Icons.snooze),
+        fabIcon: Icon(Icons.play_arrow),
       ),
       NavigationModel(
         page: AlarmView(controller: _alarmController),
         controller: _alarmController,
         title: "Alarm",
-        icon: Icon(Icons.alarm_outlined),
-        fabIcon: Icon(Icons.add_outlined),
+        icon: Icon(Icons.alarm),
+        fabIcon: Icon(Icons.add),
       ),
     ];
 
@@ -125,7 +125,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           currentIndex: model.currentIndex,
           onTap: model.setIndex,
           items: _navItems.map((item) {
-            return BottomNavigationBarItem(icon: item.icon, label: item.title);
+            return BottomNavigationBarItem(icon: item.icon, title: Text(item.title));
           }).toList()),
     );
   }

@@ -2,29 +2,28 @@ package dr.achim.sleep_timer
 
 import android.content.Context
 
-class WidgetHelper {
+class EntryPointCallbackHelper {
     companion object  {
-        private const val WIDGET_PREFERENCES_KEY = "widget_preferences"
-        private const val WIDGET_HANDLE_KEY = "handle"
+        private const val ENTRY_POINT_HELPER_PREF = "ENTRY_POINT_HELPER_PREF"
+        private const val CALLBACK_HANDLE_KEY = "CALLBACK_HANDLE_KEY"
 
-        const val CHANNEL = "dr.achim/sleep_timer"
         const val NO_HANDLE = -1L
 
         fun setHandle(context: Context, handle: Long) {
             context.getSharedPreferences(
-                WIDGET_PREFERENCES_KEY,
+                ENTRY_POINT_HELPER_PREF,
                 Context.MODE_PRIVATE
             ).edit().apply {
-                putLong(WIDGET_HANDLE_KEY, handle)
+                putLong(CALLBACK_HANDLE_KEY, handle)
                 apply()
             }
         }
 
         fun getRawHandle(context: Context): Long {
             return context.getSharedPreferences(
-                WIDGET_PREFERENCES_KEY,
+                ENTRY_POINT_HELPER_PREF,
                 Context.MODE_PRIVATE
-            ).getLong(WIDGET_HANDLE_KEY, NO_HANDLE)
+            ).getLong(CALLBACK_HANDLE_KEY, NO_HANDLE)
         }
     }
 }

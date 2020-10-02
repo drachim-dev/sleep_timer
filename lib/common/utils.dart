@@ -1,7 +1,14 @@
 class Utils {
-  static String secondsToString(int seconds, {spacing = false}) {
-    var duration = Duration(seconds: seconds);
+  static String secondsToString(int seconds,
+      {spacing = false, trimTrailingZeros = false}) {
     var space = spacing ? "\u2009" : "";
-    return '${duration.inMinutes}$space:$space${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+
+    var duration = Duration(seconds: seconds);
+    var minutes = duration.inMinutes.toString();
+    var secondsRemainder = duration.inSeconds % 60;
+
+    return trimTrailingZeros && secondsRemainder == 0
+        ? minutes
+        : "$minutes$space:$space${secondsRemainder.toString().padLeft(2, '0')}";
   }
 }

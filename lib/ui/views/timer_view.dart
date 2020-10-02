@@ -18,19 +18,13 @@ class TimerView extends StatefulWidget {
 
 class _TimerViewState extends State<TimerView> {
   TimerViewModel model;
+
   _TimerViewState(NavigationItemController _controller) {
     _controller.onClickFAB = onClickFAB;
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
     return ViewModelBuilder<TimerViewModel>.reactive(
         viewModelBuilder: () => TimerViewModel(),
         onModelReady: (model) => this.model = model,
@@ -42,23 +36,21 @@ class _TimerViewState extends State<TimerView> {
               TimerSlider(
                 initialValue: model.initialTime,
                 onUpdateLabel: (value) => "$value Min",
-                onChange: model.setTime,
+                onChange: (value) => model.setTime(value.round()),
               ),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [10, 20, 30, 60].map((value) {
-                    return RoundedRectButton(
-                        title: "$value",
-                        onPressed: () {
-                          model.updateTime(value);
-                        });
+                    return Expanded(
+                      child: RoundedRectButton(
+                          title: "$value",
+                          onPressed: () => model.updateTime(value)),
+                    );
                   }).toList()),
             ],
           );
         });
   }
 
-  void onClickFAB() {
-    model.navigateToTimerDetail();
-  }
+  void onClickFAB() => model.navigateToTimerDetail();
 }

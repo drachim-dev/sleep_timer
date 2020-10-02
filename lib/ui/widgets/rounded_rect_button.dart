@@ -14,9 +14,8 @@ class RoundedRectButton extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return FlatButton(
-        padding: const EdgeInsets.all(25.0),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        padding: const EdgeInsets.all(24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Text(title, style: theme.textTheme.headline5),
         onPressed: onPressed);
   }

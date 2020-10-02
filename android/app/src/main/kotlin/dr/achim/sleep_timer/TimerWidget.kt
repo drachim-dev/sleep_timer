@@ -35,30 +35,23 @@ class TimerWidget : AppWidgetProvider(), MethodChannel.Result {
         for (appWidgetId in appWidgetIds) {
             updateWidget("onUpdate ${Math.random()}", appWidgetId, context)
             // Pass over the id so we can update it later...
-            channel?.invokeMethod("update", appWidgetId, this)
+            channel?.invokeMethod("updateWidget", appWidgetId, this)
         }
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         appWidgetIds.forEach { appWidgetId ->
-            // Create an Intent to launch ExampleActivity
+            // Create an Intent to launch MainActivity
             val pendingIntentApp: PendingIntent = Intent(context, MainActivity::class.java)
                     .let { intent ->
                         PendingIntent.getActivity(context, 0, intent, 0)
                     }
 
-            val pendingIntentSettings: PendingIntent = Intent(context, MainActivity::class.java)
-                    .let { intent ->
-                        PendingIntent.getActivity(context, 0, intent, 0)
-                    }
-
-            // Get the layout for the App Widget and attach an on-click listener
-            // to the button
+            // Get the layout for the Widget and attach an OnClickListener
             val views: RemoteViews = RemoteViews(
                     context.packageName,
                     R.layout.widget_layout
             ).apply {
-                setOnClickPendingIntent(R.id.button_app, pendingIntentApp)
-                setOnClickPendingIntent(R.id.button_settings, pendingIntentSettings)
+                //setOnClickPendingIntent(R.id.btn_timer_start, pendingIntentApp)
             }
 
             // Tell the AppWidgetManager to perform an update on the current app widget
@@ -75,8 +68,8 @@ class TimerWidget : AppWidgetProvider(), MethodChannel.Result {
             FlutterMain.startInitialization(context!!)
             FlutterMain.ensureInitializationComplete(context!!, arrayOf())
 
-            val handle = WidgetHelper.getRawHandle(context!!)
-            if (handle == WidgetHelper.NO_HANDLE) {
+            val handle = EntryPointCallbackHelper.getRawHandle(context!!)
+            if (handle == EntryPointCallbackHelper.NO_HANDLE) {
                 Log.w(TAG, "Couldn't update widget because there is no handle stored!")
                 return
             }
@@ -97,7 +90,7 @@ class TimerWidget : AppWidgetProvider(), MethodChannel.Result {
             // warnings in the log).
             GeneratedPluginRegistrant.registerWith(engine)
 
-            channel = MethodChannel(engine.dartExecutor.binaryMessenger, WidgetHelper.CHANNEL)
+            channel = MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL_NAME)
         }
     }
 
@@ -127,7 +120,7 @@ class TimerWidget : AppWidgetProvider(), MethodChannel.Result {
 
 internal fun updateWidget(text: String, id: Int, context: Context) {
     val views = RemoteViews(context.packageName, R.layout.widget_layout).apply {
-        setTextViewText(R.id.text, text)
+        setTextViewText(R.id.tv_timer_duration, text)
     }
 
     val manager = AppWidgetManager.getInstance(context)
