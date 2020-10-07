@@ -10,3 +10,7 @@ const MethodChannel kMethodChannel =
 
 const int kNotificationId = 0;
 const int kAlarmId = 0;
+
+const String kProductRemoveAds = "remove_ads";
+const String kProductDonation = "donate";
+const Set<String> kProducts = {kProductRemoveAds, kProductDonation};

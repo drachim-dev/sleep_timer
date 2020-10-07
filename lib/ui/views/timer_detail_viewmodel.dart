@@ -9,24 +9,25 @@ import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/main.dart';
 import 'package:sleep_timer/model/action_model.dart';
+import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
+import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
 
-class TimerDetailViewModel extends ReactiveViewModel {
+class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   final TimerService _timerService;
   final TimerModel _timerModel;
   final _deviceService = locator<DeviceService>();
   final _prefsService = locator<SharedPreferences>();
+  final _purchaseService = locator<PurchaseService>();
 
   Timer _timer;
   bool _isStarting = true;
 
   TimerDetailViewModel(this._timerModel)
-      : _timerService = locator<TimerService>(param1: _timerModel) {
-    startTimer(delay: const Duration(milliseconds: 1500));
-  }
+      : _timerService = locator<TimerService>(param1: _timerModel);
 
   TimerModel get timerModel => _timerModel;
   int get initialTime => _timerModel.initialTimeInSeconds;
@@ -35,6 +36,27 @@ class TimerDetailViewModel extends ReactiveViewModel {
       max(_timerModel.initialTimeInSeconds, _timerService.remainingTime);
   bool get isStarting => _isStarting;
   bool get isActive => _timer?.isActive ?? false;
+
+  bool _isAdFree = false;
+  bool get isAdFree => _isAdFree;
+
+  @override
+  Future<void> initialise() async {
+    setBusy(true);
+    notifyListeners();
+
+    // Check for adfree in-app purchase
+    final List<Product> products =
+        await runBusyFuture(_purchaseService.products);
+    _isAdFree = products.firstWhere(
+            (element) =>
+                element.productDetails.id == kProductRemoveAds &&
+                element.purchased,
+            orElse: () => null) !=
+        null;
+
+    startTimer(delay: const Duration(milliseconds: 1500));
+  }
 
   Future<void> startTimer(
       {final Duration delay = const Duration(seconds: 0)}) async {

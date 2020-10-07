@@ -21,7 +21,7 @@ class _AlarmDetailViewState extends State<AlarmDetailView> {
         builder: (context, model, child) {
           return Scaffold(
             appBar: _buildAppBar(theme),
-            body: _buildyBody(theme),
+            body: _buildBody(theme),
           );
         });
   }
@@ -30,7 +30,7 @@ class _AlarmDetailViewState extends State<AlarmDetailView> {
     return AppBar();
   }
 
-  _buildyBody(ThemeData theme) {
+  _buildBody(ThemeData theme) {
     return Container(
       child: Text("AlarmDetailPage"),
     );

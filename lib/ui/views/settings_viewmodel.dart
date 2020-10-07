@@ -1,59 +1,80 @@
+import 'dart:async';
+
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/services/device_service.dart';
+import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:stacked/stacked.dart';
 
-class SettingsViewModel extends ReactiveViewModel {
+class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   final _prefsService = locator<SharedPreferences>();
   final _themeService = locator<ThemeService>();
   final _deviceService = locator<DeviceService>();
-  final _iap = InAppPurchaseConnection.instance;
+  final _purchaseService = locator<PurchaseService>();
 
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
   String get currentTheme => _prefsService.getString(kPrefKeyTheme) ?? 'Dark';
 
-  List<ProductDetails> _products = [];
-  List<PurchaseDetails> _purchases = [];
+  StreamSubscription _streamSubscription;
+  StreamSubscription get streamSubscription => _streamSubscription;
+  Stream<List<PurchaseDetails>> get stream =>
+      _purchaseService.purchaseUpdatedStream;
 
-  List<ProductDetails> get products => _products;
-  List<PurchaseDetails> get purchases => _purchases;
+  List<Product> _products = [];
+  List<Product> get products => _products;
 
   @override
   List<ReactiveServiceMixin> get reactiveServices =>
       [_themeService, _deviceService];
 
-  void init() async {
-    await _deviceService.init();
+  @override
+  Future initialise() async {
+    setError(null);
+    // We set busy manually as well because when notify listeners is called to clear error messages the
+    // ui is rebuilt and if you expect busy to be true it's not.
+    setBusy(true);
     notifyListeners();
+
+    await _deviceService.init();
+    _products = await runBusyFuture(_purchaseService.products);
+
+    _streamSubscription = stream.listen((data) async {
+      setBusy(true);
+      _products = await runBusyFuture(_purchaseService.products);
+      notifyListeners();
+    });
   }
 
-  void onChangeDeviceAdmin(bool value) async {
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
+  }
+
+  void onChangeDeviceAdmin(final bool value) async {
     await _deviceService.toggleDeviceAdmin(value);
     notifyListeners();
   }
 
-  void onChangeNotificationSettingsAccess(bool value) async {
+  void onChangeNotificationSettingsAccess(final bool value) async {
     await _deviceService.toggleNotificationSettingsAccess(value);
     notifyListeners();
   }
 
-  void updateTheme(String theme) {
+  void updateTheme(final String theme) {
     _prefsService.setString(kPrefKeyTheme, theme);
     _themeService.updateTheme(theme);
 
     notifyListeners();
   }
 
-  bool hasPurchased(ProductDetails product) {
-    PurchaseDetails purchase = _purchases.singleWhere(
-        (purchase) => purchase.productID == product.id,
-        orElse: () => null);
-
-    return purchase != null;
+  Future<void> buyProduct(final Product product) async {
+    await _purchaseService.buyProduct(product);
   }
 }

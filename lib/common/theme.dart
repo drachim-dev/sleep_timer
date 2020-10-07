@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class MyTheme {
-  final String id;
-  final String title;
+  final String id, title;
   final ThemeData theme;
 
-  const MyTheme(this.id, this.title, this.theme);
+  const MyTheme({this.id, this.title, this.theme});
 }
 
 const _lightFillColor = Colors.black;
@@ -21,19 +20,19 @@ const TextTheme _textTheme = TextTheme(
 
 List<MyTheme> themeList = [
   MyTheme(
-    "light_theme",
-    "Light",
-    _themeData(_lightColorScheme, _lightFocusColor),
+    id: "light_theme",
+    title: "Light",
+    theme: _themeData(_lightColorScheme, _lightFocusColor),
   ),
   MyTheme(
-    "dark_theme",
-    "Dark",
-    _themeData(_darkColorScheme, _darkFocusColor),
+    id: "dark_theme",
+    title: "Dark",
+    theme: _themeData(_darkColorScheme, _darkFocusColor),
   ),
   MyTheme(
-    "black_theme",
-    "Black",
-    _themeData(_blackColorScheme, _darkFocusColor),
+    id: "black_theme",
+    title: "Black",
+    theme: _themeData(_blackColorScheme, _darkFocusColor),
   )
 ];
 

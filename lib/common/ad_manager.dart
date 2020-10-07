@@ -27,9 +27,12 @@ class AdManager {
     }
   }
 
-  static String get testDeviceId {
+  static List<String> get testDeviceId {
     if (Platform.isAndroid) {
-      return FlutterConfig.get("ADMOB_TEST_DEVICE_ID");
+      final List<String> testIds = [];
+      testIds.add(FlutterConfig.get("ADMOB_TEST_DEVICE_ID_1"));
+      testIds.add(FlutterConfig.get("ADMOB_TEST_DEVICE_ID_2"));
+      return testIds;
     } else {
       throw new UnsupportedError("Unsupported platform");
     }

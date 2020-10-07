@@ -74,7 +74,7 @@ class Application {
     // load environment variables
     await FlutterConfig.loadEnvVariables();
 
-    // init inapp purchases
+    // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
 
     // ignore: await_only_futures

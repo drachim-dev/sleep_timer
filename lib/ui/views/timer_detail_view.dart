@@ -27,9 +27,8 @@ class TimerDetailView extends StatefulWidget {
 class _TimerDetailViewState extends State<TimerDetailView>
     with TickerProviderStateMixin {
   final targetingInfo = MobileAdTargetingInfo(
-      testDevices: AdManager.testDeviceId != null
-          ? <String>[AdManager.testDeviceId]
-          : null);
+      testDevices:
+          AdManager.testDeviceId != null ? AdManager.testDeviceId : null);
 
   final _controller = NativeAdmobController();
 
@@ -48,7 +47,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
     initAnimations();
     FirebaseAdMob.instance.initialize(appId: AdManager.appId);
-    _controller.setTestDeviceIds([AdManager.testDeviceId]);
+    _controller.setTestDeviceIds(AdManager.testDeviceId);
   }
 
   void initAnimations() {
@@ -86,7 +85,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
           return NotificationListener(
             onNotification: _onScrollNotification,
             child: Scaffold(
-              body: _buildyBody(theme),
+              body: _buildBody(theme),
               floatingActionButton: _buildFAB(theme),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
@@ -95,7 +94,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
         });
   }
 
-  Widget _buildyBody(final ThemeData theme) {
+  Widget _buildBody(final ThemeData theme) {
     return Column(
       children: [
         SizedBox(height: 56),
@@ -168,26 +167,58 @@ class _TimerDetailViewState extends State<TimerDetailView>
   List<Widget> _buildCommonActions(final ThemeData theme) {
     return [
       SwitchListTile(
-        secondary: Icon(Icons.music_note),
+        secondary: Icon(Icons.music_off_outlined),
         title: Text(model.timerModel.mediaAction.title),
         subtitle: Text(model.timerModel.mediaAction.description),
         value: model.timerModel.mediaAction.value,
         onChanged: model.onChangeMedia,
       ),
-      _buildAd(theme),
+      if (!model.isAdFree) _buildAd(theme),
       SwitchListTile(
-        secondary: Icon(Icons.wifi),
+        secondary: Icon(Icons.wifi_off_outlined),
         title: Text(model.timerModel.wifiAction.title),
         subtitle: Text(model.timerModel.wifiAction.description),
         value: model.timerModel.wifiAction.value,
         onChanged: model.onChangeWifi,
       ),
       SwitchListTile(
-          secondary: Icon(Icons.bluetooth),
+          secondary: Icon(Icons.bluetooth_disabled_outlined),
           title: Text(model.timerModel.bluetoothAction.title),
           subtitle: Text(model.timerModel.bluetoothAction.description),
           value: model.timerModel.bluetoothAction.value,
           onChanged: model.onChangeBluetooth),
+    ];
+  }
+
+  List<SwitchListTile> _buildMoreActions() {
+    return [
+      SwitchListTile(
+        secondary: Icon(Icons.tv_off_outlined),
+        title: Text(model.timerModel.screenAction.title),
+        subtitle: Text(model.timerModel.screenAction.description),
+        value: model.timerModel.screenAction.value,
+        onChanged: model.onChangeScreen,
+      ),
+      SwitchListTile(
+          secondary: Icon(Icons.volume_down_outlined),
+          title: Text(model.timerModel.volumeAction.title),
+          subtitle: Text(model.timerModel.volumeAction.description),
+          value: model.timerModel.volumeAction.value,
+          onChanged: model.onChangeVolume),
+      SwitchListTile(
+        secondary: Icon(Icons.lightbulb_outline),
+        title: Text(model.timerModel.lightAction.title),
+        subtitle: Text(model.timerModel.lightAction.description),
+        value: model.timerModel.lightAction.value,
+        onChanged: model.onChangeLight,
+      ),
+      SwitchListTile(
+        secondary: Icon(Icons.close_outlined),
+        title: Text(model.timerModel.appAction.title),
+        subtitle: Text(model.timerModel.appAction.description),
+        value: model.timerModel.appAction.value,
+        onChanged: model.onChangeApp,
+      ),
     ];
   }
 
@@ -213,38 +244,6 @@ class _TimerDetailViewState extends State<TimerDetailView>
         ),
       ),
     );
-  }
-
-  List<SwitchListTile> _buildMoreActions() {
-    return [
-      SwitchListTile(
-        secondary: Icon(Icons.tv),
-        title: Text(model.timerModel.screenAction.title),
-        subtitle: Text(model.timerModel.screenAction.description),
-        value: model.timerModel.screenAction.value,
-        onChanged: model.onChangeScreen,
-      ),
-      SwitchListTile(
-          secondary: Icon(Icons.volume_down),
-          title: Text(model.timerModel.volumeAction.title),
-          subtitle: Text(model.timerModel.volumeAction.description),
-          value: model.timerModel.volumeAction.value,
-          onChanged: model.onChangeVolume),
-      SwitchListTile(
-        secondary: Icon(Icons.lightbulb_outline),
-        title: Text(model.timerModel.lightAction.title),
-        subtitle: Text(model.timerModel.lightAction.description),
-        value: model.timerModel.lightAction.value,
-        onChanged: model.onChangeLight,
-      ),
-      SwitchListTile(
-        secondary: Icon(Icons.close),
-        title: Text(model.timerModel.appAction.title),
-        subtitle: Text(model.timerModel.appAction.description),
-        value: model.timerModel.appAction.value,
-        onChanged: model.onChangeApp,
-      ),
-    ];
   }
 
   _buildFAB(ThemeData theme) {

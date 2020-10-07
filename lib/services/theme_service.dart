@@ -13,8 +13,9 @@ class ThemeService with ReactiveServiceMixin {
   MyTheme get myTheme => _myTheme.value;
 
   void updateTheme(final String value) {
-    if (themeList.contains(value)) {
-      _myTheme.value = themeList.singleWhere((theme) => theme.title == value);
-    }
+    final MyTheme theme = themeList.firstWhere((theme) => theme.title == value,
+        orElse: () => null);
+
+    if (theme != null) _myTheme.value = theme;
   }
 }
