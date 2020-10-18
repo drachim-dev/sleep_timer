@@ -31,14 +31,22 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-project.ext.envConfigFiles = [
-        debug: ".env.dev",
-        release: ".env.prd",
-]
-apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
+// Default values
+def dartEnvironmentVariables = [
+        ADMOB_APP_ID: "",
+        APP_NAME: "Sleep Timer"
+];
+if (project.hasProperty('dart-defines')) {
+    dartEnvironmentVariables = dartEnvironmentVariables + project.property('dart-defines')
+            .split(',')
+            .collectEntries { entry ->
+                def pair = URLDecoder.decode(entry).split('=')
+                [(pair.first()): pair.last()]
+            }
+}
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -51,10 +59,12 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "dr.achim.sleep_timer"
-        minSdkVersion 23
-        targetSdkVersion 29
+        minSdkVersion 24
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders.ADMOB_APP_ID = dartEnvironmentVariables.ADMOB_APP_ID
+        manifestPlaceholders.APP_NAME = dartEnvironmentVariables.APP_NAME
     }
 
     signingConfigs {

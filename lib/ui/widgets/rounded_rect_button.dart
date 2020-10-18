@@ -13,9 +13,13 @@ class RoundedRectButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return FlatButton(
-        padding: const EdgeInsets.all(24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    final ButtonStyle buttonStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.all(24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    );
+
+    return TextButton(
+        style: buttonStyle,
         child: Text(title, style: theme.textTheme.headline5),
         onPressed: onPressed);
   }

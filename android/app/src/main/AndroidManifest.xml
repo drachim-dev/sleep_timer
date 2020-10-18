@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -13,7 +14,8 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:label="@string/APP_NAME"
+        android:name="io.flutter.app.FlutterApplication"
+        android:label="${APP_NAME}"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round">
 
@@ -46,9 +48,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <service android:name=".NotificationService"
+                 android:exported="false" />
         <!-- Notification Broadcast Receiver -->
         <receiver android:name=".NotificationReceiver" />
-        <receiver android:name="dr.achim.device_functions.NotificationReceiver" />
         <!-- Device Admin -->
         <receiver
             android:name= ".DeviceAdmin"
@@ -95,7 +98,7 @@
         <!-- Firebase AdMob Application ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/ADMOB_APP_ID"/>
+            android:value="${ADMOB_APP_ID}"/>
 
     </application>
 

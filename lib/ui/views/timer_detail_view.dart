@@ -270,7 +270,11 @@ class _TimerDetailViewState extends State<TimerDetailView>
               model.pauseTimer();
             } else {
               _fabAnimController.reverse();
-              model.startTimer();
+
+              if(!model.isStarting) {
+                model.startTimer();
+              }
+
             }
           }),
     );

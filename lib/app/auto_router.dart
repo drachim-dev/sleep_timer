@@ -6,7 +6,7 @@ import 'package:sleep_timer/ui/views/timer_detail_view.dart';
 
 @MaterialAutoRouter(
   routes: <AutoRoute>[
-    MaterialRoute(page: HomeView, initial: true),
+    MaterialRoute(page: HomeView),
     MaterialRoute(page: SettingsView),
     MaterialRoute(page: TimerDetailView),
     MaterialRoute(page: AlarmDetailView),

@@ -1,15 +1,16 @@
 import 'dart:ui';
 
-import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:device_functions/device_functions.dart';
+import 'package:device_functions/device_functions_old.dart';
+import 'package:device_functions/device_functions_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_config/flutter_config.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
-import 'package:sleep_timer/ui/views/home_view.dart';
+import 'package:sleep_timer/messages_generated.dart';
+import 'package:sleep_timer/platform_impl.dart';
+import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -30,13 +31,18 @@ Future<void> main() async {
         ? ErrorWidget(details.stack)
         : SingleChildScrollView(child: ErrorWidget(details.stack));
   };
-
-  runApp(MyApp());
+  runApp(MyApp(initialRoute: Routes.homeView));
 }
 
 class MyApp extends StatelessWidget {
+  final String initialRoute;
+  
+  MyApp({this.initialRoute});
+  
   @override
   Widget build(BuildContext context) {
+    print(this.initialRoute);
+    
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
         builder: (context, model, child) {
@@ -45,7 +51,7 @@ class MyApp extends StatelessWidget {
             title: 'Sleep timer',
             navigatorKey: locator<NavigationService>().navigatorKey,
             onGenerateRoute: AutoRouter(),
-            home: HomeView(),
+            initialRoute: initialRoute ?? Routes.homeView,
             debugShowCheckedModeBanner: false,
           );
         });
@@ -71,52 +77,37 @@ class Application {
   static init({Function onCallBack}) async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // load environment variables
-    await FlutterConfig.loadEnvVariables();
-
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
 
     // ignore: await_only_futures
     await setupLocator();
 
-    AndroidAlarmManager.initialize();
-    _initMethodChannel();
-    DeviceFunctions.init(onDeviceFunctionsCallback);
-  }
+    // initialize DeviceFunctionsPlugin for callback
+    final CallbackHandle deviceFunctionsCallback =
+        PluginUtilities.getCallbackHandle(onDeviceFunctionsCallback);
+    DeviceFunctionsPlatform.getInstance().init(deviceFunctionsCallback.toRawHandle());
 
-  static _initMethodChannel() async {
-    final CallbackHandle callback =
-        PluginUtilities.getCallbackHandle(onNativeSideCallback);
-    kMethodChannel.invokeMethod(
-        'initMainActivityEntry', callback.toRawHandle());
+    // initialize PlatformChannel for callback
+    final CallbackHandle sleepTimerCallback =
+    PluginUtilities.getCallbackHandle(onNativeSideCallback);
+    SleepTimerPlatform.getInstance().init(sleepTimerCallback.toRawHandle());
+
+    // setup callback even when activity is destroyed
+    FlutterTimerApi.setup(FlutterApiHandler(onNativeSideCallback));
   }
 }
 
-void onNativeSideCallback() {
+void onNativeSideCallback() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  kMethodChannel.setMethodCallHandler((MethodCall call) async {
-    print('On Dart side: ${call.method}');
-
-    switch (call.method) {
-      case "updateWidget":
-        final result = 7.0;
-        final id = call.arguments;
-
-        return {
-          // Pass back the id of the widget so we can update it later
-          'id': id,
-          'value': result,
-        };
-      default:
-        throw MissingPluginException('notImplemented');
-    }
-  });
+  print('onNativeSideCallback');
 }
 
 void onDeviceFunctionsCallback() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  print('onDeviceFunctionsCallback');
 
   DeviceFunctions.channel.setMethodCallHandler((MethodCall call) async {
     print('On Dart side2: ${call.method}');

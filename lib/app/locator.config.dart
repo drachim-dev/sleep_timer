@@ -15,6 +15,7 @@ import '../services/theme_service.dart';
 import '../services/third_party_services_module.dart';
 import '../model/timer_model.dart';
 import '../services/timer_service.dart';
+import '../common/timer_service_manager.dart';
 
 /// adds generated dependencies
 /// to the provided [GetIt] instance
@@ -36,6 +37,7 @@ Future<GetIt> $initGetIt(
   gh.lazySingleton<ThemeService>(() => ThemeService());
   gh.factoryParam<TimerService, TimerModel, dynamic>(
       (timerModel, _) => TimerService(timerModel));
+  gh.lazySingleton<TimerServiceManager>(() => TimerServiceManager());
   return get;
 }
 

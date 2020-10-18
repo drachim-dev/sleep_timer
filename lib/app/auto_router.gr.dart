@@ -16,7 +16,7 @@ import '../ui/views/settings_view.dart';
 import '../ui/views/timer_detail_view.dart';
 
 class Routes {
-  static const String homeView = '/';
+  static const String homeView = '/home-view';
   static const String settingsView = '/settings-view';
   static const String timerDetailView = '/timer-detail-view';
   static const String alarmDetailView = '/alarm-detail-view';

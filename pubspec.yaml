@@ -23,19 +23,19 @@ environment:
 dependencies:
   stacked: ^1.7.6
   stacked_services: ^0.5.4+4
-  get_it: ^4.0.4
+  get_it: ^5.0.1
   injectable: 
   observable_ish:
   provider: ^4.3.2+2
-  shared_preferences: '>=0.5.10 <2.0.0'
+  shared_preferences: '>=0.5.12 <2.0.0'
   auto_route: ^0.6.7
   sleek_circular_slider: ^1.1.0
   preferences: ^5.2.1
   android_alarm_manager: '>=0.4.5+14 <2.0.0'
-  firebase_admob: ^0.10.0+1
+  firebase_admob: ^0.10.0+2
   flutter_native_admob: ^2.1.0+3
-  in_app_purchase: ^0.3.4+10
-  flutter_config: ^1.0.7
+  in_app_purchase: ^0.3.4+12
+  uuid: ^2.2.2
   device_functions:
     path: ../device_functions/
 
@@ -51,6 +51,7 @@ dev_dependencies:
   auto_route_generator:
   injectable_generator:
   build_runner:
+  pigeon:
   flutter_test:
     sdk: flutter
 

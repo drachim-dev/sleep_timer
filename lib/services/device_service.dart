@@ -4,10 +4,15 @@ import 'package:injectable/injectable.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
+import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
+import 'package:device_functions/device_functions_platform_interface.dart';
 
 @lazySingleton
 class DeviceService with ReactiveServiceMixin {
+  final DeviceFunctionsPlatform _deviceFunctionsPlatform =
+      DeviceFunctionsPlatform.getInstance();
+
   DeviceService() {
     listenToReactiveValues([_deviceAdmin, _notificationSettingsAccess]);
   }
@@ -23,6 +28,26 @@ class DeviceService with ReactiveServiceMixin {
         await kMethodChannel.invokeMethod("isDeviceAdminActive");
     _notificationSettingsAccess.value =
         await kMethodChannel.invokeMethod("isNotificationSettingsAccessActive");
+  }
+
+  Future<bool> toggleMedia(final bool enable) {
+    return _deviceFunctionsPlatform.toggleMedia(enable);
+  }
+
+  Future<bool> toggleWifi(final bool enable) {
+    return _deviceFunctionsPlatform.toggleWifi(enable);
+  }
+
+  Future<bool> toggleBluetooth(final bool enable) {
+    return _deviceFunctionsPlatform.toggleBluetooth(enable);
+  }
+
+  Future<bool> toggleScreen(final bool enable) {
+    return _deviceFunctionsPlatform.toggleScreen(enable);
+  }
+
+  Future<int> setVolume(final int level, final int maxIndex) {
+    return _deviceFunctionsPlatform.setVolume(level, maxIndex);
   }
 
   Future<void> toggleDeviceAdmin(bool value) async {
@@ -46,43 +71,27 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<bool> showRunningNotification(
-      {@required int initialTime, @required int remainingTime}) async {
-    try {
-      bool success =
-          await kMethodChannel.invokeMethod("showRunningNotification", {
-        "id": kNotificationId,
-        "title": "Sleep timer running",
-        "subtitle":
-            "Timer set for ${Utils.secondsToString(initialTime, trimTrailingZeros: true)} minutes",
-        "seconds": remainingTime,
-        "actionTitle1": "Pause",
-        "actionTitle2": "+5",
-        "actionTitle3": "+20",
-      });
-      return success;
-    } on PlatformException catch (e) {
-      print(e.message);
-      return false;
-    }
+      {@required final String timerId,
+      @required final int duration,
+      @required final int remainingTime}) async {
+
+    return SleepTimerPlatform.getInstance().showRunningNotification(
+        timerId: timerId,
+        title: "Sleep timer running",
+        description: "Timer set for ${Utils.secondsToString(duration, trimTrailingZeros: true)} minutes",
+        actions: ["Pause", "+5", "+20"],
+        duration: duration,
+        remainingTime: remainingTime);
   }
 
-  Future<bool> showPauseNotification(int remainingTime) async {
-    try {
-      bool success =
-          await kMethodChannel.invokeMethod("showPauseNotification", {
-        "id": kNotificationId,
-        "title": "Sleep timer pausing",
-        "subtitle":
-            "Time left: ${Utils.secondsToString(remainingTime, trimTrailingZeros: true)}",
-        "seconds": remainingTime,
-        "actionTitle1": "Cancel",
-        "actionTitle2": "Continue",
-      });
-      return success;
-    } on PlatformException catch (e) {
-      print(e.message);
-      return false;
-    }
+  Future<bool> showPauseNotification({@required final String timerId, @required final int remainingTime}) async {
+
+    return SleepTimerPlatform.getInstance().showPausingNotification(
+        timerId: timerId,
+        title: "Sleep timer pausing",
+        description: "Time left: ${Utils.secondsToString(remainingTime, trimTrailingZeros: true)}",
+        actions: ["Cancel", "Continue"],
+        remainingTime: remainingTime);
   }
 
   Future<bool> showElapsedNotification() async {
@@ -102,16 +111,7 @@ class DeviceService with ReactiveServiceMixin {
     }
   }
 
-  Future<bool> cancelNotification() async {
-    try {
-      bool success = await kMethodChannel.invokeMethod("cancelNotification", {
-        "id": kNotificationId,
-      });
-      return success;
-    } on PlatformException catch (e) {
-      print(e.message);
-      return false;
-    }
+  Future<bool> cancelNotification({@required final String timerId}) async {
+    return SleepTimerPlatform.getInstance().cancelNotification(timerId);
   }
-
 }
