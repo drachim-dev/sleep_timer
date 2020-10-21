@@ -1,8 +1,17 @@
 import 'package:injectable/injectable.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 
-@lazySingleton
 class TimerServiceManager {
+  static TimerServiceManager _instance;
+
+  static TimerServiceManager getInstance({name, age}) {
+    if (_instance == null) {
+      _instance = TimerServiceManager();
+      return _instance;
+    }
+    return _instance;
+  }
+
   Map<String, TimerService> _timerServices = {};
 
   TimerService getTimerService(final String id) {

@@ -7,6 +7,7 @@ import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:flutter_native_admob/native_admob_options.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -78,9 +79,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
     return ViewModelBuilder<TimerDetailViewModel>.reactive(
         viewModelBuilder: () => TimerDetailViewModel(widget.timer),
-        onModelReady: (model) {
-          this.model = model;
-        },
+        onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
           return NotificationListener(
             onNotification: _onScrollNotification,
@@ -95,42 +94,46 @@ class _TimerDetailViewState extends State<TimerDetailView>
   }
 
   Widget _buildBody(final ThemeData theme) {
-    return Column(
-      children: [
-        SizedBox(height: 56),
-        TimerSlider(
-            initialValue: model.remainingTime,
-            maxValue: model.maxTime,
-            hasHandle: false,
-            labelStyle: theme.textTheme.headline2.copyWith(
-              shadows: [Shadow(blurRadius: 5.0, color: Colors.white)],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(top: kVerticalPaddingBig),
+        child: Column(
+          children: [
+            TimerSlider(
+                initialValue: model.remainingTime,
+                maxValue: model.maxTime,
+                hasHandle: false,
+                labelStyle: theme.textTheme.headline2.copyWith(
+                  shadows: [Shadow(blurRadius: 5.0, color: Colors.white)],
+                ),
+                size: 200,
+                onUpdateLabel: (value) {
+                  return Utils.secondsToString(value.round(), spacing: true);
+                }),
+            SizedBox(height: 24),
+            _buildExtendTimeRow(),
+            Expanded(
+              child: ListView(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                children: [
+                  ExpansionTile(
+                      title: Text("Common actions"),
+                      initiallyExpanded: true,
+                      children: _buildCommonActions(theme)),
+                  ExpansionTile(
+                      title: Text("More"),
+                      initiallyExpanded: model.timerModel.actions.any((action) {
+                        return !action.common && action.value;
+                      }),
+                      children: _buildMoreActions()),
+                ],
+              ),
             ),
-            size: 200,
-            onUpdateLabel: (value) {
-              return Utils.secondsToString(value.round(), spacing: true);
-            }),
-        SizedBox(height: 24),
-        _buildExtendTimeRow(),
-        Expanded(
-          child: ListView(
-            controller: _scrollController,
-            shrinkWrap: true,
-            physics: ScrollPhysics(),
-            children: [
-              ExpansionTile(
-                  title: Text("Common actions"),
-                  initiallyExpanded: true,
-                  children: _buildCommonActions(theme)),
-              ExpansionTile(
-                  title: Text("More"),
-                  initiallyExpanded: model.timerModel.actions.any((action) {
-                    return !action.common && action.value;
-                  }),
-                  children: _buildMoreActions()),
-            ],
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

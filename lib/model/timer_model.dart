@@ -1,4 +1,6 @@
-import 'package:uuid/uuid.dart';
+import 'dart:math';
+
+import 'package:sleep_timer/common/utils.dart';
 
 import 'action_model.dart';
 
@@ -8,7 +10,7 @@ class TimerModel {
   final List<ActionModel> _actions;
 
   TimerModel(this._initialTimeInSeconds, this._actions)
-      : this._id = Uuid().v4();
+      : this._id = Utils.random.nextInt(pow(2, 31)).toString();
 
   String get id => _id;
 

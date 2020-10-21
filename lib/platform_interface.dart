@@ -26,6 +26,10 @@ abstract class SleepTimerPlatform {
         @required final String description,
         @required final List<String> actions,
         @required final int remainingTime});
-  Future<bool> showElapsedNotification(final String timerId);
+  Future<bool> showElapsedNotification(
+      {@required final String timerId,
+        @required final String title,
+        @required final String description,
+        @required final List<String> actions});
   Future<bool> cancelNotification(final String timerId);
 }

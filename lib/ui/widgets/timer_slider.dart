@@ -51,7 +51,7 @@ class TimerSlider extends StatelessWidget {
             customWidths: CustomSliderWidths(
               trackWidth: 15,
               progressBarWidth: 4,
-              handlerSize: hasHandle ? 10 : 0,
+              handlerSize: hasHandle ? 12 : 0,
               shadowWidth: shadowWidth,
             ),
             startAngle: 270,

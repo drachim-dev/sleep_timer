@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/navigation_item_model.dart';
 import 'package:sleep_timer/ui/views/alarm_view.dart';
 import 'package:sleep_timer/ui/views/timer_view.dart';
@@ -71,10 +72,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           return Scaffold(
             appBar: _buildAppBar(theme),
             body: _buildBody(),
-            bottomNavigationBar: _buildBottomNavigationBar(),
-            floatingActionButton: _buildFAB(),
+            // bottomNavigationBar: _buildBottomNavigationBar(),
+            floatingActionButton: _buildFAB(theme),
             floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
+                FloatingActionButtonLocation.centerFloat,
           );
         });
   }
@@ -108,7 +109,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         index: model.currentIndex,
         children: _navItems.map((item) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 8),
+            padding: const EdgeInsets.symmetric(
+                vertical: kVerticalPaddingBig,
+                horizontal: kHorizontalPaddingSmall),
             child: item.page,
           );
         }).toList());
@@ -139,8 +142,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildFAB() {
+  Widget _buildFAB(final ThemeData theme) {
     final NavigationModel item = _navItems[model.currentIndex];
+    final Color foregroundColor = Colors.white;
+
+    final TextStyle textStyle =
+        theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -149,10 +156,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         transitionBuilder: (Widget child, Animation<double> animation) {
           return ScaleTransition(child: child, scale: animation);
         },
-        child: FloatingActionButton(
+        child: FloatingActionButton.extended(
           key: ValueKey(item.title),
           onPressed: () => item.controller.onClickFAB(),
-          child: item.fabIcon,
+          icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
+          label: Text("Go to sleep", style: textStyle),
+          // child: item.fabIcon,
         ),
       ),
     );

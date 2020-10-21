@@ -31,11 +31,9 @@ dependencies:
   auto_route: ^0.6.7
   sleek_circular_slider: ^1.1.0
   preferences: ^5.2.1
-  android_alarm_manager: '>=0.4.5+14 <2.0.0'
   firebase_admob: ^0.10.0+2
   flutter_native_admob: ^2.1.0+3
-  in_app_purchase: ^0.3.4+12
-  uuid: ^2.2.2
+  in_app_purchase: ^0.3.4+15
   device_functions:
     path: ../device_functions/
 

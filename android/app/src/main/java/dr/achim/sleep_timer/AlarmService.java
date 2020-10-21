@@ -1,10 +1,12 @@
 package dr.achim.sleep_timer;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
@@ -14,18 +16,17 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import dr.achim.sleep_timer.Messages.*;
+
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
 import io.flutter.Log;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.FlutterEngineCache;
-import io.flutter.embedding.engine.dart.DartExecutor;
-import io.flutter.view.FlutterCallbackInformation;
-import io.flutter.view.FlutterMain;
 
-public class NotificationService extends Service {
-    private static final String TAG = NotificationService.class.toString();
+public class AlarmService extends Service {
+    private static final String TAG = AlarmService.class.toString();
 
     private static final String NOTIFICATION_CHANNEL_ID = "0";
     private static final int NOTIFICATION_ID = 1;
@@ -38,6 +39,9 @@ public class NotificationService extends Service {
     private static final int REQUEST_CODE_CANCEL_REQUEST = 310;
     private static final int REQUEST_CODE_EXTEND_5 = 510;
     private static final int REQUEST_CODE_EXTEND_20 = 520;
+    private static final int REQUEST_CODE_ELAPSE_NOTIFICATION = 600;
+    private static final int REQUEST_CODE_RESTART_REQUEST = 250;
+    private static final int REQUEST_CODE_ALARM = 700;
 
     public static final String ACTION_START = "ACTION_START";
     public static final String ACTION_CONTINUE_REQUEST = "ACTION_CONTINUE";
@@ -47,8 +51,11 @@ public class NotificationService extends Service {
     public static final String ACTION_CANCEL_REQUEST = "ACTION_CANCEL_REQUEST";
     public static final String ACTION_CANCEL_NOTIFICATION = "ACTION_CANCEL_NOTIFICATION";
     public static final String ACTION_EXTEND = "ACTION_EXTEND";
+    public static final String ACTION_ELAPSE_NOTIFICATION = "ACTION_ELAPSE_NOTIFICATION";
+    public static final String ACTION_RESTART_REQUEST = "ACTION_RESTART_REQUEST";
 
     public static final String KEY_TIMER_ID = "KEY_TIMER_ID";
+    public static final String KEY_DURATION = "KEY_DURATION";
     public static final String KEY_OPEN_REQUEST = "KEY_OPEN_REQUEST";
     public static final String KEY_SHOW_NOTIFICATION = "KEY_SHOW_NOTIFICATION";
     public static final String KEY_CONTINUE_REQUEST = "KEY_CONTINUE_REQUEST";
@@ -57,8 +64,17 @@ public class NotificationService extends Service {
     public static final String KEY_CANCEL_REQUEST = "KEY_CANCEL_REQUEST";
     public static final String KEY_CANCEL_NOTIFICATION= "KEY_CANCEL_NOTIFICATION";
     public static final String KEY_EXTEND_RESPONSE = "KEY_EXTEND_RESPONSE";
+    public static final String KEY_ELAPSE_NOTIFICATION = "KEY_ELAPSE_NOTIFICATION";
+    public static final String KEY_RESTART_REQUEST = "KEY_RESTART_REQUEST";
 
     private FlutterTimerApi flutterTimerApi;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        initNotificationChannel();
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -69,17 +85,29 @@ public class NotificationService extends Service {
             if(action != null) {
                 Log.wtf(TAG, action);
 
-                final HashMap<String,Object> hashMap;
+                final HashMap<String,Object> map;
                 switch (action) {
                 case ACTION_START:
+                    
                     showRunningNotification(intent);
+                    
+                    map = (HashMap) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
+                    if(map != null) {
+                        final ShowRunningNotificationRequest request = ShowRunningNotificationRequest.fromMap(map);
+                        final Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+                        alarmIntent.putExtra(KEY_TIMER_ID, request.getTimerId());
+                        final PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() + request.getRemainingTime() * 1000, pendingAlarmIntent);
+                    }
+
+                    
                     break;
 
                 case ACTION_CONTINUE_REQUEST:
-                    hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_CONTINUE_REQUEST);
-                    if(hashMap != null) {
-                        flutterTimerApi.onContinueRequest(ContinueRequest.fromMap(hashMap), reply -> {
-                        });
+                    map = (HashMap) intent.getSerializableExtra(KEY_CONTINUE_REQUEST);
+                    if(map != null) {
+                        flutterTimerApi.onContinueRequest(ContinueRequest.fromMap(map), reply -> {});
                     }
                     break;
 
@@ -88,35 +116,46 @@ public class NotificationService extends Service {
                     break;
 
                 case ACTION_PAUSE_REQUEST:
-                    hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_PAUSE_REQUEST);
-                    if(hashMap != null) {
-                        flutterTimerApi.onPauseRequest(PauseRequest.fromMap(hashMap), reply -> {
-                        });
+                    map = (HashMap) intent.getSerializableExtra(KEY_PAUSE_REQUEST);
+                    if(map != null) {
+                        flutterTimerApi.onPauseRequest(PauseRequest.fromMap(map), reply -> {});
                     }
                     break;
 
                 case ACTION_PAUSE_NOTIFICATION:
                     showPausingNotification(intent);
+                    stopForeground(false);
                     break;
 
                 case ACTION_CANCEL_REQUEST:
-                    hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_CANCEL_REQUEST);
-                    if(hashMap != null) {
-                        flutterTimerApi.onCancelRequest(CancelRequest.fromMap(hashMap), reply -> {
-                        });
+                    map = (HashMap) intent.getSerializableExtra(KEY_CANCEL_REQUEST);
+                    if(map != null) {
+                        flutterTimerApi.onCancelRequest(CancelRequest.fromMap(map), reply -> {});
                     }
                     break;
 
                 case ACTION_CANCEL_NOTIFICATION:
-                    stopForegroundService();
+                    stopForeground(true);
+                    stopSelf();
                     break;
 
                 case ACTION_EXTEND:
-                    hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_EXTEND_RESPONSE);
-                    if(hashMap != null) {
-                        final ExtendTimeResponse extendTimeResponse = ExtendTimeResponse.fromMap(hashMap);
-                        flutterTimerApi.onExtendTime(extendTimeResponse, reply -> {
-                        });
+                    map = (HashMap) intent.getSerializableExtra(KEY_EXTEND_RESPONSE);
+                    if(map != null) {
+                        final ExtendTimeResponse extendTimeResponse = ExtendTimeResponse.fromMap(map);
+                        flutterTimerApi.onExtendTime(extendTimeResponse, reply -> {});
+                    }
+                    break;
+
+                case ACTION_ELAPSE_NOTIFICATION:
+                    showElapsedNotification(intent);
+                    stopForeground(false);
+                    break;
+
+                case ACTION_RESTART_REQUEST:
+                    map = (HashMap) intent.getSerializableExtra(KEY_RESTART_REQUEST);
+                    if(map != null) {
+                        flutterTimerApi.onRestartRequest(RestartRequest.fromMap(map), reply -> {});
                     }
                     break;
             }}
@@ -128,13 +167,6 @@ public class NotificationService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    private void stopForegroundService() {
-        Log.d(TAG, "Stop foreground service.");
-
-        stopForeground(true);
-        stopSelf();
     }
 
     private void initNotificationChannel() {
@@ -149,11 +181,9 @@ public class NotificationService extends Service {
     }
 
     private void showRunningNotification(final Intent intent) {
-        final HashMap<String,Object> hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
-        if(hashMap != null) {
-            initNotificationChannel();
-
-            final ShowRunningNotificationRequest request = ShowRunningNotificationRequest.fromMap(hashMap);
+        final HashMap<String, Object> map = (HashMap) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
+        if(map != null) {
+            final ShowRunningNotificationRequest request = ShowRunningNotificationRequest.fromMap(map);
 
             final String timerId = request.getTimerId();
             final List<String> actions = request.getActions();
@@ -180,11 +210,9 @@ public class NotificationService extends Service {
     }
 
     private void showPausingNotification(final Intent intent) {
-        final HashMap<String,Object> hashMap = (HashMap<String, Object>) intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION);
-        if(hashMap != null) {
-            initNotificationChannel();
-
-            final ShowPausingNotificationRequest request = ShowPausingNotificationRequest.fromMap(hashMap);
+        final HashMap<String,Object> map = (HashMap) intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION);
+        if(map != null) {
+            final ShowPausingNotificationRequest request = ShowPausingNotificationRequest.fromMap(map);
 
             final String timerId = request.getTimerId();
             final List<String> actions = request.getActions();
@@ -202,7 +230,28 @@ public class NotificationService extends Service {
 
             startForeground(NOTIFICATION_ID, notification);
         }
+    }
 
+    private void showElapsedNotification(final Intent intent) {
+        final HashMap<String,Object> map = (HashMap) intent.getSerializableExtra(KEY_ELAPSE_NOTIFICATION);
+        if(map != null) {
+            final ShowElapsedNotificationRequest request = ShowElapsedNotificationRequest.fromMap(map);
+
+            final String timerId = request.getTimerId();
+            final List<String> actions = request.getActions();
+
+            Notification notification = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
+                    .setContentTitle(request.getTitle())
+                    .setContentText(request.getDescription())
+                    .setSmallIcon(R.drawable.ic_hourglass_full)
+                    .setShowWhen(false)
+                    .setUsesChronometer(false)
+                    .setContentIntent(createOpenIntent(timerId))
+                    .addAction(R.drawable.ic_baseline_replay_24, actions.get(0).toUpperCase(), createRestartRequestIntent(timerId))
+                    .build();
+
+            startForeground(NOTIFICATION_ID, notification);
+        }
     }
 
     private PendingIntent createOpenIntent(final String timerId) {
@@ -224,7 +273,7 @@ public class NotificationService extends Service {
     }
 
     private PendingIntent createContinueRequestIntent(final String timerId) {
-        final Intent intent = new Intent(this, NotificationService.class);
+        final Intent intent = new Intent(this, AlarmService.class);
         intent.setAction(ACTION_CONTINUE_REQUEST);
 
         final ContinueRequest request = new ContinueRequest();
@@ -239,7 +288,7 @@ public class NotificationService extends Service {
     }
 
     private PendingIntent createPauseRequestIntent(final String timerId) {
-        final Intent intent = new Intent(this, NotificationService.class);
+        final Intent intent = new Intent(this, AlarmService.class);
         intent.setAction(ACTION_PAUSE_REQUEST);
 
         final PauseRequest request = new PauseRequest();
@@ -254,7 +303,7 @@ public class NotificationService extends Service {
     }
 
     private PendingIntent createCancelRequestIntent(final String timerId) {
-        final Intent intent = new Intent(this, NotificationService.class);
+        final Intent intent = new Intent(this, AlarmService.class);
         intent.setAction(ACTION_CANCEL_REQUEST);
 
         final CancelNotificationResponse response = new CancelNotificationResponse();
@@ -270,7 +319,7 @@ public class NotificationService extends Service {
     }
 
     private PendingIntent createExtendTimeIntent(final String timerId, final int additionalTime, final int requestCode) {
-        final Intent intent = new Intent(this, NotificationService.class);
+        final Intent intent = new Intent(this, AlarmService.class);
         intent.setAction(ACTION_EXTEND);
 
         final ExtendTimeResponse response = new ExtendTimeResponse();
@@ -285,35 +334,30 @@ public class NotificationService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    private PendingIntent createRestartRequestIntent(final String timerId) {
+        final Intent intent = new Intent(this, AlarmService.class);
+        intent.setAction(ACTION_RESTART_REQUEST);
+
+        final RestartRequest request = new RestartRequest();
+        request.setTimerId(timerId);
+        intent.putExtra(KEY_RESTART_REQUEST, request.toMap());
+
+        return PendingIntent.getService(
+                this,
+                REQUEST_CODE_RESTART_REQUEST,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     private void initializeFlutter() {
         if (getApplicationContext() == null) {
             Log.e(TAG, "Context is null");
             return;
         }
 
-        FlutterEngine flutterEngine = FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID);
-        if (flutterEngine == null) {
-            Log.e(TAG, "FlutterEngine is null");
-            FlutterMain.startInitialization(getApplicationContext());
-            FlutterMain.ensureInitializationComplete(getApplicationContext(), new String[0]);
-
-            long handle = CallbackHelper.getRawHandle(getApplicationContext());
-            if (handle == CallbackHelper.NO_HANDLE) {
-                Log.w(TAG, "Couldn't update widget because there is no handle stored!");
-                return;
-            }
-
-            FlutterCallbackInformation callbackInfo = FlutterCallbackInformation.lookupCallbackInformation(handle);
-            // You could also use a hard coded value to save you from all
-            // the hassle with SharedPreferences, but alas when running your
-            // app in release mode this would fail.
-            String entryPointFunctionName = callbackInfo.callbackName;
-
-            // Instantiate a FlutterEngine.
-            flutterEngine = new FlutterEngine(getApplicationContext());
-            DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(FlutterMain.findAppBundlePath(), entryPointFunctionName);
-            flutterEngine.getDartExecutor().executeDartEntrypoint(entryPoint);
+        final FlutterEngine flutterEngine = FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID);
+        if(flutterEngine != null) {
+            flutterTimerApi = new FlutterTimerApi(flutterEngine.getDartExecutor().getBinaryMessenger());
         }
-        flutterTimerApi = new FlutterTimerApi(flutterEngine.getDartExecutor());
     }
 }

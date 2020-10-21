@@ -32,8 +32,7 @@
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+              android:resource="@style/NormalTheme" />
             <!-- Displays an Android View that continues showing the launch screen
                  Drawable until Flutter paints its first frame, then this splash
                  screen fades out. A splash screen is useful to avoid any visual
@@ -41,43 +40,32 @@
                  Flutter's first frame. -->
             <meta-data
               android:name="io.flutter.embedding.android.SplashScreenDrawable"
-              android:resource="@drawable/launch_background"
-              />
+              android:resource="@drawable/launch_background" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".NotificationService"
-                 android:exported="false" />
-        <!-- Notification Broadcast Receiver -->
-        <receiver android:name=".NotificationReceiver" />
+        <service
+            android:name=".AlarmService"
+            android:enabled="true"
+            android:exported="false" />
         <!-- Device Admin -->
         <receiver
-            android:name= ".DeviceAdmin"
-            android:permission= "android.permission.BIND_DEVICE_ADMIN" >
+            android:name="dr.achim.device_functions.DeviceAdmin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <meta-data
-                android:name= "android.app.device_admin"
-                android:resource= "@xml/device_admin_policies" />
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_policies" />
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
                 <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
             </intent-filter>
         </receiver>
         <!-- Android Alarm Manager -->
-        <service
-            android:name="io.flutter.plugins.androidalarmmanager.AlarmService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"/>
         <receiver
-            android:name="io.flutter.plugins.androidalarmmanager.AlarmBroadcastReceiver"
-            android:exported="false"/>
-        <receiver
-            android:name="io.flutter.plugins.androidalarmmanager.RebootBroadcastReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
+            android:name=".AlarmReceiver"
+            android:enabled="true" >
         </receiver>
         <!-- Timer Widget -->
         <receiver 
@@ -98,7 +86,7 @@
         <!-- Firebase AdMob Application ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${ADMOB_APP_ID}"/>
+            android:value="${ADMOB_APP_ID}" />
 
     </application>
 

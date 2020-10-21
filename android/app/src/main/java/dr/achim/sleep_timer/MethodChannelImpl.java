@@ -12,9 +12,6 @@ public class MethodChannelImpl implements HostTimerApi {
     private static final String TAG = MethodChannelImpl.class.toString();
     private final Context context;
 
-    private static final int REQUEST_CODE_ENABLE_ADMIN = 200;
-    private static final int REQUEST_CODE_NOTIF_SETTINGS_ACCESS = 300;
-
     public MethodChannelImpl(Context context) {
         this.context = context;
     }
@@ -36,9 +33,9 @@ public class MethodChannelImpl implements HostTimerApi {
         Log.wtf(TAG, "Request to show notification for timer with id " + timerId);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(context, NotificationService.class);
-            intent.setAction(NotificationService.ACTION_START);
-            intent.putExtra(NotificationService.KEY_SHOW_NOTIFICATION, arg.toMap());
+            Intent intent = new Intent(context, AlarmService.class);
+            intent.setAction(AlarmService.ACTION_START);
+            intent.putExtra(AlarmService.KEY_SHOW_NOTIFICATION, arg.toMap());
             context.startForegroundService(intent);
         }
 
@@ -57,9 +54,9 @@ public class MethodChannelImpl implements HostTimerApi {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(context, NotificationService.class);
-            intent.setAction(NotificationService.ACTION_PAUSE_NOTIFICATION);
-            intent.putExtra(NotificationService.KEY_PAUSE_NOTIFICATION, arg.toMap());
+            Intent intent = new Intent(context, AlarmService.class);
+            intent.setAction(AlarmService.ACTION_PAUSE_NOTIFICATION);
+            intent.putExtra(AlarmService.KEY_PAUSE_NOTIFICATION, arg.toMap());
             context.startForegroundService(intent);
         }
 
@@ -75,6 +72,13 @@ public class MethodChannelImpl implements HostTimerApi {
         if(timerId == null) {
             response.setSuccess(false);
             return response;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent intent = new Intent(context, AlarmService.class);
+            intent.setAction(AlarmService.ACTION_ELAPSE_NOTIFICATION);
+            intent.putExtra(AlarmService.KEY_ELAPSE_NOTIFICATION, arg.toMap());
+            context.startForegroundService(intent);
         }
 
         Log.wtf(TAG, "Request to show elapsed notification for timer with id " + timerId);
@@ -93,9 +97,9 @@ public class MethodChannelImpl implements HostTimerApi {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(context, NotificationService.class);
-            intent.setAction(NotificationService.ACTION_CANCEL_NOTIFICATION);
-            intent.putExtra(NotificationService.KEY_CANCEL_NOTIFICATION, arg.toMap());
+            Intent intent = new Intent(context, AlarmService.class);
+            intent.setAction(AlarmService.ACTION_CANCEL_NOTIFICATION);
+            intent.putExtra(AlarmService.KEY_CANCEL_NOTIFICATION, arg.toMap());
             context.startForegroundService(intent);
         }
 

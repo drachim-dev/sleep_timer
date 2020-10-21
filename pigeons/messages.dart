@@ -10,7 +10,7 @@ class ShowRunningNotificationRequest {
 
   List<String> actions;
 
-  /// The initial number of seconds the timer was set to.
+  /// The initial number of minutes the timer was set to.
   int duration;
 
   /// The number of seconds left for the timer.
@@ -29,6 +29,8 @@ class ShowPausingNotificationRequest {
 
 class ShowElapsedNotificationRequest {
   String timerId, title, description;
+
+  List<String> actions;
 }
 
 class ShowNotificationResponse {
@@ -68,6 +70,14 @@ class CancelRequest {
   String timerId;
 }
 
+class RestartRequest {
+  String timerId;
+}
+
+class AlarmRequest {
+  String timerId;
+}
+
 // Native methods
 @HostApi()
 abstract class HostTimerApi {
@@ -90,12 +100,14 @@ abstract class FlutterTimerApi {
   void onContinueRequest(ContinueRequest request);
   void onPauseRequest(PauseRequest request);
   void onCancelRequest(CancelRequest request);
+  void onRestartRequest(RestartRequest request);
   void onOpen(OpenRequest request);
+  void onAlarm(AlarmRequest request);
 }
 
 void configurePigeon(PigeonOptions opts) {
   opts.dartOut = 'lib/messages_generated.dart';
   opts.javaOut =
-      'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
+  'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
   opts.javaOptions.package = 'dr.achim.sleep_timer';
 }

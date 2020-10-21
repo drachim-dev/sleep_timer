@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -24,14 +22,14 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   TimerDetailViewModel(this._timerModel)
       : _timerService = locator<TimerService>(param1: _timerModel) {
 
-    locator<TimerServiceManager>().setTimerService(_timerService);
+    TimerServiceManager.getInstance().setTimerService(_timerService);
   }
 
   TimerModel get timerModel => _timerModel;
   int get initialTime => _timerModel.initialTimeInSeconds;
   int get remainingTime => _timerService.remainingTime;
-  int get maxTime =>
-      max(_timerModel.initialTimeInSeconds, _timerService.remainingTime);
+  int get maxTime => _timerService.maxTime;
+
   bool get isStarting => _isStarting;
   bool get isActive => _timerService.timer?.isActive ?? false;
 
@@ -42,8 +40,6 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> initialise() async {
     setBusy(true);
     notifyListeners();
-
-    AndroidAlarmManager.initialize();
 
     // Check for adFree in-app purchase
     final List<Product> products =

@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class CallbackHelper {
-    static String ENTRY_POINT_HELPER_PREF = "SLEEP_TIMER_CALLBACK_PREF";
-    static String CALLBACK_HANDLE_KEY = "SLEEP_TIMER_CALLBACK_KEY";
+    static final String ENTRY_POINT_HELPER_PREF = "SLEEP_TIMER_CALLBACK_PREF";
+    static final String CALLBACK_HANDLE_KEY = "SLEEP_TIMER_CALLBACK_KEY";
 
-    static Long NO_HANDLE = -1L;
+    static final Long NO_HANDLE = -1L;
 
     static void setHandle(Context context, Long handle) {
         final SharedPreferences.Editor editor= context.getSharedPreferences(

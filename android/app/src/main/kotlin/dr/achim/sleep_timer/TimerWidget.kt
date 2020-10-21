@@ -90,7 +90,7 @@ class TimerWidget : AppWidgetProvider(), MethodChannel.Result {
             // warnings in the log).
             GeneratedPluginRegistrant.registerWith(engine)
 
-            channel = MethodChannel(engine.dartExecutor.binaryMessenger, CHANNEL_NAME)
+            channel = MethodChannel(engine.dartExecutor.binaryMessenger, "dr.achim/time_widget")
         }
     }
 

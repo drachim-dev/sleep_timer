@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:device_functions/device_functions_old.dart';
-import 'package:device_functions/device_functions_platform_interface.dart';
+import 'package:device_functions/platform_impl.dart';
+import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -11,10 +10,13 @@ import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
 import 'package:sleep_timer/platform_interface.dart';
+import 'package:sleep_timer/services/device_service.dart';
+import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import 'app/locator.dart';
+import 'common/timer_service_manager.dart';
 import 'services/theme_service.dart';
 
 Future<void> main() async {
@@ -36,13 +38,13 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
-  
+
   MyApp({this.initialRoute});
-  
+
   @override
   Widget build(BuildContext context) {
     print(this.initialRoute);
-    
+
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
         builder: (context, model, child) {
@@ -83,18 +85,17 @@ class Application {
     // ignore: await_only_futures
     await setupLocator();
 
-    // initialize DeviceFunctionsPlugin for callback
-    final CallbackHandle deviceFunctionsCallback =
-        PluginUtilities.getCallbackHandle(onDeviceFunctionsCallback);
-    DeviceFunctionsPlatform.getInstance().init(deviceFunctionsCallback.toRawHandle());
-
     // initialize PlatformChannel for callback
     final CallbackHandle sleepTimerCallback =
-    PluginUtilities.getCallbackHandle(onNativeSideCallback);
+        PluginUtilities.getCallbackHandle(onNativeSideCallback);
     SleepTimerPlatform.getInstance().init(sleepTimerCallback.toRawHandle());
 
     // setup callback even when activity is destroyed
-    FlutterTimerApi.setup(FlutterApiHandler(onNativeSideCallback));
+    FlutterTimerApi.setup(FlutterApiHandler(callback: onNativeSideCallback, alarmCallback: onAlarmCallback));
+
+    FlutterDeviceFunctionsApi.setup(DeviceFunctionsApiHandler(
+        onDeviceAdminCallback: onDeviceAdminCallback,
+        onNotificationAccessCallback: onNotificationAccessCallback));
   }
 }
 
@@ -104,23 +105,33 @@ void onNativeSideCallback() async {
   print('onNativeSideCallback');
 }
 
-void onDeviceFunctionsCallback() async {
+void onAlarmCallback(final String timerId) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('onDeviceFunctionsCallback');
+  print('onAlarmCallback for $timerId');
 
-  DeviceFunctions.channel.setMethodCallHandler((MethodCall call) async {
-    print('On Dart side2: ${call.method}');
+  final _timerService = TimerServiceManager.getInstance().getTimerService(timerId);
+  _timerService.handleAlarm();
+}
 
-    switch (call.method) {
-      case "NOTIF_ACTION_RESTART":
-        final id = call.arguments;
-        print("Restart timer");
-        return {
-          'id': id,
-        };
-      default:
-        throw MissingPluginException('notImplemented');
-    }
-  });
+void onNativeSideDeviceFunctionsCallback() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  print('onNativeSideDeviceFunctionsCallback');
+}
+
+void onDeviceAdminCallback(final bool granted) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  print('onDeviceAdminGrantedCallback');
+  final _deviceService = locator<DeviceService>();
+  _deviceService.setDeviceAdmin(granted);
+}
+
+void onNotificationAccessCallback(final bool granted) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  print('onNotificationAccessGrantedCallback');
+  final _deviceService = locator<DeviceService>();
+  _deviceService.setNotificationAccess(granted);
 }

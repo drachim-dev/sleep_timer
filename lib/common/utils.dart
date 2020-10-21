@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class Utils {
   static String secondsToString(int seconds,
       {spacing = false, trimTrailingZeros = false}) {
@@ -11,4 +13,6 @@ class Utils {
         ? minutes
         : "$minutes$space:$space${secondsRemainder.toString().padLeft(2, '0')}";
   }
+
+  static var random = Random();
 }
