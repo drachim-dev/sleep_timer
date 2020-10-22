@@ -11,6 +11,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
+import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
 
@@ -125,7 +126,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
                   ExpansionTile(
                       title: Text("More"),
                       initiallyExpanded: model.timerModel.actions.any((action) {
-                        return !action.common && action.value;
+                        return !action.common && action.enabled;
                       }),
                       children: _buildMoreActions()),
                 ],
@@ -173,7 +174,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
         secondary: Icon(Icons.music_off_outlined),
         title: Text(model.timerModel.mediaAction.title),
         subtitle: Text(model.timerModel.mediaAction.description),
-        value: model.timerModel.mediaAction.value,
+        value: model.timerModel.mediaAction.enabled,
         onChanged: model.onChangeMedia,
       ),
       if (!model.isAdFree) _buildAd(theme),
@@ -181,45 +182,50 @@ class _TimerDetailViewState extends State<TimerDetailView>
         secondary: Icon(Icons.wifi_off_outlined),
         title: Text(model.timerModel.wifiAction.title),
         subtitle: Text(model.timerModel.wifiAction.description),
-        value: model.timerModel.wifiAction.value,
+        value: model.timerModel.wifiAction.enabled,
         onChanged: model.onChangeWifi,
       ),
       SwitchListTile(
           secondary: Icon(Icons.bluetooth_disabled_outlined),
           title: Text(model.timerModel.bluetoothAction.title),
           subtitle: Text(model.timerModel.bluetoothAction.description),
-          value: model.timerModel.bluetoothAction.value,
+          value: model.timerModel.bluetoothAction.enabled,
           onChanged: model.onChangeBluetooth),
     ];
   }
 
-  List<SwitchListTile> _buildMoreActions() {
+  List<Widget> _buildMoreActions() {
     return [
-      SwitchListTile(
-        secondary: Icon(Icons.tv_off_outlined),
-        title: Text(model.timerModel.screenAction.title),
-        subtitle: Text(model.timerModel.screenAction.description),
-        value: model.timerModel.screenAction.value,
-        onChanged: model.onChangeScreen,
+      if (model.deviceAdmin)
+        SwitchListTile(
+          secondary: Icon(Icons.tv_off_outlined),
+          title: Text(model.timerModel.screenAction.title),
+          subtitle: Text(model.timerModel.screenAction.description),
+          value: model.timerModel.screenAction.enabled,
+          onChanged: model.onChangeScreen,
+        ),
+      ListTile(
+        leading: Icon(Icons.volume_down_outlined),
+        title: Text(model.timerModel.volumeAction.title),
+        subtitle: Text(model.timerModel.volumeAction.description),
+        onTap: () => _showVolumeLevelPicker(),
+        trailing: Switch(
+          value: model.timerModel.volumeAction.enabled,
+          onChanged: model.onChangeVolume,
+        ),
       ),
-      SwitchListTile(
-          secondary: Icon(Icons.volume_down_outlined),
-          title: Text(model.timerModel.volumeAction.title),
-          subtitle: Text(model.timerModel.volumeAction.description),
-          value: model.timerModel.volumeAction.value,
-          onChanged: model.onChangeVolume),
       SwitchListTile(
         secondary: Icon(Icons.lightbulb_outline),
         title: Text(model.timerModel.lightAction.title),
         subtitle: Text(model.timerModel.lightAction.description),
-        value: model.timerModel.lightAction.value,
+        value: model.timerModel.lightAction.enabled,
         onChanged: model.onChangeLight,
       ),
       SwitchListTile(
         secondary: Icon(Icons.close_outlined),
         title: Text(model.timerModel.appAction.title),
         subtitle: Text(model.timerModel.appAction.description),
-        value: model.timerModel.appAction.value,
+        value: model.timerModel.appAction.enabled,
         onChanged: model.onChangeApp,
       ),
     ];
@@ -249,6 +255,19 @@ class _TimerDetailViewState extends State<TimerDetailView>
     );
   }
 
+  void _showVolumeLevelPicker() async {
+    final volumeLevel = await showDialog<double>(
+        context: context,
+        builder: (context) => SliderDialog(
+            title: "Set volume",
+            initialValue: model.timerModel.volumeAction.value,
+            maxValue: 10));
+
+    if (volumeLevel != null) {
+      model.onChangeVolumeLevel(volumeLevel);
+    }
+  }
+
   _buildFAB(ThemeData theme) {
     final Color foregroundColor = Colors.white;
     final TextStyle textStyle =
@@ -274,10 +293,9 @@ class _TimerDetailViewState extends State<TimerDetailView>
             } else {
               _fabAnimController.reverse();
 
-              if(!model.isStarting) {
+              if (!model.isStarting) {
                 model.startTimer();
               }
-
             }
           }),
     );

@@ -78,11 +78,12 @@ class TimerService with ReactiveServiceMixin {
   Future<void> handleAlarm() async {
     print("handleAlarm()");
 
-    if (timerModel.mediaAction.value) _deviceService.toggleMedia(false);
-    if (timerModel.wifiAction.value) _deviceService.toggleWifi(false);
-    if (timerModel.bluetoothAction.value) _deviceService.toggleBluetooth(false);
-    if (timerModel.screenAction.value) _deviceService.toggleScreen(false);
-    if (timerModel.volumeAction.value) _deviceService.setVolume(1, 10);
+    if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
+    if (timerModel.wifiAction.enabled) _deviceService.toggleWifi(false);
+    if (timerModel.bluetoothAction.enabled) _deviceService.toggleBluetooth(false);
+    if (timerModel.screenAction.enabled && _deviceService.deviceAdmin)
+      _deviceService.toggleScreen(false);
+    if (timerModel.volumeAction.enabled) _deviceService.setVolume(timerModel.volumeAction.value.floor(), 10);
 
     _deviceService.showElapsedNotification(timerModel: timerModel);
   }

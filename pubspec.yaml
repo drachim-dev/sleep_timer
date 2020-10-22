@@ -27,9 +27,9 @@ dependencies:
   injectable: 
   observable_ish:
   provider: ^4.3.2+2
-  shared_preferences: '>=0.5.12 <2.0.0'
-  auto_route: ^0.6.7
-  sleek_circular_slider: ^1.1.0
+  shared_preferences: '>=0.5.12+2 <2.0.0'
+  auto_route: ^0.6.9
+  sleek_circular_slider: ^1.2.0+web
   preferences: ^5.2.1
   firebase_admob: ^0.10.0+2
   flutter_native_admob: ^2.1.0+3

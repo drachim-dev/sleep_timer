@@ -8,3 +8,5 @@ const String kPrefKeyTheme = 'pref_theme';
 const String kProductRemoveAds = "remove_ads";
 const String kProductDonation = "donate";
 const Set<String> kProducts = {kProductRemoveAds, kProductDonation};
+
+const String kKeyVolumeLevel = "PREF_KEY_VOLUME_LEVEL";

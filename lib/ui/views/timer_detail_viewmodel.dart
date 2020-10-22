@@ -7,6 +7,7 @@ import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/model/timer_model.dart';
+import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
@@ -16,12 +17,13 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   final TimerModel _timerModel;
   final _prefsService = locator<SharedPreferences>();
   final _purchaseService = locator<PurchaseService>();
+  final _deviceService = locator<DeviceService>();
 
   bool _isStarting = true;
+  bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
 
   TimerDetailViewModel(this._timerModel)
       : _timerService = locator<TimerService>(param1: _timerModel) {
-
     TimerServiceManager.getInstance().setTimerService(_timerService);
   }
 
@@ -57,19 +59,21 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
 
   Future<void> initActionPreferences() async {
     _prefsService.setBool(
-        ActionType.MEDIA.toString(), _timerModel.mediaAction.value);
+        ActionType.MEDIA.toString(), _timerModel.mediaAction.enabled);
     _prefsService.setBool(
-        ActionType.WIFI.toString(), _timerModel.wifiAction.value);
+        ActionType.WIFI.toString(), _timerModel.wifiAction.enabled);
     _prefsService.setBool(
-        ActionType.BLUETOOTH.toString(), _timerModel.bluetoothAction.value);
+        ActionType.BLUETOOTH.toString(), _timerModel.bluetoothAction.enabled);
     _prefsService.setBool(
-        ActionType.SCREEN.toString(), _timerModel.screenAction.value);
+        ActionType.SCREEN.toString(), _timerModel.screenAction.enabled);
     _prefsService.setBool(
-        ActionType.VOLUME.toString(), _timerModel.volumeAction.value);
+        ActionType.VOLUME.toString(), _timerModel.volumeAction.enabled);
+    _prefsService.setDouble(
+        _timerModel.volumeAction.key, _timerModel.volumeAction.value);
     _prefsService.setBool(
-        ActionType.LIGHT.toString(), _timerModel.lightAction.value);
+        ActionType.LIGHT.toString(), _timerModel.lightAction.enabled);
     _prefsService.setBool(
-        ActionType.APP.toString(), _timerModel.appAction.value);
+        ActionType.APP.toString(), _timerModel.appAction.enabled);
   }
 
   Future<void> startTimer(
@@ -88,43 +92,49 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
     _timerService.extendTime(seconds);
   }
 
-  void onChangeMedia(bool value) {
-    _timerModel.mediaAction.value = value;
-    _prefsService.setBool(ActionType.MEDIA.toString(), value);
+  void onChangeMedia(bool enabled) {
+    _timerModel.mediaAction.enabled = enabled;
+    _prefsService.setBool(ActionType.MEDIA.toString(), enabled);
     notifyListeners();
   }
 
-  void onChangeWifi(bool value) {
-    _timerModel.wifiAction.value = value;
-    _prefsService.setBool(ActionType.WIFI.toString(), value);
+  void onChangeWifi(bool enabled) {
+    _timerModel.wifiAction.enabled = enabled;
+    _prefsService.setBool(ActionType.WIFI.toString(), enabled);
     notifyListeners();
   }
 
-  void onChangeBluetooth(bool value) {
-    _timerModel.bluetoothAction.value = value;
-    _prefsService.setBool(ActionType.BLUETOOTH.toString(), value);
+  void onChangeBluetooth(bool enabled) {
+    _timerModel.bluetoothAction.enabled = enabled;
+    _prefsService.setBool(ActionType.BLUETOOTH.toString(), enabled);
     notifyListeners();
   }
 
-  void onChangeScreen(bool value) {
-    _timerModel.screenAction.value = value;
-    _prefsService.setBool(ActionType.SCREEN.toString(), value);
+  void onChangeScreen(bool enabled) {
+    _timerModel.screenAction.enabled = enabled;
+    _prefsService.setBool(ActionType.SCREEN.toString(), enabled);
     notifyListeners();
   }
 
-  void onChangeVolume(bool value) {
+  void onChangeVolume(bool enabled) {
+    _timerModel.volumeAction.enabled = enabled;
+    _prefsService.setBool(ActionType.VOLUME.toString(), enabled);
+    notifyListeners();
+  }
+
+  void onChangeVolumeLevel(double value) {
     _timerModel.volumeAction.value = value;
-    _prefsService.setBool(ActionType.VOLUME.toString(), value);
+    _prefsService.setDouble(_timerModel.volumeAction.key, value);
     notifyListeners();
   }
 
-  void onChangeLight(bool value) {
-    _timerModel.lightAction.value = value;
+  void onChangeLight(bool enabled) {
+    _timerModel.lightAction.enabled = enabled;
     notifyListeners();
   }
 
-  void onChangeApp(bool value) {
-    _timerModel.appAction.value = value;
+  void onChangeApp(bool enabled) {
+    _timerModel.appAction.enabled = enabled;
     notifyListeners();
   }
 

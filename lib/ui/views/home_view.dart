@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/navigation_item_model.dart';
 import 'package:sleep_timer/ui/views/alarm_view.dart';
 import 'package:sleep_timer/ui/views/timer_view.dart';
@@ -108,12 +107,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return FadeIndexedStack(
         index: model.currentIndex,
         children: _navItems.map((item) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-                vertical: kVerticalPaddingBig,
-                horizontal: kHorizontalPaddingSmall),
-            child: item.page,
-          );
+          return item.page;
         }).toList());
   }
 

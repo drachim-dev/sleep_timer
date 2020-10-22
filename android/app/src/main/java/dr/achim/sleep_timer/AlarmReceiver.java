@@ -21,7 +21,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.e(TAG, "onReceive()");
 
-        final String timerId = intent.getStringExtra(AlarmService.KEY_TIMER_ID);
+        final String timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID);
         Messages.AlarmRequest request = new Messages.AlarmRequest();
         request.setTimerId(timerId);
         flutterTimerApi.onAlarm(request, reply -> {});

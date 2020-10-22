@@ -94,7 +94,7 @@ class DeviceService with ReactiveServiceMixin {
 
     String description = "$time $unit expired. ";
     final Iterable<ActionModel> activeActions =
-        timerModel.actions.where((element) => element.value == true);
+        timerModel.actions.where((element) => element.enabled == true);
     if (activeActions.isEmpty) {
       description += "No actions selected for execution.";
     } else {

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:stacked/stacked.dart';
@@ -25,6 +26,7 @@ class TimerViewModel extends BaseViewModel {
     _prefService.get(ActionType.BLUETOOTH.toString());
     final bool screenAction = _prefService.get(ActionType.SCREEN.toString());
     final bool volumeAction = _prefService.get(ActionType.VOLUME.toString());
+    final double volumeLevel= _prefService.get(kKeyVolumeLevel);
     final bool lightAction = _prefService.get(ActionType.LIGHT.toString());
     final bool actionAction = _prefService.get(ActionType.APP.toString());
 
@@ -33,46 +35,48 @@ class TimerViewModel extends BaseViewModel {
         id: ActionType.MEDIA,
         title: "Media",
         description: "Stop media playback",
-        value: mediaAction ?? true,
+        enabled: mediaAction ?? true,
       ),
       ActionModel(
         id: ActionType.WIFI,
         title: "Wifi",
         description: "Turn off wifi",
-        value: wifiAction ?? false,
+        enabled: wifiAction ?? false,
       ),
       ActionModel(
         id: ActionType.BLUETOOTH,
         title: "Bluetooth",
         description: "Turn off bluetooth",
-        value: bluetoothAction ?? true,
+        enabled: bluetoothAction ?? true,
       ),
       ActionModel(
         id: ActionType.SCREEN,
         title: "Screen",
         description: "Turn off screen",
-        value: screenAction ?? false,
+        enabled: screenAction ?? false,
         common: false,
       ),
-      ActionModel(
+      ValueActionModel(
         id: ActionType.VOLUME,
         title: "Volume",
-        description: "Set media volume to 10",
-        value: volumeAction ?? false,
+        description: "Set media volume to ",
+        enabled: volumeAction ?? false,
         common: false,
+        value: volumeLevel ?? 5.0,
+        key: kKeyVolumeLevel,
       ),
       ActionModel(
         id: ActionType.LIGHT,
         title: "Light",
         description: "Turn off 3 lights",
-        value: lightAction ?? false,
+        enabled: lightAction ?? false,
         common: false,
       ),
       ActionModel(
         id: ActionType.APP,
         title: "App",
         description: "Force close YouTube",
-        value: actionAction ?? false,
+        enabled: actionAction ?? false,
         common: false,
       ),
     ];

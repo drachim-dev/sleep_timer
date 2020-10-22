@@ -31,7 +31,8 @@ class _TimerViewState extends State<TimerView> {
         onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingBig),
+            padding: const EdgeInsets.symmetric(
+                horizontal: kHorizontalPadding, vertical: kVerticalPaddingBig),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -41,15 +42,18 @@ class _TimerViewState extends State<TimerView> {
                   onUpdateLabel: (value) => "$value Min",
                   onChange: (value) => model.setTime(value.round()),
                 ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [10, 20, 30, 60].map((value) {
-                      return Expanded(
-                        child: RoundedRectButton(
-                            title: "$value",
-                            onPressed: () => model.updateTime(value)),
-                      );
-                    }).toList()),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: kVerticalPaddingBig),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [10, 20, 30, 60].map((value) {
+                        return Expanded(
+                          child: RoundedRectButton(
+                              title: "$value",
+                              onPressed: () => model.updateTime(value)),
+                        );
+                      }).toList()),
+                ),
               ],
             ),
           );

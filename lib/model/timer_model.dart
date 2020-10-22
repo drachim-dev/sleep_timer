@@ -25,7 +25,7 @@ class TimerModel {
       _actions.singleWhere((action) => action.id == ActionType.BLUETOOTH);
   ActionModel get screenAction =>
       _actions.singleWhere((action) => action.id == ActionType.SCREEN);
-  ActionModel get volumeAction =>
+  ValueActionModel get volumeAction =>
       _actions.singleWhere((action) => action.id == ActionType.VOLUME);
   ActionModel get lightAction =>
       _actions.singleWhere((action) => action.id == ActionType.LIGHT);

@@ -65,8 +65,13 @@
         <!-- Android Alarm Manager -->
         <receiver
             android:name=".AlarmReceiver"
-            android:enabled="true" >
-        </receiver>
+            android:enabled="true" />
+        <receiver
+            android:name=".NotificationReceiver"
+            android:enabled="true" />
+        <receiver
+            android:name=".NotificationActionReceiver"
+            android:enabled="true" />
         <!-- Timer Widget -->
         <receiver 
             android:name=".TimerWidget"
