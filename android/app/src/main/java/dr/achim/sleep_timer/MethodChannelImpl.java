@@ -24,7 +24,7 @@ public class MethodChannelImpl implements HostTimerApi {
         CallbackHelper.setHandle(context, arg.getCallbackHandle());
     }
 
-    private void _startForegroundService(final ShowRunningNotificationRequest arg) {
+    private void _startForegroundService(final TimeNotificationRequest arg) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final Intent intent = new Intent(context, AlarmService.class);
             intent.setAction(ACTION_START);
@@ -41,8 +41,8 @@ public class MethodChannelImpl implements HostTimerApi {
     }
 
     @Override
-    public ShowNotificationResponse showRunningNotification(ShowRunningNotificationRequest arg) {
-        final ShowNotificationResponse response = new ShowNotificationResponse();
+    public NotificationResponse showRunningNotification(TimeNotificationRequest arg) {
+        final NotificationResponse response = new NotificationResponse();
         final String timerId = arg.getTimerId();
         if(timerId == null) {
             response.setSuccess(false);
@@ -60,8 +60,8 @@ public class MethodChannelImpl implements HostTimerApi {
     }
 
     @Override
-    public ShowNotificationResponse showPausingNotification(ShowPausingNotificationRequest arg) {
-        final ShowNotificationResponse response = new ShowNotificationResponse();
+    public NotificationResponse showPausingNotification(TimeNotificationRequest arg) {
+        final NotificationResponse response = new NotificationResponse();
         final String timerId = arg.getTimerId();
         if(timerId == null) {
             response.setSuccess(false);
@@ -83,8 +83,8 @@ public class MethodChannelImpl implements HostTimerApi {
     }
 
     @Override
-    public ShowNotificationResponse showElapsedNotification(ShowElapsedNotificationRequest arg) {
-        final ShowNotificationResponse response = new ShowNotificationResponse();
+    public NotificationResponse showElapsedNotification(NotificationRequest arg) {
+        final NotificationResponse response = new NotificationResponse();
         final String timerId = arg.getTimerId();
         if(timerId == null) {
             response.setSuccess(false);
@@ -106,8 +106,8 @@ public class MethodChannelImpl implements HostTimerApi {
     }
 
     @Override
-    public CancelNotificationResponse cancelNotification(CancelNotificationRequest arg) {
-        final CancelNotificationResponse response = new CancelNotificationResponse();
+    public CancelResponse cancelTimer(CancelRequest arg) {
+        final CancelResponse response = new CancelResponse();
         final String timerId = arg.getTimerId();
         if(timerId == null) {
             response.setSuccess(false);

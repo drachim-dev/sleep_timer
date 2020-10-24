@@ -119,7 +119,7 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<bool> cancelNotification({@required final String timerId}) async {
-    return SleepTimerPlatform.getInstance().cancelNotification(timerId);
+    return SleepTimerPlatform.getInstance().cancelTimer(timerId);
   }
 
   // Async response not yet possible with pigeon.

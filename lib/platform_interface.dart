@@ -31,5 +31,5 @@ abstract class SleepTimerPlatform {
         @required final String title,
         @required final String description,
         @required final List<String> actions});
-  Future<bool> cancelNotification(final String timerId);
+  Future<bool> cancelTimer(final String timerId);
 }

@@ -30,14 +30,14 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             case ACTION_CONTINUE_REQUEST:
                 map = (HashMap) intent.getSerializableExtra(KEY_CONTINUE_REQUEST);
                 if(map != null) {
-                    flutterTimerApi.onContinueRequest(ContinueRequest.fromMap(map), reply -> {});
+                    flutterTimerApi.onContinueRequest(TimerRequest.fromMap(map), reply -> {});
                 }
                 break;
 
             case ACTION_PAUSE_REQUEST:
                 map = (HashMap) intent.getSerializableExtra(KEY_PAUSE_REQUEST);
                 if(map != null) {
-                    flutterTimerApi.onPauseRequest(PauseRequest.fromMap(map), reply -> {});
+                    flutterTimerApi.onPauseRequest(TimerRequest.fromMap(map), reply -> {});
                 }
                 break;
 
@@ -59,7 +59,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             case ACTION_RESTART_REQUEST:
                 map = (HashMap) intent.getSerializableExtra(KEY_RESTART_REQUEST);
                 if(map != null) {
-                    flutterTimerApi.onRestartRequest(RestartRequest.fromMap(map), reply -> {});
+                    flutterTimerApi.onRestartRequest(TimerRequest.fromMap(map), reply -> {});
                 }
                 break;
 

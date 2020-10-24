@@ -24,8 +24,8 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       @required final List<String> actions,
       @required final int duration,
       @required final int remainingTime}) async {
-    final ShowNotificationResponse response =
-        await _hostApi.showRunningNotification(ShowRunningNotificationRequest()
+    final NotificationResponse response =
+        await _hostApi.showRunningNotification(TimeNotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
@@ -42,8 +42,8 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       @required final String description,
       @required final List<String> actions,
       @required final int remainingTime}) async {
-    final ShowNotificationResponse response =
-        await _hostApi.showPausingNotification(ShowPausingNotificationRequest()
+    final NotificationResponse response =
+        await _hostApi.showPausingNotification(TimeNotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
@@ -58,8 +58,8 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       @required final String title,
       @required final String description,
       @required final List<String> actions}) async {
-    final ShowNotificationResponse response =
-        await _hostApi.showElapsedNotification(ShowElapsedNotificationRequest()
+    final NotificationResponse response =
+        await _hostApi.showElapsedNotification(NotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
@@ -68,9 +68,9 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   }
 
   @override
-  Future<bool> cancelNotification(final String timerId) async {
-    final CancelNotificationResponse response = await _hostApi
-        .cancelNotification(CancelNotificationRequest()..timerId = timerId);
+  Future<bool> cancelTimer(final String timerId) async {
+    final CancelResponse response = await _hostApi
+        .cancelTimer(CancelRequest()..timerId = timerId);
     return response.success;
   }
 }
@@ -80,13 +80,6 @@ class FlutterApiHandler extends FlutterTimerApi {
   final Function alarmCallback;
 
   FlutterApiHandler({this.callback, this.alarmCallback});
-
-  @override
-  void onShowRunningNotification(ShowNotificationResponse arg) {
-    final String timerId = arg.timerId;
-    print("onShowRunningNotification called for timer with id $timerId");
-    callback();
-  }
 
   @override
   void onExtendTime(ExtendTimeResponse arg) {
@@ -108,12 +101,13 @@ class FlutterApiHandler extends FlutterTimerApi {
     final _navigationService = locator<NavigationService>();
 
     // Navigate to timer detail view
-    _navigationService.replaceWith(Routes.timerDetailView,
+    _navigationService.popUntil((route) => route.isFirst);
+    _navigationService.navigateTo(Routes.timerDetailView,
         arguments: TimerDetailViewArguments(timer: _timerService.timerModel));
   }
 
   @override
-  void onPauseRequest(PauseRequest arg) {
+  void onPauseRequest(TimerRequest arg) {
     final String timerId = arg.timerId;
     print("onPauseRequest requested for timer with id $timerId");
 
@@ -133,7 +127,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
-  void onContinueRequest(ContinueRequest arg) {
+  void onContinueRequest(TimerRequest arg) {
     final String timerId = arg.timerId;
     print("onContinueRequest called for timer with id $timerId");
 
@@ -143,7 +137,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
-  void onRestartRequest(RestartRequest arg) {
+  void onRestartRequest(TimerRequest arg) {
     final String timerId = arg.timerId;
     print("onRestartRequest called for timer with id $timerId");
 
@@ -153,7 +147,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
-  void onAlarm(AlarmRequest arg) {
+  void onAlarm(TimerRequest arg) {
     print("onAlarm()");
     alarmCallback(arg.timerId);
   }

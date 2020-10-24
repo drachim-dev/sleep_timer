@@ -4,45 +4,42 @@ class InitializationRequest {
   int callbackHandle;
 }
 
-
-class ShowRunningNotificationRequest {
+class NotificationRequest {
   String timerId, title, description;
 
   List<String> actions;
+}
+
+class TimeNotificationRequest implements NotificationRequest {
+  @override
+  List<String> actions;
+
+  @override
+  String description;
+
+  @override
+  String timerId;
+
+  @override
+  String title;
 
   /// The initial number of minutes the timer was set to.
   int duration;
 
   /// The number of seconds left for the timer.
   int remainingTime;
-
 }
 
-class ShowPausingNotificationRequest {
-  String timerId, title, description;
-
-  List<String> actions;
-
-  /// The number of seconds left for the timer.
-  int remainingTime;
-}
-
-class ShowElapsedNotificationRequest {
-  String timerId, title, description;
-
-  List<String> actions;
-}
-
-class ShowNotificationResponse {
+class NotificationResponse {
   String timerId;
   bool success;
 }
 
-class CancelNotificationRequest {
+class CancelRequest {
   String timerId;
 }
 
-class CancelNotificationResponse {
+class CancelResponse {
   String timerId;
   bool success;
 }
@@ -58,23 +55,7 @@ class OpenRequest {
   String timerId;
 }
 
-class PauseRequest {
-  String timerId;
-}
-
-class ContinueRequest {
-  String timerId;
-}
-
-class CancelRequest {
-  String timerId;
-}
-
-class RestartRequest {
-  String timerId;
-}
-
-class AlarmRequest {
+class TimerRequest {
   String timerId;
 }
 
@@ -82,32 +63,30 @@ class AlarmRequest {
 @HostApi()
 abstract class HostTimerApi {
   void init(InitializationRequest request);
-  ShowNotificationResponse showRunningNotification(
-      ShowRunningNotificationRequest request);
-  ShowNotificationResponse showPausingNotification(
-      ShowPausingNotificationRequest request);
-  ShowNotificationResponse showElapsedNotification(
-      ShowElapsedNotificationRequest request);
-  CancelNotificationResponse cancelNotification(
-      CancelNotificationRequest request);
+  NotificationResponse showRunningNotification(
+      TimeNotificationRequest request);
+  NotificationResponse showPausingNotification(
+      TimeNotificationRequest request);
+  NotificationResponse showElapsedNotification(
+      NotificationRequest request);
+  CancelResponse cancelTimer(
+      CancelRequest request);
 }
 
 // Dart methods
 @FlutterApi()
 abstract class FlutterTimerApi {
-  void onShowRunningNotification(ShowNotificationResponse response);
   void onExtendTime(ExtendTimeResponse response);
-  void onContinueRequest(ContinueRequest request);
-  void onPauseRequest(PauseRequest request);
+  void onContinueRequest(TimerRequest request);
+  void onPauseRequest(TimerRequest request);
   void onCancelRequest(CancelRequest request);
-  void onRestartRequest(RestartRequest request);
+  void onRestartRequest(TimerRequest request);
   void onOpen(OpenRequest request);
-  void onAlarm(AlarmRequest request);
+  void onAlarm(TimerRequest request);
 }
 
 void configurePigeon(PigeonOptions opts) {
   opts.dartOut = 'lib/messages_generated.dart';
-  opts.javaOut =
-  'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
+  opts.javaOut = 'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
   opts.javaOptions.package = 'dr.achim.sleep_timer';
 }

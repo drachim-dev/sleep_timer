@@ -63,17 +63,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         switch (intent.getAction()) {
             case ACTION_SHOW_RUNNING:
                 map = (HashMap) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
-                showRunningNotification(ShowRunningNotificationRequest.fromMap(map));
+                showRunningNotification(TimeNotificationRequest.fromMap(map));
                 break;
 
             case ACTION_PAUSE_NOTIFICATION:
                 map = (HashMap) intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION);
-                showPausingNotification(ShowPausingNotificationRequest.fromMap(map));
+                showPausingNotification(TimeNotificationRequest.fromMap(map));
                 break;
 
             case ACTION_ELAPSED_NOTIFICATION:
                 map = (HashMap) intent.getSerializableExtra(KEY_ELAPSED_NOTIFICATION);
-                showElapsedNotification(ShowElapsedNotificationRequest.fromMap(map));
+                showElapsedNotification(NotificationRequest.fromMap(map));
                 break;
         }
     }
@@ -82,7 +82,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationManagerCompat.from(context).notify(NotificationReceiver.NOTIFICATION_ID, notification);
     }
 
-    private void showRunningNotification(final ShowRunningNotificationRequest request) {
+    private void showRunningNotification(final TimeNotificationRequest request) {
         final String timerId = request.getTimerId();
         final List<String> actions = request.getActions();
 
@@ -106,7 +106,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         showNotification(notification);
     }
 
-    private void showPausingNotification(final ShowPausingNotificationRequest request) {
+    private void showPausingNotification(final TimeNotificationRequest request) {
         final String timerId = request.getTimerId();
         final List<String> actions = request.getActions();
 
@@ -124,7 +124,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         showNotification(notification);
     }
 
-    private void showElapsedNotification(final ShowElapsedNotificationRequest request) {
+    private void showElapsedNotification(final NotificationRequest request) {
         final String timerId = request.getTimerId();
         final List<String> actions = request.getActions();
 
@@ -165,7 +165,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Intent intent = new Intent(context, NotificationActionReceiver.class);
         intent.setAction(ACTION_CONTINUE_REQUEST);
 
-        final ContinueRequest request = new ContinueRequest();
+        final TimerRequest request = new TimerRequest();
         request.setTimerId(timerId);
         intent.putExtra(KEY_CONTINUE_REQUEST, request.toMap());
 
@@ -180,7 +180,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Intent intent = new Intent(context, NotificationActionReceiver.class);
         intent.setAction(ACTION_PAUSE_REQUEST);
 
-        final PauseRequest request = new PauseRequest();
+        final TimerRequest request = new TimerRequest();
         request.setTimerId(timerId);
         intent.putExtra(KEY_PAUSE_REQUEST, request.toMap());
 
@@ -195,7 +195,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Intent intent = new Intent(context, NotificationActionReceiver.class);
         intent.setAction(ACTION_CANCEL_REQUEST);
 
-        final CancelNotificationResponse response = new CancelNotificationResponse();
+        final CancelResponse response = new CancelResponse();
         response.setTimerId(timerId);
         response.setSuccess(true);
         intent.putExtra(KEY_CANCEL_REQUEST, response.toMap());
@@ -227,7 +227,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Intent intent = new Intent(context, NotificationActionReceiver.class);
         intent.setAction(ACTION_RESTART_REQUEST);
 
-        final RestartRequest request = new RestartRequest();
+        final TimerRequest request = new TimerRequest();
         request.setTimerId(timerId);
         intent.putExtra(KEY_RESTART_REQUEST, request.toMap());
 

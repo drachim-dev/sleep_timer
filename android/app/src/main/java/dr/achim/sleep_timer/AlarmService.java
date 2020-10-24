@@ -62,7 +62,7 @@ public class AlarmService extends Service {
         switch (intent.getAction()) {
             case ACTION_START:
                 final HashMap map = (HashMap) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
-                final ShowRunningNotificationRequest request = ShowRunningNotificationRequest.fromMap(map);
+                final TimeNotificationRequest request = TimeNotificationRequest.fromMap(map);
                 _startAlarm(request);
                 final Intent showRunningIntent = new Intent(this, NotificationReceiver.class);
                 showRunningIntent.setAction(ACTION_SHOW_RUNNING);
@@ -84,7 +84,7 @@ public class AlarmService extends Service {
         return START_STICKY;
     }
 
-    private void _startAlarm(Messages.ShowRunningNotificationRequest request) {
+    private void _startAlarm(TimeNotificationRequest request) {
         final Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         alarmIntent.putExtra(NotificationReceiver.KEY_TIMER_ID, request.getTimerId());
         pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);

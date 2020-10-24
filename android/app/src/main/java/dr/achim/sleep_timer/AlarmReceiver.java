@@ -8,6 +8,8 @@ import android.util.Log;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.FlutterEngineCache;
 
+import dr.achim.sleep_timer.Messages.*;
+
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String TAG = AlarmReceiver.class.toString();
     private Context context;
@@ -22,7 +24,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.e(TAG, "onReceive()");
 
         final String timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID);
-        Messages.AlarmRequest request = new Messages.AlarmRequest();
+        TimerRequest request = new TimerRequest();
         request.setTimerId(timerId);
         flutterTimerApi.onAlarm(request, reply -> {});
     }
