@@ -21,7 +21,10 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
-      @required final List<String> actions,
+      final String restartAction,
+      final String pauseAction,
+      final String cancelAction,
+      final List<int> extendActions,
       @required final int duration,
       @required final int remainingTime}) async {
     final NotificationResponse response =
@@ -29,7 +32,10 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..timerId = timerId
           ..title = title
           ..description = description
-          ..actions = actions
+          ..restartAction = restartAction
+          ..pauseAction = pauseAction
+          ..cancelAction = cancelAction
+          ..extendActions = extendActions
           ..duration = duration
           ..remainingTime = remainingTime);
     return response.success;
@@ -40,37 +46,44 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
-      @required final List<String> actions,
+      final String restartAction,
+      final String continueAction,
+      final String cancelAction,
+      final List<int> extendActions,
       @required final int remainingTime}) async {
     final NotificationResponse response =
         await _hostApi.showPausingNotification(TimeNotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
-          ..actions = actions
+          ..restartAction = restartAction
+          ..continueAction = continueAction
+          ..cancelAction = cancelAction
+          ..extendActions = extendActions
           ..remainingTime = remainingTime);
     return response.success;
   }
 
   @override
-  Future<bool> showElapsedNotification(
-      {@required final String timerId,
-      @required final String title,
-      @required final String description,
-      @required final List<String> actions}) async {
+  Future<bool> showElapsedNotification({
+    @required final String timerId,
+    @required final String title,
+    @required final String description,
+    final String restartAction,
+  }) async {
     final NotificationResponse response =
         await _hostApi.showElapsedNotification(NotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
-          ..actions = actions);
+          ..restartAction = restartAction);
     return response.success;
   }
 
   @override
   Future<bool> cancelTimer(final String timerId) async {
-    final CancelResponse response = await _hostApi
-        .cancelTimer(CancelRequest()..timerId = timerId);
+    final CancelResponse response =
+        await _hostApi.cancelTimer(CancelRequest()..timerId = timerId);
     return response.success;
   }
 }
@@ -117,7 +130,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
-  void onCancelRequest(CancelRequest arg) {
+  void onCancelRequest(TimerRequest arg) {
     final String timerId = arg.timerId;
     print("onCancelRequest called for timer with id $timerId");
 

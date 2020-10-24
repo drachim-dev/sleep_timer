@@ -42,19 +42,27 @@ class NotificationResponse {
 }
 
 class TimeNotificationRequest {
-  List actions;
   String description;
   String timerId;
   String title;
+  String restartAction;
+  String continueAction;
+  String pauseAction;
+  String cancelAction;
+  List extendActions;
   int duration;
   int remainingTime;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
-    pigeonMap['actions'] = actions;
     pigeonMap['description'] = description;
     pigeonMap['timerId'] = timerId;
     pigeonMap['title'] = title;
+    pigeonMap['restartAction'] = restartAction;
+    pigeonMap['continueAction'] = continueAction;
+    pigeonMap['pauseAction'] = pauseAction;
+    pigeonMap['cancelAction'] = cancelAction;
+    pigeonMap['extendActions'] = extendActions;
     pigeonMap['duration'] = duration;
     pigeonMap['remainingTime'] = remainingTime;
     return pigeonMap;
@@ -62,10 +70,14 @@ class TimeNotificationRequest {
   // ignore: unused_element
   static TimeNotificationRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
     final TimeNotificationRequest result = TimeNotificationRequest();
-    result.actions = pigeonMap['actions'];
     result.description = pigeonMap['description'];
     result.timerId = pigeonMap['timerId'];
     result.title = pigeonMap['title'];
+    result.restartAction = pigeonMap['restartAction'];
+    result.continueAction = pigeonMap['continueAction'];
+    result.pauseAction = pigeonMap['pauseAction'];
+    result.cancelAction = pigeonMap['cancelAction'];
+    result.extendActions = pigeonMap['extendActions'];
     result.duration = pigeonMap['duration'];
     result.remainingTime = pigeonMap['remainingTime'];
     return result;
@@ -76,14 +88,22 @@ class NotificationRequest {
   String timerId;
   String title;
   String description;
-  List actions;
+  String restartAction;
+  String continueAction;
+  String pauseAction;
+  String cancelAction;
+  List extendActions;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
     pigeonMap['timerId'] = timerId;
     pigeonMap['title'] = title;
     pigeonMap['description'] = description;
-    pigeonMap['actions'] = actions;
+    pigeonMap['restartAction'] = restartAction;
+    pigeonMap['continueAction'] = continueAction;
+    pigeonMap['pauseAction'] = pauseAction;
+    pigeonMap['cancelAction'] = cancelAction;
+    pigeonMap['extendActions'] = extendActions;
     return pigeonMap;
   }
   // ignore: unused_element
@@ -92,7 +112,11 @@ class NotificationRequest {
     result.timerId = pigeonMap['timerId'];
     result.title = pigeonMap['title'];
     result.description = pigeonMap['description'];
-    result.actions = pigeonMap['actions'];
+    result.restartAction = pigeonMap['restartAction'];
+    result.continueAction = pigeonMap['continueAction'];
+    result.pauseAction = pigeonMap['pauseAction'];
+    result.cancelAction = pigeonMap['cancelAction'];
+    result.extendActions = pigeonMap['extendActions'];
     return result;
   }
 }
@@ -300,7 +324,7 @@ abstract class FlutterTimerApi {
   void onExtendTime(ExtendTimeResponse arg);
   void onContinueRequest(TimerRequest arg);
   void onPauseRequest(TimerRequest arg);
-  void onCancelRequest(CancelRequest arg);
+  void onCancelRequest(TimerRequest arg);
   void onRestartRequest(TimerRequest arg);
   void onOpen(OpenRequest arg);
   void onAlarm(TimerRequest arg);
@@ -356,7 +380,7 @@ abstract class FlutterTimerApi {
 
         channel.setMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage = message as Map<dynamic, dynamic>;
-          final CancelRequest input = CancelRequest._fromMap(mapMessage);
+          final TimerRequest input = TimerRequest._fromMap(mapMessage);
           api.onCancelRequest(input);
         });
       }

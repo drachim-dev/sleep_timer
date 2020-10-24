@@ -31,8 +31,7 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   TimerDetailViewModel(this._timerModel)
       : _timerService =
             TimerServiceManager.getInstance().getTimerService(_timerModel.id) ??
-                locator<TimerService>(param1: _timerModel),
-        _maxTime = _timerModel.initialTimeInSeconds {
+                locator<TimerService>(param1: _timerModel) {
     _newInstance =
         TimerServiceManager.getInstance().getTimerService(timerModel.id) ==
             null;
@@ -45,14 +44,13 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   int get initialTime => _timerModel.initialTimeInSeconds;
   int get remainingTime => _timerService.remainingTime;
 
-  int _maxTime;
-  int get maxTime => _maxTime;
-
   bool get isActive => _timerService.isActive;
   bool get isStarting => _isStarting;
 
   bool _isAdFree = false;
   bool get isAdFree => _isAdFree;
+
+  int get maxTime => _timerService.maxTime;
 
   Future<VolumeResponse> get volume => _deviceService.volume;
 
@@ -113,9 +111,8 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
 
   void onExtendTime(int minutes) {
     final int seconds = minutes * 60;
-    _timerService.extendTime(seconds);
 
-    _maxTime = max(timerModel.initialTimeInSeconds, remainingTime);
+    _timerService.extendTime(seconds);
   }
 
   void onChangeMedia(bool enabled) {

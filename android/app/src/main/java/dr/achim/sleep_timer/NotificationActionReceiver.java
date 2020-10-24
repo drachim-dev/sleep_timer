@@ -44,7 +44,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             case ACTION_CANCEL_REQUEST:
                 map = (HashMap) intent.getSerializableExtra(KEY_CANCEL_REQUEST);
                 if(map != null) {
-                    flutterTimerApi.onCancelRequest(CancelRequest.fromMap(map), reply -> {});
+                    flutterTimerApi.onCancelRequest(TimerRequest.fromMap(map), reply -> {});
                 }
                 break;
 

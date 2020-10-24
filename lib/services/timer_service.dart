@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
@@ -18,17 +19,20 @@ class TimerService with ReactiveServiceMixin {
   bool get isActive => _isActive.value;
 
   TimerService(@factoryParam this.timerModel)
-      : _remainingTime =
-            RxValue<int>(initial: timerModel.initialTimeInSeconds) {
+      : _remainingTime = RxValue<int>(initial: timerModel.initialTimeInSeconds),
+        _maxTime = timerModel.initialTimeInSeconds {
     listenToReactiveValues([_remainingTime, _isActive]);
   }
 
   final RxValue<int> _remainingTime;
   int get remainingTime => _remainingTime.value;
 
-  void setRemainingTime(int value) {
+  void setRemainingTime(final int value) {
     _remainingTime.value = value;
   }
+
+  int _maxTime;
+  int get maxTime => _maxTime;
 
   void start() {
     const interval = Duration(seconds: 1);
@@ -49,8 +53,10 @@ class TimerService with ReactiveServiceMixin {
     start();
   }
 
-  void extendTime(int seconds) {
+  void extendTime(final int seconds) {
     _remainingTime.value += seconds;
+
+    setMaxTime();
 
     _deviceService.showRunningNotification(
         timerId: timerModel.id,
@@ -92,6 +98,9 @@ class TimerService with ReactiveServiceMixin {
 
     _deviceService.showElapsedNotification(timerModel: timerModel);
   }
+
+  void setMaxTime() =>
+      _maxTime = max(timerModel.initialTimeInSeconds, remainingTime);
 }
 
 void onDeviceAdminCallback(final bool granted) async {

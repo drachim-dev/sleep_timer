@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,8 +46,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     public static final String KEY_TIMER_ID = "KEY_TIMER_ID";
 
     private static final int REQUEST_CODE_OPEN = 100;
-    private static final int REQUEST_CODE_EXTEND_5 = 505;
-    private static final int REQUEST_CODE_EXTEND_20 = 520;
+    private static final int REQUEST_CODE_EXTEND = 500;
     private static final int REQUEST_CODE_CONTINUE_REQUEST = 200;
     private static final int REQUEST_CODE_PAUSE_REQUEST = 300;
     private static final int REQUEST_CODE_RESTART_REQUEST = 150;
@@ -84,51 +84,91 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     private void showRunningNotification(final TimeNotificationRequest request) {
         final String timerId = request.getTimerId();
-        final List<String> actions = request.getActions();
 
-        final Notification notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.getTitle())
                 .setContentText(request.getDescription())
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setContentIntent(createOpenIntent(timerId))
-                .addAction(R.drawable.ic_baseline_pause_24, actions.get(0).toUpperCase(), createPauseRequestIntent(timerId))
-                .addAction(R.drawable.ic_baseline_replay_5_24, actions.get(1).toUpperCase(), createExtendTimeIntent(timerId, 5 * 60, REQUEST_CODE_EXTEND_5))
-                .addAction(R.drawable.ic_baseline_replay_10_24, actions.get(2).toUpperCase(), createExtendTimeIntent(timerId, 20 * 60, REQUEST_CODE_EXTEND_20))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setShowWhen(true)
                 .setUsesChronometer(true)
                 .setOngoing(false) // TODO: set to true
                 .setAutoCancel(false)
-                .setWhen(System.currentTimeMillis() + request.getRemainingTime() * 1000)
-                .build();
+                .setWhen(System.currentTimeMillis() + request.getRemainingTime() * 1000);
 
+        final List<NotificationCompat.Action> actions = buildNotificationActions(timerId, request.getRestartAction(), request.getPauseAction(), request.getContinueAction(), request.getCancelAction(), request.getExtendActions());
+        for (NotificationCompat.Action action : actions) {
+            builder.addAction(action);
+        }
+
+        final Notification notification = builder.build();
         showNotification(notification);
+    }
+
+    private List<NotificationCompat.Action> buildNotificationActions(String timerId, String restartAction, String pauseAction, String continueAction, String cancelAction, ArrayList extendActions) {
+        List<NotificationCompat.Action> actions = new ArrayList<>();
+
+        if(restartAction != null && !restartAction.isEmpty()) {
+            final PendingIntent intent = createRestartRequestIntent(timerId);
+            final NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.ic_baseline_replay_24, restartAction.toUpperCase(), intent);
+            actions.add(action);
+        }
+
+        if(pauseAction != null && !pauseAction.isEmpty()) {
+            final PendingIntent intent = createPauseRequestIntent(timerId);
+            final NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.ic_baseline_pause_24, pauseAction.toUpperCase(), intent);
+            actions.add(action);
+        }
+
+        if(continueAction != null && !continueAction.isEmpty()) {
+            final PendingIntent intent = createContinueRequestIntent(timerId);
+            final NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.ic_baseline_replay_24, continueAction.toUpperCase(), intent);
+            actions.add(action);
+        }
+
+        if(cancelAction != null && !cancelAction.isEmpty()) {
+            final PendingIntent intent = createCancelRequestIntent(timerId);
+            final NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.ic_baseline_clear_24, cancelAction.toUpperCase(), intent);
+            actions.add(action);
+        }
+
+        if(extendActions != null) {
+            for (int extendAction : (List<Integer>) extendActions) {
+                final PendingIntent intent = createExtendTimeIntent(timerId, extendAction * 60);
+                final NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.ic_baseline_replay_5_24, "+" + extendAction, intent);
+                actions.add(action);
+            }
+        }
+
+        return actions;
     }
 
     private void showPausingNotification(final TimeNotificationRequest request) {
         final String timerId = request.getTimerId();
-        final List<String> actions = request.getActions();
 
-        final Notification notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.getTitle())
                 .setContentText(request.getDescription())
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
-                .setContentIntent(createOpenIntent(timerId))
-                .addAction(R.drawable.ic_baseline_clear_24, actions.get(0).toUpperCase(), createCancelRequestIntent(timerId))
-                .addAction(R.drawable.ic_baseline_replay_24, actions.get(1).toUpperCase(), createContinueRequestIntent(timerId))
-                .build();
+                .setContentIntent(createOpenIntent(timerId));
 
+        final List<NotificationCompat.Action> actions = buildNotificationActions(timerId, request.getRestartAction(), request.getPauseAction(), request.getContinueAction(), request.getCancelAction(), request.getExtendActions());
+        for (NotificationCompat.Action action : actions) {
+            builder.addAction(action);
+        }
+
+        final Notification notification = builder.build();
         showNotification(notification);
     }
 
     private void showElapsedNotification(final NotificationRequest request) {
         final String timerId = request.getTimerId();
-        final List<String> actions = request.getActions();
 
-        final Notification notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.getTitle())
                 .setContentText(request.getDescription())
                 .setStyle(new NotificationCompat.BigTextStyle()
@@ -136,10 +176,14 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
-                .setContentIntent(createOpenIntent(timerId))
-                .addAction(R.drawable.ic_baseline_replay_24, actions.get(0).toUpperCase(), createRestartRequestIntent(timerId))
-                .build();
+                .setContentIntent(createOpenIntent(timerId));
 
+        final List<NotificationCompat.Action> actions = buildNotificationActions(timerId, request.getRestartAction(), request.getPauseAction(), request.getContinueAction(), request.getCancelAction(), request.getExtendActions());
+        for (NotificationCompat.Action action : actions) {
+            builder.addAction(action);
+        }
+
+        final Notification notification = builder.build();
         showNotification(notification);
     }
 
@@ -207,7 +251,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private PendingIntent createExtendTimeIntent(final String timerId, final int additionalTime, final int requestCode) {
+    private PendingIntent createExtendTimeIntent(final String timerId, final int additionalTime) {
         final Intent intent = new Intent(context, NotificationActionReceiver.class);
         intent.setAction(ACTION_EXTEND);
 
@@ -218,7 +262,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         return PendingIntent.getBroadcast(
                 context,
-                requestCode,
+                REQUEST_CODE_EXTEND + additionalTime,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }

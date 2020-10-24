@@ -17,19 +17,25 @@ abstract class SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
-      @required final List<String> actions,
+      final String restartAction,
+      final String pauseAction,
+      final String cancelAction,
+      final List<int> extendActions,
       @required final int duration,
       @required final int remainingTime});
   Future<bool> showPausingNotification(
       {@required final String timerId,
-        @required final String title,
-        @required final String description,
-        @required final List<String> actions,
-        @required final int remainingTime});
+      @required final String title,
+      @required final String description,
+      final String restartAction,
+      final String continueAction,
+      final String cancelAction,
+      final List<int> extendActions,
+      @required final int remainingTime});
   Future<bool> showElapsedNotification(
       {@required final String timerId,
-        @required final String title,
-        @required final String description,
-        @required final List<String> actions});
+      @required final String title,
+      @required final String description,
+      final String restartAction});
   Future<bool> cancelTimer(final String timerId);
 }

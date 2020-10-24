@@ -60,10 +60,6 @@ public class Messages {
 
   /** Generated class from Pigeon that represents data sent in messages. */
   public static class TimeNotificationRequest {
-    private ArrayList actions;
-    public ArrayList getActions() { return actions; }
-    public void setActions(ArrayList setterArg) { this.actions = setterArg; }
-
     private String description;
     public String getDescription() { return description; }
     public void setDescription(String setterArg) { this.description = setterArg; }
@@ -76,6 +72,26 @@ public class Messages {
     public String getTitle() { return title; }
     public void setTitle(String setterArg) { this.title = setterArg; }
 
+    private String restartAction;
+    public String getRestartAction() { return restartAction; }
+    public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
+
+    private String continueAction;
+    public String getContinueAction() { return continueAction; }
+    public void setContinueAction(String setterArg) { this.continueAction = setterArg; }
+
+    private String pauseAction;
+    public String getPauseAction() { return pauseAction; }
+    public void setPauseAction(String setterArg) { this.pauseAction = setterArg; }
+
+    private String cancelAction;
+    public String getCancelAction() { return cancelAction; }
+    public void setCancelAction(String setterArg) { this.cancelAction = setterArg; }
+
+    private ArrayList extendActions;
+    public ArrayList getExtendActions() { return extendActions; }
+    public void setExtendActions(ArrayList setterArg) { this.extendActions = setterArg; }
+
     private Long duration;
     public Long getDuration() { return duration; }
     public void setDuration(Long setterArg) { this.duration = setterArg; }
@@ -86,24 +102,36 @@ public class Messages {
 
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
-      toMapResult.put("actions", actions);
       toMapResult.put("description", description);
       toMapResult.put("timerId", timerId);
       toMapResult.put("title", title);
+      toMapResult.put("restartAction", restartAction);
+      toMapResult.put("continueAction", continueAction);
+      toMapResult.put("pauseAction", pauseAction);
+      toMapResult.put("cancelAction", cancelAction);
+      toMapResult.put("extendActions", extendActions);
       toMapResult.put("duration", duration);
       toMapResult.put("remainingTime", remainingTime);
       return toMapResult;
     }
     static TimeNotificationRequest fromMap(HashMap map) {
       TimeNotificationRequest fromMapResult = new TimeNotificationRequest();
-      Object actions = map.get("actions");
-      fromMapResult.actions = (ArrayList)actions;
       Object description = map.get("description");
       fromMapResult.description = (String)description;
       Object timerId = map.get("timerId");
       fromMapResult.timerId = (String)timerId;
       Object title = map.get("title");
       fromMapResult.title = (String)title;
+      Object restartAction = map.get("restartAction");
+      fromMapResult.restartAction = (String)restartAction;
+      Object continueAction = map.get("continueAction");
+      fromMapResult.continueAction = (String)continueAction;
+      Object pauseAction = map.get("pauseAction");
+      fromMapResult.pauseAction = (String)pauseAction;
+      Object cancelAction = map.get("cancelAction");
+      fromMapResult.cancelAction = (String)cancelAction;
+      Object extendActions = map.get("extendActions");
+      fromMapResult.extendActions = (ArrayList)extendActions;
       Object duration = map.get("duration");
       fromMapResult.duration = (duration == null) ? null : ((duration instanceof Integer) ? (Integer)duration : (Long)duration);
       Object remainingTime = map.get("remainingTime");
@@ -126,16 +154,36 @@ public class Messages {
     public String getDescription() { return description; }
     public void setDescription(String setterArg) { this.description = setterArg; }
 
-    private ArrayList actions;
-    public ArrayList getActions() { return actions; }
-    public void setActions(ArrayList setterArg) { this.actions = setterArg; }
+    private String restartAction;
+    public String getRestartAction() { return restartAction; }
+    public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
+
+    private String continueAction;
+    public String getContinueAction() { return continueAction; }
+    public void setContinueAction(String setterArg) { this.continueAction = setterArg; }
+
+    private String pauseAction;
+    public String getPauseAction() { return pauseAction; }
+    public void setPauseAction(String setterArg) { this.pauseAction = setterArg; }
+
+    private String cancelAction;
+    public String getCancelAction() { return cancelAction; }
+    public void setCancelAction(String setterArg) { this.cancelAction = setterArg; }
+
+    private ArrayList extendActions;
+    public ArrayList getExtendActions() { return extendActions; }
+    public void setExtendActions(ArrayList setterArg) { this.extendActions = setterArg; }
 
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("timerId", timerId);
       toMapResult.put("title", title);
       toMapResult.put("description", description);
-      toMapResult.put("actions", actions);
+      toMapResult.put("restartAction", restartAction);
+      toMapResult.put("continueAction", continueAction);
+      toMapResult.put("pauseAction", pauseAction);
+      toMapResult.put("cancelAction", cancelAction);
+      toMapResult.put("extendActions", extendActions);
       return toMapResult;
     }
     static NotificationRequest fromMap(HashMap map) {
@@ -146,8 +194,16 @@ public class Messages {
       fromMapResult.title = (String)title;
       Object description = map.get("description");
       fromMapResult.description = (String)description;
-      Object actions = map.get("actions");
-      fromMapResult.actions = (ArrayList)actions;
+      Object restartAction = map.get("restartAction");
+      fromMapResult.restartAction = (String)restartAction;
+      Object continueAction = map.get("continueAction");
+      fromMapResult.continueAction = (String)continueAction;
+      Object pauseAction = map.get("pauseAction");
+      fromMapResult.pauseAction = (String)pauseAction;
+      Object cancelAction = map.get("cancelAction");
+      fromMapResult.cancelAction = (String)cancelAction;
+      Object extendActions = map.get("extendActions");
+      fromMapResult.extendActions = (ArrayList)extendActions;
       return fromMapResult;
     }
   }
@@ -412,7 +468,7 @@ public class Messages {
         callback.reply(null);
       });
     }
-    public void onCancelRequest(CancelRequest argInput, Reply<Void> callback) {
+    public void onCancelRequest(TimerRequest argInput, Reply<Void> callback) {
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onCancelRequest", new StandardMessageCodec());
       HashMap inputMap = argInput.toMap();

@@ -76,7 +76,8 @@ class DeviceService with ReactiveServiceMixin {
         timerId: timerId,
         title: "Sleep timer running",
         description: "Timer set for $time $unit",
-        actions: ["Pause", "+5", "+20"],
+        pauseAction: "Pause",
+        extendActions: [5, 20],
         duration: duration,
         remainingTime: remainingTime);
   }
@@ -89,7 +90,8 @@ class DeviceService with ReactiveServiceMixin {
         title: "Sleep timer pausing",
         description:
             "Time left: ${Utils.secondsToString(remainingTime, trimTrailingZeros: true)}",
-        actions: ["Cancel", "Continue"],
+        cancelAction: "Cancel",
+        continueAction: "Continue",
         remainingTime: remainingTime);
   }
 
@@ -115,7 +117,7 @@ class DeviceService with ReactiveServiceMixin {
         timerId: timerModel.id,
         title: "Sleep timer elapsed",
         description: description,
-        actions: ["Restart"]);
+        restartAction: "Restart");
   }
 
   Future<bool> cancelNotification({@required final String timerId}) async {
