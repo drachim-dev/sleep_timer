@@ -11,7 +11,6 @@ import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/services/device_service.dart';
-import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 

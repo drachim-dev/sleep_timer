@@ -37,32 +37,24 @@ class _SettingsViewState extends State<SettingsView> {
   PreferencePage _buildBody(final ThemeData theme) {
     return PreferencePage(
       [
-        PreferenceTitle("Appearance"),
+        PreferenceTitle("Appearance", leftPadding: kPreferenceTitleLeftPadding),
         ListTile(
             title: Text('Choose theme'),
             subtitle: Text(model.currentTheme),
             leading: Icon(Icons.color_lens_outlined),
             onTap: () => showThemeDialog()),
-        PreferenceTitle("Experimental"),
-        SwitchListTile(
-            secondary: Icon(Icons.security_outlined),
-            title: Text("Device admin"),
-            subtitle: Text(
-                "Required for advanced actions such as switching off the display"),
-            isThreeLine: true,
-            value: model.deviceAdmin,
-            onChanged: (value) => model.onChangeDeviceAdmin(value)),
-        SwitchListTile(
-            secondary: Icon(Icons.do_not_disturb_on),
-            title: Text("Notification Settings Access"),
-            subtitle: Text("Required for accessing do not disturb mode"),
-            isThreeLine: true,
-            value: model.notificationSettingsAccess,
-            onChanged: (value) =>
-                model.onChangeNotificationSettingsAccess(value)),
-        PreferenceTitle("Support me"),
+        PreferenceTitle("Support me", leftPadding: kPreferenceTitleLeftPadding),
         for (var product in model.products) _buildProduct(theme, product),
-        PreferenceTitle("Other"),
+        ExpansionTile(
+            title: Text(
+              "Experiments",
+              style: theme.textTheme.bodyText1.copyWith(
+                  color: Theme.of(context).accentColor,
+                  fontWeight: FontWeight.bold),
+            ),
+            initiallyExpanded: model.experimentActive,
+            children: _buildExperimental(theme)),
+        PreferenceTitle("Other", leftPadding: kPreferenceTitleLeftPadding),
         ListTile(title: Text("FAQ")),
         ListTile(title: Text("Credits")),
       ],
@@ -134,5 +126,37 @@ class _SettingsViewState extends State<SettingsView> {
         );
       },
     );
+  }
+
+  List<Widget> _buildExperimental(final ThemeData theme) {
+    return [
+      SwitchListTile(
+          secondary: Icon(Icons.security_outlined),
+          title: Text("Device admin"),
+          subtitle: Text(
+              "Allow app to manage device functions. Enables screen off action."),
+          isThreeLine: true,
+          value: model.deviceAdmin,
+          onChanged: (value) => model.onChangeDeviceAdmin(value)),
+      SwitchListTile(
+          secondary: Icon(Icons.do_not_disturb_on),
+          title: Text("Notification Settings Access"),
+          subtitle: Text(
+              "Allow access to notification settings. Enables do not disturb action."),
+          isThreeLine: true,
+          value: model.notificationSettingsAccess,
+          onChanged: (value) =>
+              model.onChangeNotificationSettingsAccess(value)),
+      // TODO: Enable connection to philips hue
+      if (false)
+        SwitchListTile(
+            secondary: Icon(Icons.lightbulb_outline),
+            title: Text("Philips Hue"),
+            subtitle: Text(
+                "Connect to your Philips hue bridge. Enables light actions."),
+            isThreeLine: true,
+            value: model.deviceAdmin,
+            onChanged: null),
+    ];
   }
 }

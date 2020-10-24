@@ -14,13 +14,14 @@ import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
+import 'package:device_functions/messages_generated.dart';
 
 import 'timer_detail_viewmodel.dart';
 
 class TimerDetailView extends StatefulWidget {
-  final TimerModel timer;
+  final TimerModel timerModel;
 
-  const TimerDetailView({Key key, @required this.timer});
+  const TimerDetailView({Key key, @required this.timerModel});
 
   @override
   _TimerDetailViewState createState() => _TimerDetailViewState();
@@ -79,7 +80,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
     final ThemeData theme = Theme.of(context);
 
     return ViewModelBuilder<TimerDetailViewModel>.reactive(
-        viewModelBuilder: () => TimerDetailViewModel(widget.timer),
+        viewModelBuilder: () => TimerDetailViewModel(widget.timerModel),
         onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
           return NotificationListener(
@@ -186,11 +187,20 @@ class _TimerDetailViewState extends State<TimerDetailView>
         onChanged: model.onChangeWifi,
       ),
       SwitchListTile(
-          secondary: Icon(Icons.bluetooth_disabled_outlined),
-          title: Text(model.timerModel.bluetoothAction.title),
-          subtitle: Text(model.timerModel.bluetoothAction.description),
-          value: model.timerModel.bluetoothAction.enabled,
-          onChanged: model.onChangeBluetooth),
+        secondary: Icon(Icons.bluetooth_disabled_outlined),
+        title: Text(model.timerModel.bluetoothAction.title),
+        subtitle: Text(model.timerModel.bluetoothAction.description),
+        value: model.timerModel.bluetoothAction.enabled,
+        onChanged: model.onChangeBluetooth,
+      ),
+      if (model.notificationSettingsAccess)
+        SwitchListTile(
+          secondary: Icon(Icons.do_not_disturb_on),
+          title: Text(model.timerModel.doNotDisturbAction.title),
+          subtitle: Text(model.timerModel.doNotDisturbAction.description),
+          value: model.timerModel.doNotDisturbAction.enabled,
+          onChanged: model.onChangeDoNotDisturb,
+        ),
     ];
   }
 
@@ -214,20 +224,27 @@ class _TimerDetailViewState extends State<TimerDetailView>
           onChanged: model.onChangeVolume,
         ),
       ),
-      SwitchListTile(
-        secondary: Icon(Icons.lightbulb_outline),
-        title: Text(model.timerModel.lightAction.title),
-        subtitle: Text(model.timerModel.lightAction.description),
-        value: model.timerModel.lightAction.enabled,
-        onChanged: model.onChangeLight,
-      ),
-      SwitchListTile(
-        secondary: Icon(Icons.close_outlined),
-        title: Text(model.timerModel.appAction.title),
-        subtitle: Text(model.timerModel.appAction.description),
-        value: model.timerModel.appAction.enabled,
-        onChanged: model.onChangeApp,
-      ),
+      // TODO: Enable connection to philips hue
+      if (false)
+        SwitchListTile(
+          secondary: Icon(Icons.lightbulb_outline),
+          title: Text(model.timerModel.lightAction.title),
+          subtitle: Text(model.timerModel.lightAction.description),
+          value: model.timerModel.lightAction.enabled,
+          onChanged: model.onChangeLight,
+        ),
+      // TODO: Implement kill app
+      if (false)
+        ListTile(
+          leading: Icon(Icons.close_outlined),
+          title: Text(model.timerModel.appAction.title),
+          subtitle: Text(model.timerModel.appAction.description),
+          onTap: null,
+          trailing: Switch(
+            value: model.timerModel.appAction.enabled,
+            onChanged: model.onChangeApp,
+          ),
+        ),
     ];
   }
 
@@ -258,10 +275,21 @@ class _TimerDetailViewState extends State<TimerDetailView>
   void _showVolumeLevelPicker() async {
     final volumeLevel = await showDialog<double>(
         context: context,
-        builder: (context) => SliderDialog(
-            title: "Set volume",
-            initialValue: model.timerModel.volumeAction.value,
-            maxValue: 10));
+        builder: (context) => FutureBuilder<VolumeResponse>(
+            future: model.volume,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var currentLevel = snapshot.data?.currentLevel?.toDouble() ?? 3;
+                var maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
+                return SliderDialog(
+                    title: "Set volume",
+                    initialValue:
+                        model.timerModel.volumeAction.value ?? currentLevel,
+                    maxValue: maxVolume);
+              } else {
+                return CircularProgressIndicator();
+              }
+            }));
 
     if (volumeLevel != null) {
       model.onChangeVolumeLevel(volumeLevel);
@@ -273,6 +301,12 @@ class _TimerDetailViewState extends State<TimerDetailView>
     final TextStyle textStyle =
         theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
+    if (model.isActive) {
+      _fabAnimController.reverse();
+    } else {
+      _fabAnimController.forward();
+    }
+
     return ScaleTransition(
       scale: _hideFabAnimController,
       child: FloatingActionButton.extended(
@@ -283,19 +317,14 @@ class _TimerDetailViewState extends State<TimerDetailView>
             color: foregroundColor,
           ),
           label: Text(
-            model.isStarting || model.isActive ? "Pause" : "Continue",
+            model.isActive ? "Pause" : "Continue",
             style: textStyle,
           ),
           onPressed: () {
             if (model.isActive) {
-              _fabAnimController.forward();
               model.pauseTimer();
             } else {
-              _fabAnimController.reverse();
-
-              if (!model.isStarting) {
-                model.startTimer();
-              }
+              model.startTimer();
             }
           }),
     );

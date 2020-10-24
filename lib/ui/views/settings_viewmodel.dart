@@ -19,6 +19,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
+  bool get experimentActive => deviceAdmin || notificationSettingsAccess;
   String get currentTheme => _prefsService.getString(kPrefKeyTheme) ?? 'Dark';
 
   StreamSubscription _streamSubscription;

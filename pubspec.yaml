@@ -34,8 +34,14 @@ dependencies:
   firebase_admob: ^0.10.0+2
   flutter_native_admob: ^2.1.0+3
   in_app_purchase: ^0.3.4+15
+
+
   device_functions:
     path: ../device_functions/
+    # Add unpublished plugins from private repo
+    # https://flutter.dev/docs/development/packages-and-plugins/using-packages#dependencies-on-unpublished-packages
+    # git:
+      # url: git@github.com:FRiGiDiTy/device_functions.git
 
   flutter:
     sdk: flutter

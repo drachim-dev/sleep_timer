@@ -70,13 +70,11 @@ public class AlarmService extends Service {
                 sendBroadcast(showRunningIntent);
                 break;
             case ACTION_STOP:
-                _stopAlarm();
                 stopForeground(true);
                 stopSelf();
             default:
                 if(isRunning()) {
                     isRunning = false;
-                    _stopAlarm();
                     stopForeground(true);
                     stopSelf();
                 }
@@ -108,8 +106,9 @@ public class AlarmService extends Service {
     }
 
     public void onDestroy() {
-        isRunning = false;
         Log.wtf(TAG, "onDestroy Service");
+        _stopAlarm();
+        isRunning = false;
     }
     public static boolean isRunning() {
         return isRunning;

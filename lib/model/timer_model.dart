@@ -27,6 +27,8 @@ class TimerModel {
       _actions.singleWhere((action) => action.id == ActionType.SCREEN);
   ValueActionModel get volumeAction =>
       _actions.singleWhere((action) => action.id == ActionType.VOLUME);
+  ActionModel get doNotDisturbAction =>
+      _actions.singleWhere((action) => action.id == ActionType.DND);
   ActionModel get lightAction =>
       _actions.singleWhere((action) => action.id == ActionType.LIGHT);
   ActionModel get appAction =>

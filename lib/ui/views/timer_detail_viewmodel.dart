@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -10,6 +11,7 @@ import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
+import 'package:device_functions/messages_generated.dart';
 import 'package:stacked/stacked.dart';
 
 class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
@@ -19,24 +21,40 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   final _purchaseService = locator<PurchaseService>();
   final _deviceService = locator<DeviceService>();
 
-  bool _isStarting = true;
+  bool _newInstance;
+
+  bool _isStarting = false;
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
+  bool get notificationSettingsAccess =>
+      _deviceService.notificationSettingsAccess ?? false;
 
   TimerDetailViewModel(this._timerModel)
-      : _timerService = locator<TimerService>(param1: _timerModel) {
-    TimerServiceManager.getInstance().setTimerService(_timerService);
+      : _timerService =
+            TimerServiceManager.getInstance().getTimerService(_timerModel.id) ??
+                locator<TimerService>(param1: _timerModel),
+        _maxTime = _timerModel.initialTimeInSeconds {
+    _newInstance =
+        TimerServiceManager.getInstance().getTimerService(timerModel.id) ==
+            null;
+    if (_newInstance) {
+      TimerServiceManager.getInstance().setTimerService(_timerService);
+    }
   }
 
   TimerModel get timerModel => _timerModel;
   int get initialTime => _timerModel.initialTimeInSeconds;
   int get remainingTime => _timerService.remainingTime;
-  int get maxTime => _timerService.maxTime;
 
+  int _maxTime;
+  int get maxTime => _maxTime;
+
+  bool get isActive => _timerService.isActive;
   bool get isStarting => _isStarting;
-  bool get isActive => _timerService.timer?.isActive ?? false;
 
   bool _isAdFree = false;
   bool get isAdFree => _isAdFree;
+
+  Future<VolumeResponse> get volume => _deviceService.volume;
 
   @override
   Future<void> initialise() async {
@@ -53,8 +71,10 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
             orElse: () => null) !=
         null;
 
-    await initActionPreferences();
-    startTimer(delay: const Duration(milliseconds: 1500));
+    if (_newInstance) {
+      await initActionPreferences();
+      startTimer(delay: const Duration(milliseconds: 1500));
+    }
   }
 
   Future<void> initActionPreferences() async {
@@ -79,17 +99,23 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> startTimer(
       {final Duration delay = const Duration(seconds: 0)}) async {
     _isStarting = true;
-    await Future.delayed(delay, () {
+    setBusy(true);
+    notifyListeners();
+    await runBusyFuture(Future.delayed(delay, () {
       _timerService.start();
-    });
+    }));
     _isStarting = false;
   }
 
-  void pauseTimer() => _timerService.pauseTimer();
+  void pauseTimer() {
+    _timerService.pauseTimer();
+  }
 
   void onExtendTime(int minutes) {
     final int seconds = minutes * 60;
     _timerService.extendTime(seconds);
+
+    _maxTime = max(timerModel.initialTimeInSeconds, remainingTime);
   }
 
   void onChangeMedia(bool enabled) {
@@ -125,6 +151,12 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   void onChangeVolumeLevel(double value) {
     _timerModel.volumeAction.value = value;
     _prefsService.setDouble(_timerModel.volumeAction.key, value);
+    notifyListeners();
+  }
+
+  void onChangeDoNotDisturb(bool enabled) {
+    _timerModel.doNotDisturbAction.enabled = enabled;
+    _prefsService.setBool(ActionType.DND.toString(), enabled);
     notifyListeners();
   }
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
@@ -15,18 +14,17 @@ class TimerService with ReactiveServiceMixin {
   final TimerModel timerModel;
   Timer _timer;
 
-  Timer get timer => _timer;
+  final RxValue<bool> _isActive = RxValue(initial: true);
+  bool get isActive => _isActive.value;
 
   TimerService(@factoryParam this.timerModel)
       : _remainingTime =
             RxValue<int>(initial: timerModel.initialTimeInSeconds) {
-    listenToReactiveValues([_remainingTime]);
+    listenToReactiveValues([_remainingTime, _isActive]);
   }
 
   final RxValue<int> _remainingTime;
   int get remainingTime => _remainingTime.value;
-
-  int get maxTime => max(timerModel.initialTimeInSeconds, remainingTime);
 
   void setRemainingTime(int value) {
     _remainingTime.value = value;
@@ -38,6 +36,7 @@ class TimerService with ReactiveServiceMixin {
     _timer = Timer.periodic(interval, (timer) {
       remainingTime > 0 ? setRemainingTime(remainingTime - 1) : _disposeTimer();
     });
+    _isActive.value = true;
 
     _deviceService.showRunningNotification(
         timerId: timerModel.id,
@@ -73,6 +72,7 @@ class TimerService with ReactiveServiceMixin {
   void _disposeTimer() {
     _timer?.cancel();
     _timer = null;
+    _isActive.value = false;
   }
 
   Future<void> handleAlarm() async {
@@ -80,10 +80,15 @@ class TimerService with ReactiveServiceMixin {
 
     if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
     if (timerModel.wifiAction.enabled) _deviceService.toggleWifi(false);
-    if (timerModel.bluetoothAction.enabled) _deviceService.toggleBluetooth(false);
+    if (timerModel.bluetoothAction.enabled)
+      _deviceService.toggleBluetooth(false);
     if (timerModel.screenAction.enabled && _deviceService.deviceAdmin)
       _deviceService.toggleScreen(false);
-    if (timerModel.volumeAction.enabled) _deviceService.setVolume(timerModel.volumeAction.value.floor(), 10);
+    if (timerModel.volumeAction.enabled)
+      _deviceService.setVolume(timerModel.volumeAction.value.truncate());
+    if (timerModel.doNotDisturbAction.enabled &&
+        _deviceService.notificationSettingsAccess)
+      _deviceService.toggleDoNotDisturb(true);
 
     _deviceService.showElapsedNotification(timerModel: timerModel);
   }

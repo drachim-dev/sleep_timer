@@ -131,6 +131,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Notification notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.getTitle())
                 .setContentText(request.getDescription())
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(request.getDescription()))
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
@@ -145,7 +147,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         final Intent intent = new Intent(context, MainActivity.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         final Messages.OpenRequest request = new Messages.OpenRequest();
         request.setTimerId(timerId);

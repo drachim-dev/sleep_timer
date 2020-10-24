@@ -7,6 +7,7 @@ import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
 import 'package:device_functions/platform_interface.dart';
+import 'package:device_functions/messages_generated.dart';
 
 @lazySingleton
 class DeviceService with ReactiveServiceMixin {
@@ -20,12 +21,15 @@ class DeviceService with ReactiveServiceMixin {
   RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
   bool get deviceAdmin => _deviceAdmin.value;
 
+  Future<VolumeResponse> get volume => _deviceFunctionsPlatform.getVolume();
+
   RxValue<bool> _notificationSettingsAccess = RxValue<bool>(initial: false);
   bool get notificationSettingsAccess => _notificationSettingsAccess.value;
 
   Future<void> init() async {
     _deviceAdmin.value = await _deviceFunctionsPlatform.isDeviceAdminActive();
-    _notificationSettingsAccess.value = await _deviceFunctionsPlatform.isNotificationAccessGranted();
+    _notificationSettingsAccess.value =
+        await _deviceFunctionsPlatform.isNotificationAccessGranted();
   }
 
   Future<bool> toggleMedia(final bool enable) {
@@ -44,13 +48,16 @@ class DeviceService with ReactiveServiceMixin {
     return _deviceFunctionsPlatform.toggleScreen(enable);
   }
 
-  Future<int> setVolume(final int level, final int maxIndex) {
-    return _deviceFunctionsPlatform.setVolume(level, maxIndex);
+  Future<VolumeResponse> setVolume(final int level) {
+    return _deviceFunctionsPlatform.setVolume(level);
+  }
+
+  Future<bool> toggleDoNotDisturb(final bool enable) {
+    return _deviceFunctionsPlatform.toggleDoNotDisturb(enable);
   }
 
   Future<void> toggleDeviceAdmin(bool enable) async {
     await _deviceFunctionsPlatform.toggleDeviceAdmin(enable);
-
   }
 
   Future<void> toggleNotificationSettingsAccess(bool enable) async {
@@ -98,16 +105,9 @@ class DeviceService with ReactiveServiceMixin {
     if (activeActions.isEmpty) {
       description += "No actions selected for execution.";
     } else {
-      description += "Toggle ";
-
       for (var i = 0; i < activeActions.length; i++) {
         final element = activeActions.elementAt(i);
-        description += "${element.title}";
-
-        // Add separator, if it's not the last element
-        if (i != activeActions.length - 1) {
-          description += ", ";
-        }
+        description += "${element.description}. ";
       }
     }
 
@@ -133,5 +133,4 @@ class DeviceService with ReactiveServiceMixin {
   void setNotificationAccess(final bool granted) {
     _notificationSettingsAccess.value = granted;
   }
-
 }

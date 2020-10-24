@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum ActionType { MEDIA, WIFI, BLUETOOTH, SCREEN, VOLUME, LIGHT, APP }
+enum ActionType { MEDIA, WIFI, BLUETOOTH, SCREEN, VOLUME, DND, LIGHT, APP }
 
 class ActionModel {
   final ActionType id;

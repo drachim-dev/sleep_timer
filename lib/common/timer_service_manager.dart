@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 
 class TimerServiceManager {

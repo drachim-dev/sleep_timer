@@ -16,6 +16,7 @@ class TimerViewModel extends BaseViewModel {
   int get initialTime => _initialTime;
 
   TimerViewModel() {
+    _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
     _initActions();
   }
 
@@ -23,10 +24,11 @@ class TimerViewModel extends BaseViewModel {
     final bool mediaAction = _prefService.get(ActionType.MEDIA.toString());
     final bool wifiAction = _prefService.get(ActionType.WIFI.toString());
     final bool bluetoothAction =
-    _prefService.get(ActionType.BLUETOOTH.toString());
+        _prefService.get(ActionType.BLUETOOTH.toString());
     final bool screenAction = _prefService.get(ActionType.SCREEN.toString());
     final bool volumeAction = _prefService.get(ActionType.VOLUME.toString());
-    final double volumeLevel= _prefService.get(kKeyVolumeLevel);
+    final double volumeLevel = _prefService.get(kKeyVolumeLevel);
+    final bool dndAction = _prefService.get(ActionType.DND.toString());
     final bool lightAction = _prefService.get(ActionType.LIGHT.toString());
     final bool actionAction = _prefService.get(ActionType.APP.toString());
 
@@ -40,19 +42,19 @@ class TimerViewModel extends BaseViewModel {
       ActionModel(
         id: ActionType.WIFI,
         title: "Wifi",
-        description: "Turn off wifi",
+        description: "Disable wifi",
         enabled: wifiAction ?? false,
       ),
       ActionModel(
         id: ActionType.BLUETOOTH,
         title: "Bluetooth",
-        description: "Turn off bluetooth",
+        description: "Disable bluetooth",
         enabled: bluetoothAction ?? true,
       ),
       ActionModel(
         id: ActionType.SCREEN,
         title: "Screen",
-        description: "Turn off screen",
+        description: "Turn screen off",
         enabled: screenAction ?? false,
         common: false,
       ),
@@ -66,9 +68,16 @@ class TimerViewModel extends BaseViewModel {
         key: kKeyVolumeLevel,
       ),
       ActionModel(
+        id: ActionType.DND,
+        title: "Do not disturb",
+        description: "Enable do not disturb",
+        enabled: dndAction ?? false,
+        common: true,
+      ),
+      ActionModel(
         id: ActionType.LIGHT,
         title: "Light",
-        description: "Turn off 3 lights",
+        description: "Turn 3 lights off",
         enabled: lightAction ?? false,
         common: false,
       ),
@@ -93,6 +102,8 @@ class TimerViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void setTime(int value) => _initialTime = value;
-
+  void setTime(int value) {
+    _initialTime = value;
+    _prefService.setInt(kPrefKeyInitialTime, value);
+  }
 }

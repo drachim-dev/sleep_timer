@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/messages_generated.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 import 'common/timer_service_manager.dart';
 
@@ -71,7 +73,6 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
         .cancelNotification(CancelNotificationRequest()..timerId = timerId);
     return response.success;
   }
-
 }
 
 class FlutterApiHandler extends FlutterTimerApi {
@@ -93,7 +94,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("extend time by: ${arg.additionalTime} for timer with id $timerId");
 
     final _timerService =
-    TimerServiceManager.getInstance().getTimerService(timerId);
+        TimerServiceManager.getInstance().getTimerService(timerId);
     _timerService.extendTime(arg.additionalTime);
   }
 
@@ -101,6 +102,14 @@ class FlutterApiHandler extends FlutterTimerApi {
   void onOpen(OpenRequest arg) {
     final String timerId = arg.timerId;
     print("onOpen called for timer with id $timerId");
+
+    final _timerService =
+        TimerServiceManager.getInstance().getTimerService(timerId);
+    final _navigationService = locator<NavigationService>();
+
+    // Navigate to timer detail view
+    _navigationService.replaceWith(Routes.timerDetailView,
+        arguments: TimerDetailViewArguments(timer: _timerService.timerModel));
   }
 
   @override
@@ -109,7 +118,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("onPauseRequest requested for timer with id $timerId");
 
     final _timerService =
-    TimerServiceManager.getInstance().getTimerService(timerId);
+        TimerServiceManager.getInstance().getTimerService(timerId);
     _timerService.pauseTimer();
   }
 
@@ -119,7 +128,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("onCancelRequest called for timer with id $timerId");
 
     final _timerService =
-    TimerServiceManager.getInstance().getTimerService(timerId);
+        TimerServiceManager.getInstance().getTimerService(timerId);
     _timerService.cancelTimer();
   }
 
@@ -129,7 +138,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("onContinueRequest called for timer with id $timerId");
 
     final _timerService =
-    TimerServiceManager.getInstance().getTimerService(timerId);
+        TimerServiceManager.getInstance().getTimerService(timerId);
     _timerService.start();
   }
 
@@ -139,7 +148,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("onRestartRequest called for timer with id $timerId");
 
     final _timerService =
-    TimerServiceManager.getInstance().getTimerService(timerId);
+        TimerServiceManager.getInstance().getTimerService(timerId);
     _timerService.restartTimer();
   }
 
@@ -148,5 +157,4 @@ class FlutterApiHandler extends FlutterTimerApi {
     print("onAlarm()");
     alarmCallback(arg.timerId);
   }
-
 }
