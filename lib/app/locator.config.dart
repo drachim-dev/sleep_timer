@@ -6,6 +6,7 @@
 
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,6 @@ import '../services/theme_service.dart';
 import '../services/third_party_services_module.dart';
 import '../model/timer_model.dart';
 import '../services/timer_service.dart';
-import '../common/timer_service_manager.dart';
 
 /// adds generated dependencies
 /// to the provided [GetIt] instance
@@ -29,15 +29,18 @@ Future<GetIt> $initGetIt(
   final thirdPartyServicesModule = _$ThirdPartyServicesModule();
   gh.lazySingleton<DeviceService>(() => DeviceService());
   gh.lazySingleton<DialogService>(() => thirdPartyServicesModule.dialogService);
+  gh.lazySingleton<InAppPurchaseConnection>(
+      () => thirdPartyServicesModule.iapService);
   gh.lazySingleton<NavigationService>(
       () => thirdPartyServicesModule.navigationService);
-  gh.lazySingleton<PurchaseService>(() => PurchaseService());
   final sharedPreferences = await thirdPartyServicesModule.prefsService;
   gh.factory<SharedPreferences>(() => sharedPreferences);
   gh.lazySingleton<ThemeService>(() => ThemeService());
   gh.factoryParam<TimerService, TimerModel, dynamic>(
       (timerModel, _) => TimerService(timerModel));
-  gh.lazySingleton<TimerServiceManager>(() => TimerServiceManager());
+
+  // Eager singletons must be registered in the right order
+  gh.singletonAsync<PurchaseService>(() => PurchaseService.create());
   return get;
 }
 

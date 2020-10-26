@@ -57,7 +57,7 @@ class AutoRouter extends RouterBase {
       return MaterialPageRoute<dynamic>(
         builder: (context) => TimerDetailView(
           key: args.key,
-          timerModel: args.timer,
+          timerModel: args.timerModel,
         ),
         settings: data,
       );
@@ -78,6 +78,6 @@ class AutoRouter extends RouterBase {
 /// TimerDetailView arguments holder class
 class TimerDetailViewArguments {
   final Key key;
-  final TimerModel timer;
-  TimerDetailViewArguments({this.key, @required this.timer});
+  final TimerModel timerModel;
+  TimerDetailViewArguments({this.key, @required this.timerModel});
 }

@@ -1,29 +1,28 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:device_functions/messages_generated.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
-import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
-import 'package:device_functions/messages_generated.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   final TimerService _timerService;
   final TimerModel _timerModel;
+  final _navigationService = locator<NavigationService>();
   final _prefsService = locator<SharedPreferences>();
   final _purchaseService = locator<PurchaseService>();
   final _deviceService = locator<DeviceService>();
 
   bool _newInstance;
 
-  bool _isStarting = false;
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
@@ -38,14 +37,21 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
     if (_newInstance) {
       TimerServiceManager.getInstance().setTimerService(_timerService);
     }
+
+    // Check for adFree in-app purchase
+    _isAdFree = _purchaseService.products.firstWhere(
+            (element) =>
+                element.productDetails.id == kProductRemoveAds &&
+                element.purchased,
+            orElse: () => null) !=
+        null;
   }
 
   TimerModel get timerModel => _timerModel;
   int get initialTime => _timerModel.initialTimeInSeconds;
   int get remainingTime => _timerService.remainingTime;
 
-  bool get isActive => _timerService.isActive;
-  bool get isStarting => _isStarting;
+  bool get isRunning => _timerService.isActive;
 
   bool _isAdFree = false;
   bool get isAdFree => _isAdFree;
@@ -56,19 +62,6 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
 
   @override
   Future<void> initialise() async {
-    setBusy(true);
-    notifyListeners();
-
-    // Check for adFree in-app purchase
-    final List<Product> products =
-        await runBusyFuture(_purchaseService.products);
-    _isAdFree = products.firstWhere(
-            (element) =>
-                element.productDetails.id == kProductRemoveAds &&
-                element.purchased,
-            orElse: () => null) !=
-        null;
-
     if (_newInstance) {
       await initActionPreferences();
       startTimer(delay: const Duration(milliseconds: 1500));
@@ -96,17 +89,19 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
 
   Future<void> startTimer(
       {final Duration delay = const Duration(seconds: 0)}) async {
-    _isStarting = true;
-    setBusy(true);
-    notifyListeners();
     await runBusyFuture(Future.delayed(delay, () {
       _timerService.start();
     }));
-    _isStarting = false;
   }
 
-  void pauseTimer() {
-    _timerService.pauseTimer();
+  void pauseTimer() => _timerService.pauseTimer();
+  void cancelTimer() async {
+    _navigationService.back();
+    await runBusyFuture(_timerService.cancelTimer());
+  }
+
+  void navigateBack() {
+    _navigationService.back(result: timerModel.id);
   }
 
   void onExtendTime(int minutes) {

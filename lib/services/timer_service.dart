@@ -70,7 +70,7 @@ class TimerService with ReactiveServiceMixin {
     _disposeTimer();
   }
 
-  void cancelTimer() {
+  Future<void> cancelTimer() async {
     _deviceService.cancelNotification(timerId: timerModel.id);
     _disposeTimer();
   }

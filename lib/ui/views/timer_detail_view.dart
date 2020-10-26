@@ -1,21 +1,19 @@
-import 'dart:math';
+import 'dart:async';
 import 'dart:ui';
 
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:flutter_native_admob/native_admob_options.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
-import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
-import 'package:device_functions/messages_generated.dart';
 
 import 'timer_detail_viewmodel.dart';
 
@@ -30,12 +28,7 @@ class TimerDetailView extends StatefulWidget {
 
 class _TimerDetailViewState extends State<TimerDetailView>
     with TickerProviderStateMixin {
-  final targetingInfo = MobileAdTargetingInfo(
-      testDevices:
-          AdManager.testDeviceId != null ? AdManager.testDeviceId : null);
-
-  final _controller = NativeAdmobController();
-
+  final _adController = NativeAdmobController();
   final _scrollController = ScrollController();
   AnimationController _hideFabAnimController;
   AnimationController _fabAnimController;
@@ -45,13 +38,31 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
   _TimerDetailViewState();
 
+  StreamSubscription _adControllerSubscription;
+  double _adHeight = 0;
+
   @override
   void initState() {
+    _adController.setTestDeviceIds(AdManager.testDeviceId);
+    _adControllerSubscription =
+        _adController.stateChanged.listen(_onStateChanged);
+
     super.initState();
 
     initAnimations();
-    FirebaseAdMob.instance.initialize(appId: AdManager.appId);
-    _controller.setTestDeviceIds(AdManager.testDeviceId);
+  }
+
+  void _onStateChanged(AdLoadState state) {
+    switch (state) {
+      case AdLoadState.loadCompleted:
+        setState(() {
+          _adHeight = 80;
+        });
+        break;
+
+      default:
+        break;
+    }
   }
 
   void initAnimations() {
@@ -69,6 +80,8 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
   @override
   void dispose() {
+    _adControllerSubscription.cancel();
+    _adController.dispose();
     _scrollController.dispose();
     _hideFabAnimController.dispose();
     _fabAnimController.dispose();
@@ -84,59 +97,82 @@ class _TimerDetailViewState extends State<TimerDetailView>
         viewModelBuilder: () => TimerDetailViewModel(widget.timerModel),
         onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
-          return NotificationListener(
-            onNotification: _onScrollNotification,
-            child: Scaffold(
-              body: _buildBody(theme),
-              floatingActionButton: _buildFAB(theme),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
+          return WillPopScope(
+            onWillPop: () async {
+              model.navigateBack();
+              return false;
+            },
+            child: NotificationListener(
+              onNotification: _onScrollNotification,
+              child: Scaffold(
+                appBar: _buildAppBar(theme),
+                body: _buildBody(theme),
+                floatingActionButton: _buildFAB(theme),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+              ),
             ),
           );
         });
   }
 
-  Widget _buildBody(final ThemeData theme) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(top: kVerticalPaddingBig),
-        child: Column(
-          children: [
-            TimerSlider(
-                initialValue: model.remainingTime,
-                maxValue: model.maxTime,
-                hasHandle: false,
-                labelStyle: theme.textTheme.headline2.copyWith(
-                  shadows: [Shadow(blurRadius: 5.0, color: Colors.white)],
-                ),
-                size: 200,
-                onUpdateLabel: (value) {
-                  return Utils.secondsToString(value.round(), spacing: true);
-                }),
-            SizedBox(height: 24),
-            _buildExtendTimeRow(),
-            Expanded(
-              child: ListView(
-                controller: _scrollController,
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                children: [
-                  ExpansionTile(
-                      title: Text("Common actions"),
-                      initiallyExpanded: true,
-                      children: _buildCommonActions(theme)),
-                  ExpansionTile(
-                      title: Text("More"),
-                      initiallyExpanded: model.timerModel.actions.any((action) {
-                        return !action.common && action.enabled;
-                      }),
-                      children: _buildMoreActions()),
-                ],
-              ),
-            ),
-          ],
-        ),
+  AppBar _buildAppBar(final ThemeData theme) {
+    const double height = 200;
+
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => model.navigateBack(),
       ),
+      automaticallyImplyLeading: false,
+      bottom: PreferredSize(
+        preferredSize: Size(height, height),
+        child: TimerSlider(
+            initialValue: model.remainingTime,
+            maxValue: model.maxTime,
+            hasHandle: false,
+            labelStyle: theme.textTheme.headline2.copyWith(
+              shadows: [Shadow(blurRadius: 5.0, color: Colors.white)],
+            ),
+            size: height,
+            onUpdateLabel: (value) {
+              return Utils.secondsToString(value.round(), spacing: true);
+            }),
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () => model.cancelTimer(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(final ThemeData theme) {
+    return Column(
+      children: [
+        SizedBox(height: 24),
+        _buildExtendTimeRow(),
+        Expanded(
+          child: ListView(
+            controller: _scrollController,
+            shrinkWrap: true,
+            physics: ScrollPhysics(),
+            children: [
+              ExpansionTile(
+                  title: Text("Common actions"),
+                  initiallyExpanded: true,
+                  children: _buildCommonActions(theme)),
+              ExpansionTile(
+                  title: Text("More"),
+                  initiallyExpanded: model.timerModel.actions.any((action) {
+                    return !action.common && action.enabled;
+                  }),
+                  children: _buildMoreActions()),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -251,14 +287,14 @@ class _TimerDetailViewState extends State<TimerDetailView>
 
   Container _buildAd(ThemeData theme) {
     return Container(
-      height: 80,
+      height: _adHeight,
       padding: EdgeInsets.only(left: 16, right: 32, top: 8, bottom: 8),
       margin: EdgeInsets.only(bottom: 16),
       child: NativeAdmob(
         adUnitID: AdManager.nativeAdUnitId,
         loading: Center(child: CircularProgressIndicator()),
         error: Text("Failed to load the ad"),
-        controller: _controller,
+        controller: _adController,
         type: NativeAdmobType.banner,
         options: NativeAdmobOptions(
           ratingColor: Colors.red,
@@ -302,7 +338,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
     final TextStyle textStyle =
         theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
-    if (model.isActive) {
+    if (model.isRunning) {
       _fabAnimController.reverse();
     } else {
       _fabAnimController.forward();
@@ -318,11 +354,11 @@ class _TimerDetailViewState extends State<TimerDetailView>
             color: foregroundColor,
           ),
           label: Text(
-            model.isActive ? "Pause" : "Continue",
+            model.isRunning ? "Pause" : "Continue",
             style: textStyle,
           ),
           onPressed: () {
-            if (model.isActive) {
+            if (model.isRunning) {
               model.pauseTimer();
             } else {
               model.startTimer();

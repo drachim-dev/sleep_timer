@@ -79,27 +79,35 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         });
   }
 
-  AppBar _buildAppBar(ThemeData theme) {
-    return AppBar(
-      bottom: PreferredSize(
-        preferredSize: Size(64, 64),
-        child: Text(
-          _navItems[model.currentIndex].title,
-          style: theme.textTheme.headline2,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      actions: [
-        PopupMenuButton<MenuOption>(
-          onSelected: _onMenuOption,
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              child: Text("Settings"),
-              value: MenuOption.settings,
+  PreferredSize _buildAppBar(ThemeData theme) {
+    const double padding = 20;
+
+    return PreferredSize(
+      preferredSize: Size.fromHeight(52.0 + padding),
+      child: SafeArea(
+        child: AppBar(
+          centerTitle: true,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.only(top: padding),
+            child: Text(
+              _navItems[model.currentIndex].title,
+              style: theme.textTheme.headline2,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: [
+            PopupMenuButton<MenuOption>(
+              onSelected: _onMenuOption,
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Text("Settings"),
+                  value: MenuOption.settings,
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 

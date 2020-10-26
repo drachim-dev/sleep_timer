@@ -26,6 +26,8 @@ class _TimerViewState extends State<TimerView> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return ViewModelBuilder<TimerViewModel>.reactive(
         viewModelBuilder: () => TimerViewModel(),
         onModelReady: (model) => this.model = model,
@@ -34,9 +36,9 @@ class _TimerViewState extends State<TimerView> {
             padding: const EdgeInsets.symmetric(
                 horizontal: kHorizontalPadding, vertical: kVerticalPaddingBig),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                model.hasActiveTimer ? _buildActiveTimers(theme) : SizedBox(),
                 TimerSlider(
                   initialValue: model.initialTime,
                   onUpdateLabel: (value) => "$value Min",
@@ -60,5 +62,18 @@ class _TimerViewState extends State<TimerView> {
         });
   }
 
-  void onClickFAB() => model.navigateToTimerDetail();
+  Widget _buildActiveTimers(ThemeData theme) {
+    return FlatButton(
+      child: Text("Tap here to see your timer"),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      shape: StadiumBorder(
+          side: BorderSide(
+        color: theme.colorScheme.primary.withAlpha(50),
+        width: 3,
+      )),
+      onPressed: () => model.openActiveTimer(),
+    );
+  }
+
+  void onClickFAB() => model.startNewTimer();
 }

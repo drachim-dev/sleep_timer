@@ -43,8 +43,8 @@ class TimerSlider extends StatelessWidget {
     final double shadowWidth = theme.brightness == Brightness.light ? 30 : 25;
 
     return SleekCircularSlider(
-        min: 0.0,
-        max: maxValue?.toDouble() ?? 60.0,
+        min: 1,
+        max: maxValue?.toDouble() ?? 60,
         initialValue: initialValue.toDouble(),
         appearance: CircularSliderAppearance(
             size: size ?? 256,

@@ -22,13 +22,10 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   bool get experimentActive => deviceAdmin || notificationSettingsAccess;
   String get currentTheme => _prefsService.getString(kPrefKeyTheme) ?? 'Dark';
 
-  StreamSubscription _streamSubscription;
-  StreamSubscription get streamSubscription => _streamSubscription;
   Stream<List<PurchaseDetails>> get stream =>
       _purchaseService.purchaseUpdatedStream;
 
-  List<Product> _products = [];
-  List<Product> get products => _products;
+  List<Product> get products => _purchaseService.products;
 
   @override
   List<ReactiveServiceMixin> get reactiveServices =>
@@ -36,26 +33,13 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
 
   @override
   Future initialise() async {
-    setError(null);
-    // We set busy manually as well because when notify listeners is called to clear error messages the
-    // ui is rebuilt and if you expect busy to be true it's not.
-    setBusy(true);
-    notifyListeners();
-
     await _deviceService.init();
-    _products = await runBusyFuture(_purchaseService.products);
 
-    _streamSubscription = stream.listen((data) async {
+    stream.listen((data) async {
       setBusy(true);
-      _products = await runBusyFuture(_purchaseService.products);
+      await runBusyFuture(_purchaseService.updateProducts());
       notifyListeners();
     });
-  }
-
-  @override
-  void dispose() {
-    _streamSubscription.cancel();
-    super.dispose();
   }
 
   void onChangeDeviceAdmin(final bool value) async {

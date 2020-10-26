@@ -5,6 +5,7 @@ import 'package:preferences/preferences.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:stacked/stacked.dart';
+
 import 'settings_viewmodel.dart';
 
 class SettingsView extends StatefulWidget {
@@ -35,6 +36,9 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   PreferencePage _buildBody(final ThemeData theme) {
+    print("Warum?? ");
+    print(model.products.length);
+
     return PreferencePage(
       [
         PreferenceTitle("Appearance", leftPadding: kPreferenceTitleLeftPadding),
