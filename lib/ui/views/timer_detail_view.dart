@@ -161,15 +161,13 @@ class _TimerDetailViewState extends State<TimerDetailView>
             physics: ScrollPhysics(),
             children: [
               ExpansionTile(
-                  title: Text("Common actions"),
+                  title: Text("Actions"),
                   initiallyExpanded: true,
-                  children: _buildCommonActions(theme)),
+                  children: _buildActions(theme)),
               ExpansionTile(
-                  title: Text("More"),
-                  initiallyExpanded: model.timerModel.actions.any((action) {
-                    return !action.common && action.enabled;
-                  }),
-                  children: _buildMoreActions()),
+                  title: Text("Experiments"),
+                  initiallyExpanded: model.hasExperiment,
+                  children: _buildExperiments()),
             ],
           ),
         ),
@@ -207,7 +205,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
         }).toList());
   }
 
-  List<Widget> _buildCommonActions(final ThemeData theme) {
+  List<Widget> _buildActions(final ThemeData theme) {
     return [
       SwitchListTile(
         secondary: Icon(Icons.music_off_outlined),
@@ -217,13 +215,14 @@ class _TimerDetailViewState extends State<TimerDetailView>
         onChanged: model.onChangeMedia,
       ),
       if (!model.isAdFree) _buildAd(theme),
-      SwitchListTile(
-        secondary: Icon(Icons.wifi_off_outlined),
-        title: Text(model.timerModel.wifiAction.title),
-        subtitle: Text(model.timerModel.wifiAction.description),
-        value: model.timerModel.wifiAction.enabled,
-        onChanged: model.onChangeWifi,
-      ),
+      if (model.platformVersion < 29)
+        SwitchListTile(
+          secondary: Icon(Icons.wifi_off_outlined),
+          title: Text(model.timerModel.wifiAction.title),
+          subtitle: Text(model.timerModel.wifiAction.description),
+          value: model.timerModel.wifiAction.enabled,
+          onChanged: model.onChangeWifi,
+        ),
       SwitchListTile(
         secondary: Icon(Icons.bluetooth_disabled_outlined),
         title: Text(model.timerModel.bluetoothAction.title),
@@ -231,27 +230,6 @@ class _TimerDetailViewState extends State<TimerDetailView>
         value: model.timerModel.bluetoothAction.enabled,
         onChanged: model.onChangeBluetooth,
       ),
-      if (model.notificationSettingsAccess)
-        SwitchListTile(
-          secondary: Icon(Icons.do_not_disturb_on),
-          title: Text(model.timerModel.doNotDisturbAction.title),
-          subtitle: Text(model.timerModel.doNotDisturbAction.description),
-          value: model.timerModel.doNotDisturbAction.enabled,
-          onChanged: model.onChangeDoNotDisturb,
-        ),
-    ];
-  }
-
-  List<Widget> _buildMoreActions() {
-    return [
-      if (model.deviceAdmin)
-        SwitchListTile(
-          secondary: Icon(Icons.tv_off_outlined),
-          title: Text(model.timerModel.screenAction.title),
-          subtitle: Text(model.timerModel.screenAction.description),
-          value: model.timerModel.screenAction.enabled,
-          onChanged: model.onChangeScreen,
-        ),
       ListTile(
         leading: Icon(Icons.volume_down_outlined),
         title: Text(model.timerModel.volumeAction.title),
@@ -261,6 +239,29 @@ class _TimerDetailViewState extends State<TimerDetailView>
           value: model.timerModel.volumeAction.enabled,
           onChanged: model.onChangeVolume,
         ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildExperiments() {
+    return [
+      if (!model.hasExperiment)
+        ListTile(title: Text("Go to settings to enable experiments.")),
+      SwitchListTile(
+        secondary: Icon(Icons.do_not_disturb_on),
+        title: Text(model.timerModel.doNotDisturbAction.title),
+        subtitle: Text(model.timerModel.doNotDisturbAction.description),
+        value: model.timerModel.doNotDisturbAction.enabled,
+        onChanged: model.notificationSettingsAccess
+            ? model.onChangeDoNotDisturb
+            : null,
+      ),
+      SwitchListTile(
+        secondary: Icon(Icons.tv_off_outlined),
+        title: Text(model.timerModel.screenAction.title),
+        subtitle: Text(model.timerModel.screenAction.description),
+        value: model.timerModel.screenAction.enabled,
+        onChanged: model.deviceAdmin ? model.onChangeScreen : null,
       ),
       // TODO: Enable connection to philips hue
       if (false)

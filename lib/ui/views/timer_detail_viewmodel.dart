@@ -26,6 +26,7 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
+  bool get hasExperiment => deviceAdmin || notificationSettingsAccess;
 
   TimerDetailViewModel(this._timerModel)
       : _timerService =
@@ -59,9 +60,11 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   int get maxTime => _timerService.maxTime;
 
   Future<VolumeResponse> get volume => _deviceService.volume;
+  int get platformVersion => _deviceService.platformVersion;
 
   @override
   Future<void> initialise() async {
+    await _deviceService.init();
     if (_newInstance) {
       await initActionPreferences();
       startTimer(delay: const Duration(milliseconds: kStartTimerDelay));

@@ -6,14 +6,14 @@ enum ActionType { MEDIA, WIFI, BLUETOOTH, SCREEN, VOLUME, DND, LIGHT, APP }
 class ActionModel {
   final ActionType id;
   final String title, description;
-  final bool common;
+  final bool experiment;
   bool enabled;
 
   ActionModel(
       {@required this.id,
       @required this.title,
       @required this.description,
-      this.common = true,
+      this.experiment = false,
       @required this.enabled});
 }
 
@@ -24,12 +24,12 @@ class ValueActionModel extends ActionModel {
   String get description => "${super.description} ${value.toInt()}";
 
   ValueActionModel(
-      {id, title, description, common, enabled, @required this.value, this.key})
+      {id, title, description, experiment, enabled, @required this.value, this.key})
       : super(
             id: id,
             title: title,
             description: description,
-            common: common,
+            experiment: experiment,
             enabled: enabled);
 }
 
@@ -57,14 +57,14 @@ List<ActionModel> actionList = [
     title: "Screen",
     description: "Turn screen off",
     enabled: false,
-    common: false,
+    experiment: true,
   ),
   ValueActionModel(
     id: ActionType.VOLUME,
     title: "Volume",
     description: "Set media volume to ",
     enabled: false,
-    common: false,
+    experiment: false,
     value: 14.0,
     key: kKeyVolumeLevel,
   ),
@@ -73,20 +73,20 @@ List<ActionModel> actionList = [
     title: "Do not disturb",
     description: "Enable do not disturb",
     enabled: false,
-    common: true,
+    experiment: true,
   ),
   ActionModel(
     id: ActionType.LIGHT,
     title: "Light",
     description: "Turn 3 lights off",
     enabled: false,
-    common: false,
+    experiment: true,
   ),
   ActionModel(
     id: ActionType.APP,
     title: "App",
     description: "Force close YouTube",
     enabled: false,
-    common: false,
+    experiment: true,
   ),
 ];

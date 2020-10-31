@@ -88,7 +88,8 @@ class TimerService with ReactiveServiceMixin {
     log.i("handleAlarm()");
 
     if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
-    if (timerModel.wifiAction.enabled) _deviceService.toggleWifi(false);
+    if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29)
+      _deviceService.toggleWifi(false);
     if (timerModel.bluetoothAction.enabled)
       _deviceService.toggleBluetooth(false);
     if (timerModel.screenAction.enabled && _deviceService.deviceAdmin)

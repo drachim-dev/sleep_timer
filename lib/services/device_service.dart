@@ -1,3 +1,5 @@
+import 'package:device_functions/messages_generated.dart';
+import 'package:device_functions/platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:observable_ish/observable_ish.dart';
@@ -6,8 +8,6 @@ import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
-import 'package:device_functions/platform_interface.dart';
-import 'package:device_functions/messages_generated.dart';
 
 @lazySingleton
 class DeviceService with ReactiveServiceMixin {
@@ -18,6 +18,9 @@ class DeviceService with ReactiveServiceMixin {
     listenToReactiveValues([_deviceAdmin, _notificationSettingsAccess]);
   }
 
+  int _platformVersion;
+  int get platformVersion => _platformVersion;
+
   RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
   bool get deviceAdmin => _deviceAdmin.value;
 
@@ -27,6 +30,7 @@ class DeviceService with ReactiveServiceMixin {
   bool get notificationSettingsAccess => _notificationSettingsAccess.value;
 
   Future<void> init() async {
+    _platformVersion = await _deviceFunctionsPlatform.getPlatformVersion();
     _deviceAdmin.value = await _deviceFunctionsPlatform.isDeviceAdminActive();
     _notificationSettingsAccess.value =
         await _deviceFunctionsPlatform.isNotificationAccessGranted();
