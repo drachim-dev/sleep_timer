@@ -12,3 +12,7 @@ const Set<String> kProducts = {kProductRemoveAds, kProductDonation};
 
 const String kKeyVolumeLevel = "pref_key_volume_level";
 const String kPrefKeyInitialTime = "pref_key_initial_time";
+
+const int kDefaultInitialTime = 15;
+const int kStartTimerDelay = 1500;
+const double kAdHeight = 80;

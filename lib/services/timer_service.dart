@@ -3,14 +3,17 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:stacked/stacked.dart';
 
 @injectable
 class TimerService with ReactiveServiceMixin {
+  final Logger log = getLogger();
   final _deviceService = locator<DeviceService>();
   final TimerModel timerModel;
   Timer _timer;
@@ -82,7 +85,7 @@ class TimerService with ReactiveServiceMixin {
   }
 
   Future<void> handleAlarm() async {
-    print("handleAlarm()");
+    log.i("handleAlarm()");
 
     if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
     if (timerModel.wifiAction.enabled) _deviceService.toggleWifi(false);
@@ -104,13 +107,15 @@ class TimerService with ReactiveServiceMixin {
 }
 
 void onDeviceAdminCallback(final bool granted) async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final Logger log = getLogger();
+  log.d("onDeviceAdminGrantedCallback");
 
-  print('onDeviceAdminGrantedCallback');
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onNotificationAccessCallback(final bool granted) async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final Logger log = getLogger();
+  log.d("onNotificationAccessGrantedCallback");
 
-  print('onNotificationAccessGrantedCallback');
+  WidgetsFlutterBinding.ensureInitialized();
 }

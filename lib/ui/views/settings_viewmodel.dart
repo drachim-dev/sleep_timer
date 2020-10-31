@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
@@ -9,8 +10,10 @@ import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 class SettingsViewModel extends ReactiveViewModel implements Initialisable {
+  final _navigationService = locator<NavigationService>();
   final _prefsService = locator<SharedPreferences>();
   final _themeService = locator<ThemeService>();
   final _deviceService = locator<DeviceService>();
@@ -62,4 +65,10 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> buyProduct(final Product product) async {
     await _purchaseService.buyProduct(product);
   }
+
+  Future<void> navigateToCredits() async =>
+      _navigationService.navigateTo(Routes.creditsView);
+
+  Future<void> navigateToFAQ() async =>
+      _navigationService.navigateTo(Routes.fAQView);
 }

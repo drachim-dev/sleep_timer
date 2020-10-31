@@ -12,8 +12,7 @@ class TimerViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
   final _prefService = locator<SharedPreferences>();
 
-  List<ActionModel> _actions;
-  int _initialTime = 15;
+  int _initialTime = kDefaultInitialTime;
   int get initialTime => _initialTime;
 
   String _activeTimerId;
@@ -21,82 +20,14 @@ class TimerViewModel extends BaseViewModel {
 
   TimerViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
-    _initActions();
-  }
-
-  void _initActions() {
-    final bool mediaAction = _prefService.get(ActionType.MEDIA.toString());
-    final bool wifiAction = _prefService.get(ActionType.WIFI.toString());
-    final bool bluetoothAction =
-        _prefService.get(ActionType.BLUETOOTH.toString());
-    final bool screenAction = _prefService.get(ActionType.SCREEN.toString());
-    final bool volumeAction = _prefService.get(ActionType.VOLUME.toString());
-    final double volumeLevel = _prefService.get(kKeyVolumeLevel);
-    final bool dndAction = _prefService.get(ActionType.DND.toString());
-    final bool lightAction = _prefService.get(ActionType.LIGHT.toString());
-    final bool actionAction = _prefService.get(ActionType.APP.toString());
-
-    _actions = [
-      ActionModel(
-        id: ActionType.MEDIA,
-        title: "Media",
-        description: "Stop media playback",
-        enabled: mediaAction ?? true,
-      ),
-      ActionModel(
-        id: ActionType.WIFI,
-        title: "Wifi",
-        description: "Disable wifi",
-        enabled: wifiAction ?? false,
-      ),
-      ActionModel(
-        id: ActionType.BLUETOOTH,
-        title: "Bluetooth",
-        description: "Disable bluetooth",
-        enabled: bluetoothAction ?? true,
-      ),
-      ActionModel(
-        id: ActionType.SCREEN,
-        title: "Screen",
-        description: "Turn screen off",
-        enabled: screenAction ?? false,
-        common: false,
-      ),
-      ValueActionModel(
-        id: ActionType.VOLUME,
-        title: "Volume",
-        description: "Set media volume to ",
-        enabled: volumeAction ?? false,
-        common: false,
-        value: volumeLevel ?? 5.0,
-        key: kKeyVolumeLevel,
-      ),
-      ActionModel(
-        id: ActionType.DND,
-        title: "Do not disturb",
-        description: "Enable do not disturb",
-        enabled: dndAction ?? false,
-        common: true,
-      ),
-      ActionModel(
-        id: ActionType.LIGHT,
-        title: "Light",
-        description: "Turn 3 lights off",
-        enabled: lightAction ?? false,
-        common: false,
-      ),
-      ActionModel(
-        id: ActionType.APP,
-        title: "App",
-        description: "Force close YouTube",
-        enabled: actionAction ?? false,
-        common: false,
-      ),
-    ];
+    actionList.forEach((element) {
+      element.enabled =
+          _prefService.get(element.id.toString()) ?? element.enabled;
+    });
   }
 
   void startNewTimer() async {
-    final TimerModel timerModel = TimerModel(_initialTime * 60, _actions);
+    final TimerModel timerModel = TimerModel(_initialTime * 60, actionList);
 
     _activeTimerId = await _navigationService.navigateTo(Routes.timerDetailView,
         arguments: TimerDetailViewArguments(timerModel: timerModel));

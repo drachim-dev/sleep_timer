@@ -317,6 +317,25 @@ public class Messages {
     }
   }
 
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class WidgetUpdateResponse {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String setterArg) { this.title = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("title", title);
+      return toMapResult;
+    }
+    static WidgetUpdateResponse fromMap(HashMap map) {
+      WidgetUpdateResponse fromMapResult = new WidgetUpdateResponse();
+      Object title = map.get("title");
+      fromMapResult.title = (String)title;
+      return fromMapResult;
+    }
+  }
+
   /** Generated interface from Pigeon that represents a handler of messages from Flutter.*/
   public interface HostTimerApi {
     void init(InitializationRequest arg);
@@ -497,6 +516,23 @@ public class Messages {
           new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onAlarm", new StandardMessageCodec());
       HashMap inputMap = argInput.toMap();
       channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onWidgetUpdate(Reply<WidgetUpdateResponse> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetUpdate", new StandardMessageCodec());
+      channel.send(null, channelReply -> {
+        HashMap outputMap = (HashMap)channelReply;
+        @SuppressWarnings("ConstantConditions")
+        WidgetUpdateResponse output = WidgetUpdateResponse.fromMap(outputMap);
+        callback.reply(output);
+      });
+    }
+    public void onWidgetStartTimer(Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetStartTimer", new StandardMessageCodec());
+      channel.send(null, channelReply -> {
         callback.reply(null);
       });
     }

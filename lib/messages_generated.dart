@@ -207,6 +207,22 @@ class OpenRequest {
   }
 }
 
+class WidgetUpdateResponse {
+  String title;
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['title'] = title;
+    return pigeonMap;
+  }
+  // ignore: unused_element
+  static WidgetUpdateResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final WidgetUpdateResponse result = WidgetUpdateResponse();
+    result.title = pigeonMap['title'];
+    return result;
+  }
+}
+
 class HostTimerApi {
   Future<void> init(InitializationRequest arg) async {
     final Map<dynamic, dynamic> requestMap = arg._toMap();
@@ -328,6 +344,8 @@ abstract class FlutterTimerApi {
   void onRestartRequest(TimerRequest arg);
   void onOpen(OpenRequest arg);
   void onAlarm(TimerRequest arg);
+  WidgetUpdateResponse onWidgetUpdate();
+  void onWidgetStartTimer();
   static void setup(FlutterTimerApi api) {
     {
       const BasicMessageChannel<dynamic> channel =
@@ -424,6 +442,31 @@ abstract class FlutterTimerApi {
           final Map<dynamic, dynamic> mapMessage = message as Map<dynamic, dynamic>;
           final TimerRequest input = TimerRequest._fromMap(mapMessage);
           api.onAlarm(input);
+        });
+      }
+    }
+    {
+      const BasicMessageChannel<dynamic> channel =
+          BasicMessageChannel<dynamic>('dev.flutter.pigeon.FlutterTimerApi.onWidgetUpdate', StandardMessageCodec());
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+
+        channel.setMessageHandler((dynamic message) async {
+          final WidgetUpdateResponse output = api.onWidgetUpdate();
+          return output._toMap();
+        });
+      }
+    }
+    {
+      const BasicMessageChannel<dynamic> channel =
+          BasicMessageChannel<dynamic>('dev.flutter.pigeon.FlutterTimerApi.onWidgetStartTimer', StandardMessageCodec());
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+
+        channel.setMessageHandler((dynamic message) async {
+          api.onWidgetStartTimer();
         });
       }
     }

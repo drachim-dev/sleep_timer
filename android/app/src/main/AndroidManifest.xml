@@ -72,6 +72,9 @@
         <receiver
             android:name=".NotificationActionReceiver"
             android:enabled="true" />
+        <receiver
+            android:name=".WidgetReceiver"
+            android:enabled="true" />
         <!-- Timer Widget -->
         <receiver 
             android:name=".TimerWidget"

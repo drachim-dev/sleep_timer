@@ -1,12 +1,14 @@
 import 'dart:ui';
 
-import 'package:device_functions/platform_impl.dart';
 import 'package:device_functions/messages_generated.dart';
+import 'package:device_functions/platform_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
+import 'package:sleep_timer/app/logger.util.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
 import 'package:sleep_timer/platform_interface.dart';
@@ -42,8 +44,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(this.initialRoute);
-
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
         builder: (context, model, child) {
@@ -75,8 +75,13 @@ class MyAppViewModel extends ReactiveViewModel {
 }
 
 class Application {
+  final Logger log = getLogger();
+
   static init({Function onCallBack}) async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    // init Logger
+    Logger.level = Level.debug;
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
@@ -90,7 +95,8 @@ class Application {
     SleepTimerPlatform.getInstance().init(sleepTimerCallback.toRawHandle());
 
     // setup callback even when activity is destroyed
-    FlutterTimerApi.setup(FlutterApiHandler(callback: onNativeSideCallback, alarmCallback: onAlarmCallback));
+    FlutterTimerApi.setup(FlutterApiHandler(
+        callback: onNativeSideCallback, alarmCallback: onAlarmCallback));
 
     FlutterDeviceFunctionsApi.setup(DeviceFunctionsApiHandler(
         onDeviceAdminCallback: onDeviceAdminCallback,
@@ -99,38 +105,47 @@ class Application {
 }
 
 void onNativeSideCallback() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final Logger log = getLogger();
+  log.d(
+      "################################## onNativeSideCallback ##################################");
 
-  print('onNativeSideCallback');
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onAlarmCallback(final String timerId) async {
+  final Logger log = getLogger();
+  log.d("onAlarmCallback for $timerId");
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('onAlarmCallback for $timerId');
-
-  final _timerService = TimerServiceManager.getInstance().getTimerService(timerId);
+  final _timerService =
+      TimerServiceManager.getInstance().getTimerService(timerId);
   _timerService.handleAlarm();
 }
 
 void onNativeSideDeviceFunctionsCallback() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final Logger log = getLogger();
+  log.d("onNativeSideDeviceFunctionsCallback");
 
-  print('onNativeSideDeviceFunctionsCallback');
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onDeviceAdminCallback(final bool granted) async {
+  final Logger log = getLogger();
+  log.d("onDeviceAdminGrantedCallback");
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('onDeviceAdminGrantedCallback');
   final _deviceService = locator<DeviceService>();
   _deviceService.setDeviceAdmin(granted);
 }
 
 void onNotificationAccessCallback(final bool granted) async {
+  final Logger log = getLogger();
+  log.d("onNotificationAccessGrantedCallback");
+
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('onNotificationAccessGrantedCallback');
   final _deviceService = locator<DeviceService>();
   _deviceService.setNotificationAccess(granted);
 }

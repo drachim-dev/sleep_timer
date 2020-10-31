@@ -8,6 +8,7 @@ import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:flutter_native_admob/native_admob_options.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -56,7 +57,7 @@ class _TimerDetailViewState extends State<TimerDetailView>
     switch (state) {
       case AdLoadState.loadCompleted:
         setState(() {
-          _adHeight = 80;
+          _adHeight = kAdHeight;
         });
         break;
 

@@ -83,7 +83,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     const double padding = 20;
 
     return PreferredSize(
-      preferredSize: Size.fromHeight(52.0 + padding),
+      preferredSize: Size.fromHeight(kToolbarHeight + padding + 4),
       child: SafeArea(
         child: AppBar(
           centerTitle: true,

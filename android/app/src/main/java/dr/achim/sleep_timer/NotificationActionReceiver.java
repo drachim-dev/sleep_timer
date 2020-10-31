@@ -17,7 +17,7 @@ import dr.achim.sleep_timer.Messages.*;
 public class NotificationActionReceiver extends BroadcastReceiver {
     private static final String TAG = NotificationActionReceiver.class.toString();
     private Context context;
-    private Messages.FlutterTimerApi flutterTimerApi;
+    private FlutterTimerApi flutterTimerApi;
 
     @Override
     public void onReceive(Context context, Intent intent) {

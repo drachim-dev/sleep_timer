@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:preferences/preference_page.dart';
-import 'package:preferences/preference_title.dart';
 import 'package:preferences/preferences.dart';
+import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
+import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:stacked/stacked.dart';
 
 import 'settings_viewmodel.dart';
@@ -14,6 +16,7 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+  final Logger log = getLogger();
   SettingsViewModel model;
 
   @override
@@ -36,18 +39,17 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   PreferencePage _buildBody(final ThemeData theme) {
-    print("Warum?? ");
-    print(model.products.length);
+    log.d("Products for InApp-Purchase found: ${model.products.length}");
 
     return PreferencePage(
       [
-        PreferenceTitle("Appearance", leftPadding: kPreferenceTitleLeftPadding),
+        SectionHeader("Appearance", leftPadding: kPreferenceTitleLeftPadding),
         ListTile(
             title: Text('Choose theme'),
             subtitle: Text(model.currentTheme),
             leading: Icon(Icons.color_lens_outlined),
             onTap: () => showThemeDialog()),
-        PreferenceTitle("Support me", leftPadding: kPreferenceTitleLeftPadding),
+        SectionHeader("Support me", leftPadding: kPreferenceTitleLeftPadding),
         for (var product in model.products) _buildProduct(theme, product),
         ExpansionTile(
             title: Text(
@@ -58,9 +60,10 @@ class _SettingsViewState extends State<SettingsView> {
             ),
             initiallyExpanded: model.experimentActive,
             children: _buildExperimental(theme)),
-        PreferenceTitle("Other", leftPadding: kPreferenceTitleLeftPadding),
-        ListTile(title: Text("FAQ")),
-        ListTile(title: Text("Credits")),
+        SectionHeader("Other", leftPadding: kPreferenceTitleLeftPadding),
+        ListTile(title: Text("FAQ"), onTap: () => model.navigateToFAQ()),
+        ListTile(
+            title: Text("Credits"), onTap: () => model.navigateToCredits()),
       ],
     );
   }

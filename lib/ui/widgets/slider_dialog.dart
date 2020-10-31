@@ -26,24 +26,19 @@ class _SliderDialogState extends State<SliderDialog> {
     return AlertDialog(
         title: Text(widget.title),
         content: Container(
-          height: 60,
-          child: Row(
-            children: [
+            height: 40,
+            child: Row(children: [
               Icon(Icons.volume_mute_outlined),
               Slider(
-                label: _initialValue.floor().toString(),
                 value: _initialValue,
                 min: widget.minValue,
                 max: widget.maxValue,
-                divisions: widget.maxValue.floor(),
                 onChanged: (value) {
                   setState(() => _initialValue = value);
                 },
               ),
-              Icon(Icons.volume_up_outlined),
-            ],
-          ),
-        ),
+              SizedBox(width: 24, child: Text(_initialValue.floor().toString()))
+            ])),
         actions: [
           FlatButton(
             onPressed: () => Navigator.pop(context, _initialValue),

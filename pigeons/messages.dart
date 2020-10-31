@@ -75,6 +75,10 @@ class TimerRequest {
   String timerId;
 }
 
+class WidgetUpdateResponse {
+  String title;
+}
+
 // Native methods
 @HostApi()
 abstract class HostTimerApi {
@@ -95,6 +99,8 @@ abstract class FlutterTimerApi {
   void onRestartRequest(TimerRequest request);
   void onOpen(OpenRequest request);
   void onAlarm(TimerRequest request);
+  WidgetUpdateResponse onWidgetUpdate();
+  void onWidgetStartTimer();
 }
 
 void configurePigeon(PigeonOptions opts) {

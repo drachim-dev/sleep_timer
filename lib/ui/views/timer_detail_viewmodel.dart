@@ -64,7 +64,7 @@ class TimerDetailViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> initialise() async {
     if (_newInstance) {
       await initActionPreferences();
-      startTimer(delay: const Duration(milliseconds: 1500));
+      startTimer(delay: const Duration(milliseconds: kStartTimerDelay));
     }
   }
 
