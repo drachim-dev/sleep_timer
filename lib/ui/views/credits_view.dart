@@ -7,10 +7,23 @@ import 'package:url_launcher/link.dart';
 
 class CreditsView extends StatelessWidget {
   static final List _imageCredits = [
-    "Images",
+    "Icons from the Noun Project",
     Credit(
-        title: "sleep by Nithinan Tatah from the Noun Project",
+        title: "Sleep by Nithinan Tatah",
         url: "https://thenounproject.com/term/sleep/2411493/"),
+    "Illustrations by Freepik Stories",
+    Credit(
+        title: "Creativity Illustrations | Cuate Style",
+        url: "https://stories.freepik.com/idea"),
+    Credit(
+        title: "Mobile marketing Illustrations | Pana Style",
+        url: "https://stories.freepik.com/business"),
+    Credit(
+        title: "Headphone Illustrations | Amico Style",
+        url: "https://stories.freepik.com/music"),
+    Credit(
+        title: "Floating | Bro Style",
+        url: "https://stories.freepik.com/people"),
   ];
 
   static final List _packageCredits = [
@@ -24,6 +37,7 @@ class CreditsView extends StatelessWidget {
         title: "in_app_purchase",
         url: "https://pub.dev/packages/in_app_purchase"),
     Credit(title: "injectable", url: "https://pub.dev/packages/injectable"),
+    Credit(title: "introduction_screen", url: "https://pub.dev/packages/introduction_screen"),
     Credit(title: "logger", url: "https://pub.dev/packages/logger"),
     Credit(
         title: "observable_ish",

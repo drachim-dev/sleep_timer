@@ -121,9 +121,9 @@ class FlutterApiHandler extends FlutterTimerApi {
 
     // Navigate to timer detail view
     _navigationService.popUntil((route) => route.isFirst);
-    _navigationService.navigateTo(Routes.timerDetailView,
+    _navigationService.navigateTo(Routes.timerView,
         arguments:
-            TimerDetailViewArguments(timerModel: _timerService.timerModel));
+            TimerViewArguments(timerModel: _timerService.timerModel));
   }
 
   @override

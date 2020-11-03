@@ -10,25 +10,25 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../model/timer_model.dart';
-import '../ui/views/alarm_detail_view.dart';
 import '../ui/views/credits_view.dart';
 import '../ui/views/faq_view.dart';
 import '../ui/views/home_view.dart';
+import '../ui/views/intro_view.dart';
 import '../ui/views/settings_view.dart';
-import '../ui/views/timer_detail_view.dart';
+import '../ui/views/timer_view.dart';
 
 class Routes {
+  static const String introView = '/intro-view';
   static const String homeView = '/home-view';
+  static const String timerView = '/timer-view';
   static const String settingsView = '/settings-view';
-  static const String timerDetailView = '/timer-detail-view';
-  static const String alarmDetailView = '/alarm-detail-view';
   static const String fAQView = '/f-aq-view';
   static const String creditsView = '/credits-view';
   static const all = <String>{
+    introView,
     homeView,
+    timerView,
     settingsView,
-    timerDetailView,
-    alarmDetailView,
     fAQView,
     creditsView,
   };
@@ -38,41 +38,41 @@ class AutoRouter extends RouterBase {
   @override
   List<RouteDef> get routes => _routes;
   final _routes = <RouteDef>[
+    RouteDef(Routes.introView, page: IntroView),
     RouteDef(Routes.homeView, page: HomeView),
+    RouteDef(Routes.timerView, page: TimerView),
     RouteDef(Routes.settingsView, page: SettingsView),
-    RouteDef(Routes.timerDetailView, page: TimerDetailView),
-    RouteDef(Routes.alarmDetailView, page: AlarmDetailView),
     RouteDef(Routes.fAQView, page: FAQView),
     RouteDef(Routes.creditsView, page: CreditsView),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, AutoRouteFactory>{
+    IntroView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => IntroView(),
+        settings: data,
+      );
+    },
     HomeView: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => HomeView(),
         settings: data,
       );
     },
-    SettingsView: (data) {
+    TimerView: (data) {
+      final args = data.getArgs<TimerViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => SettingsView(),
-        settings: data,
-      );
-    },
-    TimerDetailView: (data) {
-      final args = data.getArgs<TimerDetailViewArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => TimerDetailView(
+        builder: (context) => TimerView(
           key: args.key,
           timerModel: args.timerModel,
         ),
         settings: data,
       );
     },
-    AlarmDetailView: (data) {
+    SettingsView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => AlarmDetailView(),
+        builder: (context) => SettingsView(),
         settings: data,
       );
     },
@@ -95,9 +95,9 @@ class AutoRouter extends RouterBase {
 /// Arguments holder classes
 /// *************************************************************************
 
-/// TimerDetailView arguments holder class
-class TimerDetailViewArguments {
+/// TimerView arguments holder class
+class TimerViewArguments {
   final Key key;
   final TimerModel timerModel;
-  TimerDetailViewArguments({this.key, @required this.timerModel});
+  TimerViewArguments({this.key, @required this.timerModel});
 }

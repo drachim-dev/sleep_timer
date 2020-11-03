@@ -3,8 +3,7 @@ import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class TimerSlider extends StatelessWidget {
   final double size;
-  final int initialValue;
-  final int maxValue;
+  final int initialValue, minValue, maxValue;
   final bool hasHandle;
   final TextStyle labelStyle;
   final Function(double) onChange;
@@ -13,6 +12,7 @@ class TimerSlider extends StatelessWidget {
   const TimerSlider({
     this.size,
     @required this.initialValue,
+    this.minValue,
     this.maxValue,
     this.hasHandle = true,
     this.labelStyle,
@@ -43,7 +43,7 @@ class TimerSlider extends StatelessWidget {
     final double shadowWidth = theme.brightness == Brightness.light ? 30 : 25;
 
     return SleekCircularSlider(
-        min: 1,
+        min: minValue?.toDouble() ?? 0,
         max: maxValue?.toDouble() ?? 60,
         initialValue: initialValue.toDouble(),
         appearance: CircularSliderAppearance(

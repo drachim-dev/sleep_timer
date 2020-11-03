@@ -86,17 +86,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         final String timerId = request.getTimerId();
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(request.getTitle())
-                .setContentText(request.getDescription())
+                .setContentTitle("" + request.getRemainingTime() * 1000)
+                .setContentText(request.getTitle())
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setContentIntent(createOpenIntent(timerId))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setShowWhen(true)
-                .setUsesChronometer(true)
-                .setOngoing(false) // TODO: set to true
-                .setAutoCancel(false)
-                .setWhen(System.currentTimeMillis() + request.getRemainingTime() * 1000);
+                .setShowWhen(false)
+                .setUsesChronometer(false)
+                .setOngoing(true)
+                .setAutoCancel(false);
+                //.setWhen(System.currentTimeMillis() + request.getRemainingTime() * 1000);
 
         final List<NotificationCompat.Action> actions = buildNotificationActions(timerId, request.getRestartAction(), request.getPauseAction(), request.getContinueAction(), request.getCancelAction(), request.getExtendActions());
         for (NotificationCompat.Action action : actions) {

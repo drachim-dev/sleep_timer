@@ -34,14 +34,10 @@ Future<void> main() async {
         ? ErrorWidget(details.stack)
         : SingleChildScrollView(child: ErrorWidget(details.stack));
   };
-  runApp(MyApp(initialRoute: Routes.homeView));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final String initialRoute;
-
-  MyApp({this.initialRoute});
-
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<MyAppViewModel>.reactive(
@@ -52,7 +48,7 @@ class MyApp extends StatelessWidget {
             title: 'Sleep timer',
             navigatorKey: locator<NavigationService>().navigatorKey,
             onGenerateRoute: AutoRouter(),
-            initialRoute: initialRoute ?? Routes.homeView,
+            initialRoute: model.firstLaunch ? Routes.introView : Routes.homeView,
             debugShowCheckedModeBanner: false,
           );
         });
@@ -62,6 +58,8 @@ class MyApp extends StatelessWidget {
 class MyAppViewModel extends ReactiveViewModel {
   final _prefsService = locator<SharedPreferences>();
   final _themeService = locator<ThemeService>();
+
+  bool get firstLaunch => _prefsService.getBool(kPrefKeyFirstLaunch) ?? true;
 
   ThemeData get themeData => _themeService.myTheme.theme;
 

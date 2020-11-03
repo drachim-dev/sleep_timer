@@ -77,8 +77,25 @@ android {
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type.
+            minifyEnabled true
 
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+
+            // Enabled proguard
+            useProguard true
+
+            // Includes the default ProGuard rules files that are packaged with
+            // the Android Gradle plugin. To learn more, go to the section about
+            // R8 configuration files.
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+
+            signingConfig signingConfigs.release
             ndk {
                 // debugSymbolLevel 'FULL' // gradle plugin version needs to be >= 4.1.0 (no stable version yet)
             }

@@ -18,7 +18,7 @@ class DeviceService with ReactiveServiceMixin {
     listenToReactiveValues([_deviceAdmin, _notificationSettingsAccess]);
   }
 
-  int _platformVersion;
+  int _platformVersion = 0;
   int get platformVersion => _platformVersion;
 
   RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);

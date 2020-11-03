@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_timer/model/navigation_item_model.dart';
-import 'package:sleep_timer/ui/views/alarm_view.dart';
-import 'package:sleep_timer/ui/views/timer_view.dart';
-import 'package:sleep_timer/ui/widgets/fade_indexed_stack.dart';
+import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
+import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
 
 import 'home_viewmodel.dart';
@@ -15,11 +14,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  final _timerController = NavigationItemController();
-  final _alarmController = NavigationItemController();
-
-  List<NavigationModel> _navItems;
-
   AnimationController _animationController;
   Animation<double> _scaleAnimation;
 
@@ -27,23 +21,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _navItems = [
-      NavigationModel(
-        page: TimerView(controller: _timerController),
-        controller: _timerController,
-        title: "Timer",
-        icon: Icon(Icons.snooze_outlined),
-        fabIcon: Icon(Icons.play_arrow_outlined),
-      ),
-      NavigationModel(
-        page: AlarmView(controller: _alarmController),
-        controller: _alarmController,
-        title: "Alarm",
-        icon: Icon(Icons.alarm_outlined),
-        fabIcon: Icon(Icons.add_outlined),
-      ),
-    ];
-
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
     _scaleAnimation = CurvedAnimation(
@@ -70,8 +47,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         builder: (context, model, child) {
           return Scaffold(
             appBar: _buildAppBar(theme),
-            body: _buildBody(),
-            // bottomNavigationBar: _buildBottomNavigationBar(),
+            body: _buildBody(theme),
             floatingActionButton: _buildFAB(theme),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
@@ -90,8 +66,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           flexibleSpace: Padding(
             padding: const EdgeInsets.only(top: padding),
             child: Text(
-              _navItems[model.currentIndex].title,
-              style: theme.textTheme.headline2,
+              "Sleep Timer",
+              style: theme.textTheme.headline2.copyWith(fontSize: 48),
               textAlign: TextAlign.center,
             ),
           ),
@@ -111,30 +87,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  FadeIndexedStack _buildBody() {
-    return FadeIndexedStack(
-        index: model.currentIndex,
-        children: _navItems.map((item) {
-          return item.page;
-        }).toList());
-  }
-
-  BottomAppBar _buildBottomNavigationBar() {
-    return BottomAppBar(
-      shape: CircularNotchedRectangle(),
-      clipBehavior: Clip.antiAlias,
-      child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          unselectedFontSize: 14,
-          selectedFontSize: 14,
-          currentIndex: model.currentIndex,
-          onTap: model.setIndex,
-          items: _navItems.map((item) {
-            return BottomNavigationBarItem(icon: item.icon, label: item.title);
-          }).toList()),
-    );
-  }
-
   void _onMenuOption(MenuOption option) {
     switch (option) {
       case MenuOption.settings:
@@ -144,8 +96,51 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
   }
 
+  Widget _buildBody(final ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: kHorizontalPadding, vertical: kVerticalPaddingBig),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          model.hasActiveTimer ? _buildActiveTimers(theme) : SizedBox(),
+          TimerSlider(
+            minValue: 1,
+            initialValue: model.initialTime,
+            onUpdateLabel: (value) => "$value Min",
+            onChange: (value) => model.setTime(value.round()),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: kVerticalPaddingBig),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [10, 20, 30, 60].map((value) {
+                  return Expanded(
+                    child: RoundedRectButton(
+                        title: "$value",
+                        onPressed: () => model.updateTime(value)),
+                  );
+                }).toList()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveTimers(ThemeData theme) {
+    return FlatButton(
+      child: Text("Tap here to see your timer"),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      shape: StadiumBorder(
+          side: BorderSide(
+        color: theme.colorScheme.primary.withAlpha(50),
+        width: 3,
+      )),
+      onPressed: () => model.openActiveTimer(),
+    );
+  }
+
   Widget _buildFAB(final ThemeData theme) {
-    final NavigationModel item = _navItems[model.currentIndex];
     final Color foregroundColor = Colors.white;
 
     final TextStyle textStyle =
@@ -159,11 +154,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           return ScaleTransition(child: child, scale: animation);
         },
         child: FloatingActionButton.extended(
-          key: ValueKey(item.title),
-          onPressed: () => item.controller.onClickFAB(),
+          onPressed: () => model.startNewTimer(),
           icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
           label: Text("Go to sleep", style: textStyle),
-          // child: item.fabIcon,
         ),
       ),
     );

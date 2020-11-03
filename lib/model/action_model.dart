@@ -38,7 +38,7 @@ List<ActionModel> actionList = [
     id: ActionType.MEDIA,
     title: "Media",
     description: "Stop media playback",
-    enabled: false,
+    enabled: true,
   ),
   ActionModel(
     id: ActionType.WIFI,
