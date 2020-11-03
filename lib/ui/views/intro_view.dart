@@ -37,28 +37,28 @@ class _IntroViewState extends State<IntroView> {
                 title: "Automate your daily sleep routine",
                 body:
                     "Are you tired of adjusting the same settings every night in order to sleep well?",
-                image: _buildImage("img_automate.png"),
+                image: _buildImage("img_automate.webp"),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: "No interruptions",
                 body:
                     "Don't get distracted by incoming messages or notifications",
-                image: _buildImage("img_interruption.png"),
+                image: _buildImage("img_interruption.webp"),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: "Listen to your favorite music",
                 body:
                     "Do you like to hear music or watch a movie while falling asleep?",
-                image: _buildImage("img_music.png", bottomPadding: 24),
+                image: _buildImage("img_music.webp", bottomPadding: 24),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: "Have a good night",
                 body:
                     "Just set the timer and you're done.\nRelax and let your dreams come true ...",
-                image: _buildImage("img_sleep.png"),
+                image: _buildImage("img_sleep.webp"),
                 decoration: pageDecoration,
               ),
             ],
