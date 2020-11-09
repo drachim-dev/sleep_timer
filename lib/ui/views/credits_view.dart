@@ -37,7 +37,9 @@ class CreditsView extends StatelessWidget {
         title: "in_app_purchase",
         url: "https://pub.dev/packages/in_app_purchase"),
     Credit(title: "injectable", url: "https://pub.dev/packages/injectable"),
-    Credit(title: "introduction_screen", url: "https://pub.dev/packages/introduction_screen"),
+    Credit(
+        title: "introduction_screen",
+        url: "https://pub.dev/packages/introduction_screen"),
     Credit(title: "logger", url: "https://pub.dev/packages/logger"),
     Credit(
         title: "observable_ish",

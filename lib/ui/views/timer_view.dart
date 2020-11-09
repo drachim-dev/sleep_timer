@@ -75,8 +75,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   void initAnimations() {
     _hideFabAnimController = AnimationController(
         vsync: this, duration: kThemeAnimationDuration, value: 1);
-    _fabAnimController =
-        AnimationController(vsync: this, duration: kThemeAnimationDuration, value: 1);
+    _fabAnimController = AnimationController(
+        vsync: this, duration: kThemeAnimationDuration, value: 1);
 
     _colorAnimation = ColorTween(
       begin: Colors.redAccent,
@@ -363,18 +363,19 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         controller: _adController,
         type: NativeAdmobType.banner,
         options: NativeAdmobOptions(
-          ratingColor: Colors.red,
-          headlineTextStyle:
-              NativeTextStyle(color: theme.textTheme.subtitle1.color),
-          advertiserTextStyle:
-              NativeTextStyle(color: theme.textTheme.caption.color),
-          storeTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
-          priceTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
-          callToActionStyle: NativeTextStyle(
-            // color: theme.
-            backgroundColor: Colors.grey,
-          )
-        ),
+            ratingColor: Colors.red,
+            headlineTextStyle:
+                NativeTextStyle(color: theme.textTheme.subtitle1.color),
+            advertiserTextStyle:
+                NativeTextStyle(color: theme.textTheme.caption.color),
+            storeTextStyle:
+                NativeTextStyle(color: theme.textTheme.caption.color),
+            priceTextStyle:
+                NativeTextStyle(color: theme.textTheme.caption.color),
+            callToActionStyle: NativeTextStyle(
+              // color: theme.
+              backgroundColor: Colors.grey,
+            )),
       ),
     );
   }

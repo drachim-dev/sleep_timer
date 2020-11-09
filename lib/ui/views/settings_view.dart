@@ -163,15 +163,13 @@ class _SettingsViewState extends State<SettingsView>
           title: Text('Choose Theme'),
           content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: themeList
-                  .map((myTheme) {
-                    return RadioListTile(
-                      title: Text(myTheme.title),
-                      groupValue: model.currentTheme.id,
-                      value: myTheme.id,
-                      onChanged: model.updateTheme);
-                  })
-                  .toList()),
+              children: themeList.map((myTheme) {
+                return RadioListTile(
+                    title: Text(myTheme.title),
+                    groupValue: model.currentTheme.id,
+                    value: myTheme.id,
+                    onChanged: model.updateTheme);
+              }).toList()),
         );
       },
     );

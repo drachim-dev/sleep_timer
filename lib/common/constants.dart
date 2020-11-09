@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 const double kVerticalPadding = 16;
 const double kVerticalPaddingBig = kVerticalPadding * 2;
 const double kHorizontalPaddingSmall = kHorizontalPadding / 2;
@@ -19,3 +21,5 @@ const int kDefaultInitialTime = 15;
 const bool kDefaultGlow = true;
 const int kStartTimerDelay = 1500;
 const double kAdHeight = 80;
+
+const Color kStatusBarOverlay = Colors.transparent;

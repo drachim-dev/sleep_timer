@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_impl.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,9 +43,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
+        onModelReady: (model) {
+          final SystemUiOverlayStyle systemUiOverlayStyle =
+              model.theme.brightness == Brightness.light
+                  ? SystemUiOverlayStyle.dark
+                  : SystemUiOverlayStyle.light;
+
+          SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle.copyWith(
+              statusBarColor: Colors.transparent));
+        },
         builder: (context, model, child) {
           return MaterialApp(
-            theme: model.themeData,
+            theme: model.theme,
             title: 'Sleep timer',
             navigatorKey: locator<NavigationService>().navigatorKey,
             onGenerateRoute: AutoRouter(),
@@ -62,14 +72,14 @@ class MyAppViewModel extends ReactiveViewModel {
 
   bool get firstLaunch => _prefsService.getBool(kPrefKeyFirstLaunch) ?? true;
 
-  ThemeData get themeData => _themeService.myTheme.theme;
+  ThemeData get theme => _themeService.myTheme.theme;
 
   MyAppViewModel() {
     var savedTheme = _prefsService.getString(kPrefKeyTheme);
     if (savedTheme != null) _themeService.updateTheme(savedTheme);
 
     var savedGlow = _prefsService.getBool(kPrefKeyGlow);
-    if(savedGlow != null) _themeService.updateGlow(savedGlow);
+    if (savedGlow != null) _themeService.updateGlow(savedGlow);
   }
 
   @override
