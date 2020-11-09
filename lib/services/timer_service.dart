@@ -11,6 +11,8 @@ import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:stacked/stacked.dart';
 
+enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
+
 @injectable
 class TimerService with ReactiveServiceMixin {
   final Logger log = getLogger();
@@ -18,13 +20,13 @@ class TimerService with ReactiveServiceMixin {
   final TimerModel timerModel;
   Timer _timer;
 
-  final RxValue<bool> _isActive = RxValue(initial: true);
-  bool get isActive => _isActive.value;
+  final RxValue<TimerStatus> _status = RxValue(initial: TimerStatus.INITIAL);
+  TimerStatus get status => _status.value;
 
   TimerService(@factoryParam this.timerModel)
       : _remainingTime = RxValue<int>(initial: timerModel.initialTimeInSeconds),
         _maxTime = timerModel.initialTimeInSeconds {
-    listenToReactiveValues([_remainingTime, _isActive]);
+    listenToReactiveValues([_remainingTime, _status]);
   }
 
   final RxValue<int> _remainingTime;
@@ -43,7 +45,11 @@ class TimerService with ReactiveServiceMixin {
     _timer = Timer.periodic(interval, (timer) {
       remainingTime > 0 ? setRemainingTime(remainingTime - 1) : _disposeTimer();
     });
-    _isActive.value = true;
+
+    if (status == TimerStatus.INITIAL) {
+      handleStartActions();
+    }
+    _status.value = TimerStatus.RUNNING;
 
     _deviceService.showRunningNotification(
         timerId: timerModel.id,
@@ -68,12 +74,14 @@ class TimerService with ReactiveServiceMixin {
   }
 
   void pauseTimer() {
+    _status.value = TimerStatus.PAUSING;
     _deviceService.showPauseNotification(
         timerId: timerModel.id, remainingTime: remainingTime);
     _disposeTimer();
   }
 
   Future<void> cancelTimer() async {
+    _status.value = TimerStatus.PAUSING;
     _deviceService.cancelNotification(timerId: timerModel.id);
     _disposeTimer();
   }
@@ -81,11 +89,22 @@ class TimerService with ReactiveServiceMixin {
   void _disposeTimer() {
     _timer?.cancel();
     _timer = null;
-    _isActive.value = false;
   }
 
-  Future<void> handleAlarm() async {
-    log.i("handleAlarm()");
+  Future<void> handleStartActions() async {
+    if (timerModel.volumeAction.enabled)
+      _deviceService.setVolume(timerModel.volumeAction.value.truncate());
+
+    if (timerModel.playMusicAction.enabled) print("Play music");
+    //_deviceService.setVolume(timerModel.volumeAction.value.truncate());
+
+    if (timerModel.doNotDisturbAction.enabled &&
+        _deviceService.notificationSettingsAccess)
+      _deviceService.toggleDoNotDisturb(true);
+  }
+
+  Future<void> handleEndedActions() async {
+    log.d("handleEndedActions()");
 
     if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
     if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29)
@@ -94,11 +113,6 @@ class TimerService with ReactiveServiceMixin {
       _deviceService.toggleBluetooth(false);
     if (timerModel.screenAction.enabled && _deviceService.deviceAdmin)
       _deviceService.toggleScreen(false);
-    if (timerModel.volumeAction.enabled)
-      _deviceService.setVolume(timerModel.volumeAction.value.truncate());
-    if (timerModel.doNotDisturbAction.enabled &&
-        _deviceService.notificationSettingsAccess)
-      _deviceService.toggleDoNotDisturb(true);
 
     _deviceService.showElapsedNotification(timerModel: timerModel);
   }

@@ -27,19 +27,26 @@ class _SliderDialogState extends State<SliderDialog> {
         title: Text(widget.title),
         content: Container(
             height: 40,
+            width: 400,
             child: Row(children: [
               Icon(Icons.volume_mute_outlined),
-              Slider(
-                value: _initialValue,
-                min: widget.minValue,
-                max: widget.maxValue,
-                onChanged: (value) {
-                  setState(() => _initialValue = value);
-                },
+              Expanded(
+                child: Slider(
+                  value: _initialValue,
+                  min: widget.minValue,
+                  max: widget.maxValue,
+                  onChanged: (value) {
+                    setState(() => _initialValue = value);
+                  },
+                ),
               ),
-              SizedBox(width: 24, child: Text(_initialValue.floor().toString()))
+              SizedBox(width: 48, child: Text("${_initialValue.floor()} %"))
             ])),
         actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('CANCEL'),
+          ),
           FlatButton(
             onPressed: () => Navigator.pop(context, _initialValue),
             child: Text('DONE'),

@@ -9,10 +9,13 @@ const String kProductDonation = "donate";
 const Set<String> kProducts = {kProductRemoveAds, kProductDonation};
 
 const String kPrefKeyTheme = 'pref_key_theme';
+const String kPrefKeyGlow = 'pref_key_glow';
 const String kKeyVolumeLevel = "pref_key_volume_level";
 const String kPrefKeyInitialTime = "pref_key_initial_time";
 const String kPrefKeyFirstLaunch = "pref_key_first_launch";
+const String kSpotifyCredentials = "pref_key_spotify_credentials";
 
 const int kDefaultInitialTime = 15;
+const bool kDefaultGlow = true;
 const int kStartTimerDelay = 1500;
 const double kAdHeight = 80;

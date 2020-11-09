@@ -13,8 +13,10 @@ import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/model/timer_model.dart';
+import 'package:sleep_timer/services/timer_service.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/sabt.dart';
+import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
@@ -38,6 +40,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   Animation<Color> _colorAnimation;
 
   TimerViewModel model;
+
+  String _selectedPlaylist = "Playlist 10";
 
   _TimerViewState();
 
@@ -72,7 +76,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     _hideFabAnimController = AnimationController(
         vsync: this, duration: kThemeAnimationDuration, value: 1);
     _fabAnimController =
-        AnimationController(vsync: this, duration: kThemeAnimationDuration);
+        AnimationController(vsync: this, duration: kThemeAnimationDuration, value: 1);
 
     _colorAnimation = ColorTween(
       begin: Colors.redAccent,
@@ -150,6 +154,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                 initialValue: model.remainingTime,
                 maxValue: model.maxTime,
                 hasHandle: false,
+                showGlow: model.showGlow,
                 labelStyle: titleStyle,
                 size: 180,
                 onUpdateLabel: (value) {
@@ -168,19 +173,16 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         SliverList(
           delegate: SliverChildListDelegate([
             Divider(height: 1),
-            ListTile(
-              leading: Icon(Icons.music_note_outlined),
-              title: Text("Open spotify playlist"),
-              onTap: () => _playSpotify(),
-            ),
+            SectionHeader("Quick actions", leftPadding: kHorizontalPadding),
+            _buildQuickActions(theme),
             ExpansionTile(
-                title: Text("Actions"),
+                title: Text("When timer starts"),
                 initiallyExpanded: true,
-                children: _buildActions(theme)),
+                children: _buildStartedActions(theme)),
             ExpansionTile(
-                title: Text("Experiments"),
-                initiallyExpanded: model.hasExperiment,
-                children: _buildExperiments()),
+                title: Text("When time is up"),
+                initiallyExpanded: true,
+                children: _buildEndedActions(theme)),
           ]),
         ),
       ],
@@ -217,7 +219,84 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         }).toList());
   }
 
-  List<Widget> _buildActions(final ThemeData theme) {
+  Widget _buildQuickActionsHint(final ThemeData theme) {
+    return ListTile(
+      title: Text("Tap to add quick actions"),
+      subtitle: Text("Add shortcuts to quickly open your players"),
+      tileColor: Colors.grey.withOpacity(0.35),
+      onTap: () {},
+      trailing: FlatButton(
+        child: Text("DISMISS"),
+        onPressed: () {},
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(final ThemeData theme) {
+    const double appIconPadding = 4;
+
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        children: [
+          "assets/media_player/spotify.png",
+        ].map((image) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: appIconPadding),
+            child: Ink.image(
+              width: 40,
+              height: 40,
+              image: AssetImage(image),
+              child: InkWell(
+                onTap: _openSpotify,
+                customBorder: CircleBorder(),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  List<Widget> _buildStartedActions(final ThemeData theme) {
+    return [
+      ListTile(
+        leading: Icon(Icons.volume_down_outlined),
+        title: Text(model.timerModel.volumeAction.title),
+        subtitle: Text(model.timerModel.volumeAction.description),
+        onTap: () => _showVolumeLevelPicker(),
+        trailing: Switch(
+          value: model.timerModel.volumeAction.enabled,
+          onChanged: model.onChangeVolume,
+        ),
+      ),
+      if (!model.isAdFree) _buildAd(theme),
+      if (false)
+        ListTile(
+          leading: Icon(Icons.music_note_outlined),
+          title: Text(model.timerModel.playMusicAction.title),
+          subtitle: Text(model.timerModel.playMusicAction.description),
+          onTap: () => _showPlaylistPicker(),
+          trailing: Switch(
+            value: model.timerModel.playMusicAction.enabled,
+            onChanged: model.onChangePlayMusic,
+          ),
+        ),
+      SwitchListTile(
+        secondary: Icon(Icons.do_not_disturb_on),
+        title: Text(model.timerModel.doNotDisturbAction.title),
+        subtitle: Text(model.timerModel.doNotDisturbAction.description),
+        value: model.timerModel.doNotDisturbAction.enabled &&
+            model.notificationSettingsAccess,
+        onChanged: model.notificationSettingsAccess
+            ? model.onChangeDoNotDisturb
+            : (value) => model.navigateToSettings(
+                notificationSettingsAccessFocused: true),
+      ),
+    ];
+  }
+
+  List<Widget> _buildEndedActions(final ThemeData theme) {
     return [
       SwitchListTile(
         secondary: Icon(Icons.music_off_outlined),
@@ -226,7 +305,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         value: model.timerModel.mediaAction.enabled,
         onChanged: model.onChangeMedia,
       ),
-      if (!model.isAdFree) _buildAd(theme),
       if (model.platformVersion < 29)
         SwitchListTile(
           secondary: Icon(Icons.wifi_off_outlined),
@@ -242,38 +320,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         value: model.timerModel.bluetoothAction.enabled,
         onChanged: model.onChangeBluetooth,
       ),
-      ListTile(
-        leading: Icon(Icons.volume_down_outlined),
-        title: Text(model.timerModel.volumeAction.title),
-        subtitle: Text(model.timerModel.volumeAction.description),
-        onTap: () => _showVolumeLevelPicker(),
-        trailing: Switch(
-          value: model.timerModel.volumeAction.enabled,
-          onChanged: model.onChangeVolume,
-        ),
-      ),
-    ];
-  }
-
-  List<Widget> _buildExperiments() {
-    return [
-      if (!model.hasExperiment)
-        ListTile(title: Text("Go to settings to enable experiments.")),
-      SwitchListTile(
-        secondary: Icon(Icons.do_not_disturb_on),
-        title: Text(model.timerModel.doNotDisturbAction.title),
-        subtitle: Text(model.timerModel.doNotDisturbAction.description),
-        value: model.timerModel.doNotDisturbAction.enabled,
-        onChanged: model.notificationSettingsAccess
-            ? model.onChangeDoNotDisturb
-            : null,
-      ),
       SwitchListTile(
         secondary: Icon(Icons.tv_off_outlined),
         title: Text(model.timerModel.screenAction.title),
         subtitle: Text(model.timerModel.screenAction.description),
-        value: model.timerModel.screenAction.enabled,
-        onChanged: model.deviceAdmin ? model.onChangeScreen : null,
+        value: model.timerModel.screenAction.enabled && model.deviceAdmin,
+        onChanged: model.onChangeScreen,
       ),
       // TODO: Enable connection to philips hue
       if (false)
@@ -299,7 +351,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     ];
   }
 
-  Container _buildAd(ThemeData theme) {
+  Container _buildAd(final ThemeData theme) {
     return Container(
       height: _adHeight,
       padding: EdgeInsets.only(left: 16, right: 32, top: 8, bottom: 8),
@@ -318,6 +370,10 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               NativeTextStyle(color: theme.textTheme.caption.color),
           storeTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
           priceTextStyle: NativeTextStyle(color: theme.textTheme.caption.color),
+          callToActionStyle: NativeTextStyle(
+            // color: theme.
+            backgroundColor: Colors.grey,
+          )
         ),
       ),
     );
@@ -332,6 +388,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               if (snapshot.hasData) {
                 var currentLevel = snapshot.data?.currentLevel?.toDouble() ?? 3;
                 var maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
+
                 return SliderDialog(
                     title: "Set volume",
                     initialValue:
@@ -347,12 +404,49 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     }
   }
 
+  void _showPlaylistPicker() async {
+    final playlistUri = await showDialog<double>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("Choose playlist"),
+              content: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                return Container(
+                  width: 400,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemBuilder: (_, index) {
+                      return RadioListTile(
+                        title: Text(
+                          "RAWER Than The Rest by Gearbox Digital $index",
+                          maxLines: 2,
+                        ),
+                        groupValue: _selectedPlaylist,
+                        value: "Playlist $index",
+                        onChanged: (value) {
+                          setState(() => _selectedPlaylist = value);
+                        },
+                      );
+                    },
+                    itemCount: 25,
+                  ),
+                );
+              }),
+              actions: [
+                FlatButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("DONE"),
+                ),
+              ],
+            ));
+  }
+
   _buildFAB(ThemeData theme) {
     final Color foregroundColor = Colors.white;
     final TextStyle textStyle =
         theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
-    if (model.isRunning) {
+    if (model.timerStatus == TimerStatus.RUNNING) {
       _fabAnimController.reverse();
     } else {
       _fabAnimController.forward();
@@ -368,11 +462,15 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             color: foregroundColor,
           ),
           label: Text(
-            model.isRunning ? "Pause" : "Continue",
+            model.timerStatus == TimerStatus.RUNNING
+                ? "Pause"
+                : model.timerStatus == TimerStatus.INITIAL
+                    ? "Start timer"
+                    : "Continue",
             style: textStyle,
           ),
           onPressed: () {
-            if (model.isRunning) {
+            if (model.timerStatus == TimerStatus.RUNNING) {
               model.pauseTimer();
             } else {
               model.startTimer();
@@ -381,13 +479,18 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  void _playSpotify() async {
+  void _openSpotify() async {
+    final AndroidIntent intent = AndroidIntent(
+        action: "action_view",
+        package: "com.spotify.music",
+        data: "spotify:home");
+
+    await intent.launch();
+  }
+
+  void _startPlaylist() async {
     if (Platform.isAndroid) {
-      final AndroidIntent intent = AndroidIntent(
-        action: 'android.intent.action.VIEW',
-        data: 'spotify:playlist:2d9sMcd0nXkswqTRpP2Hxq:play',
-      );
-      await intent.launch();
+      model.navigateToSpotifyAuth();
     }
   }
 }

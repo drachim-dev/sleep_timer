@@ -1,7 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:sleep_timer/common/constants.dart';
 
-enum ActionType { MEDIA, WIFI, BLUETOOTH, SCREEN, VOLUME, DND, LIGHT, APP }
+enum ActionType {
+  PLAY_MUSIC,
+  MEDIA,
+  WIFI,
+  BLUETOOTH,
+  SCREEN,
+  VOLUME,
+  DND,
+  LIGHT,
+  APP
+}
 
 class ActionModel {
   final ActionType id;
@@ -19,12 +29,20 @@ class ActionModel {
 
 class ValueActionModel extends ActionModel {
   double value;
-  String key;
+  final String unit;
+  final String key;
 
-  String get description => "${super.description} ${value.toInt()}";
+  String get description => "${super.description} ${value.toInt()}$unit";
 
   ValueActionModel(
-      {id, title, description, experiment, enabled, @required this.value, this.key})
+      {id,
+      title,
+      description,
+      experiment,
+      enabled,
+      @required this.value,
+      this.unit,
+      this.key})
       : super(
             id: id,
             title: title,
@@ -32,6 +50,32 @@ class ValueActionModel extends ActionModel {
             experiment: experiment,
             enabled: enabled);
 }
+
+List<ActionModel> startActionList = [
+  ValueActionModel(
+    id: ActionType.VOLUME,
+    title: "Volume",
+    description: "Set media volume to",
+    unit: " %",
+    enabled: false,
+    experiment: false,
+    value: 10.0,
+    key: kKeyVolumeLevel,
+  ),
+  ActionModel(
+    id: ActionType.PLAY_MUSIC,
+    title: "Play music",
+    description: "Peacock's Frenchcore Choice",
+    enabled: false,
+  ),
+  ActionModel(
+    id: ActionType.DND,
+    title: "Do not disturb",
+    description: "Enable do not disturb",
+    enabled: false,
+    experiment: true,
+  ),
+];
 
 List<ActionModel> actionList = [
   ActionModel(
@@ -56,22 +100,6 @@ List<ActionModel> actionList = [
     id: ActionType.SCREEN,
     title: "Screen",
     description: "Turn screen off",
-    enabled: false,
-    experiment: true,
-  ),
-  ValueActionModel(
-    id: ActionType.VOLUME,
-    title: "Volume",
-    description: "Set media volume to ",
-    enabled: false,
-    experiment: false,
-    value: 14.0,
-    key: kKeyVolumeLevel,
-  ),
-  ActionModel(
-    id: ActionType.DND,
-    title: "Do not disturb",
-    description: "Enable do not disturb",
     enabled: false,
     experiment: true,
   ),

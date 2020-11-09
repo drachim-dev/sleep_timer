@@ -109,6 +109,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             initialValue: model.initialTime,
             onUpdateLabel: (value) => "$value Min",
             onChange: (value) => model.setTime(value.round()),
+            showGlow: model.showGlow,
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: kVerticalPaddingBig),

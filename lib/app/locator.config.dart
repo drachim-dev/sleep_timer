@@ -28,7 +28,6 @@ Future<GetIt> $initGetIt(
   final gh = GetItHelper(get, environment, environmentFilter);
   final thirdPartyServicesModule = _$ThirdPartyServicesModule();
   gh.lazySingleton<DeviceService>(() => DeviceService());
-  gh.lazySingleton<DialogService>(() => thirdPartyServicesModule.dialogService);
   gh.lazySingleton<InAppPurchaseConnection>(
       () => thirdPartyServicesModule.iapService);
   gh.lazySingleton<NavigationService>(
@@ -45,8 +44,6 @@ Future<GetIt> $initGetIt(
 }
 
 class _$ThirdPartyServicesModule extends ThirdPartyServicesModule {
-  @override
-  DialogService get dialogService => DialogService();
   @override
   NavigationService get navigationService => NavigationService();
 }

@@ -5,14 +5,18 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
+import 'package:sleep_timer/services/theme_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class HomeViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
   final _prefService = locator<SharedPreferences>();
+  final _themeService = locator<ThemeService>();
 
   int _initialTime = kDefaultInitialTime;
+
+  bool get showGlow => _themeService.showGlow;
   int get initialTime => _initialTime;
 
   String _activeTimerId;
@@ -20,6 +24,17 @@ class HomeViewModel extends BaseViewModel {
 
   HomeViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
+
+    startActionList.forEach((element) {
+      element.enabled =
+          _prefService.get(element.id.toString()) ?? element.enabled;
+
+      if (element is ValueActionModel) {
+        element.value =
+            _prefService.get(element.key.toString()) ?? element.value;
+      }
+    });
+
     actionList.forEach((element) {
       element.enabled =
           _prefService.get(element.id.toString()) ?? element.enabled;
@@ -27,7 +42,8 @@ class HomeViewModel extends BaseViewModel {
   }
 
   void startNewTimer() async {
-    final TimerModel timerModel = TimerModel(_initialTime * 60, actionList);
+    final TimerModel timerModel =
+        TimerModel(_initialTime * 60, startActionList, actionList);
 
     _activeTimerId = await _navigationService.navigateTo(Routes.timerView,
         arguments: TimerViewArguments(timerModel: timerModel));
@@ -40,8 +56,7 @@ class HomeViewModel extends BaseViewModel {
           .getTimerService(_activeTimerId)
           .timerModel;
 
-      _activeTimerId = await _navigationService.navigateTo(
-          Routes.timerView,
+      _activeTimerId = await _navigationService.navigateTo(Routes.timerView,
           arguments: TimerViewArguments(timerModel: timerModel));
       notifyListeners();
     }

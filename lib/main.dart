@@ -48,7 +48,8 @@ class MyApp extends StatelessWidget {
             title: 'Sleep timer',
             navigatorKey: locator<NavigationService>().navigatorKey,
             onGenerateRoute: AutoRouter(),
-            initialRoute: model.firstLaunch ? Routes.introView : Routes.homeView,
+            initialRoute:
+                model.firstLaunch ? Routes.introView : Routes.homeView,
             debugShowCheckedModeBanner: false,
           );
         });
@@ -66,6 +67,9 @@ class MyAppViewModel extends ReactiveViewModel {
   MyAppViewModel() {
     var savedTheme = _prefsService.getString(kPrefKeyTheme);
     if (savedTheme != null) _themeService.updateTheme(savedTheme);
+
+    var savedGlow = _prefsService.getBool(kPrefKeyGlow);
+    if(savedGlow != null) _themeService.updateGlow(savedGlow);
   }
 
   @override
@@ -118,7 +122,7 @@ void onAlarmCallback(final String timerId) async {
 
   final _timerService =
       TimerServiceManager.getInstance().getTimerService(timerId);
-  _timerService.handleAlarm();
+  _timerService.handleEndedActions();
 }
 
 void onNativeSideDeviceFunctionsCallback() async {

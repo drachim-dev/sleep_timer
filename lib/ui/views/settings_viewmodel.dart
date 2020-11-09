@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/common/theme.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
@@ -19,11 +20,11 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   final _deviceService = locator<DeviceService>();
   final _purchaseService = locator<PurchaseService>();
 
+  MyTheme get currentTheme => _themeService.myTheme;
+  bool get glow => _themeService.showGlow;
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
-  bool get experimentActive => deviceAdmin || notificationSettingsAccess;
-  String get currentTheme => _prefsService.getString(kPrefKeyTheme) ?? 'Dark';
 
   Stream<List<PurchaseDetails>> get stream =>
       _purchaseService.purchaseUpdatedStream;
@@ -58,8 +59,11 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   void updateTheme(final String theme) {
     _prefsService.setString(kPrefKeyTheme, theme);
     _themeService.updateTheme(theme);
+  }
 
-    notifyListeners();
+  void onChangeGlow(bool value) {
+    _prefsService.setBool(kPrefKeyGlow, value);
+    _themeService.updateGlow(value);
   }
 
   Future<void> buyProduct(final Product product) async {

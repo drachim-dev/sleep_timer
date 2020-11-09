@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:sleep_timer/common/constants.dart';
 
 class TimerSlider extends StatelessWidget {
   final double size;
   final int initialValue, minValue, maxValue;
   final bool hasHandle;
+  final bool showGlow;
   final TextStyle labelStyle;
   final Function(double) onChange;
   final String Function(int) onUpdateLabel;
@@ -15,6 +17,7 @@ class TimerSlider extends StatelessWidget {
     this.minValue,
     this.maxValue,
     this.hasHandle = true,
+    this.showGlow = kDefaultGlow,
     this.labelStyle,
     this.onChange,
     this.onUpdateLabel,
@@ -33,14 +36,14 @@ class TimerSlider extends StatelessWidget {
         : theme.colorScheme.surface;
 
     final Color shadowColor = theme.brightness == Brightness.light
-        ? Colors.grey[100]
+        ? theme.colorScheme.secondary
         : theme.colorScheme.primary;
 
     final Color handleColor = theme.brightness == Brightness.light
         ? theme.colorScheme.secondary
         : Colors.white;
 
-    final double shadowWidth = theme.brightness == Brightness.light ? 30 : 25;
+    final double shadowWidth = showGlow ? 25 : 0;
 
     return SleekCircularSlider(
         min: minValue?.toDouble() ?? 0,

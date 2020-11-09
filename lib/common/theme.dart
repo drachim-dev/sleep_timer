@@ -59,6 +59,16 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     scaffoldBackgroundColor: colorScheme.background,
     highlightColor: Colors.transparent,
     accentColor: colorScheme.primary,
+    toggleableActiveColor: colorScheme.primaryVariant,
+    textSelectionTheme: TextSelectionThemeData(
+      selectionColor: colorScheme.primary,
+      selectionHandleColor: colorScheme.primary,
+      cursorColor: colorScheme.primary,
+    ),
+    dialogBackgroundColor: colorScheme.surface,
+    popupMenuTheme: PopupMenuThemeData(
+      color: colorScheme.surface,
+    ),
     focusColor: focusColor,
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
@@ -72,10 +82,10 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
 }
 
 ColorScheme _lightColorScheme = ColorScheme(
-  primary: Colors.indigo[700],
-  primaryVariant: Colors.indigo[800],
-  secondary: Colors.deepOrangeAccent,
-  secondaryVariant: Colors.deepOrange,
+  primary: Colors.blueGrey[600],
+  primaryVariant: Colors.deepOrangeAccent[100],
+  secondary: Colors.deepOrangeAccent[100],
+  secondaryVariant: Colors.deepOrange[300],
   background: Color(0xFFFCFCFC),
   surface: Color(0xFFFCFCFC),
   onBackground: Colors.grey[900],
@@ -89,11 +99,11 @@ ColorScheme _lightColorScheme = ColorScheme(
 
 ColorScheme _darkColorScheme = ColorScheme(
   primary: Colors.deepOrange[300],
-  primaryVariant: Colors.deepOrange[400],
+  primaryVariant: Colors.tealAccent,
   secondary: Colors.deepPurpleAccent,
   secondaryVariant: Colors.deepPurple,
   background: Color(0xFF1F1929),
-  surface: Color(0xFF241E30),
+  surface: Color(0xFF393343), // 241E30
   onBackground: Color(0x0DFFFFFF),
   error: _darkFillColor,
   onError: _darkFillColor,
@@ -104,12 +114,12 @@ ColorScheme _darkColorScheme = ColorScheme(
 );
 
 ColorScheme _blackColorScheme = ColorScheme(
-  primary: Colors.purple[300],
-  primaryVariant: Colors.purple[400],
-  secondary: Colors.teal,
-  secondaryVariant: Colors.teal[700],
+  primary: Colors.indigo[200],
+  primaryVariant: Colors.indigoAccent[100],
+  secondary: Colors.indigo[500],
+  secondaryVariant: Colors.indigo[400],
   background: Colors.black,
-  surface: Color(0xFF111111),
+  surface: Color(0xFF1A1A1A),
   onBackground: Color(0x0DFFFFFF),
   error: _darkFillColor,
   onError: _darkFillColor,

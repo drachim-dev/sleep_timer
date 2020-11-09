@@ -122,8 +122,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     // Navigate to timer detail view
     _navigationService.popUntil((route) => route.isFirst);
     _navigationService.navigateTo(Routes.timerView,
-        arguments:
-            TimerViewArguments(timerModel: _timerService.timerModel));
+        arguments: TimerViewArguments(timerModel: _timerService.timerModel));
   }
 
   @override
@@ -182,7 +181,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   void onWidgetStartTimer() {
     log.i("onWidgetStartTimer called on dart side");
 
-    final TimerModel timerModel = TimerModel(120, actionList);
+    final TimerModel timerModel = TimerModel(120, startActionList, actionList);
     final _timerService = locator<TimerService>(param1: timerModel);
     TimerServiceManager.getInstance().setTimerService(_timerService);
     _timerService.start();

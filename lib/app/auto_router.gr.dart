@@ -15,12 +15,14 @@ import '../ui/views/faq_view.dart';
 import '../ui/views/home_view.dart';
 import '../ui/views/intro_view.dart';
 import '../ui/views/settings_view.dart';
+import '../ui/views/spotify_auth_view.dart';
 import '../ui/views/timer_view.dart';
 
 class Routes {
   static const String introView = '/intro-view';
   static const String homeView = '/home-view';
   static const String timerView = '/timer-view';
+  static const String spotifyAuthView = '/spotify-auth-view';
   static const String settingsView = '/settings-view';
   static const String fAQView = '/f-aq-view';
   static const String creditsView = '/credits-view';
@@ -28,6 +30,7 @@ class Routes {
     introView,
     homeView,
     timerView,
+    spotifyAuthView,
     settingsView,
     fAQView,
     creditsView,
@@ -41,6 +44,7 @@ class AutoRouter extends RouterBase {
     RouteDef(Routes.introView, page: IntroView),
     RouteDef(Routes.homeView, page: HomeView),
     RouteDef(Routes.timerView, page: TimerView),
+    RouteDef(Routes.spotifyAuthView, page: SpotifyAuthView),
     RouteDef(Routes.settingsView, page: SettingsView),
     RouteDef(Routes.fAQView, page: FAQView),
     RouteDef(Routes.creditsView, page: CreditsView),
@@ -70,9 +74,26 @@ class AutoRouter extends RouterBase {
         settings: data,
       );
     },
-    SettingsView: (data) {
+    SpotifyAuthView: (data) {
+      final args = data.getArgs<SpotifyAuthViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => SettingsView(),
+        builder: (context) => SpotifyAuthView(
+          url: args.url,
+          redirectUrl: args.redirectUrl,
+        ),
+        settings: data,
+      );
+    },
+    SettingsView: (data) {
+      final args = data.getArgs<SettingsViewArguments>(
+        orElse: () => SettingsViewArguments(),
+      );
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => SettingsView(
+          deviceAdminFocused: args.deviceAdminFocused,
+          notificationSettingsAccessFocused:
+              args.notificationSettingsAccessFocused,
+        ),
         settings: data,
       );
     },
@@ -100,4 +121,20 @@ class TimerViewArguments {
   final Key key;
   final TimerModel timerModel;
   TimerViewArguments({this.key, @required this.timerModel});
+}
+
+/// SpotifyAuthView arguments holder class
+class SpotifyAuthViewArguments {
+  final String url;
+  final String redirectUrl;
+  SpotifyAuthViewArguments({@required this.url, @required this.redirectUrl});
+}
+
+/// SettingsView arguments holder class
+class SettingsViewArguments {
+  final dynamic deviceAdminFocused;
+  final dynamic notificationSettingsAccessFocused;
+  SettingsViewArguments(
+      {this.deviceAdminFocused = false,
+      this.notificationSettingsAccessFocused = false});
 }
