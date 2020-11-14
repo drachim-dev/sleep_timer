@@ -1,9 +1,11 @@
 package dr.achim.sleep_timer;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -25,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import dr.achim.sleep_timer.Messages.*;
@@ -167,8 +168,28 @@ public class MethodChannelImpl implements HostTimerApi {
         List<ResolveInfo> playerList = new ArrayList<>(audioList);
         playerList.addAll(videoList);
         playerList.addAll(mediaList);
+        final ArrayList<HashMap> apps = getAppsFromResolveInfo(manager, playerList);
 
-        final ArrayList apps = getAppsFromResolveInfo(manager, playerList);
+        try {
+            final PackageInfo netflixPackage = manager.getPackageInfo("com.netflix.mediaclient", 0);
+
+            final ApplicationInfo applicationInfo = netflixPackage.applicationInfo;
+            if (applicationInfo != null && applicationInfo.enabled) {
+                // https://stackoverflow.com/questions/51368075/how-can-i-get-android-drawables-in-flutter
+                final Bitmap bitmap = getBitmapFromDrawable(applicationInfo.loadIcon(manager));
+                final String encoded = getBase64FromBitmap(bitmap);
+
+                Messages.Package app = new Messages.Package();
+                app.setPackageName(applicationInfo.packageName);
+                app.setTitle(applicationInfo.loadLabel(manager).toString());
+                app.setIcon(encoded);
+                apps.add(app.toMap());
+            }
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         response.setApps(apps);
         return response;
     }
@@ -182,18 +203,18 @@ public class MethodChannelImpl implements HostTimerApi {
         Intent showAlarmsIntent = new Intent(AlarmClock.ACTION_SHOW_ALARMS);
         List<ResolveInfo> alarmList = manager.queryIntentActivities(showAlarmsIntent, 0);
 
-        final ArrayList apps = getAppsFromResolveInfo(manager, alarmList);
+        final ArrayList<HashMap> apps = getAppsFromResolveInfo(manager, alarmList);
         response.setApps(apps);
         return response;
     }
 
     @NotNull
-    private ArrayList getAppsFromResolveInfo(PackageManager manager, List<ResolveInfo> playerList) {
+    private ArrayList<HashMap> getAppsFromResolveInfo(PackageManager manager, List<ResolveInfo> playerList) {
         Set<String> distinctAppSet = new HashSet<>();
-        ArrayList apps = new ArrayList();
+        ArrayList<HashMap> apps = new ArrayList<>();
         for(ResolveInfo info : playerList) {
-            ActivityInfo activity = info.activityInfo;
-            ApplicationInfo applicationInfo = activity.applicationInfo;
+            final ActivityInfo activity = info.activityInfo;
+            final ApplicationInfo applicationInfo = activity.applicationInfo;
 
             if (applicationInfo == null || !applicationInfo.enabled || distinctAppSet.contains(applicationInfo.packageName)) {
                 continue;

@@ -73,11 +73,11 @@
         <receiver
             android:name=".NotificationActionReceiver"
             android:enabled="true" />
-        <receiver
+        <!-- <receiver
             android:name=".WidgetReceiver"
-            android:enabled="true" />
+            android:enabled="true" /> -->
         <!-- Timer Widget -->
-        <receiver 
+        <!-- <receiver 
             android:name=".TimerWidget"
             android:label= "sleep_timer">
             <intent-filter>
@@ -85,7 +85,7 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/app_widget_info" />
-        </receiver>
+        </receiver> -->
 
         <!-- This is used to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -100,6 +100,7 @@
     </application>
 
     <queries>
+        <!-- Alarm clocks -->
         <package android:name="com.htc.android.worldclock" />
         <package android:name="com.android.deskclock" />
         <package android:name="com.google.android.deskclock" />
@@ -115,6 +116,7 @@
         <package android:name="com.urbandroid.sleep.alarmclock" />
         <package android:name="com.splunchy.android.alarmclock" />
 
+        <!-- Audio player -->
         <package android:name="com.spotify.music" />
         <package android:name="com.google.android.youtube" />
         <package android:name="deezer.android.app" />
@@ -123,6 +125,11 @@
         <package android:name="com.pandora.android" />
         <package android:name="com.rhapsody" />
         <package android:name="com.aspiro.tidal" />
+        <package android:name="com.soundcloud.android" />
+        <package android:name="com.google.android.apps.podcasts" />
+        <package android:name="com.sec.android.app.music" />
+
+        <!-- Video player -->
         <package android:name="com.netflix.mediaclient" />
         <package android:name="com.amazon.avod.thirdpartyclient" />
         <package android:name="com.disney.disneyplus" />
@@ -130,6 +137,10 @@
         <package android:name="de.sky.bw" />
         <package android:name="de.sky.online" />
         <package android:name="com.dazn" />
+        <package android:name="com.plexapp.android" />
+        <package android:name="org.xbmc.kodi" />
+        <package android:name="com.vanced.android.youtube" />
+
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:mimeType="audio/*" />

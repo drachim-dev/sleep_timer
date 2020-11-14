@@ -279,7 +279,7 @@ packages:
       name: get
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.15.0"
+    version: "3.17.1"
   get_it:
     dependency: "direct main"
     description:
@@ -676,7 +676,7 @@ packages:
       name: stacked_services
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.4+4"
+    version: "0.5.4+5"
   stream_channel:
     dependency: transitive
     description:
@@ -795,7 +795,7 @@ packages:
       name: webview_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.7"
   win32:
     dependency: transitive
     description:

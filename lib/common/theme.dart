@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_timer/common/constants.dart';
 
 class MyTheme {
   final String id, title;
@@ -20,22 +21,27 @@ const TextTheme _textTheme = TextTheme(
 
 List<MyTheme> themeList = [
   MyTheme(
-    id: "light_orange_theme",
+    id: kThemeKeyLightOrange,
     title: "Light Orange",
     theme: _themeData(_lightOrangeColorScheme, _lightFocusColor),
   ),
     MyTheme(
-    id: "light_green_theme",
+    id: kThemeKeyLightGreen,
     title: "Light Green",
     theme: _themeData(_lightGreenColorScheme, _lightFocusColor),
   ),
   MyTheme(
-    id: "dark_theme",
-    title: "Dark",
-    theme: _themeData(_darkColorScheme, _darkFocusColor),
+    id: kThemeKeyDarkOrange,
+    title: "Dark Orange",
+    theme: _themeData(_darkOrangeColorScheme, _darkFocusColor),
+  ),
+    MyTheme(
+    id: kThemeKeyDarkYellow,
+    title: "Dark Yellow",
+    theme: _themeData(_darkYellowColorScheme, _darkFocusColor),
   ),
   MyTheme(
-    id: "black_theme",
+    id: kThemeKeyBlackBlue,
     title: "Black",
     theme: _themeData(_blackColorScheme, _darkFocusColor),
   )
@@ -122,13 +128,29 @@ ColorScheme _lightGreenColorScheme = ColorScheme(
   brightness: Brightness.light,
 );
 
-ColorScheme _darkColorScheme = ColorScheme(
+ColorScheme _darkOrangeColorScheme = ColorScheme(
   primary: Colors.deepOrange[300],
   primaryVariant: Colors.tealAccent,
   secondary: Colors.deepPurpleAccent,
   secondaryVariant: Colors.deepPurple,
   background: Color(0xFF1F1929),
   surface: Color(0xFF393343), // 241E30
+  onBackground: Color(0x0DFFFFFF),
+  error: _darkFillColor,
+  onError: _darkFillColor,
+  onPrimary: _darkFillColor,
+  onSecondary: _darkFillColor,
+  onSurface: _darkFillColor,
+  brightness: Brightness.dark,
+);
+
+ColorScheme _darkYellowColorScheme = ColorScheme(
+  primary: Colors.yellow[800],
+  primaryVariant: Colors.tealAccent[400],
+  secondary: Colors.teal[700],
+  secondaryVariant: Colors.teal[800],
+  background: Color(0xFF1b1b1b),
+  surface: Color(0xFF373737), 
   onBackground: Color(0x0DFFFFFF),
   error: _darkFillColor,
   onError: _darkFillColor,
