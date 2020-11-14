@@ -42,8 +42,12 @@ class TimerService with ReactiveServiceMixin {
   void start() {
     const interval = Duration(seconds: 1);
 
+    if (status == TimerStatus.ELAPSED) {
+      _resetTime();
+    }
+
     _timer = Timer.periodic(interval, (timer) {
-      remainingTime > 0 ? setRemainingTime(remainingTime - 1) : _disposeTimer();
+      remainingTime > 0 ? setRemainingTime(remainingTime - 1) : _elapseTimer();
     });
 
     if (status == TimerStatus.INITIAL) {
@@ -53,7 +57,7 @@ class TimerService with ReactiveServiceMixin {
 
     _deviceService.showRunningNotification(
         timerId: timerModel.id,
-        duration: timerModel.initialTimeInSeconds,
+        duration: maxTime,
         remainingTime: remainingTime);
   }
 
@@ -67,10 +71,14 @@ class TimerService with ReactiveServiceMixin {
 
     setMaxTime();
 
-    _deviceService.showRunningNotification(
-        timerId: timerModel.id,
-        duration: timerModel.initialTimeInSeconds,
-        remainingTime: remainingTime);
+    if (status == TimerStatus.RUNNING) {
+      _deviceService.showRunningNotification(
+          timerId: timerModel.id,
+          duration: maxTime,
+          remainingTime: remainingTime);
+    } else if (status == TimerStatus.PAUSING) {
+      pauseTimer();
+    }
   }
 
   void pauseTimer() {
@@ -81,8 +89,18 @@ class TimerService with ReactiveServiceMixin {
   }
 
   Future<void> cancelTimer() async {
-    _status.value = TimerStatus.PAUSING;
+    _status.value = TimerStatus.INITIAL;
     _deviceService.cancelNotification(timerId: timerModel.id);
+    _resetTime();
+    _disposeTimer();
+  }
+
+  void _resetTime() {
+    setRemainingTime(timerModel.initialTimeInSeconds);
+  }
+
+  void _elapseTimer() {
+    _status.value = TimerStatus.ELAPSED;
     _disposeTimer();
   }
 

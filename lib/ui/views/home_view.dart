@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
@@ -66,7 +67,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           flexibleSpace: Padding(
             padding: const EdgeInsets.only(top: padding),
             child: Text(
-              "Sleep Timer",
+              S.of(context).sleepTimer,
               style: theme.textTheme.headline2.copyWith(fontSize: 48),
               textAlign: TextAlign.center,
             ),
@@ -76,7 +77,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               onSelected: _onMenuOption,
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  child: Text("Settings"),
+                  child: Text(S.of(context).settings),
                   value: MenuOption.settings,
                 ),
               ],
@@ -107,7 +108,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           TimerSlider(
             minValue: 1,
             initialValue: model.initialTime,
-            onUpdateLabel: (value) => "$value Min",
+            onUpdateLabel: (value) => S.of(context).numberOfMinutesShort(value),
             onChange: (value) => model.setTime(value.round()),
             showGlow: model.showGlow,
           ),
@@ -130,7 +131,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   Widget _buildActiveTimers(ThemeData theme) {
     return FlatButton(
-      child: Text("Tap here to see your timer"),
+      child: Text(S.of(context).buttonOpenSavedTimer),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       shape: StadiumBorder(
           side: BorderSide(
@@ -157,7 +158,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         child: FloatingActionButton.extended(
           onPressed: () => model.startNewTimer(),
           icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
-          label: Text("Go to sleep", style: textStyle),
+          label: Text(S.of(context).buttonSetupTimer, style: textStyle),
         ),
       ),
     );

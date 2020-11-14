@@ -10,7 +10,7 @@ class ThemeService with ReactiveServiceMixin {
     listenToReactiveValues([_myTheme, _showGlow]);
   }
 
-  final RxValue<MyTheme> _myTheme = RxValue<MyTheme>(initial: themeList[1]);
+  final RxValue<MyTheme> _myTheme = RxValue<MyTheme>(initial: themeList[2]);
   MyTheme get myTheme => _myTheme.value;
 
   final RxValue<bool> _showGlow = RxValue<bool>(initial: kDefaultGlow);

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 
 enum ActionType {
   PLAY_MUSIC,
@@ -16,14 +17,12 @@ enum ActionType {
 class ActionModel {
   final ActionType id;
   final String title, description;
-  final bool experiment;
   bool enabled;
 
   ActionModel(
       {@required this.id,
       @required this.title,
       @required this.description,
-      this.experiment = false,
       @required this.enabled});
 }
 
@@ -38,7 +37,6 @@ class ValueActionModel extends ActionModel {
       {id,
       title,
       description,
-      experiment,
       enabled,
       @required this.value,
       this.unit,
@@ -47,74 +45,68 @@ class ValueActionModel extends ActionModel {
             id: id,
             title: title,
             description: description,
-            experiment: experiment,
             enabled: enabled);
 }
 
 List<ActionModel> startActionList = [
   ValueActionModel(
     id: ActionType.VOLUME,
-    title: "Volume",
-    description: "Set media volume to",
+    title: S.current.actionVolumeTitle,
+    description: S.current.actionVolumeDescription,
     unit: " %",
     enabled: false,
-    experiment: false,
     value: 10.0,
     key: kKeyVolumeLevel,
   ),
   ActionModel(
     id: ActionType.PLAY_MUSIC,
-    title: "Play music",
+    title: S.current.actionPlayMusicTitle,
     description: "Peacock's Frenchcore Choice",
     enabled: false,
   ),
   ActionModel(
     id: ActionType.DND,
-    title: "Do not disturb",
-    description: "Enable do not disturb",
+    title: S.current.actionDoNotDisturbTitle,
+    description: S.current.actionDoNotDisturbDescription,
     enabled: false,
-    experiment: true,
   ),
 ];
 
 List<ActionModel> actionList = [
   ActionModel(
     id: ActionType.MEDIA,
-    title: "Media",
-    description: "Stop media playback",
+    title: S.current.actionToggleMediaTitle,
+    description: S.current.actionToggleMediaDescription,
     enabled: true,
   ),
   ActionModel(
     id: ActionType.WIFI,
-    title: "Wifi",
-    description: "Disable wifi",
+    title: S.current.actionToggleWifiTitle,
+    description: S.current.actionToggleWifiDescription,
     enabled: false,
   ),
   ActionModel(
     id: ActionType.BLUETOOTH,
-    title: "Bluetooth",
-    description: "Disable bluetooth",
+    title: S.current.actionToggleBluetoothTitle,
+    description: S.current.actionToggleBluetoothDescription,
     enabled: false,
   ),
   ActionModel(
     id: ActionType.SCREEN,
-    title: "Screen",
-    description: "Turn screen off",
+    title: S.current.actionToggleScreenTitle,
+    description: S.current.actionToggleScreenDescription,
     enabled: false,
-    experiment: true,
   ),
   ActionModel(
     id: ActionType.LIGHT,
     title: "Light",
     description: "Turn 3 lights off",
     enabled: false,
-    experiment: true,
   ),
   ActionModel(
     id: ActionType.APP,
     title: "App",
     description: "Force close YouTube",
     enabled: false,
-    experiment: true,
   ),
 ];

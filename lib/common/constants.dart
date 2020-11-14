@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+const double kVerticalPaddingSmall = kVerticalPadding / 2;
 const double kVerticalPadding = 16;
 const double kVerticalPaddingBig = kVerticalPadding * 2;
 const double kHorizontalPaddingSmall = kHorizontalPadding / 2;
 const double kHorizontalPadding = 16;
 const double kPreferenceTitleLeftPadding = 16;
+const double kBottomSheetPadding = 24;
 
 const String kProductRemoveAds = "remove_ads";
 const String kProductDonation = "donate";

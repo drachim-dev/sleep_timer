@@ -9,6 +9,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/spotify_manager.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/playlist.dart' as MyPlaylist;
 import 'package:sleep_timer/model/spotify_authentication.dart';
 import 'package:sleep_timer/model/timer_model.dart';
@@ -71,6 +72,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   int get platformVersion => _deviceService.platformVersion;
 
   bool get showGlow => _themeService.showGlow;
+
+  Future<List<App>> get playerApps => _deviceService.playerApps;
+  Future<List<App>> get alarmApps => _deviceService.alarmApps;
 
   @override
   Future<void> initialise() async {
@@ -269,6 +273,11 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   void onChangeApp(bool enabled) {
     _timerModel.appAction.enabled = enabled;
     notifyListeners();
+  }
+
+  void openPackage(String packageName) {
+    _deviceService.openPackage(packageName);
+    _navigationService.back();
   }
 
   @override

@@ -6,6 +6,73 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:typed_data' show Uint8List, Int32List, Int64List, Float64List;
 
+class ExtendTimeResponse {
+  String timerId;
+  int additionalTime;
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['timerId'] = timerId;
+    pigeonMap['additionalTime'] = additionalTime;
+    return pigeonMap;
+  }
+  // ignore: unused_element
+  static ExtendTimeResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final ExtendTimeResponse result = ExtendTimeResponse();
+    result.timerId = pigeonMap['timerId'];
+    result.additionalTime = pigeonMap['additionalTime'];
+    return result;
+  }
+}
+
+class TimerRequest {
+  String timerId;
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['timerId'] = timerId;
+    return pigeonMap;
+  }
+  // ignore: unused_element
+  static TimerRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final TimerRequest result = TimerRequest();
+    result.timerId = pigeonMap['timerId'];
+    return result;
+  }
+}
+
+class OpenRequest {
+  String timerId;
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['timerId'] = timerId;
+    return pigeonMap;
+  }
+  // ignore: unused_element
+  static OpenRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final OpenRequest result = OpenRequest();
+    result.timerId = pigeonMap['timerId'];
+    return result;
+  }
+}
+
+class WidgetUpdateResponse {
+  String title;
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['title'] = title;
+    return pigeonMap;
+  }
+  // ignore: unused_element
+  static WidgetUpdateResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final WidgetUpdateResponse result = WidgetUpdateResponse();
+    result.title = pigeonMap['title'];
+    return result;
+  }
+}
+
 class InitializationRequest {
   int callbackHandle;
   // ignore: unused_element
@@ -156,183 +223,57 @@ class CancelRequest {
   }
 }
 
-class ExtendTimeResponse {
-  String timerId;
-  int additionalTime;
+class InstalledAppsResponse {
+  List apps;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
-    pigeonMap['timerId'] = timerId;
-    pigeonMap['additionalTime'] = additionalTime;
+    pigeonMap['apps'] = apps;
     return pigeonMap;
   }
   // ignore: unused_element
-  static ExtendTimeResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
-    final ExtendTimeResponse result = ExtendTimeResponse();
-    result.timerId = pigeonMap['timerId'];
-    result.additionalTime = pigeonMap['additionalTime'];
+  static InstalledAppsResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final InstalledAppsResponse result = InstalledAppsResponse();
+    result.apps = pigeonMap['apps'];
     return result;
   }
 }
 
-class TimerRequest {
-  String timerId;
+class LaunchAppRequest {
+  String packageName;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
-    pigeonMap['timerId'] = timerId;
+    pigeonMap['packageName'] = packageName;
     return pigeonMap;
   }
   // ignore: unused_element
-  static TimerRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
-    final TimerRequest result = TimerRequest();
-    result.timerId = pigeonMap['timerId'];
+  static LaunchAppRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final LaunchAppRequest result = LaunchAppRequest();
+    result.packageName = pigeonMap['packageName'];
     return result;
   }
 }
 
-class OpenRequest {
-  String timerId;
-  // ignore: unused_element
-  Map<dynamic, dynamic> _toMap() {
-    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
-    pigeonMap['timerId'] = timerId;
-    return pigeonMap;
-  }
-  // ignore: unused_element
-  static OpenRequest _fromMap(Map<dynamic, dynamic> pigeonMap) {
-    final OpenRequest result = OpenRequest();
-    result.timerId = pigeonMap['timerId'];
-    return result;
-  }
-}
-
-class WidgetUpdateResponse {
+class Package {
   String title;
+  String icon;
+  String packageName;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
     pigeonMap['title'] = title;
+    pigeonMap['icon'] = icon;
+    pigeonMap['packageName'] = packageName;
     return pigeonMap;
   }
   // ignore: unused_element
-  static WidgetUpdateResponse _fromMap(Map<dynamic, dynamic> pigeonMap) {
-    final WidgetUpdateResponse result = WidgetUpdateResponse();
+  static Package _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final Package result = Package();
     result.title = pigeonMap['title'];
+    result.icon = pigeonMap['icon'];
+    result.packageName = pigeonMap['packageName'];
     return result;
-  }
-}
-
-class HostTimerApi {
-  Future<void> init(InitializationRequest arg) async {
-    final Map<dynamic, dynamic> requestMap = arg._toMap();
-    const BasicMessageChannel<dynamic> channel =
-        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.init', StandardMessageCodec());
-    
-    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
-    if (replyMap == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-        details: null);
-    } else if (replyMap['error'] != null) {
-      final Map<dynamic, dynamic> error = replyMap['error'];
-      throw PlatformException(
-          code: error['code'],
-          message: error['message'],
-          details: error['details']);
-    } else {
-      // noop
-    }
-    
-  }
-  Future<NotificationResponse> showRunningNotification(TimeNotificationRequest arg) async {
-    final Map<dynamic, dynamic> requestMap = arg._toMap();
-    const BasicMessageChannel<dynamic> channel =
-        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showRunningNotification', StandardMessageCodec());
-    
-    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
-    if (replyMap == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-        details: null);
-    } else if (replyMap['error'] != null) {
-      final Map<dynamic, dynamic> error = replyMap['error'];
-      throw PlatformException(
-          code: error['code'],
-          message: error['message'],
-          details: error['details']);
-    } else {
-      return NotificationResponse._fromMap(replyMap['result']);
-    }
-    
-  }
-  Future<NotificationResponse> showPausingNotification(TimeNotificationRequest arg) async {
-    final Map<dynamic, dynamic> requestMap = arg._toMap();
-    const BasicMessageChannel<dynamic> channel =
-        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showPausingNotification', StandardMessageCodec());
-    
-    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
-    if (replyMap == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-        details: null);
-    } else if (replyMap['error'] != null) {
-      final Map<dynamic, dynamic> error = replyMap['error'];
-      throw PlatformException(
-          code: error['code'],
-          message: error['message'],
-          details: error['details']);
-    } else {
-      return NotificationResponse._fromMap(replyMap['result']);
-    }
-    
-  }
-  Future<NotificationResponse> showElapsedNotification(NotificationRequest arg) async {
-    final Map<dynamic, dynamic> requestMap = arg._toMap();
-    const BasicMessageChannel<dynamic> channel =
-        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showElapsedNotification', StandardMessageCodec());
-    
-    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
-    if (replyMap == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-        details: null);
-    } else if (replyMap['error'] != null) {
-      final Map<dynamic, dynamic> error = replyMap['error'];
-      throw PlatformException(
-          code: error['code'],
-          message: error['message'],
-          details: error['details']);
-    } else {
-      return NotificationResponse._fromMap(replyMap['result']);
-    }
-    
-  }
-  Future<CancelResponse> cancelTimer(CancelRequest arg) async {
-    final Map<dynamic, dynamic> requestMap = arg._toMap();
-    const BasicMessageChannel<dynamic> channel =
-        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.cancelTimer', StandardMessageCodec());
-    
-    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
-    if (replyMap == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-        details: null);
-    } else if (replyMap['error'] != null) {
-      final Map<dynamic, dynamic> error = replyMap['error'];
-      throw PlatformException(
-          code: error['code'],
-          message: error['message'],
-          details: error['details']);
-    } else {
-      return CancelResponse._fromMap(replyMap['result']);
-    }
-    
   }
 }
 
@@ -470,6 +411,204 @@ abstract class FlutterTimerApi {
         });
       }
     }
+  }
+}
+
+class HostTimerApi {
+  Future<void> init(InitializationRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.init', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      // noop
+    }
+    
+  }
+  Future<NotificationResponse> showRunningNotification(TimeNotificationRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showRunningNotification', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return NotificationResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<NotificationResponse> showPausingNotification(TimeNotificationRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showPausingNotification', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return NotificationResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<NotificationResponse> showElapsedNotification(NotificationRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.showElapsedNotification', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return NotificationResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<CancelResponse> cancelTimer(CancelRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.cancelTimer', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return CancelResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<InstalledAppsResponse> getInstalledPlayerApps() async {
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.getInstalledPlayerApps', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(null);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return InstalledAppsResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<InstalledAppsResponse> getInstalledAlarmApps() async {
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.getInstalledAlarmApps', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(null);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return InstalledAppsResponse._fromMap(replyMap['result']);
+    }
+    
+  }
+  Future<void> launchApp(LaunchAppRequest arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.launchApp', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      // noop
+    }
+    
+  }
+  Future<Package> dummyApp() async {
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.HostTimerApi.dummyApp', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(null);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      return Package._fromMap(replyMap['result']);
+    }
+    
   }
 }
 

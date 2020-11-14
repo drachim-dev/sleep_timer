@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/platform_impl.dart';
+
 
 abstract class SleepTimerPlatform {
   static SleepTimerPlatform _instance;
@@ -38,4 +40,7 @@ abstract class SleepTimerPlatform {
       @required final String description,
       final String restartAction});
   Future<bool> cancelTimer(final String timerId);
+  Future<List<App>> getInstalledPlayerApps();
+  Future<List<App>> getInstalledAlarmApps();
+  Future<void> launchApp(String packageName);
 }

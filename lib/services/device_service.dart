@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/common/utils.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/action_model.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
@@ -28,6 +30,12 @@ class DeviceService with ReactiveServiceMixin {
 
   RxValue<bool> _notificationSettingsAccess = RxValue<bool>(initial: false);
   bool get notificationSettingsAccess => _notificationSettingsAccess.value;
+
+  Future<List<App>> get playerApps async =>
+      SleepTimerPlatform.getInstance().getInstalledPlayerApps();
+
+  Future<List<App>> get alarmApps async =>
+      SleepTimerPlatform.getInstance().getInstalledAlarmApps();
 
   Future<void> init() async {
     _platformVersion = await _deviceFunctionsPlatform.getPlatformVersion();
@@ -72,15 +80,14 @@ class DeviceService with ReactiveServiceMixin {
       {@required final String timerId,
       @required final int duration,
       @required final int remainingTime}) async {
-    final String time =
+    final String durationString =
         Utils.secondsToString(duration, trimTrailingZeros: true);
-    final String unit = time == "1" ? "minute" : "minutes";
 
     return SleepTimerPlatform.getInstance().showRunningNotification(
         timerId: timerId,
-        title: "Sleep timer running",
-        description: "Timer set for $time $unit",
-        pauseAction: "Pause",
+        title: S.current.notificationStatusRunning,
+        description: S.current.notificationTimerSet(durationString),
+        pauseAction: S.current.notificationActionPause,
         extendActions: [5, 20],
         duration: duration,
         remainingTime: remainingTime);
@@ -89,27 +96,30 @@ class DeviceService with ReactiveServiceMixin {
   Future<bool> showPauseNotification(
       {@required final String timerId,
       @required final int remainingTime}) async {
+final String timeLeft = Utils.secondsToString(remainingTime, trimTrailingZeros: true);
+
     return SleepTimerPlatform.getInstance().showPausingNotification(
         timerId: timerId,
-        title: "Sleep timer pausing",
+        title: S.current.notificationStatusPausing,
         description:
-            "Time left: ${Utils.secondsToString(remainingTime, trimTrailingZeros: true)}",
-        cancelAction: "Cancel",
-        continueAction: "Continue",
+            S.current.notificationTimeLeft(timeLeft),
+        cancelAction: S.current.notificationActionCancel,
+        continueAction: S.current.notificationActionContinue,
         remainingTime: remainingTime);
   }
 
   Future<bool> showElapsedNotification(
       {@required final TimerModel timerModel}) async {
-    final String time = Utils.secondsToString(timerModel.initialTimeInSeconds,
+    final String durationString = Utils.secondsToString(
+        timerModel.initialTimeInSeconds,
         trimTrailingZeros: true);
-    final String unit = time == "1" ? "minute has" : "minutes have";
+    final String time = S.current.unitMinute(durationString);
 
-    String description = "$time $unit expired. ";
+    String description = S.current.notificationTimeExpired(time);
     final Iterable<ActionModel> activeActions =
-        timerModel.actions.where((element) => element.enabled == true);
+        timerModel.actions.where((element) => element.enabled);
     if (activeActions.isEmpty) {
-      description += "No actions selected for execution.";
+      description += S.current.notificationNoActionsExecuted;
     } else {
       for (var i = 0; i < activeActions.length; i++) {
         final element = activeActions.elementAt(i);
@@ -119,9 +129,9 @@ class DeviceService with ReactiveServiceMixin {
 
     return SleepTimerPlatform.getInstance().showElapsedNotification(
         timerId: timerModel.id,
-        title: "Sleep timer elapsed",
+        title: S.current.notificationStatusElapsed,
         description: description,
-        restartAction: "Restart");
+        restartAction: S.current.notificationActionRestart);
   }
 
   Future<bool> cancelNotification({@required final String timerId}) async {
@@ -138,5 +148,9 @@ class DeviceService with ReactiveServiceMixin {
   // Workaround by using @FlutterApi() for callback.
   void setNotificationAccess(final bool granted) {
     _notificationSettingsAccess.value = granted;
+  }
+
+  Future<void> openPackage(final String packageName) async {
+    return SleepTimerPlatform.getInstance().launchApp(packageName);
   }
 }

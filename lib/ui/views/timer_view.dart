@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:android_intent/android_intent.dart';
 import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -12,6 +12,8 @@ import 'package:flutter_native_admob/native_admob_options.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
+import 'package:sleep_timer/generated/l10n.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -171,22 +173,97 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       slivers: [
         _buildAppBar(theme),
         SliverList(
-          delegate: SliverChildListDelegate([
+          delegate: SliverChildListDelegate.fixed([
             Divider(height: 1),
-            SectionHeader("Quick actions", leftPadding: kHorizontalPadding),
-            _buildQuickActions(theme),
-            ExpansionTile(
-                title: Text("When timer starts"),
-                initiallyExpanded: true,
-                children: _buildStartedActions(theme)),
-            ExpansionTile(
-                title: Text("When time is up"),
-                initiallyExpanded: true,
-                children: _buildEndedActions(theme)),
+            SectionHeader(S.of(context).quickLaunchTitle,
+                leftPadding: kHorizontalPadding),
+            _buildQuickLaunch(),
+            SectionHeader(S.of(context).timerStartsActionsTitle,
+                leftPadding: kHorizontalPadding),
+            for (var action in _buildStartedActions(theme)) action,
+            SectionHeader(S.of(context).timerEndsActionsTitle,
+                leftPadding: kHorizontalPadding),
+            for (var action in _buildEndedActions(theme)) action,
           ]),
         ),
       ],
     );
+  }
+
+  SizedBox _buildQuickLaunch() {
+    return SizedBox(
+      height: 56,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(
+            horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        children: [
+          OutlineButton.icon(
+            icon: Icon(Icons.play_arrow_outlined),
+            label: Text(S.of(context).buttonShowPlayerApps),
+            shape: StadiumBorder(),
+            onPressed: () => _showAppSheet(model.playerApps),
+          ),
+          SizedBox(width: 12),
+          OutlineButton.icon(
+            icon: Icon(Icons.alarm),
+            label: Text(S.of(context).buttonShowAlarmApps),
+            shape: StadiumBorder(),
+            onPressed: () => _showAppSheet(model.alarmApps),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future _showAppSheet(final Future<List<App>> apps) {
+    const double appSize = 40;
+    const int gridSize = 3;
+    const double labelMargin = 12;
+
+    return showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return FutureBuilder<List<App>>(
+              future: apps,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final apps = snapshot.data;
+
+                  return GridView.builder(
+                      padding: const EdgeInsets.all(kBottomSheetPadding),
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridSize),
+                      itemBuilder: (_, index) {
+                        final app = apps[index];
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Ink.image(
+                              width: appSize,
+                              height: appSize,
+                              image: MemoryImage(base64Decode(app.icon)),
+                              child: InkWell(
+                                onTap: () => model.openPackage(app.packageName),
+                                customBorder: CircleBorder(),
+                              ),
+                            ),
+                            SizedBox(height: labelMargin),
+                            Text(app.title,
+                                overflow: TextOverflow.ellipsis, maxLines: 1),
+                          ],
+                        );
+                      },
+                      itemCount: apps.length);
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              });
+        });
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
@@ -217,45 +294,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               title: "+ $minutes",
               onPressed: () => model.onExtendTime(minutes));
         }).toList());
-  }
-
-  Widget _buildQuickActionsHint(final ThemeData theme) {
-    return ListTile(
-      title: Text("Tap to add quick actions"),
-      subtitle: Text("Add shortcuts to quickly open your players"),
-      tileColor: Colors.grey.withOpacity(0.35),
-      onTap: () {},
-      trailing: FlatButton(
-        child: Text("DISMISS"),
-        onPressed: () {},
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(final ThemeData theme) {
-    const double appIconPadding = 4;
-
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Row(
-        children: [
-          "assets/media_player/spotify.png",
-        ].map((image) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: appIconPadding),
-            child: Ink.image(
-              width: 40,
-              height: 40,
-              image: AssetImage(image),
-              child: InkWell(
-                onTap: _openSpotify,
-                customBorder: CircleBorder(),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
   }
 
   List<Widget> _buildStartedActions(final ThemeData theme) {
@@ -359,10 +397,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       child: NativeAdmob(
         adUnitID: AdManager.nativeAdUnitId,
         loading: Center(child: CircularProgressIndicator()),
-        error: Text("Failed to load the ad"),
+        error: Text(S.of(context).adLoadFailure),
         controller: _adController,
         type: NativeAdmobType.banner,
         options: NativeAdmobOptions(
+            showMediaContent: true,
             ratingColor: Colors.red,
             headlineTextStyle:
                 NativeTextStyle(color: theme.textTheme.subtitle1.color),
@@ -391,7 +430,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                 var maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
 
                 return SliderDialog(
-                    title: "Set volume",
+                    title: S.of(context).setVolumeTitle,
                     initialValue:
                         model.timerModel.volumeAction.value ?? currentLevel,
                     maxValue: maxVolume);
@@ -436,10 +475,16 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               actions: [
                 FlatButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text("DONE"),
+                  child: Text(S.of(context).introButtonDone),
                 ),
               ],
             ));
+  }
+
+  void _startPlaylist() async {
+    if (Platform.isAndroid) {
+      model.navigateToSpotifyAuth();
+    }
   }
 
   _buildFAB(ThemeData theme) {
@@ -464,10 +509,10 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           ),
           label: Text(
             model.timerStatus == TimerStatus.RUNNING
-                ? "Pause"
-                : model.timerStatus == TimerStatus.INITIAL
-                    ? "Start timer"
-                    : "Continue",
+                ? S.of(context).buttonTimerPause
+                : model.timerStatus == TimerStatus.INITIAL || model.timerStatus == TimerStatus.ELAPSED
+                    ? S.of(context).buttonTimerStart
+                    : S.of(context).buttonTimerContinue,
             style: textStyle,
           ),
           onPressed: () {
@@ -478,20 +523,5 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             }
           }),
     );
-  }
-
-  void _openSpotify() async {
-    final AndroidIntent intent = AndroidIntent(
-        action: "action_view",
-        package: "com.spotify.music",
-        data: "spotify:home");
-
-    await intent.launch();
-  }
-
-  void _startPlaylist() async {
-    if (Platform.isAndroid) {
-      model.navigateToSpotifyAuth();
-    }
   }
 }

@@ -14,6 +14,89 @@ import java.util.HashMap;
 public class Messages {
 
   /** Generated class from Pigeon that represents data sent in messages. */
+  public static class ExtendTimeResponse {
+    private String timerId;
+    public String getTimerId() { return timerId; }
+    public void setTimerId(String setterArg) { this.timerId = setterArg; }
+
+    private Long additionalTime;
+    public Long getAdditionalTime() { return additionalTime; }
+    public void setAdditionalTime(Long setterArg) { this.additionalTime = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("timerId", timerId);
+      toMapResult.put("additionalTime", additionalTime);
+      return toMapResult;
+    }
+    static ExtendTimeResponse fromMap(HashMap map) {
+      ExtendTimeResponse fromMapResult = new ExtendTimeResponse();
+      Object timerId = map.get("timerId");
+      fromMapResult.timerId = (String)timerId;
+      Object additionalTime = map.get("additionalTime");
+      fromMapResult.additionalTime = (additionalTime == null) ? null : ((additionalTime instanceof Integer) ? (Integer)additionalTime : (Long)additionalTime);
+      return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class TimerRequest {
+    private String timerId;
+    public String getTimerId() { return timerId; }
+    public void setTimerId(String setterArg) { this.timerId = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("timerId", timerId);
+      return toMapResult;
+    }
+    static TimerRequest fromMap(HashMap map) {
+      TimerRequest fromMapResult = new TimerRequest();
+      Object timerId = map.get("timerId");
+      fromMapResult.timerId = (String)timerId;
+      return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class OpenRequest {
+    private String timerId;
+    public String getTimerId() { return timerId; }
+    public void setTimerId(String setterArg) { this.timerId = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("timerId", timerId);
+      return toMapResult;
+    }
+    static OpenRequest fromMap(HashMap map) {
+      OpenRequest fromMapResult = new OpenRequest();
+      Object timerId = map.get("timerId");
+      fromMapResult.timerId = (String)timerId;
+      return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class WidgetUpdateResponse {
+    private String title;
+    public String getTitle() { return title; }
+    public void setTitle(String setterArg) { this.title = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("title", title);
+      return toMapResult;
+    }
+    static WidgetUpdateResponse fromMap(HashMap map) {
+      WidgetUpdateResponse fromMapResult = new WidgetUpdateResponse();
+      Object title = map.get("title");
+      fromMapResult.title = (String)title;
+      return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
   public static class InitializationRequest {
     private Long callbackHandle;
     public Long getCallbackHandle() { return callbackHandle; }
@@ -254,85 +337,157 @@ public class Messages {
   }
 
   /** Generated class from Pigeon that represents data sent in messages. */
-  public static class ExtendTimeResponse {
-    private String timerId;
-    public String getTimerId() { return timerId; }
-    public void setTimerId(String setterArg) { this.timerId = setterArg; }
-
-    private Long additionalTime;
-    public Long getAdditionalTime() { return additionalTime; }
-    public void setAdditionalTime(Long setterArg) { this.additionalTime = setterArg; }
+  public static class InstalledAppsResponse {
+    private ArrayList apps;
+    public ArrayList getApps() { return apps; }
+    public void setApps(ArrayList setterArg) { this.apps = setterArg; }
 
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
-      toMapResult.put("timerId", timerId);
-      toMapResult.put("additionalTime", additionalTime);
+      toMapResult.put("apps", apps);
       return toMapResult;
     }
-    static ExtendTimeResponse fromMap(HashMap map) {
-      ExtendTimeResponse fromMapResult = new ExtendTimeResponse();
-      Object timerId = map.get("timerId");
-      fromMapResult.timerId = (String)timerId;
-      Object additionalTime = map.get("additionalTime");
-      fromMapResult.additionalTime = (additionalTime == null) ? null : ((additionalTime instanceof Integer) ? (Integer)additionalTime : (Long)additionalTime);
+    static InstalledAppsResponse fromMap(HashMap map) {
+      InstalledAppsResponse fromMapResult = new InstalledAppsResponse();
+      Object apps = map.get("apps");
+      fromMapResult.apps = (ArrayList)apps;
       return fromMapResult;
     }
   }
 
   /** Generated class from Pigeon that represents data sent in messages. */
-  public static class TimerRequest {
-    private String timerId;
-    public String getTimerId() { return timerId; }
-    public void setTimerId(String setterArg) { this.timerId = setterArg; }
+  public static class LaunchAppRequest {
+    private String packageName;
+    public String getPackageName() { return packageName; }
+    public void setPackageName(String setterArg) { this.packageName = setterArg; }
 
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
-      toMapResult.put("timerId", timerId);
+      toMapResult.put("packageName", packageName);
       return toMapResult;
     }
-    static TimerRequest fromMap(HashMap map) {
-      TimerRequest fromMapResult = new TimerRequest();
-      Object timerId = map.get("timerId");
-      fromMapResult.timerId = (String)timerId;
+    static LaunchAppRequest fromMap(HashMap map) {
+      LaunchAppRequest fromMapResult = new LaunchAppRequest();
+      Object packageName = map.get("packageName");
+      fromMapResult.packageName = (String)packageName;
       return fromMapResult;
     }
   }
 
   /** Generated class from Pigeon that represents data sent in messages. */
-  public static class OpenRequest {
-    private String timerId;
-    public String getTimerId() { return timerId; }
-    public void setTimerId(String setterArg) { this.timerId = setterArg; }
-
-    HashMap toMap() {
-      HashMap<String, Object> toMapResult = new HashMap<>();
-      toMapResult.put("timerId", timerId);
-      return toMapResult;
-    }
-    static OpenRequest fromMap(HashMap map) {
-      OpenRequest fromMapResult = new OpenRequest();
-      Object timerId = map.get("timerId");
-      fromMapResult.timerId = (String)timerId;
-      return fromMapResult;
-    }
-  }
-
-  /** Generated class from Pigeon that represents data sent in messages. */
-  public static class WidgetUpdateResponse {
+  public static class Package {
     private String title;
     public String getTitle() { return title; }
     public void setTitle(String setterArg) { this.title = setterArg; }
 
+    private String icon;
+    public String getIcon() { return icon; }
+    public void setIcon(String setterArg) { this.icon = setterArg; }
+
+    private String packageName;
+    public String getPackageName() { return packageName; }
+    public void setPackageName(String setterArg) { this.packageName = setterArg; }
+
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("title", title);
+      toMapResult.put("icon", icon);
+      toMapResult.put("packageName", packageName);
       return toMapResult;
     }
-    static WidgetUpdateResponse fromMap(HashMap map) {
-      WidgetUpdateResponse fromMapResult = new WidgetUpdateResponse();
+    static Package fromMap(HashMap map) {
+      Package fromMapResult = new Package();
       Object title = map.get("title");
       fromMapResult.title = (String)title;
+      Object icon = map.get("icon");
+      fromMapResult.icon = (String)icon;
+      Object packageName = map.get("packageName");
+      fromMapResult.packageName = (String)packageName;
       return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents Flutter messages that can be called from Java.*/
+  public static class FlutterTimerApi {
+    private final BinaryMessenger binaryMessenger;
+    public FlutterTimerApi(BinaryMessenger argBinaryMessenger){
+      this.binaryMessenger = argBinaryMessenger;
+    }
+    public interface Reply<T> {
+      void reply(T reply);
+    }
+    public void onExtendTime(ExtendTimeResponse argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onExtendTime", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onContinueRequest(TimerRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onContinueRequest", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onPauseRequest(TimerRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onPauseRequest", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onCancelRequest(TimerRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onCancelRequest", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onRestartRequest(TimerRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onRestartRequest", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onOpen(OpenRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onOpen", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onAlarm(TimerRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onAlarm", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onWidgetUpdate(Reply<WidgetUpdateResponse> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetUpdate", new StandardMessageCodec());
+      channel.send(null, channelReply -> {
+        HashMap outputMap = (HashMap)channelReply;
+        @SuppressWarnings("ConstantConditions")
+        WidgetUpdateResponse output = WidgetUpdateResponse.fromMap(outputMap);
+        callback.reply(output);
+      });
+    }
+    public void onWidgetStartTimer(Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetStartTimer", new StandardMessageCodec());
+      channel.send(null, channelReply -> {
+        callback.reply(null);
+      });
     }
   }
 
@@ -343,6 +498,10 @@ public class Messages {
     NotificationResponse showPausingNotification(TimeNotificationRequest arg);
     NotificationResponse showElapsedNotification(NotificationRequest arg);
     CancelResponse cancelTimer(CancelRequest arg);
+    InstalledAppsResponse getInstalledPlayerApps();
+    InstalledAppsResponse getInstalledAlarmApps();
+    void launchApp(LaunchAppRequest arg);
+    Package dummyApp();
 
     /** Sets up an instance of `HostTimerApi` to handle messages through the `binaryMessenger` */
     static void setup(BinaryMessenger binaryMessenger, HostTimerApi api) {
@@ -451,90 +610,84 @@ public class Messages {
           channel.setMessageHandler(null);
         }
       }
-    }
-  }
-
-  /** Generated class from Pigeon that represents Flutter messages that can be called from Java.*/
-  public static class FlutterTimerApi {
-    private final BinaryMessenger binaryMessenger;
-    public FlutterTimerApi(BinaryMessenger argBinaryMessenger){
-      this.binaryMessenger = argBinaryMessenger;
-    }
-    public interface Reply<T> {
-      void reply(T reply);
-    }
-    public void onExtendTime(ExtendTimeResponse argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onExtendTime", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onContinueRequest(TimerRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onContinueRequest", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onPauseRequest(TimerRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onPauseRequest", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onCancelRequest(TimerRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onCancelRequest", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onRestartRequest(TimerRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onRestartRequest", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onOpen(OpenRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onOpen", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onAlarm(TimerRequest argInput, Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onAlarm", new StandardMessageCodec());
-      HashMap inputMap = argInput.toMap();
-      channel.send(inputMap, channelReply -> {
-        callback.reply(null);
-      });
-    }
-    public void onWidgetUpdate(Reply<WidgetUpdateResponse> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetUpdate", new StandardMessageCodec());
-      channel.send(null, channelReply -> {
-        HashMap outputMap = (HashMap)channelReply;
-        @SuppressWarnings("ConstantConditions")
-        WidgetUpdateResponse output = WidgetUpdateResponse.fromMap(outputMap);
-        callback.reply(output);
-      });
-    }
-    public void onWidgetStartTimer(Reply<Void> callback) {
-      BasicMessageChannel<Object> channel =
-          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onWidgetStartTimer", new StandardMessageCodec());
-      channel.send(null, channelReply -> {
-        callback.reply(null);
-      });
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.HostTimerApi.getInstalledPlayerApps", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              InstalledAppsResponse output = api.getInstalledPlayerApps();
+              wrapped.put("result", output.toMap());
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.HostTimerApi.getInstalledAlarmApps", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              InstalledAppsResponse output = api.getInstalledAlarmApps();
+              wrapped.put("result", output.toMap());
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.HostTimerApi.launchApp", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              LaunchAppRequest input = LaunchAppRequest.fromMap((HashMap)message);
+              api.launchApp(input);
+              wrapped.put("result", null);
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.HostTimerApi.dummyApp", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              Package output = api.dummyApp();
+              wrapped.put("result", output.toMap());
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
     }
   }
   private static HashMap wrapError(Exception exception) {

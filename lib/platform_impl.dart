@@ -4,6 +4,7 @@ import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/messages_generated.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
@@ -90,6 +91,31 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
     final CancelResponse response =
         await _hostApi.cancelTimer(CancelRequest()..timerId = timerId);
     return response.success;
+  }
+
+  @override
+  Future<List<App>> getInstalledPlayerApps() async {
+    final InstalledAppsResponse response =
+        await _hostApi.getInstalledPlayerApps();
+
+    final List<App> apps = response.apps.map((e) => App.fromMap(e)).toList()
+      ..sort((a, b) => a.title.compareTo(b.title));
+    return apps;
+  }
+
+  @override
+  Future<List<App>> getInstalledAlarmApps() async {
+    final InstalledAppsResponse response =
+        await _hostApi.getInstalledAlarmApps();
+
+    final List<App> apps = response.apps.map((e) => App.fromMap(e)).toList()
+      ..sort((a, b) => a.title.compareTo(b.title));
+    return apps;
+  }
+
+  @override
+  Future<void> launchApp(final String packageName) async {
+    await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName);
   }
 }
 

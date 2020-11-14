@@ -79,6 +79,18 @@ class WidgetUpdateResponse {
   String title;
 }
 
+class Package {
+  String title, icon, packageName;
+}
+
+class InstalledAppsResponse {
+  List<Package> apps;
+}
+
+class LaunchAppRequest {
+  String packageName;
+}
+
 // Native methods
 @HostApi()
 abstract class HostTimerApi {
@@ -87,6 +99,10 @@ abstract class HostTimerApi {
   NotificationResponse showPausingNotification(TimeNotificationRequest request);
   NotificationResponse showElapsedNotification(NotificationRequest request);
   CancelResponse cancelTimer(CancelRequest request);
+  InstalledAppsResponse getInstalledPlayerApps();
+  InstalledAppsResponse getInstalledAlarmApps();
+  void launchApp(LaunchAppRequest request);
+  Package dummyApp();
 }
 
 // Dart methods

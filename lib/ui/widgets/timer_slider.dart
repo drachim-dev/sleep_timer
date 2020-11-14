@@ -7,6 +7,7 @@ class TimerSlider extends StatelessWidget {
   final int initialValue, minValue, maxValue;
   final bool hasHandle;
   final bool showGlow;
+  final bool animationEnabled;
   final TextStyle labelStyle;
   final Function(double) onChange;
   final String Function(int) onUpdateLabel;
@@ -18,6 +19,7 @@ class TimerSlider extends StatelessWidget {
     this.maxValue,
     this.hasHandle = true,
     this.showGlow = kDefaultGlow,
+    this.animationEnabled = true,
     this.labelStyle,
     this.onChange,
     this.onUpdateLabel,
@@ -50,6 +52,7 @@ class TimerSlider extends StatelessWidget {
         max: maxValue?.toDouble() ?? 60,
         initialValue: initialValue.toDouble(),
         appearance: CircularSliderAppearance(
+            animationEnabled: animationEnabled,
             size: size ?? 256,
             customWidths: CustomSliderWidths(
               trackWidth: 15,

@@ -4,6 +4,7 @@ import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,7 @@ import 'package:stacked_services/stacked_services.dart';
 
 import 'app/locator.dart';
 import 'common/timer_service_manager.dart';
+import 'generated/l10n.dart';
 import 'services/theme_service.dart';
 
 Future<void> main() async {
@@ -60,6 +62,16 @@ class MyApp extends StatelessWidget {
             onGenerateRoute: AutoRouter(),
             initialRoute:
                 model.firstLaunch ? Routes.introView : Routes.homeView,
+            localizationsDelegates: [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale.fromSubtags(languageCode: 'en'),
+              const Locale.fromSubtags(languageCode: 'de'),
+            ],
             debugShowCheckedModeBanner: false,
           );
         });

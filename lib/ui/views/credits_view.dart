@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:url_launcher/link.dart';
 
@@ -27,7 +28,7 @@ class CreditsView extends StatelessWidget {
   ];
 
   static final List _packageCredits = [
-    "Libraries",
+    S.current.creditsLibraries,
     Credit(title: "auto_route", url: "https://pub.dev/packages/auto_route"),
     Credit(
         title: "flutter_native_admob",
@@ -66,7 +67,7 @@ class CreditsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Credits")),
+        appBar: AppBar(title: Text(S.of(context).creditsAppTitle)),
         body: ListView.builder(
           itemCount: _creditList.length,
           // ignore: missing_return

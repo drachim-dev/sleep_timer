@@ -20,9 +20,14 @@ const TextTheme _textTheme = TextTheme(
 
 List<MyTheme> themeList = [
   MyTheme(
-    id: "light_theme",
-    title: "Light",
-    theme: _themeData(_lightColorScheme, _lightFocusColor),
+    id: "light_orange_theme",
+    title: "Light Orange",
+    theme: _themeData(_lightOrangeColorScheme, _lightFocusColor),
+  ),
+    MyTheme(
+    id: "light_green_theme",
+    title: "Light Green",
+    theme: _themeData(_lightGreenColorScheme, _lightFocusColor),
   ),
   MyTheme(
     id: "dark_theme",
@@ -69,6 +74,10 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     popupMenuTheme: PopupMenuThemeData(
       color: colorScheme.surface,
     ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: colorScheme.surface,
+      modalBackgroundColor: colorScheme.surface,
+    ),
     focusColor: focusColor,
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
@@ -81,11 +90,27 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
   );
 }
 
-ColorScheme _lightColorScheme = ColorScheme(
+ColorScheme _lightOrangeColorScheme = ColorScheme(
   primary: Colors.blueGrey[600],
   primaryVariant: Colors.deepOrangeAccent[100],
   secondary: Colors.deepOrangeAccent[100],
   secondaryVariant: Colors.deepOrange[300],
+  background: Color(0xFFFCFCFC),
+  surface: Color(0xFFFCFCFC),
+  onBackground: Colors.grey[900],
+  error: _lightFillColor,
+  onError: _lightFillColor,
+  onPrimary: _lightFillColor,
+  onSecondary: Color(0xFF322942),
+  onSurface: Color(0xFF241E30),
+  brightness: Brightness.light,
+);
+
+ColorScheme _lightGreenColorScheme = ColorScheme(
+  primary: Colors.blueGrey[600],
+  primaryVariant: Color(0xFF68D391),
+  secondary: Color(0xFF68D391),
+  secondaryVariant: Color(0xFF48BB78),
   background: Color(0xFFFCFCFC),
   surface: Color(0xFFFCFCFC),
   onBackground: Colors.grey[900],

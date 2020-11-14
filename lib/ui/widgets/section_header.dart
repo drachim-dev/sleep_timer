@@ -10,16 +10,15 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final double size = dense
-        ? theme.textTheme.bodyText1.fontSize
-        : theme.textTheme.subtitle1.fontSize;
 
-    final TextStyle textStyle = TextStyle(
-        color: theme.accentColor, fontWeight: FontWeight.bold, fontSize: size);
+    final TextStyle denseTextStyle = theme.textTheme.bodyText1
+        .copyWith(color: theme.accentColor, fontWeight: FontWeight.bold);
+    final TextStyle textStyle =
+        theme.textTheme.subtitle1.copyWith(color: theme.accentColor);
 
     return Padding(
       padding: EdgeInsets.only(left: leftPadding, bottom: 6.0, top: 20.0),
-      child: Text(title, style: textStyle),
+      child: Text(title, style: dense ? denseTextStyle : textStyle),
     );
   }
 }

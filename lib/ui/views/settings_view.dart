@@ -5,6 +5,7 @@ import 'package:preferences/preferences.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:stacked/stacked.dart';
@@ -47,8 +48,8 @@ class _SettingsViewState extends State<SettingsView>
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
       final String message = widget.deviceAdminFocused
-          ? "Please enable device admin"
-          : "Please enable access to notification settings";
+          ? S.current.prefsHintEnableDeviceAdmin
+          : S.current.prefsHintEnableAccessToNotificationSettings;
 
       WidgetsBinding.instance.addPostFrameCallback(
           (_) => Future.delayed(snackBarDelay).then((value) {
@@ -96,42 +97,37 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   AppBar _buildAppBar(final ThemeData theme) {
-    return AppBar(title: Text("Settings"));
+    return AppBar(title: Text(S.of(context).settings));
   }
 
   PreferencePage _buildBody(final ThemeData theme) {
-    log.d("Products for InApp-Purchase found: ${model.products.length}");
-
     return PreferencePage(
       [
-        SectionHeader("Appearance",
+        SectionHeader(S.of(context).appearanceSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildAppearance(theme)) option,
-        SectionHeader("Support me",
+        SectionHeader(S.of(context).purchasesSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var product in model.products) _buildProduct(theme, product),
-        SectionHeader("Advanced",
+        SectionHeader(S.of(context).advancedSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildAdvanced(theme)) option,
-        SectionHeader("Other",
+        SectionHeader(S.of(context).otherSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        ListTile(title: Text("FAQ"), onTap: () => model.navigateToFAQ()),
+        ListTile(title: Text(S.of(context).faqShort), onTap: () => model.navigateToFAQ()),
         ListTile(
-            title: Text("Credits"), onTap: () => model.navigateToCredits()),
+            title: Text(S.of(context).creditsAppTitle), onTap: () => model.navigateToCredits()),
       ],
     );
   }
 
   ListTile _buildProduct(ThemeData theme, Product product) {
-    String title;
     IconData icon;
     switch (product.productDetails.id) {
       case kProductDonation:
-        title = "Donation";
         icon = Icons.local_cafe_outlined;
         break;
       case kProductRemoveAds:
-        title = "Remove ads";
         icon = Icons.cleaning_services_outlined;
         break;
       default:
@@ -144,10 +140,10 @@ class _SettingsViewState extends State<SettingsView>
 
     return ListTile(
       leading: Icon(icon),
-      title: Text(title),
+      title: Text(product.productDetails.title.split(" (").first),
       subtitle: Text(product.productDetails.description),
       trailing: Text(
-        purchased ? "Already\npurchased" : product.productDetails.price,
+        purchased ? S.of(context).alreadyPurchased : product.productDetails.price,
         textAlign: TextAlign.center,
         style: priceStyle,
       ),
@@ -160,7 +156,7 @@ class _SettingsViewState extends State<SettingsView>
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: Text('Choose Theme'),
+          title: Text(S.of(context).chooseThemeTitle),
           content: Column(
               mainAxisSize: MainAxisSize.min,
               children: themeList.map((myTheme) {
@@ -178,14 +174,14 @@ class _SettingsViewState extends State<SettingsView>
   List<Widget> _buildAppearance(final ThemeData theme) {
     return [
       ListTile(
-        title: Text('Choose theme'),
+        title: Text(S.of(context).chooseThemeTitle),
         subtitle: Text(model.currentTheme.title),
         leading: Icon(Icons.color_lens_outlined),
         onTap: showThemeDialog,
       ),
       SwitchListTile(
-        title: Text('Show timer glow'),
-        subtitle: Text("Enables shadow effect around the timers progress bar"),
+        title: Text(S.of(context).showTimerGlow),
+        subtitle: Text(S.of(context).showTimerGlowDescription),
         isThreeLine: true,
         secondary: Icon(Icons.blur_on_outlined),
         value: model.glow,
@@ -206,9 +202,9 @@ class _SettingsViewState extends State<SettingsView>
                   : Colors.transparent,
               child: SwitchListTile(
                   secondary: Icon(Icons.security_outlined),
-                  title: Text("Device admin"),
+                  title: Text(S.of(context).prefsDeviceAdmin),
                   subtitle: Text(
-                      "Allow app to manage device functions. Enables screen off action."),
+                      S.of(context).prefsDeviceAdminDescription),
                   isThreeLine: true,
                   value: model.deviceAdmin,
                   onChanged: model.onChangeDeviceAdmin),
@@ -224,9 +220,9 @@ class _SettingsViewState extends State<SettingsView>
                   : Colors.transparent,
               child: SwitchListTile(
                   secondary: Icon(Icons.do_not_disturb_on),
-                  title: Text("Notification Settings Access"),
+                  title: Text(S.of(context).prefsNotificationSettingsAccess),
                   subtitle: Text(
-                      "Allow access to notification settings. Enables do not disturb action."),
+                      S.of(context).prefsNotificationSettingsAccessDescription),
                   isThreeLine: true,
                   value: model.notificationSettingsAccess,
                   onChanged: model.onChangeNotificationSettingsAccess),

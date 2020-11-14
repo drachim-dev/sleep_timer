@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -99,7 +100,44 @@
     </application>
 
     <queries>
+        <package android:name="com.htc.android.worldclock" />
+        <package android:name="com.android.deskclock" />
+        <package android:name="com.google.android.deskclock" />
+        <package android:name="com.motorola.blur.alarmclock" />
+        <package android:name="com.sec.android.app.clockpackage" />
+        <package android:name="com.sonyericsson.organizer" />
+        <package android:name="com.asus.deskclock" />
+        <package android:name="com.htc.android.worldclock" />
+        <package android:name="com.lge.clock" />
+        <package android:name="com.lge.alarm.alarmclocknew" />
+        <package android:name="zte.com.cn.alarmclock" />
+        <package android:name="com.mobitobi.android.gentlealarm" />
+        <package android:name="com.urbandroid.sleep.alarmclock" />
+        <package android:name="com.splunchy.android.alarmclock" />
+
         <package android:name="com.spotify.music" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="deezer.android.app" />
+        <package android:name="com.apple.android.music" />
+        <package android:name="com.amazon.mp3" />
+        <package android:name="com.pandora.android" />
+        <package android:name="com.rhapsody" />
+        <package android:name="com.aspiro.tidal" />
+        <package android:name="com.netflix.mediaclient" />
+        <package android:name="com.amazon.avod.thirdpartyclient" />
+        <package android:name="com.disney.disneyplus" />
+        <package android:name="de.prosiebensat1digital.seventv" />
+        <package android:name="de.sky.bw" />
+        <package android:name="de.sky.online" />
+        <package android:name="com.dazn" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="audio/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="video/*" />
+        </intent>
     </queries>
 
 </manifest>
