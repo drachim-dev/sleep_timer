@@ -165,32 +165,31 @@ public class MethodChannelImpl implements HostTimerApi {
         Intent intentMedia = new Intent(Intent.ACTION_MEDIA_BUTTON);
         List<ResolveInfo> mediaList = manager.queryBroadcastReceivers(intentMedia, 0);
 
-        List<ResolveInfo> playerList = new ArrayList<>(audioList);
-        playerList.addAll(videoList);
-        playerList.addAll(mediaList);
-        final ArrayList<HashMap> apps = getAppsFromResolveInfo(manager, playerList);
+        final List<Messages.Package> apps = new ArrayList<>();
+        apps.addAll(getAppsFromResolveInfo(audioList));
+        apps.addAll(getAppsFromResolveInfo(videoList));
+        apps.addAll(getAppsFromResolveInfo(mediaList));
 
         try {
-            final PackageInfo netflixPackage = manager.getPackageInfo("com.netflix.mediaclient", 0);
+            List<String> packageNames = new ArrayList<>();
+            packageNames.add("com.netflix.mediaclient");
+            packageNames.add("com.google.android.apps.podcasts");
 
-            final ApplicationInfo applicationInfo = netflixPackage.applicationInfo;
-            if (applicationInfo != null && applicationInfo.enabled) {
-                // https://stackoverflow.com/questions/51368075/how-can-i-get-android-drawables-in-flutter
-                final Bitmap bitmap = getBitmapFromDrawable(applicationInfo.loadIcon(manager));
-                final String encoded = getBase64FromBitmap(bitmap);
-
-                Messages.Package app = new Messages.Package();
-                app.setPackageName(applicationInfo.packageName);
-                app.setTitle(applicationInfo.loadLabel(manager).toString());
-                app.setIcon(encoded);
-                apps.add(app.toMap());
+            for (String packageName : packageNames) {
+                final PackageInfo netflixPackage = manager.getPackageInfo(packageName, 0);
+                final ApplicationInfo applicationInfo = netflixPackage.applicationInfo;
+                if (applicationInfo != null && applicationInfo.enabled) {
+                    final Messages.Package app = getAppFromApplicationInfo(applicationInfo);
+                    apps.add(app);
+                }
             }
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        response.setApps(apps);
+        final ArrayList<HashMap> distinctApps = getDistinctAppList(apps);
+        response.setApps(distinctApps);
         return response;
     }
 
@@ -203,36 +202,53 @@ public class MethodChannelImpl implements HostTimerApi {
         Intent showAlarmsIntent = new Intent(AlarmClock.ACTION_SHOW_ALARMS);
         List<ResolveInfo> alarmList = manager.queryIntentActivities(showAlarmsIntent, 0);
 
-        final ArrayList<HashMap> apps = getAppsFromResolveInfo(manager, alarmList);
-        response.setApps(apps);
+        final List<Messages.Package> apps = getAppsFromResolveInfo(alarmList);
+        final ArrayList<HashMap> distinctApps = getDistinctAppList(apps);
+        response.setApps(distinctApps);
         return response;
     }
 
     @NotNull
-    private ArrayList<HashMap> getAppsFromResolveInfo(PackageManager manager, List<ResolveInfo> playerList) {
-        Set<String> distinctAppSet = new HashSet<>();
-        ArrayList<HashMap> apps = new ArrayList<>();
-        for(ResolveInfo info : playerList) {
-            final ActivityInfo activity = info.activityInfo;
-            final ApplicationInfo applicationInfo = activity.applicationInfo;
-
-            if (applicationInfo == null || !applicationInfo.enabled || distinctAppSet.contains(applicationInfo.packageName)) {
-                continue;
-            }
-
-            // https://stackoverflow.com/questions/51368075/how-can-i-get-android-drawables-in-flutter
-            final Bitmap bitmap = getBitmapFromDrawable(applicationInfo.loadIcon(manager));
-            final String encoded = getBase64FromBitmap(bitmap);
-
-            Messages.Package app = new Messages.Package();
-            app.setPackageName(applicationInfo.packageName);
-            app.setTitle(applicationInfo.loadLabel(manager).toString());
-            app.setIcon(encoded);
-
-            distinctAppSet.add(applicationInfo.packageName);
-            apps.add(app.toMap());
+    private List<Messages.Package> getAppsFromResolveInfo(List<ResolveInfo> infoList) {
+        List<Messages.Package> apps = new ArrayList<>();
+        for(ResolveInfo info : infoList) {
+            final ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
+            final Messages.Package app = getAppFromApplicationInfo(applicationInfo);
+            apps.add(app);
         }
         return apps;
+    }
+
+    @NotNull
+    private Messages.Package getAppFromApplicationInfo(final ApplicationInfo applicationInfo) {
+        final PackageManager manager = context.getPackageManager();
+
+        // https://stackoverflow.com/questions/51368075/how-can-i-get-android-drawables-in-flutter
+        final Bitmap bitmap = getBitmapFromDrawable(applicationInfo.loadIcon(manager));
+        final String encoded = getBase64FromBitmap(bitmap);
+
+        Messages.Package app = new Messages.Package();
+        app.setPackageName(applicationInfo.packageName);
+        app.setTitle(applicationInfo.loadLabel(manager).toString());
+        app.setIcon(encoded);
+
+        return app;
+    }
+
+    /**
+     * Ensure that there are no duplicates.
+     */
+    @NotNull
+    private ArrayList<HashMap> getDistinctAppList(final List<Messages.Package> apps) {
+        Set<String> distinctAppSet = new HashSet<>();
+        final ArrayList<HashMap> distinctApps = new ArrayList<>();
+        for (Messages.Package app : apps) {
+            if(!distinctAppSet.contains(app.getPackageName())) {
+                distinctAppSet.add(app.getPackageName());
+                distinctApps.add(app.toMap());
+            }
+        }
+        return distinctApps;
     }
 
     @Override
