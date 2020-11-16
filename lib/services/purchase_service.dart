@@ -66,7 +66,7 @@ class PurchaseService with ReactiveServiceMixin {
 
   Future<List<Product>> _getProducts() async {
     List<PurchaseDetails> purchases = await _getPurchases();
-    // resetPurchases(purchases);
+    // if (!kReleaseMode) resetPurchases(purchases);
 
     final ProductDetailsResponse response =
         await _iap.queryProductDetails(kProducts);
@@ -122,6 +122,7 @@ class PurchaseService with ReactiveServiceMixin {
 
   // TODO: only for internal testing
   void resetPurchases(List<PurchaseDetails> purchases) {
+
     log.d("Reset purchases");
     purchases.forEach((element) {
       log.d(element.productID);
