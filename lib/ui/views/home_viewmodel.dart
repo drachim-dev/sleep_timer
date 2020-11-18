@@ -14,9 +14,9 @@ class HomeViewModel extends BaseViewModel {
   final _prefService = locator<SharedPreferences>();
   final _themeService = locator<ThemeService>();
 
-  int _initialTime = kDefaultInitialTime;
-
   bool get showGlow => _themeService.showGlow;
+
+  int _initialTime = kDefaultInitialTime;
   int get initialTime => _initialTime;
 
   String _activeTimerId;
@@ -63,7 +63,8 @@ class HomeViewModel extends BaseViewModel {
   }
 
   void updateTime(int value) {
-    setTime(value);
+    _initialTime = value;
+    _prefService.setInt(kPrefKeyInitialTime, value);
     notifyListeners();
   }
 

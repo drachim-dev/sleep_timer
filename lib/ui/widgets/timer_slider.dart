@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/ui/widgets/sleek_circular_slider/appearance.dart';
+import 'package:sleep_timer/ui/widgets/sleek_circular_slider/circular_slider.dart';
 
-class TimerSlider extends StatelessWidget {
+class TimerSlider extends StatefulWidget {
   final double size;
   final int initialValue, minValue, maxValue;
   final bool hasHandle;
   final bool showGlow;
   final bool animationEnabled;
   final TextStyle labelStyle;
-  final Function(double) onChange;
+  final Function(int) onChange;
   final String Function(int) onUpdateLabel;
 
   const TimerSlider({
@@ -24,6 +25,20 @@ class TimerSlider extends StatelessWidget {
     this.onChange,
     this.onUpdateLabel,
   });
+
+  @override
+  _TimerSliderState createState() => _TimerSliderState();
+}
+
+class _TimerSliderState extends State<TimerSlider> {
+  CustomSliderColors customSliderColors = CustomSliderColors();
+  ValueNotifier<CustomSliderColors> colors;
+
+  @override
+  void initState() {
+    super.initState();
+    colors = ValueNotifier(customSliderColors);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,33 +60,36 @@ class TimerSlider extends StatelessWidget {
         ? theme.colorScheme.secondary
         : Colors.white;
 
-    final double shadowWidth = showGlow ? 25 : 0;
+    final double shadowWidth = widget.showGlow ? 25 : 0;
+
+    customSliderColors = CustomSliderColors(
+      trackColor: trackColor,
+      progressBarColor: progressBarColor,
+      shadowColor: shadowColor,
+      dotColor: handleColor,
+    );
+    colors.value = customSliderColors;
 
     return SleekCircularSlider(
-        min: minValue?.toDouble() ?? 0,
-        max: maxValue?.toDouble() ?? 60,
-        initialValue: initialValue.toDouble(),
+        minValue: widget.minValue ?? 0,
+        maxValue: widget.maxValue ?? 60,
+        initialValue: widget.initialValue,
         appearance: CircularSliderAppearance(
-            animationEnabled: animationEnabled,
-            size: size ?? 256,
+            animationEnabled: widget.animationEnabled,
+            size: widget.size ?? 256,
             customWidths: CustomSliderWidths(
               trackWidth: 15,
               progressBarWidth: 4,
-              handlerSize: hasHandle ? 12 : 0,
+              handlerSize: widget.hasHandle ? 12 : 0,
               shadowWidth: shadowWidth,
             ),
             startAngle: 270,
             angleRange: 360,
             infoProperties: InfoProperties(
-                mainLabelStyle: labelStyle ?? theme.textTheme.headline2,
-                modifier: (value) => onUpdateLabel(value.round())),
-            customColors: CustomSliderColors(
-              trackColor: trackColor,
-              progressBarColor: progressBarColor,
-              shadowColor: shadowColor,
-              dotColor: handleColor,
-            )),
-        onChange: hasHandle ? (_) {} : null,
-        onChangeEnd: hasHandle ? onChange : null);
+                mainLabelStyle: widget.labelStyle ?? theme.textTheme.headline2,
+                modifier: (value) => widget.onUpdateLabel(value.round())),
+            customColors: colors),
+        onChange: widget.hasHandle ? (_) {} : null,
+        onChangeEnd: widget.hasHandle ? widget.onChange : null);
   }
 }

@@ -30,6 +30,7 @@ class CreditsView extends StatelessWidget {
   static final List _packageCredits = [
     S.current.creditsLibraries,
     Credit(title: "auto_route", url: "https://pub.dev/packages/auto_route"),
+    Credit(title: "flushbar", url: "https://pub.dev/packages/flushbar"),
     Credit(
         title: "flutter_native_admob",
         url: "https://pub.dev/packages/flutter_native_admob"),

@@ -22,13 +22,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
+
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
     _scaleAnimation = CurvedAnimation(
         parent: _animationController, curve: Curves.easeInOutBack);
     _animationController.forward();
-
-    super.initState();
   }
 
   @override
@@ -109,7 +109,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             minValue: 1,
             initialValue: model.initialTime,
             onUpdateLabel: (value) => S.of(context).numberOfMinutesShort(value),
-            onChange: (value) => model.setTime(value.round()),
+            onChange: (value) => model.setTime(value),
+            
             showGlow: model.showGlow,
           ),
           Padding(
@@ -119,8 +120,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 children: [10, 20, 30, 60].map((value) {
                   return Expanded(
                     child: RoundedRectButton(
-                        title: "$value",
-                        onPressed: () => model.updateTime(value)),
+                        title: "$value", onPressed: () => model.updateTime(value)),
                   );
                 }).toList()),
           ),

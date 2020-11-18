@@ -22,6 +22,7 @@ environment:
 
 dependencies:
   auto_route: ^0.6.9
+  flushbar: ^1.10.4
   flutter_native_admob: ^2.1.0+3
   get_it: ^5.0.1
   in_app_purchase: ^0.3.4+16
@@ -32,15 +33,14 @@ dependencies:
   preferences: ^5.2.1
   provider: ^4.3.2+2
   shared_preferences: '>=0.5.12+4 <2.0.0'
-  sleek_circular_slider: ^1.2.0+web
   stacked: ^1.7.6
   stacked_services: ^0.5.4+5
   url_launcher: ^5.7.10
-  android_intent: '>=0.3.7+7 <2.0.0'
+  
   spotify: ^0.4.0
   spotify_sdk: ^1.0.0
   webview_flutter: ^1.0.7
-  flushbar: ^1.10.4
+  
 
   device_functions:
     path: ../device_functions/

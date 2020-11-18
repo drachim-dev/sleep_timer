@@ -71,6 +71,7 @@ class MyApp extends StatelessWidget {
             supportedLocales: [
               const Locale.fromSubtags(languageCode: 'en'),
               const Locale.fromSubtags(languageCode: 'de'),
+              const Locale.fromSubtags(languageCode: 'es'),
             ],
             debugShowCheckedModeBanner: false,
           );
