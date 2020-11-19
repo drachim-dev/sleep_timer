@@ -31,14 +31,8 @@ class TimerSlider extends StatefulWidget {
 }
 
 class _TimerSliderState extends State<TimerSlider> {
-  CustomSliderColors customSliderColors = CustomSliderColors();
-  ValueNotifier<CustomSliderColors> colors;
-
-  @override
-  void initState() {
-    super.initState();
-    colors = ValueNotifier(customSliderColors);
-  }
+  ValueNotifier<CustomSliderColors> colors =
+      ValueNotifier(CustomSliderColors());
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +54,15 @@ class _TimerSliderState extends State<TimerSlider> {
         ? theme.colorScheme.secondary
         : Colors.white;
 
-    final double shadowWidth = widget.showGlow ? 25 : 0;
+    final double shadowWidth = 25;
 
-    customSliderColors = CustomSliderColors(
+    colors.value = CustomSliderColors(
       trackColor: trackColor,
       progressBarColor: progressBarColor,
       shadowColor: shadowColor,
       dotColor: handleColor,
+      hideShadow: !widget.showGlow,
     );
-    colors.value = customSliderColors;
 
     return SleekCircularSlider(
         minValue: widget.minValue ?? 0,
