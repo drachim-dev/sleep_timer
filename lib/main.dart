@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
+import 'package:shake/shake.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/logger.util.dart';
@@ -27,7 +28,7 @@ Future<void> main() async {
   await Application.init();
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    bool inDebug = false;
+    var inDebug = false;
     assert(() {
       inDebug = true;
       return true;
@@ -40,24 +41,31 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
+final mainScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
         onModelReady: (model) {
-          final SystemUiOverlayStyle systemUiOverlayStyle =
+          final systemUiOverlayStyle =
               model.theme.brightness == Brightness.light
                   ? SystemUiOverlayStyle.dark
                   : SystemUiOverlayStyle.light;
 
           SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle.copyWith(
               statusBarColor: Colors.transparent));
+
+          ShakeDetector.autoStart(onPhoneShake: () {
+            print('SHAKE IT BABY');
+          });
         },
         builder: (context, model, child) {
           return MaterialApp(
             theme: model.theme,
             title: 'Sleep timer',
+            scaffoldMessengerKey: mainScaffoldMessengerKey,
             navigatorKey: locator<NavigationService>().navigatorKey,
             onGenerateRoute: AutoRouter(),
             initialRoute:
@@ -92,7 +100,7 @@ class MyAppViewModel extends ReactiveViewModel {
     if (savedTheme != null) _themeService.updateTheme(savedTheme);
 
     var savedGlow = _prefsService.getBool(kPrefKeyGlow);
-    if (savedGlow != null) _themeService.updateGlow(savedGlow);
+    if (savedGlow != null) _themeService.showGlow = savedGlow;
   }
 
   @override
@@ -102,7 +110,7 @@ class MyAppViewModel extends ReactiveViewModel {
 class Application {
   final Logger log = getLogger();
 
-  static init({Function onCallBack}) async {
+  static void init({Function onCallBack}) async {
     WidgetsFlutterBinding.ensureInitialized();
 
     // init Logger
@@ -115,9 +123,10 @@ class Application {
     await setupLocator();
 
     // initialize PlatformChannel for callback
-    final CallbackHandle sleepTimerCallback =
+    final sleepTimerCallback =
         PluginUtilities.getCallbackHandle(onNativeSideCallback);
-    SleepTimerPlatform.getInstance().init(sleepTimerCallback.toRawHandle());
+    await SleepTimerPlatform.getInstance()
+        .init(sleepTimerCallback.toRawHandle());
 
     // setup callback even when activity is destroyed
     FlutterTimerApi.setup(FlutterApiHandler(
@@ -130,34 +139,34 @@ class Application {
 }
 
 void onNativeSideCallback() async {
-  final Logger log = getLogger();
+  final log = getLogger();
   log.d(
-      "################################## onNativeSideCallback ##################################");
+      '################################## onNativeSideCallback ##################################');
 
   WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onAlarmCallback(final String timerId) async {
-  final Logger log = getLogger();
-  log.d("onAlarmCallback for $timerId");
+  final log = getLogger();
+  log.d('onAlarmCallback for $timerId');
 
   WidgetsFlutterBinding.ensureInitialized();
 
   final _timerService =
       TimerServiceManager.getInstance().getTimerService(timerId);
-  _timerService.handleEndedActions();
+  await _timerService.handleEndedActions();
 }
 
 void onNativeSideDeviceFunctionsCallback() async {
-  final Logger log = getLogger();
-  log.d("onNativeSideDeviceFunctionsCallback");
+  final log = getLogger();
+  log.d('onNativeSideDeviceFunctionsCallback');
 
   WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onDeviceAdminCallback(final bool granted) async {
-  final Logger log = getLogger();
-  log.d("onDeviceAdminGrantedCallback");
+  final log = getLogger();
+  log.d('onDeviceAdminGrantedCallback');
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -166,8 +175,8 @@ void onDeviceAdminCallback(final bool granted) async {
 }
 
 void onNotificationAccessCallback(final bool granted) async {
-  final Logger log = getLogger();
-  log.d("onNotificationAccessGrantedCallback");
+  final log = getLogger();
+  log.d('onNotificationAccessGrantedCallback');
 
   WidgetsFlutterBinding.ensureInitialized();
 

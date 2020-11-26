@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'utils.dart';
 
-typedef void ValueChangeAnimation(double animation, bool animationFinished);
+typedef ValueChangeAnimation = void Function(
+    double animation, bool animationFinished);
 
 class ValueChangedAnimationManager {
   final TickerProvider tickerProvider;
@@ -32,9 +33,7 @@ class ValueChangedAnimationManager {
             valueToDuration(
                 initialValue, oldValue ?? minValue, minValue, maxValue))
         .toInt();
-    if (_animController == null) {
-      _animController = AnimationController(vsync: tickerProvider);
-    }
+    _animController ??= AnimationController(vsync: tickerProvider);
 
     _animController.duration = Duration(milliseconds: duration);
 

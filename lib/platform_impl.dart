@@ -14,7 +14,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'common/timer_service_manager.dart';
 
 class SleepTimerPlatformImpl implements SleepTimerPlatform {
-  HostTimerApi _hostApi = HostTimerApi();
+  final HostTimerApi _hostApi = HostTimerApi();
 
   @override
   Future<void> init(final int callbackHandle) {
@@ -33,7 +33,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       final List<int> extendActions,
       @required final int duration,
       @required final int remainingTime}) async {
-    final NotificationResponse response =
+    final response =
         await _hostApi.showRunningNotification(TimeNotificationRequest()
           ..timerId = timerId
           ..title = title
@@ -57,7 +57,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       final String cancelAction,
       final List<int> extendActions,
       @required final int remainingTime}) async {
-    final NotificationResponse response =
+    final response =
         await _hostApi.showPausingNotification(TimeNotificationRequest()
           ..timerId = timerId
           ..title = title
@@ -77,7 +77,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
     @required final String description,
     final String restartAction,
   }) async {
-    final NotificationResponse response =
+    final response =
         await _hostApi.showElapsedNotification(NotificationRequest()
           ..timerId = timerId
           ..title = title
@@ -88,27 +88,25 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
 
   @override
   Future<bool> cancelTimer(final String timerId) async {
-    final CancelResponse response =
+    final response =
         await _hostApi.cancelTimer(CancelRequest()..timerId = timerId);
     return response.success;
   }
 
   @override
   Future<List<App>> getInstalledPlayerApps() async {
-    final InstalledAppsResponse response =
-        await _hostApi.getInstalledPlayerApps();
+    final response = await _hostApi.getInstalledPlayerApps();
 
-    final List<App> apps = response.apps.map((e) => App.fromMap(e)).toList()
+    final apps = response.apps.map((e) => App.fromMap(e)).toList()
       ..sort((a, b) => a.title.compareTo(b.title));
     return apps;
   }
 
   @override
   Future<List<App>> getInstalledAlarmApps() async {
-    final InstalledAppsResponse response =
-        await _hostApi.getInstalledAlarmApps();
+    final response = await _hostApi.getInstalledAlarmApps();
 
-    final List<App> apps = response.apps.map((e) => App.fromMap(e)).toList()
+    final apps = response.apps.map((e) => App.fromMap(e)).toList()
       ..sort((a, b) => a.title.compareTo(b.title));
     return apps;
   }
@@ -128,8 +126,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onExtendTime(ExtendTimeResponse arg) {
-    final String timerId = arg.timerId;
-    log.i("extend time by: ${arg.additionalTime} for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('extend time by: ${arg.additionalTime} for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -138,8 +136,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onOpen(OpenRequest arg) {
-    final String timerId = arg.timerId;
-    log.i("onOpen called for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('onOpen called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -153,8 +151,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onPauseRequest(TimerRequest arg) {
-    final String timerId = arg.timerId;
-    log.i("onPauseRequest requested for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('onPauseRequest requested for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -163,8 +161,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onCancelRequest(TimerRequest arg) {
-    final String timerId = arg.timerId;
-    log.i("onCancelRequest called for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('onCancelRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -173,8 +171,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onContinueRequest(TimerRequest arg) {
-    final String timerId = arg.timerId;
-    log.i("onContinueRequest called for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('onContinueRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -183,8 +181,8 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onRestartRequest(TimerRequest arg) {
-    final String timerId = arg.timerId;
-    log.i("onRestartRequest called for timer with id $timerId");
+    final timerId = arg.timerId;
+    log.i('onRestartRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -193,21 +191,21 @@ class FlutterApiHandler extends FlutterTimerApi {
 
   @override
   void onAlarm(TimerRequest arg) {
-    log.i("onAlarm()");
+    log.i('onAlarm()');
     alarmCallback(arg.timerId);
   }
 
   @override
   WidgetUpdateResponse onWidgetUpdate() {
-    log.i("onWidgetUpdate called on dart side");
-    return WidgetUpdateResponse()..title = "Test ";
+    log.i('onWidgetUpdate called on dart side');
+    return WidgetUpdateResponse()..title = 'Test ';
   }
 
   @override
   void onWidgetStartTimer() {
-    log.i("onWidgetStartTimer called on dart side");
+    log.i('onWidgetStartTimer called on dart side');
 
-    final TimerModel timerModel = TimerModel(120, startActionList, actionList);
+    final timerModel = TimerModel(120, startActionList, actionList);
     final _timerService = locator<TimerService>(param1: timerModel);
     TimerServiceManager.getInstance().setTimerService(_timerService);
     _timerService.start();

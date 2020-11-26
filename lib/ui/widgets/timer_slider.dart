@@ -36,25 +36,25 @@ class _TimerSliderState extends State<TimerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    final Color progressBarColor = theme.brightness == Brightness.light
+    final progressBarColor = theme.brightness == Brightness.light
         ? theme.colorScheme.secondary
         : theme.colorScheme.primary;
 
-    final Color trackColor = theme.brightness == Brightness.light
+    final trackColor = theme.brightness == Brightness.light
         ? Colors.grey[100]
         : theme.colorScheme.surface;
 
-    final Color shadowColor = theme.brightness == Brightness.light
+    final shadowColor = theme.brightness == Brightness.light
         ? theme.colorScheme.secondary
         : theme.colorScheme.primary;
 
-    final Color handleColor = theme.brightness == Brightness.light
+    final handleColor = theme.brightness == Brightness.light
         ? theme.colorScheme.secondary
         : Colors.white;
 
-    final double shadowWidth = 25;
+    final shadowWidth = 25.0;
 
     colors.value = CustomSliderColors(
       trackColor: trackColor,

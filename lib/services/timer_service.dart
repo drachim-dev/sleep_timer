@@ -90,6 +90,7 @@ class TimerService with ReactiveServiceMixin {
 
   Future<void> cancelTimer() async {
     _status.value = TimerStatus.INITIAL;
+    // ignore: unawaited_futures
     _deviceService.cancelNotification(timerId: timerModel.id);
     _resetTime();
     _disposeTimer();
@@ -110,29 +111,36 @@ class TimerService with ReactiveServiceMixin {
   }
 
   Future<void> handleStartActions() async {
-    if (timerModel.volumeAction.enabled)
-      _deviceService.setVolume(timerModel.volumeAction.value.truncate());
+    if (timerModel.volumeAction.enabled) {
+      await _deviceService.setVolume(timerModel.volumeAction.value.truncate());
+    }
 
-    if (timerModel.playMusicAction.enabled) print("Play music");
+    if (timerModel.playMusicAction.enabled) {
+      print('Play music');
+    }
     //_deviceService.setVolume(timerModel.volumeAction.value.truncate());
 
     if (timerModel.doNotDisturbAction.enabled &&
-        _deviceService.notificationSettingsAccess)
-      _deviceService.toggleDoNotDisturb(true);
+        _deviceService.notificationSettingsAccess) {
+      await _deviceService.toggleDoNotDisturb(true);
+    }
   }
 
   Future<void> handleEndedActions() async {
-    log.d("handleEndedActions()");
+    log.d('handleEndedActions()');
 
-    if (timerModel.mediaAction.enabled) _deviceService.toggleMedia(false);
-    if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29)
-      _deviceService.toggleWifi(false);
-    if (timerModel.bluetoothAction.enabled)
-      _deviceService.toggleBluetooth(false);
-    if (timerModel.screenAction.enabled && _deviceService.deviceAdmin)
-      _deviceService.toggleScreen(false);
+    if (timerModel.mediaAction.enabled) await _deviceService.toggleMedia(false);
+    if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29) {
+      await _deviceService.toggleWifi(false);
+    }
+    if (timerModel.bluetoothAction.enabled) {
+      await _deviceService.toggleBluetooth(false);
+    }
+    if (timerModel.screenAction.enabled && _deviceService.deviceAdmin) {
+      await _deviceService.toggleScreen(false);
+    }
 
-    _deviceService.showElapsedNotification(timerModel: timerModel);
+    await _deviceService.showElapsedNotification(timerModel: timerModel);
   }
 
   void setMaxTime() =>
@@ -140,15 +148,15 @@ class TimerService with ReactiveServiceMixin {
 }
 
 void onDeviceAdminCallback(final bool granted) async {
-  final Logger log = getLogger();
-  log.d("onDeviceAdminGrantedCallback");
+  final log = getLogger();
+  log.d('onDeviceAdminGrantedCallback');
 
   WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onNotificationAccessCallback(final bool granted) async {
-  final Logger log = getLogger();
-  log.d("onNotificationAccessGrantedCallback");
+  final log = getLogger();
+  log.d('onNotificationAccessGrantedCallback');
 
   WidgetsFlutterBinding.ensureInitialized();
 }

@@ -14,8 +14,8 @@ import 'utils.dart';
 part 'curve_painter.dart';
 part 'custom_gesture_recognizer.dart';
 
-typedef void OnChange(int value);
-typedef Widget InnerWidget(double percentage);
+typedef OnChange = void Function(int value);
+typedef InnerWidget = Widget Function(double percentage);
 
 class SleekCircularSlider extends StatefulWidget {
   final int initialValue;
@@ -91,14 +91,12 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
       _updateOnChange();
       return;
     }
-    if (_animationManager == null) {
-      _animationManager = ValueChangedAnimationManager(
-        tickerProvider: this,
-        minValue: widget.minValue.toDouble(),
-        maxValue: widget.maxValue.toDouble(),
-        durationMultiplier: widget.appearance.animDurationMultiplier,
-      );
-    }
+    _animationManager ??= ValueChangedAnimationManager(
+      tickerProvider: this,
+      minValue: widget.minValue.toDouble(),
+      maxValue: widget.maxValue.toDouble(),
+      durationMultiplier: widget.appearance.animDurationMultiplier,
+    );
 
     _animationManager.animate(
         initialValue: widget.initialValue.toDouble(),
@@ -175,7 +173,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
     if (widget.onChange != null && !_animationInProgress) {
       final value = angleToValue(
           _currentAngle, widget.minValue, widget.maxValue, _angleRange);
-      widget.onChange(value.truncate());
+      widget.onChange(value.round());
     }
   }
 
@@ -184,10 +182,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
         _currentAngle, widget.minValue, widget.maxValue, _angleRange);
     final childWidget = widget.innerWidget != null
         ? widget.innerWidget(value)
-        : SliderLabel(
-            value: value,
-            appearance: widget.appearance,
-          );
+        : SliderLabel(value: value, appearance: widget.appearance);
     return childWidget;
   }
 
@@ -206,7 +201,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
     if (widget.onChangeEnd != null) {
       final value = angleToValue(
           _currentAngle, widget.minValue, widget.maxValue, _angleRange);
-      widget.onChangeEnd(value.truncate());
+      widget.onChangeEnd(value.round());
     }
   }
 
@@ -216,7 +211,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
     }
     RenderBox renderBox = context.findRenderObject();
     var position = renderBox.globalToLocal(details);
-    final double touchWidth = widget.appearance.progressBarWidth + 100;
+    final touchWidth = widget.appearance.progressBarWidth + 100;
 
     if (isPointAlongCircle(
         position, _painter.center, _painter.radius, touchWidth)) {
@@ -249,7 +244,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider>
       return false;
     }
 
-    final double touchWidth = widget.appearance.handlerSize + 10;
+    final touchWidth = widget.appearance.handlerSize + 10;
 
     if (isPointAlongCircle(
         position, _painter.center, _painter.radius, touchWidth)) {

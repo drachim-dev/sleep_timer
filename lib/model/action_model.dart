@@ -31,7 +31,8 @@ class ValueActionModel extends ActionModel {
   final String unit;
   final String key;
 
-  String get description => "${super.description} ${value.toInt()}$unit";
+  @override
+  String get description => '${super.description} ${value.toInt()}$unit';
 
   ValueActionModel(
       {id,
@@ -41,11 +42,7 @@ class ValueActionModel extends ActionModel {
       @required this.value,
       this.unit,
       this.key})
-      : super(
-            id: id,
-            title: title,
-            description: description,
-            enabled: enabled);
+      : super(id: id, title: title, description: description, enabled: enabled);
 }
 
 List<ActionModel> startActionList = [
@@ -53,7 +50,7 @@ List<ActionModel> startActionList = [
     id: ActionType.VOLUME,
     title: S.current.actionVolumeTitle,
     description: S.current.actionVolumeDescription,
-    unit: " %",
+    unit: ' %',
     enabled: false,
     value: 10.0,
     key: kKeyVolumeLevel,
@@ -99,14 +96,14 @@ List<ActionModel> actionList = [
   ),
   ActionModel(
     id: ActionType.LIGHT,
-    title: "Light",
-    description: "Turn 3 lights off",
+    title: 'Light',
+    description: 'Turn 3 lights off',
     enabled: false,
   ),
   ActionModel(
     id: ActionType.APP,
-    title: "App",
-    description: "Force close YouTube",
+    title: 'App',
+    description: 'Force close YouTube',
     enabled: false,
   ),
 ];

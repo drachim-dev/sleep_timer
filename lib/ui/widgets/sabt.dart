@@ -37,9 +37,10 @@ class _SABTState extends State<SABT> {
   }
 
   void _positionListener() {
+    // ignore: omit_local_variable_types
     final FlexibleSpaceBarSettings settings = context
         .dependOnInheritedWidgetOfExactType(aspect: FlexibleSpaceBarSettings);
-    bool visible =
+    var visible =
         settings == null || settings.currentExtent <= settings.minExtent;
     if (_visible != visible) {
       setState(() {

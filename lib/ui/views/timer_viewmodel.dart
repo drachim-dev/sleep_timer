@@ -10,7 +10,7 @@ import 'package:sleep_timer/common/spotify_manager.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/app.dart';
-import 'package:sleep_timer/model/playlist.dart' as MyPlaylist;
+import 'package:sleep_timer/model/playlist.dart' as my_playlist;
 import 'package:sleep_timer/model/spotify_authentication.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
@@ -85,27 +85,27 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   Future<void> initActionPreferences() async {
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.VOLUME.toString(), _timerModel.volumeAction.enabled);
-    _prefsService.setDouble(
+    await _prefsService.setDouble(
         _timerModel.volumeAction.key, _timerModel.volumeAction.value);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.PLAY_MUSIC.toString(), _timerModel.playMusicAction.enabled);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.DND.toString(), _timerModel.doNotDisturbAction.enabled);
 
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.MEDIA.toString(), _timerModel.mediaAction.enabled);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.WIFI.toString(), _timerModel.wifiAction.enabled);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.BLUETOOTH.toString(), _timerModel.bluetoothAction.enabled);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.SCREEN.toString(), _timerModel.screenAction.enabled);
 
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.LIGHT.toString(), _timerModel.lightAction.enabled);
-    _prefsService.setBool(
+    await _prefsService.setBool(
         ActionType.APP.toString(), _timerModel.appAction.enabled);
   }
 
@@ -129,7 +129,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> navigateToSettings(
       {final bool deviceAdminFocused,
       final bool notificationSettingsAccessFocused}) async {
-    _navigationService.navigateTo(Routes.settingsView,
+    await _navigationService.navigateTo(Routes.settingsView,
         arguments: SettingsViewArguments(
             deviceAdminFocused: deviceAdminFocused,
             notificationSettingsAccessFocused:
@@ -137,7 +137,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   Future<void> navigateToSpotifyAuth() async {
-    final String clientId = SpotifyManager.clientId;
+    final clientId = SpotifyManager.clientId;
 
     // The URI to redirect to after the user grants or denies permission. It must
     // be in your Spotify application Redirect whitelist. This URI can be a fabricated
@@ -160,15 +160,15 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     // final jsonString = _prefsService.getString(kSpotifyCredentials);
     final jsonString = null;
     if (jsonString != null) {
-      print("saved authentication loaded");
+      print('saved authentication loaded');
       authCredentials = SpotifyAuthentication.fromJson(jsonDecode(jsonString))
           .toCredentials();
       spotify = SpotifyApi(authCredentials);
     } else {
       // start new authentication flow
-      print("new authentication");
+      print('new authentication');
 
-      final String clientSecret = SpotifyManager.clientSecret;
+      final clientSecret = SpotifyManager.clientSecret;
       final credentials = SpotifyApiCredentials(clientId, clientSecret);
       final grant = SpotifyApi.authorizationCodeGrant(credentials);
 
@@ -186,29 +186,29 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
       authCredentials = await spotify.getCredentials();
 
       // save authentication as own model
-      final SpotifyAuthentication authentication =
+      final authentication =
           SpotifyAuthentication.fromCredentials(authCredentials);
-      _prefsService.setString(
+      await _prefsService.setString(
           kSpotifyCredentials, jsonEncode(authentication.toJson()));
     }
 
     // get playlists
     final playlists = await spotify.playlists.me.all();
-    List<MyPlaylist.Playlist> myPlaylists = playlists.map((e) {
-      return MyPlaylist.Playlist(id: e.uri, name: e.name);
+    var myPlaylists = playlists.map((e) {
+      return my_playlist.Playlist(id: e.uri, name: e.name);
     }).toList();
 
     final token = await SpotifySdk.getAuthenticationToken(
-        clientId: clientId, redirectUrl: redirectUri, scope: scopes.join(", "));
+        clientId: clientId, redirectUrl: redirectUri, scope: scopes.join(', '));
 
     final success = await SpotifySdk.connectToSpotifyRemote(
         clientId: clientId, redirectUrl: redirectUri, accessToken: token);
 
-    SpotifySdk.play(spotifyUri: playlists.first.uri);
+    await SpotifySdk.play(spotifyUri: playlists.first.uri);
   }
 
   void onExtendTime(int minutes) {
-    final int seconds = minutes * 60;
+    final seconds = minutes * 60;
 
     _timerService.extendTime(seconds);
   }

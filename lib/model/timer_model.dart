@@ -11,7 +11,7 @@ class TimerModel {
   final List<ActionModel> _actions;
 
   TimerModel(this._initialTimeInSeconds, this._startActions, this._actions)
-      : this._id = Utils.random.nextInt(pow(2, 31)).toString();
+      : _id = Utils.random.nextInt(pow(2, 31)).toString();
 
   String get id => _id;
 

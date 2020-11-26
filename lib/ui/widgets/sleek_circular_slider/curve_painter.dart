@@ -11,7 +11,10 @@ class _CurvePainter extends CustomPainter {
   double radius;
 
   _CurvePainter(
-      {this.appearance, this.angle = 30, this.startAngle, this.angleRange})
+      {@required this.appearance,
+      this.angle = 30,
+      @required this.startAngle,
+      @required this.angleRange})
       : assert(appearance != null),
         assert(startAngle != null),
         assert(angleRange != null);
@@ -57,15 +60,13 @@ class _CurvePainter extends CustomPainter {
     }
 
     final currentAngle = appearance.counterClockwise ? -angle : angle;
-    final dynamicGradient =
-        appearance.dynamicGradient != null ? appearance.dynamicGradient : false;
+    final dynamicGradient = appearance.dynamicGradient ?? false;
     final gradientRotationAngle = dynamicGradient
         ? appearance.counterClockwise
             ? startAngle + 10.0
             : startAngle - 10.0
         : 0.0;
-    final GradientRotation rotation =
-        GradientRotation(degreeToRadians(gradientRotationAngle));
+    final rotation = GradientRotation(degreeToRadians(gradientRotationAngle));
 
     final gradientStartAngle = dynamicGradient
         ? appearance.counterClockwise
@@ -103,12 +104,12 @@ class _CurvePainter extends CustomPainter {
 
     var dotPaint = Paint()..color = appearance.dotColor;
 
-    Offset handler = degreesToCoordinates(
+    var handler = degreesToCoordinates(
         center, -math.pi / 2 + startAngle + currentAngle + 1.5, radius);
     canvas.drawCircle(handler, appearance.handlerSize, dotPaint);
   }
 
-  drawCircularArc(
+  void drawCircularArc(
       {@required Canvas canvas,
       @required Size size,
       @required Paint paint,
@@ -125,10 +126,9 @@ class _CurvePainter extends CustomPainter {
         paint);
   }
 
-  drawShadow({@required Canvas canvas, @required Size size}) {
-    final shadowStep = appearance.shadowStep != null
-        ? appearance.shadowStep
-        : math.max(
+  void drawShadow({@required Canvas canvas, @required Size size}) {
+    final int shadowStep = appearance.shadowStep ??
+        math.max(
             1, (appearance.shadowWidth - appearance.progressBarWidth) ~/ 10);
     final maxOpacity = math.min(1.0, appearance.shadowMaxOpacity);
     final repetitions = math.max(1,
@@ -137,7 +137,7 @@ class _CurvePainter extends CustomPainter {
     final shadowPaint = Paint()
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-    for (int i = 1; i <= repetitions; i++) {
+    for (var i = 1; i <= repetitions; i++) {
       shadowPaint.strokeWidth = appearance.progressBarWidth + i * shadowStep;
       shadowPaint.color = appearance.shadowColor
           .withOpacity(maxOpacity - (opacityStep * (i - 1)));

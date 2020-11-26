@@ -11,9 +11,9 @@ class RoundedRectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    final ButtonStyle buttonStyle = TextButton.styleFrom(
+    final buttonStyle = TextButton.styleFrom(
       padding: const EdgeInsets.all(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );

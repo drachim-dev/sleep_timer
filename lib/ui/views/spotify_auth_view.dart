@@ -24,13 +24,13 @@ class _SpotifyAuthViewState extends State<SpotifyAuthView> {
         builder: (context, model, child) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Spotify authentication"),
+              title: Text('Spotify authentication'),
             ),
             body: WebView(
               javascriptMode: JavascriptMode.unrestricted,
               initialUrl: widget.url,
               navigationDelegate: (navReq) {
-                final String responseUrl = navReq.url;
+                final responseUrl = navReq.url;
                 if (responseUrl.startsWith(widget.redirectUrl)) {
                   model.navigateBack(responseUrl);
                   return NavigationDecision.prevent;

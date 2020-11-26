@@ -6,6 +6,7 @@ import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
 import 'package:sleep_timer/generated/l10n.dart';
+import 'package:sleep_timer/main.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:stacked/stacked.dart';
@@ -17,8 +18,8 @@ class SettingsView extends StatefulWidget {
 
   const SettingsView(
       {deviceAdminFocused = false, notificationSettingsAccessFocused = false})
-      : this.deviceAdminFocused = deviceAdminFocused ?? false,
-        this.notificationSettingsAccessFocused =
+      : deviceAdminFocused = deviceAdminFocused ?? false,
+        notificationSettingsAccessFocused =
             notificationSettingsAccessFocused ?? false;
 
   @override
@@ -28,7 +29,6 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView>
     with SingleTickerProviderStateMixin {
   final Logger log = getLogger();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   SettingsViewModel model;
 
@@ -47,13 +47,13 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      final String message = widget.deviceAdminFocused
+      final message = widget.deviceAdminFocused
           ? S.current.prefsHintEnableDeviceAdmin
           : S.current.prefsHintEnableAccessToNotificationSettings;
 
       WidgetsBinding.instance.addPostFrameCallback(
           (_) => Future.delayed(snackBarDelay).then((value) {
-                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                mainScaffoldMessengerKey.currentState.showSnackBar(SnackBar(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     content: Text(message)));
@@ -76,7 +76,7 @@ class _SettingsViewState extends State<SettingsView>
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return ViewModelBuilder<SettingsViewModel>.reactive(
         viewModelBuilder: () => SettingsViewModel(),
@@ -89,7 +89,6 @@ class _SettingsViewState extends State<SettingsView>
         },
         builder: (context, model, child) {
           return Scaffold(
-            key: _scaffoldKey,
             appBar: _buildAppBar(theme),
             body: _buildBody(theme),
           );
@@ -114,9 +113,12 @@ class _SettingsViewState extends State<SettingsView>
         for (var option in _buildAdvanced(theme)) option,
         SectionHeader(S.of(context).otherSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        ListTile(title: Text(S.of(context).faqShort), onTap: () => model.navigateToFAQ()),
         ListTile(
-            title: Text(S.of(context).creditsAppTitle), onTap: () => model.navigateToCredits()),
+            title: Text(S.of(context).faqShort),
+            onTap: () => model.navigateToFAQ()),
+        ListTile(
+            title: Text(S.of(context).creditsAppTitle),
+            onTap: () => model.navigateToCredits()),
       ],
     );
   }
@@ -133,17 +135,19 @@ class _SettingsViewState extends State<SettingsView>
       default:
     }
 
-    final bool purchased = product.purchased;
-    final TextStyle priceStyle = purchased
+    final purchased = product.purchased;
+    final priceStyle = purchased
         ? theme.textTheme.bodyText1.copyWith(color: Colors.green)
         : theme.textTheme.bodyText1;
 
     return ListTile(
       leading: Icon(icon),
-      title: Text(product.productDetails.title.split(" (").first),
+      title: Text(product.productDetails.title.split(' (').first),
       subtitle: Text(product.productDetails.description),
       trailing: Text(
-        purchased ? S.of(context).alreadyPurchased : product.productDetails.price,
+        purchased
+            ? S.of(context).alreadyPurchased
+            : product.productDetails.price,
         textAlign: TextAlign.center,
         style: priceStyle,
       ),
@@ -203,8 +207,7 @@ class _SettingsViewState extends State<SettingsView>
               child: SwitchListTile(
                   secondary: Icon(Icons.security_outlined),
                   title: Text(S.of(context).prefsDeviceAdmin),
-                  subtitle: Text(
-                      S.of(context).prefsDeviceAdminDescription),
+                  subtitle: Text(S.of(context).prefsDeviceAdminDescription),
                   isThreeLine: true,
                   value: model.deviceAdmin,
                   onChanged: model.onChangeDeviceAdmin),
@@ -232,9 +235,9 @@ class _SettingsViewState extends State<SettingsView>
       if (false)
         SwitchListTile(
             secondary: Icon(Icons.lightbulb_outline),
-            title: Text("Philips Hue"),
+            title: Text('Philips Hue'),
             subtitle: Text(
-                "Connect to your Philips hue bridge. Enables light actions."),
+                'Connect to your Philips hue bridge. Enables light actions.'),
             isThreeLine: true,
             value: model.deviceAdmin,
             onChanged: null),

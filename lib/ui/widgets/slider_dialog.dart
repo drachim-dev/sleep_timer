@@ -40,7 +40,7 @@ class _SliderDialogState extends State<SliderDialog> {
                   },
                 ),
               ),
-              SizedBox(width: 48, child: Text("${_initialValue.floor()} %"))
+              SizedBox(width: 48, child: Text('${_initialValue.floor()} %'))
             ])),
         actions: [
           FlatButton(

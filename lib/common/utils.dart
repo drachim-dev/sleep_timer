@@ -3,7 +3,7 @@ import 'dart:math';
 class Utils {
   static String secondsToString(int seconds,
       {spacing = false, trimTrailingZeros = false}) {
-    var space = spacing ? "\u2009" : "";
+    var space = spacing ? '\u2009' : '';
 
     var duration = Duration(seconds: seconds);
     var minutes = duration.inMinutes.toString();

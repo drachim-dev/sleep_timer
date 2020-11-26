@@ -40,7 +40,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return ViewModelBuilder<HomeViewModel>.reactive(
         viewModelBuilder: () => HomeViewModel(),
@@ -57,7 +57,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   PreferredSize _buildAppBar(ThemeData theme) {
-    const double padding = 20;
+    const padding = 20.0;
 
     return PreferredSize(
       preferredSize: Size.fromHeight(kToolbarHeight + padding + 4),
@@ -110,7 +110,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             initialValue: model.initialTime,
             onUpdateLabel: (value) => S.of(context).numberOfMinutesShort(value),
             onChange: (value) => model.setTime(value),
-            
             showGlow: model.showGlow,
           ),
           Padding(
@@ -120,7 +119,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 children: [10, 20, 30, 60].map((value) {
                   return Expanded(
                     child: RoundedRectButton(
-                        title: "$value", onPressed: () => model.updateTime(value)),
+                        title: '$value',
+                        onPressed: () => model.updateTime(value)),
                   );
                 }).toList()),
           ),
@@ -143,9 +143,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildFAB(final ThemeData theme) {
-    final Color foregroundColor = Colors.white;
+    final foregroundColor = Colors.white;
 
-    final TextStyle textStyle =
+    final textStyle =
         theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
     return ScaleTransition(

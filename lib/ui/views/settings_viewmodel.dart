@@ -63,7 +63,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
 
   void onChangeGlow(bool value) {
     _prefsService.setBool(kPrefKeyGlow, value);
-    _themeService.updateGlow(value);
+    _themeService.showGlow = value;
   }
 
   Future<void> buyProduct(final Product product) async {

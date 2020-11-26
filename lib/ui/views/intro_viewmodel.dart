@@ -10,7 +10,7 @@ class IntroViewModel extends BaseViewModel {
   final _prefsService = locator<SharedPreferences>();
 
   Future navigateToHome() async {
-    _prefsService.setBool(kPrefKeyFirstLaunch, false);
+    await _prefsService.setBool(kPrefKeyFirstLaunch, false);
     await _navigationService.replaceWith(Routes.homeView);
   }
 }

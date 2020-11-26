@@ -17,12 +17,12 @@ class PurchaseService with ReactiveServiceMixin {
 
   @factoryMethod
   static Future<PurchaseService> create() async {
-    final Logger log = getLogger();
+    final log = getLogger();
 
     final iap = InAppPurchaseConnection.instance;
     var instance = PurchaseService(iap);
 
-    bool isAvailable = await instance._iap.isAvailable();
+    var isAvailable = await instance._iap.isAvailable();
     if (!isAvailable) {
       log.e(isAvailable.toString());
       instance._products = [];
@@ -37,15 +37,15 @@ class PurchaseService with ReactiveServiceMixin {
     _iap.purchaseUpdatedStream.listen((details) {
       details.forEach((detail) {
         if (detail.status == PurchaseStatus.pending) {
-          log.d("pending");
+          log.d('pending');
         } else {
           if (detail.status == PurchaseStatus.error) {
-            log.d("error");
+            log.d('error');
           } else if (detail.status == PurchaseStatus.purchased) {
-            log.d("purchased");
+            log.d('purchased');
           }
           if (detail.pendingCompletePurchase) {
-            log.d("complete");
+            log.d('complete');
             _iap.completePurchase(detail);
           }
         }
@@ -61,21 +61,20 @@ class PurchaseService with ReactiveServiceMixin {
 
   Future<void> updateProducts() async {
     _products = await _getProducts();
-    log.d("Number of products: ${_products.length}");
+    log.d('Number of products: ${_products.length}');
   }
 
   Future<List<Product>> _getProducts() async {
-    List<PurchaseDetails> purchases = await _getPurchases();
+    var purchases = await _getPurchases();
     // if (!kReleaseMode) resetPurchases(purchases);
 
-    final ProductDetailsResponse response =
-        await _iap.queryProductDetails(kProducts);
+    final response = await _iap.queryProductDetails(kProducts);
 
     response.notFoundIDs.forEach((element) => log.d(element));
 
     if (response.error != null) {
-      log.e("error code: ${response.error.code}");
-      log.e("error message: ${response.error.message}");
+      log.e('error code: ${response.error.code}');
+      log.e('error message: ${response.error.message}');
       log.e(response.error.details);
     }
 
@@ -89,12 +88,12 @@ class PurchaseService with ReactiveServiceMixin {
           consumable = false;
       }
 
-      final bool hasPurchased = purchases.firstWhere(
+      final hasPurchased = purchases.firstWhere(
               (element) => element.productID == e.id,
               orElse: () => null) !=
           null;
 
-      log.d("Found product: ${e.id}, purchased: $hasPurchased");
+      log.d('Found product: ${e.id}, purchased: $hasPurchased');
 
       return Product(
           productDetails: e, consumable: consumable, purchased: hasPurchased);
@@ -102,18 +101,16 @@ class PurchaseService with ReactiveServiceMixin {
   }
 
   Future<List<PurchaseDetails>> _getPurchases() async {
-    log.d("Get purchases");
-    final QueryPurchaseDetailsResponse response =
-        await _iap.queryPastPurchases();
+    log.d('Get purchases');
+    final response = await _iap.queryPastPurchases();
 
     return response.pastPurchases;
   }
 
   Future<bool> buyProduct(final Product product) async {
-    final PurchaseParam purchaseParam =
-        PurchaseParam(productDetails: product.productDetails);
+    final purchaseParam = PurchaseParam(productDetails: product.productDetails);
 
-    final bool success = product.consumable
+    final success = product.consumable
         ? await _iap.buyConsumable(purchaseParam: purchaseParam)
         : await _iap.buyNonConsumable(purchaseParam: purchaseParam);
 
@@ -122,8 +119,7 @@ class PurchaseService with ReactiveServiceMixin {
 
   // TODO: only for internal testing
   void resetPurchases(List<PurchaseDetails> purchases) {
-
-    log.d("Reset purchases");
+    log.d('Reset purchases');
     purchases.forEach((element) {
       log.d(element.productID);
       _iap.consumePurchase(

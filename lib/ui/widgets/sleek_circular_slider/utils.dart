@@ -53,9 +53,9 @@ double calculateRawAngle(
     @required double angleRange,
     @required double selectedAngle,
     bool counterClockwise = false}) {
-  double angle = radiansToDegrees(selectedAngle);
+  var angle = radiansToDegrees(selectedAngle);
 
-  double calcAngle = 0.0;
+  var calcAngle = 0.0;
   if (!counterClockwise) {
     if (angle >= startAngle && angle <= 360.0) {
       calcAngle = angle - startAngle;
@@ -82,7 +82,7 @@ double calculateAngle(
     return defaultAngle;
   }
 
-  double calcAngle = calculateRawAngle(
+  var calcAngle = calculateRawAngle(
       startAngle: startAngle,
       angleRange: angleRange,
       selectedAngle: selectedAngle,
@@ -103,7 +103,7 @@ bool isAngleWithinRange(
     @required touchAngle,
     @required previousAngle,
     bool counterClockwise = false}) {
-  double calcAngle = calculateRawAngle(
+  var calcAngle = calculateRawAngle(
       startAngle: startAngle,
       angleRange: angleRange,
       selectedAngle: touchAngle,

@@ -5,7 +5,6 @@ import 'package:injectable/injectable.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
-import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
@@ -23,12 +22,13 @@ class DeviceService with ReactiveServiceMixin {
   int _platformVersion = 0;
   int get platformVersion => _platformVersion;
 
-  RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
+  final RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
   bool get deviceAdmin => _deviceAdmin.value;
 
   Future<VolumeResponse> get volume => _deviceFunctionsPlatform.getVolume();
 
-  RxValue<bool> _notificationSettingsAccess = RxValue<bool>(initial: false);
+  final RxValue<bool> _notificationSettingsAccess =
+      RxValue<bool>(initial: false);
   bool get notificationSettingsAccess => _notificationSettingsAccess.value;
 
   Future<List<App>> get playerApps async =>
@@ -80,7 +80,7 @@ class DeviceService with ReactiveServiceMixin {
       {@required final String timerId,
       @required final int duration,
       @required final int remainingTime}) async {
-    final String durationString =
+    final durationString =
         Utils.secondsToString(duration, trimTrailingZeros: true);
 
     return SleepTimerPlatform.getInstance().showRunningNotification(
@@ -96,13 +96,13 @@ class DeviceService with ReactiveServiceMixin {
   Future<bool> showPauseNotification(
       {@required final String timerId,
       @required final int remainingTime}) async {
-final String timeLeft = Utils.secondsToString(remainingTime, trimTrailingZeros: true);
+    final timeLeft =
+        Utils.secondsToString(remainingTime, trimTrailingZeros: true);
 
     return SleepTimerPlatform.getInstance().showPausingNotification(
         timerId: timerId,
         title: S.current.notificationStatusPausing,
-        description:
-            S.current.notificationTimeLeft(timeLeft),
+        description: S.current.notificationTimeLeft(timeLeft),
         cancelAction: S.current.notificationActionCancel,
         continueAction: S.current.notificationActionContinue,
         remainingTime: remainingTime);
@@ -110,20 +110,20 @@ final String timeLeft = Utils.secondsToString(remainingTime, trimTrailingZeros: 
 
   Future<bool> showElapsedNotification(
       {@required final TimerModel timerModel}) async {
-    final String durationString = Utils.secondsToString(
+    final durationString = Utils.secondsToString(
         timerModel.initialTimeInSeconds,
         trimTrailingZeros: true);
-    final String time = S.current.unitMinute(durationString);
+    final time = S.current.unitMinute(durationString);
 
-    String description = S.current.notificationTimeExpired(time);
-    final Iterable<ActionModel> activeActions =
+    var description = S.current.notificationTimeExpired(time);
+    final activeActions =
         timerModel.actions.where((element) => element.enabled);
     if (activeActions.isEmpty) {
       description += S.current.notificationNoActionsExecuted;
     } else {
       for (var i = 0; i < activeActions.length; i++) {
         final element = activeActions.elementAt(i);
-        description += "${element.description}. ";
+        description += '${element.description}. ';
       }
     }
 

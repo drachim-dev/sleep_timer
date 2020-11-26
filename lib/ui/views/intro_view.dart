@@ -15,7 +15,7 @@ class _IntroViewState extends State<IntroView> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     final pageDecoration = PageDecoration(
       titleTextStyle: theme.textTheme.headline2.copyWith(fontSize: 36),
@@ -36,25 +36,25 @@ class _IntroViewState extends State<IntroView> {
               PageViewModel(
                 title: S.of(context).introAutomateSleepRoutineTitle,
                 body: S.of(context).introAutomateSleepRoutineSubtitle,
-                image: _buildImage("img_automate.webp"),
+                image: _buildImage('img_automate.webp'),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: S.of(context).introNoInterruptionsTitle,
                 body: S.of(context).introNoInterruptionsSubtitle,
-                image: _buildImage("img_interruption.webp"),
+                image: _buildImage('img_interruption.webp'),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: S.of(context).introMediaTitle,
                 body: S.of(context).IntroMediaSubtitle,
-                image: _buildImage("img_music.webp", bottomPadding: 24),
+                image: _buildImage('img_music.webp', bottomPadding: 24),
                 decoration: pageDecoration,
               ),
               PageViewModel(
                 title: S.of(context).introGoodNightTitle,
                 body: S.of(context).introGoodNightSubtitle,
-                image: _buildImage("img_sleep.webp"),
+                image: _buildImage('img_sleep.webp'),
                 decoration: pageDecoration,
               ),
             ],
@@ -62,7 +62,10 @@ class _IntroViewState extends State<IntroView> {
             nextFlex: 0,
             showSkipButton: true,
             showNextButton: true,
-            skip: Text(S.of(context).introButtonSkip, textAlign: TextAlign.center,),
+            skip: Text(
+              S.of(context).introButtonSkip,
+              textAlign: TextAlign.center,
+            ),
             next: Icon(Icons.arrow_forward,
                 semanticLabel: S.of(context).introButtonNext),
             done: Text(S.of(context).introButtonDone),

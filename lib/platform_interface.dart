@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/platform_impl.dart';
 
-
 abstract class SleepTimerPlatform {
   static SleepTimerPlatform _instance;
 

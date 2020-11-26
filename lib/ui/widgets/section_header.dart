@@ -9,11 +9,11 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
-    final TextStyle denseTextStyle = theme.textTheme.bodyText1
+    final denseTextStyle = theme.textTheme.bodyText1
         .copyWith(color: theme.accentColor, fontWeight: FontWeight.bold);
-    final TextStyle textStyle =
+    final textStyle =
         theme.textTheme.subtitle1.copyWith(color: theme.accentColor);
 
     return Padding(

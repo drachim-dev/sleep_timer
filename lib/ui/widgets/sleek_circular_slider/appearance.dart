@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-typedef String PercentageModifier(double percentage);
+typedef PercentageModifier = String Function(double percentage);
 
 class CircularSliderAppearance {
   static const double _defaultSize = 150.0;
@@ -105,7 +105,7 @@ class CircularSliderAppearance {
       customColors != null ? customColors.value.hideShadow : null;
 
   Color get trackColor => _customTrackColor ?? _defaultTrackColor;
-  List<Color> get trackColors => _customTrackColors ?? null;
+  List<Color> get trackColors => _customTrackColors;
   List<Color> get progressBarColors =>
       _customProgressBarColors ?? _defaultBarColors;
   double get gradientStartAngle =>
@@ -138,8 +138,8 @@ class CircularSliderAppearance {
 
   PercentageModifier get infoModifier =>
       _modifier ?? _defaultPercentageModifier;
-  String get infoTopLabelText => _topLabelText ?? null;
-  String get infoBottomLabelText => _bottomLabelText ?? null;
+  String get infoTopLabelText => _topLabelText;
+  String get infoBottomLabelText => _bottomLabelText;
   TextStyle get infoMainLabelStyle {
     if (_mainLabelStyle != null) return _mainLabelStyle;
 

@@ -42,7 +42,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   void startNewTimer() async {
-    final TimerModel timerModel =
+    final timerModel =
         TimerModel(_initialTime * 60, startActionList, actionList);
 
     _activeTimerId = await _navigationService.navigateTo(Routes.timerView,
@@ -52,7 +52,7 @@ class HomeViewModel extends BaseViewModel {
 
   void openActiveTimer() async {
     if (hasActiveTimer) {
-      final TimerModel timerModel = TimerServiceManager.getInstance()
+      final timerModel = TimerServiceManager.getInstance()
           .getTimerService(_activeTimerId)
           .timerModel;
 

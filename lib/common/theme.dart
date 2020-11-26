@@ -5,7 +5,8 @@ class MyTheme {
   final String id, title;
   final ThemeData theme;
 
-  const MyTheme({this.id, this.title, this.theme});
+  const MyTheme(
+      {@required this.id, @required this.title, @required this.theme});
 }
 
 const _lightFillColor = Colors.black;
@@ -22,27 +23,27 @@ const TextTheme _textTheme = TextTheme(
 List<MyTheme> themeList = [
   MyTheme(
     id: kThemeKeyLightOrange,
-    title: "Light Orange",
+    title: 'Light Orange',
     theme: _themeData(_lightOrangeColorScheme, _lightFocusColor),
   ),
-    MyTheme(
+  MyTheme(
     id: kThemeKeyLightGreen,
-    title: "Light Green",
+    title: 'Light Green',
     theme: _themeData(_lightGreenColorScheme, _lightFocusColor),
   ),
   MyTheme(
     id: kThemeKeyDarkOrange,
-    title: "Dark Orange",
+    title: 'Dark Orange',
     theme: _themeData(_darkOrangeColorScheme, _darkFocusColor),
   ),
-    MyTheme(
+  MyTheme(
     id: kThemeKeyDarkYellow,
-    title: "Dark Yellow",
+    title: 'Dark Yellow',
     theme: _themeData(_darkYellowColorScheme, _darkFocusColor),
   ),
   MyTheme(
     id: kThemeKeyBlackBlue,
-    title: "Black",
+    title: 'Black',
     theme: _themeData(_blackColorScheme, _darkFocusColor),
   )
 ];
@@ -150,7 +151,7 @@ ColorScheme _darkYellowColorScheme = ColorScheme(
   secondary: Colors.teal[700],
   secondaryVariant: Colors.teal[800],
   background: Color(0xFF1b1b1b),
-  surface: Color(0xFF373737), 
+  surface: Color(0xFF373737),
   onBackground: Color(0x0DFFFFFF),
   error: _darkFillColor,
   onError: _darkFillColor,

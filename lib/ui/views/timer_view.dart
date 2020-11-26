@@ -43,7 +43,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   TimerViewModel model;
 
-  String _selectedPlaylist = "Playlist 10";
+  String _selectedPlaylist = 'Playlist 10';
 
   _TimerViewState();
 
@@ -100,7 +100,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return ViewModelBuilder<TimerViewModel>.reactive(
         viewModelBuilder: () => TimerViewModel(widget.timerModel),
@@ -108,7 +108,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         builder: (context, model, child) {
           return WillPopScope(
             onWillPop: () async {
-              model.navigateBack();
+              await model.navigateBack();
               return false;
             },
             child: NotificationListener(
@@ -125,7 +125,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   SliverAppBar _buildAppBar(final ThemeData theme) {
-    final TextStyle titleStyle = theme.textTheme.headline2
+    final titleStyle = theme.textTheme.headline2
         .copyWith(shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
@@ -218,9 +218,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   Future _showAppSheet(final Future<List<App>> apps) {
-    const double appSize = 40;
-    const int gridSize = 3;
-    const double labelMargin = 12;
+    const appSize = 40.0;
+    const gridSize = 3;
+    const labelMargin = 12.0;
 
     return showModalBottomSheet(
         context: context,
@@ -271,13 +271,15 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       switch (notification.direction) {
         case ScrollDirection.forward:
           if (notification.metrics.maxScrollExtent !=
-              notification.metrics.minScrollExtent)
+              notification.metrics.minScrollExtent) {
             _hideFabAnimController.forward();
+          }
           break;
         case ScrollDirection.reverse:
           if (notification.metrics.maxScrollExtent !=
-              notification.metrics.minScrollExtent)
+              notification.metrics.minScrollExtent) {
             _hideFabAnimController.reverse();
+          }
           break;
         case ScrollDirection.idle:
           break;
@@ -291,7 +293,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [1, 5, 20].map((minutes) {
           return RoundedRectButton(
-              title: "+ $minutes",
+              title: '+ $minutes',
               onPressed: () => model.onExtendTime(minutes));
         }).toList());
   }
@@ -448,7 +450,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final playlistUri = await showDialog<double>(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text("Choose playlist"),
+              title: Text('Choose playlist'),
               content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                 return Container(
@@ -458,11 +460,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                     itemBuilder: (_, index) {
                       return RadioListTile(
                         title: Text(
-                          "RAWER Than The Rest by Gearbox Digital $index",
+                          'RAWER Than The Rest by Gearbox Digital $index',
                           maxLines: 2,
                         ),
                         groupValue: _selectedPlaylist,
-                        value: "Playlist $index",
+                        value: 'Playlist $index',
                         onChanged: (value) {
                           setState(() => _selectedPlaylist = value);
                         },
@@ -483,13 +485,13 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   void _startPlaylist() async {
     if (Platform.isAndroid) {
-      model.navigateToSpotifyAuth();
+      await model.navigateToSpotifyAuth();
     }
   }
 
-  _buildFAB(ThemeData theme) {
-    final Color foregroundColor = Colors.white;
-    final TextStyle textStyle =
+  Widget _buildFAB(ThemeData theme) {
+    final foregroundColor = Colors.white;
+    final textStyle =
         theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
 
     if (model.timerStatus == TimerStatus.RUNNING) {
@@ -510,7 +512,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           label: Text(
             model.timerStatus == TimerStatus.RUNNING
                 ? S.of(context).buttonTimerPause
-                : model.timerStatus == TimerStatus.INITIAL || model.timerStatus == TimerStatus.ELAPSED
+                : model.timerStatus == TimerStatus.INITIAL ||
+                        model.timerStatus == TimerStatus.ELAPSED
                     ? S.of(context).buttonTimerStart
                     : S.of(context).buttonTimerContinue,
             style: textStyle,
