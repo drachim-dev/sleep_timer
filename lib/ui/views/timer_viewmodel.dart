@@ -1,24 +1,18 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:device_functions/messages_generated.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
-import 'package:sleep_timer/common/spotify_manager.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/app.dart';
-import 'package:sleep_timer/model/playlist.dart' as my_playlist;
-import 'package:sleep_timer/model/spotify_authentication.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
-import 'package:spotify/spotify.dart';
-import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -134,77 +128,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
             deviceAdminFocused: deviceAdminFocused,
             notificationSettingsAccessFocused:
                 notificationSettingsAccessFocused));
-  }
-
-  Future<void> navigateToSpotifyAuth() async {
-    final clientId = SpotifyManager.clientId;
-
-    // The URI to redirect to after the user grants or denies permission. It must
-    // be in your Spotify application Redirect whitelist. This URI can be a fabricated
-    // URI that allows the client device to function as an authorization server.
-    final redirectUri = 'https://dr.achim.sleep_timer/auth';
-
-    // See https://developer.spotify.com/documentation/general/guides/scopes/
-    // for a complete list of these Spotify authorization permissions. If no
-    // scopes are specified, only public Spotify information will be available.
-    final scopes = [
-      'playlist-read-collaborative',
-      'playlist-read-private',
-      'user-modify-playback-state'
-    ];
-
-    SpotifyApiCredentials authCredentials;
-    SpotifyApi spotify;
-
-    // load credentials from SharedPreferences
-    // final jsonString = _prefsService.getString(kSpotifyCredentials);
-    final jsonString = null;
-    if (jsonString != null) {
-      print('saved authentication loaded');
-      authCredentials = SpotifyAuthentication.fromJson(jsonDecode(jsonString))
-          .toCredentials();
-      spotify = SpotifyApi(authCredentials);
-    } else {
-      // start new authentication flow
-      print('new authentication');
-
-      final clientSecret = SpotifyManager.clientSecret;
-      final credentials = SpotifyApiCredentials(clientId, clientSecret);
-      final grant = SpotifyApi.authorizationCodeGrant(credentials);
-
-      final authUri = grant.getAuthorizationUrl(
-        Uri.parse(redirectUri),
-        scopes: scopes, // scopes are optional
-      );
-
-      final String authTokenUrl = await _navigationService.navigateTo(
-          Routes.spotifyAuthView,
-          arguments: SpotifyAuthViewArguments(
-              url: authUri.toString(), redirectUrl: redirectUri));
-
-      spotify = SpotifyApi.fromAuthCodeGrant(grant, authTokenUrl);
-      authCredentials = await spotify.getCredentials();
-
-      // save authentication as own model
-      final authentication =
-          SpotifyAuthentication.fromCredentials(authCredentials);
-      await _prefsService.setString(
-          kSpotifyCredentials, jsonEncode(authentication.toJson()));
-    }
-
-    // get playlists
-    final playlists = await spotify.playlists.me.all();
-    var myPlaylists = playlists.map((e) {
-      return my_playlist.Playlist(id: e.uri, name: e.name);
-    }).toList();
-
-    final token = await SpotifySdk.getAuthenticationToken(
-        clientId: clientId, redirectUrl: redirectUri, scope: scopes.join(', '));
-
-    final success = await SpotifySdk.connectToSpotifyRemote(
-        clientId: clientId, redirectUrl: redirectUri, accessToken: token);
-
-    await SpotifySdk.play(spotifyUri: playlists.first.uri);
   }
 
   void onExtendTime(int minutes) {

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:device_functions/messages_generated.dart';
@@ -42,8 +41,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   Animation<Color> _colorAnimation;
 
   TimerViewModel model;
-
-  String _selectedPlaylist = 'Playlist 10';
 
   _TimerViewState();
 
@@ -311,17 +308,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         ),
       ),
       if (!model.isAdFree) _buildAd(theme),
-      if (false)
-        ListTile(
-          leading: Icon(Icons.music_note_outlined),
-          title: Text(model.timerModel.playMusicAction.title),
-          subtitle: Text(model.timerModel.playMusicAction.description),
-          onTap: () => _showPlaylistPicker(),
-          trailing: Switch(
-            value: model.timerModel.playMusicAction.enabled,
-            onChanged: model.onChangePlayMusic,
-          ),
-        ),
       SwitchListTile(
         secondary: Icon(Icons.do_not_disturb_on),
         title: Text(model.timerModel.doNotDisturbAction.title),
@@ -443,49 +429,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
     if (volumeLevel != null) {
       model.onChangeVolumeLevel(volumeLevel);
-    }
-  }
-
-  void _showPlaylistPicker() async {
-    final playlistUri = await showDialog<double>(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Choose playlist'),
-              content: StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                return Container(
-                  width: 400,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemBuilder: (_, index) {
-                      return RadioListTile(
-                        title: Text(
-                          'RAWER Than The Rest by Gearbox Digital $index',
-                          maxLines: 2,
-                        ),
-                        groupValue: _selectedPlaylist,
-                        value: 'Playlist $index',
-                        onChanged: (value) {
-                          setState(() => _selectedPlaylist = value);
-                        },
-                      );
-                    },
-                    itemCount: 25,
-                  ),
-                );
-              }),
-              actions: [
-                FlatButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(S.of(context).introButtonDone),
-                ),
-              ],
-            ));
-  }
-
-  void _startPlaylist() async {
-    if (Platform.isAndroid) {
-      await model.navigateToSpotifyAuth();
     }
   }
 

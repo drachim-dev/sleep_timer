@@ -4,7 +4,6 @@ import 'package:sleep_timer/ui/views/faq_view.dart';
 import 'package:sleep_timer/ui/views/home_view.dart';
 import 'package:sleep_timer/ui/views/intro_view.dart';
 import 'package:sleep_timer/ui/views/settings_view.dart';
-import 'package:sleep_timer/ui/views/spotify_auth_view.dart';
 import 'package:sleep_timer/ui/views/timer_view.dart';
 
 @MaterialAutoRouter(
@@ -12,7 +11,6 @@ import 'package:sleep_timer/ui/views/timer_view.dart';
     MaterialRoute(page: IntroView),
     MaterialRoute(page: HomeView),
     MaterialRoute(page: TimerView),
-    MaterialRoute(page: SpotifyAuthView),
     MaterialRoute(page: SettingsView),
     MaterialRoute(page: FAQView),
     MaterialRoute(page: CreditsView),
