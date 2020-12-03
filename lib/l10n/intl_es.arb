@@ -12,7 +12,8 @@
   "introButtonNext": "Siguiente",
   "sleepTimer": "Sleep Timer",
   "settings": "Ajustes",
-  "numberOfMinutesShort": "{minutes} Min",
+  "numberOfMinutesShort": "{minutes} min",
+  "numberOfMinutesLong": "{minutes} minutos",
   "buttonOpenSavedTimer": "Toque aquí para ver su temporizador",
   "buttonSetupTimer": "Establezca su rutina",
   "quickLaunchTitle": "Abrir rápido",
@@ -70,6 +71,9 @@
   "notificationActionRestart": "Reiniciar",
   "notificationNoActionsExecuted": "No hay acciones seleccionadas para la ejecución",
   "notificationTimeExpired": "{time} expirado. ",
-  "notificationTimeLeft":  "Tiempo restante: {timeLeft}",
-  "notificationTimerSet": "Temporizador ajustado a {time} minutos"
+  "notificationTimeLeft": "Tiempo restante: {timeLeft}",
+  "notificationTimerSet": "Temporizador ajustado a {time} minutos",
+  "timerSettingsSectionTitle": "Temporizador",
+  "prefsExtendTimeOnShake": "Extiende el tiempo agitando",
+  "extendTimeByShakeMenuToolTip": "Toque para cambiar el tiempo"
 }

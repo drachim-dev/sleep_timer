@@ -1,9 +1,7 @@
 package dr.achim.sleep_timer;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -32,8 +30,6 @@ import java.util.Set;
 import dr.achim.sleep_timer.Messages.*;
 import io.flutter.Log;
 
-import static dr.achim.sleep_timer.AlarmService.ACTION_START;
-
 public class MethodChannelImpl implements HostTimerApi {
     private static final String TAG = MethodChannelImpl.class.toString();
     private final Context context;
@@ -48,11 +44,14 @@ public class MethodChannelImpl implements HostTimerApi {
     }
 
     private void _startForegroundService(final TimeNotificationRequest arg) {
+        final Intent intent = new Intent(context, AlarmService.class);
+        intent.setAction(AlarmService.ACTION_START);
+        intent.putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            final Intent intent = new Intent(context, AlarmService.class);
-            intent.setAction(ACTION_START);
-            intent.putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap());
             context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
         }
     }
 

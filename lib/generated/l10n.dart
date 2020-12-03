@@ -165,11 +165,21 @@ class S {
     );
   }
 
-  /// `{minutes} Min`
+  /// `{minutes} min`
   String numberOfMinutesShort(Object minutes) {
     return Intl.message(
-      '$minutes Min',
+      '$minutes min',
       name: 'numberOfMinutesShort',
+      desc: '',
+      args: [minutes],
+    );
+  }
+
+  /// `{minutes} minutes`
+  String numberOfMinutesLong(Object minutes) {
+    return Intl.message(
+      '$minutes minutes',
+      name: 'numberOfMinutesLong',
       desc: '',
       args: [minutes],
     );
@@ -762,6 +772,36 @@ class S {
       name: 'notificationTimerSet',
       desc: '',
       args: [time],
+    );
+  }
+
+  /// `Timer settings`
+  String get timerSettingsSectionTitle {
+    return Intl.message(
+      'Timer settings',
+      name: 'timerSettingsSectionTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Extend on phone shake`
+  String get prefsExtendTimeOnShake {
+    return Intl.message(
+      'Extend on phone shake',
+      name: 'prefsExtendTimeOnShake',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to change time`
+  String get extendTimeByShakeMenuToolTip {
+    return Intl.message(
+      'Tap to change time',
+      name: 'extendTimeByShakeMenuToolTip',
+      desc: '',
+      args: [],
     );
   }
 }

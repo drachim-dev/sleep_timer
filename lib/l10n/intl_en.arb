@@ -12,7 +12,8 @@
   "introButtonNext": "Next",
   "sleepTimer": "Sleep Timer",
   "settings": "Settings",
-  "numberOfMinutesShort": "{minutes} Min",
+  "numberOfMinutesShort": "{minutes} min",
+  "numberOfMinutesLong": "{minutes} minutes",
   "buttonOpenSavedTimer": "Tap here to see your timer",
   "buttonSetupTimer": "Set your routine",
   "quickLaunchTitle": "Quick launch",
@@ -71,5 +72,8 @@
   "notificationNoActionsExecuted": "No actions selected for execution.",
   "notificationTimeExpired": "{time} expired. ",
   "notificationTimeLeft": "Time left: {timeLeft}",
-  "notificationTimerSet": "Timer set to {time} minutes"
+  "notificationTimerSet": "Timer set to {time} minutes",
+  "timerSettingsSectionTitle": "Timer settings",
+  "prefsExtendTimeOnShake": "Extend on phone shake",
+  "extendTimeByShakeMenuToolTip": "Tap to change time"
 }

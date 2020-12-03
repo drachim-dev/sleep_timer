@@ -65,8 +65,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void launchedByNotification(final Intent intent) {
-        final FlutterTimerApi flutterTimerApi = new FlutterTimerApi(flutterEngine.getDartExecutor().getBinaryMessenger());
-
+        flutterTimerApi = new FlutterTimerApi(flutterEngine.getDartExecutor().getBinaryMessenger());
         final HashMap<String,Object> map = (HashMap) intent.getSerializableExtra(NotificationReceiver.KEY_OPEN_REQUEST);
         if(map != null) {
             final OpenRequest request = OpenRequest.fromMap(map);

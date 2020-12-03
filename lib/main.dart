@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
-import 'package:shake/shake.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/logger.util.dart';
@@ -56,10 +55,6 @@ class MyApp extends StatelessWidget {
 
           SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle.copyWith(
               statusBarColor: Colors.transparent));
-
-          ShakeDetector.autoStart(onPhoneShake: () {
-            print('SHAKE IT BABY');
-          });
         },
         builder: (context, model, child) {
           return MaterialApp(

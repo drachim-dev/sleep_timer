@@ -105,6 +105,9 @@ class _SettingsViewState extends State<SettingsView>
         SectionHeader(S.of(context).appearanceSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildAppearance(theme)) option,
+        SectionHeader(S.of(context).timerSettingsSectionTitle,
+            dense: true, leftPadding: kPreferenceTitleLeftPadding),
+        for (var option in _buildTimerSettings(theme)) option,
         SectionHeader(S.of(context).purchasesSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var product in model.products) _buildProduct(theme, product),
@@ -121,6 +124,68 @@ class _SettingsViewState extends State<SettingsView>
             onTap: () => model.navigateToCredits()),
       ],
     );
+  }
+
+  List<Widget> _buildAppearance(final ThemeData theme) {
+    return [
+      ListTile(
+        title: Text(S.of(context).chooseThemeTitle),
+        subtitle: Text(model.currentTheme.title),
+        leading: Icon(Icons.color_lens_outlined),
+        onTap: _showThemeDialog,
+      ),
+      SwitchListTile(
+        title: Text(S.of(context).showTimerGlow),
+        subtitle: Text(S.of(context).showTimerGlowDescription),
+        isThreeLine: true,
+        secondary: Icon(Icons.blur_on_outlined),
+        value: model.glow,
+        onChanged: model.onChangeGlow,
+      ),
+    ];
+  }
+
+  Future<void> _showThemeDialog() {
+    return showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(S.of(context).chooseThemeTitle),
+          content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: themeList.map((myTheme) {
+                return RadioListTile(
+                    title: Text(myTheme.title),
+                    groupValue: model.currentTheme.id,
+                    value: myTheme.id,
+                    onChanged: model.updateTheme);
+              }).toList()),
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildTimerSettings(final ThemeData theme) {
+    return [
+      PopupMenuButton(
+        child: ListTile(
+          leading: Icon(Icons.timer_outlined),
+          title: Text(S.of(context).prefsExtendTimeOnShake),
+          subtitle:
+              Text(S.of(context).numberOfMinutesLong(model.extendTimeByShake)),
+        ),
+        tooltip: S.of(context).extendTimeByShakeMenuToolTip,
+        offset: Offset(1, 0),
+        initialValue: model.extendTimeByShake,
+        onSelected: model.onChangeExtendTimeByShake,
+        itemBuilder: (context) => kExtendTimeByShakeOptions.map((minutes) {
+          return PopupMenuItem(
+            child: Text(S.of(context).numberOfMinutesShort(minutes)),
+            value: minutes,
+          );
+        }).toList(),
+      ),
+    ];
   }
 
   ListTile _buildProduct(ThemeData theme, Product product) {
@@ -153,45 +218,6 @@ class _SettingsViewState extends State<SettingsView>
       ),
       onTap: () => purchased ? null : model.buyProduct(product),
     );
-  }
-
-  Future<void> showThemeDialog() {
-    return showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: Text(S.of(context).chooseThemeTitle),
-          content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: themeList.map((myTheme) {
-                return RadioListTile(
-                    title: Text(myTheme.title),
-                    groupValue: model.currentTheme.id,
-                    value: myTheme.id,
-                    onChanged: model.updateTheme);
-              }).toList()),
-        );
-      },
-    );
-  }
-
-  List<Widget> _buildAppearance(final ThemeData theme) {
-    return [
-      ListTile(
-        title: Text(S.of(context).chooseThemeTitle),
-        subtitle: Text(model.currentTheme.title),
-        leading: Icon(Icons.color_lens_outlined),
-        onTap: showThemeDialog,
-      ),
-      SwitchListTile(
-        title: Text(S.of(context).showTimerGlow),
-        subtitle: Text(S.of(context).showTimerGlowDescription),
-        isThreeLine: true,
-        secondary: Icon(Icons.blur_on_outlined),
-        value: model.glow,
-        onChanged: model.onChangeGlow,
-      ),
-    ];
   }
 
   List<Widget> _buildAdvanced(final ThemeData theme) {

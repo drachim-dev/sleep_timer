@@ -25,9 +25,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(time) => "Timer set to ${time} minutes";
 
-  static m3(minutes) => "${minutes} Min";
+  static m3(minutes) => "${minutes} minutes";
 
-  static m4(durationString) => "${durationString} minutes";
+  static m4(minutes) => "${minutes} min";
+
+  static m5(durationString) => "${durationString} minutes";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chooseThemeTitle" : MessageLookupByLibrary.simpleMessage("Theme"),
     "creditsAppTitle" : MessageLookupByLibrary.simpleMessage("Credits"),
     "creditsLibraries" : MessageLookupByLibrary.simpleMessage("Libraries"),
+    "extendTimeByShakeMenuToolTip" : MessageLookupByLibrary.simpleMessage("Tap to change time"),
     "faqShort" : MessageLookupByLibrary.simpleMessage("FAQ"),
     "faqTitle" : MessageLookupByLibrary.simpleMessage("Frequently asked questions"),
     "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Are you tired of adjusting the same settings every night in order to sleep well?"),
@@ -82,10 +85,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationTimeExpired" : m0,
     "notificationTimeLeft" : m1,
     "notificationTimerSet" : m2,
-    "numberOfMinutesShort" : m3,
+    "numberOfMinutesLong" : m3,
+    "numberOfMinutesShort" : m4,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Other"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Device admin"),
     "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Allows app to manage device functions\nEnables screen off action"),
+    "prefsExtendTimeOnShake" : MessageLookupByLibrary.simpleMessage("Extend on phone shake"),
     "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Please enable access to notification settings"),
     "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Please enable device admin"),
     "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Notification Settings Access"),
@@ -102,7 +107,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerNoAlarmDescription" : MessageLookupByLibrary.simpleMessage("Make sure that battery optimization is disabled for the app. Some device manufacturers such as Samsung or Huawei require additional settings to allow the app to be running in background."),
     "timerNoWifi" : MessageLookupByLibrary.simpleMessage("Wifi option is missing"),
     "timerNoWifiDescription" : MessageLookupByLibrary.simpleMessage("Starting with Android 10 it is not possible to disable wifi anymore."),
+    "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Timer settings"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("When timer starts"),
-    "unitMinute" : m4
+    "unitMinute" : m5
   };
 }

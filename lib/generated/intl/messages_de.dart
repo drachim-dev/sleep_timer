@@ -25,9 +25,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m2(time) => "Zeit auf ${time} Minuten festgelegt";
 
-  static m3(minutes) => "${minutes} Min";
+  static m3(minutes) => "${minutes} Minuten";
 
-  static m4(durationString) => "${durationString} Minuten";
+  static m4(minutes) => "${minutes} Min";
+
+  static m5(durationString) => "${durationString} Minuten";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -46,7 +48,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "actionVolumeDescription" : MessageLookupByLibrary.simpleMessage("Ändert Lautstärke auf"),
     "actionVolumeTitle" : MessageLookupByLibrary.simpleMessage("Lautstärke"),
     "adLoadFailure" : MessageLookupByLibrary.simpleMessage("Fehler beim Laden der Werbung"),
-    "advancedSectionTitle" : MessageLookupByLibrary.simpleMessage("Fortgeschrittene"),
+    "advancedSectionTitle" : MessageLookupByLibrary.simpleMessage("Fortgeschrittene Funktionen"),
     "alreadyPurchased" : MessageLookupByLibrary.simpleMessage("Bereits\ngekauft"),
     "appearanceSectionTitle" : MessageLookupByLibrary.simpleMessage("Erscheinungsbild"),
     "buttonOpenSavedTimer" : MessageLookupByLibrary.simpleMessage("Hier tippen, um deinen Timer zu sehen"),
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chooseThemeTitle" : MessageLookupByLibrary.simpleMessage("Theme"),
     "creditsAppTitle" : MessageLookupByLibrary.simpleMessage("Credits"),
     "creditsLibraries" : MessageLookupByLibrary.simpleMessage("Bibliotheken"),
+    "extendTimeByShakeMenuToolTip" : MessageLookupByLibrary.simpleMessage("Tippen, um die Zeit zu ändern"),
     "faqShort" : MessageLookupByLibrary.simpleMessage("FAQ"),
     "faqTitle" : MessageLookupByLibrary.simpleMessage("Häufig gestellte Fragen"),
     "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Bist du es es leid, jede Nacht die gleichen Einstellungen vorzunehmen, um gut schlafen zu können?"),
@@ -82,15 +85,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationTimeExpired" : m0,
     "notificationTimeLeft" : m1,
     "notificationTimerSet" : m2,
-    "numberOfMinutesShort" : m3,
+    "numberOfMinutesLong" : m3,
+    "numberOfMinutesShort" : m4,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Sonstige"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Erweiterte Gerätefunktionen"),
-    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt die Verwaltung von Gerätefunktionen\nErmöglicht Bildschirmabschaltung"),
+    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt Verwaltung von Gerätefunktionen\nErmöglicht Bildschirmabschaltung"),
+    "prefsExtendTimeOnShake" : MessageLookupByLibrary.simpleMessage("Verlängern durch Schütteln"),
     "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Aktiviere den Zugriff auf Benachrichtigungs­einstellungen"),
     "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Aktiviere die erweiterten Gerätefunktionen"),
     "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Zugriff auf \"Bitte nicht stören\""),
-    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt den Zugriff auf Benachrichtigungs­einstellungen\nErmöglicht \"Bitte nicht stören\""),
-    "purchasesSectionTitle" : MessageLookupByLibrary.simpleMessage("Unterstütze mich"),
+    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt den Zugriff auf Benachrichtigungs­einstellungen"),
+    "purchasesSectionTitle" : MessageLookupByLibrary.simpleMessage("In-App-Käufe"),
     "quickLaunchTitle" : MessageLookupByLibrary.simpleMessage("Schnellstart"),
     "setVolumeTitle" : MessageLookupByLibrary.simpleMessage("Lautstärke ändern"),
     "settings" : MessageLookupByLibrary.simpleMessage("Einstellungen"),
@@ -102,7 +107,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerNoAlarmDescription" : MessageLookupByLibrary.simpleMessage("Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann."),
     "timerNoWifi" : MessageLookupByLibrary.simpleMessage("Die WLAN Aktion fehlt"),
     "timerNoWifiDescription" : MessageLookupByLibrary.simpleMessage("Ab Android 10 ist es nicht mehr möglich, WLAN über eine App auszuschalten."),
+    "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Timer"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("Beim Starten des Timers"),
-    "unitMinute" : m4
+    "unitMinute" : m5
   };
 }

@@ -17,7 +17,8 @@ const String kPrefKeyGlow = 'pref_key_glow';
 const String kKeyVolumeLevel = 'pref_key_volume_level';
 const String kPrefKeyInitialTime = 'pref_key_initial_time';
 const String kPrefKeyFirstLaunch = 'pref_key_first_launch';
-const String kSpotifyCredentials = 'pref_key_spotify_credentials';
+const String kPrefKeyDefaultExtendTimeByShake =
+    'pref_key_default_extend_time_by_shake';
 
 const String kThemeKeyLightOrange = 'light_orange_theme';
 const String kThemeKeyLightGreen = 'light_green_theme';
@@ -29,5 +30,7 @@ const int kDefaultInitialTime = 15;
 const bool kDefaultGlow = true;
 const int kStartTimerDelay = 1500;
 const double kAdHeight = 80;
+const List<int> kExtendTimeByShakeOptions = [15, 30, 45, 60];
+const int kDefaultExtendTimeByShake = 15;
 
 const Color kStatusBarOverlay = Colors.transparent;

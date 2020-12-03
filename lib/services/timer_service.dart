@@ -7,6 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:stacked/stacked.dart';
@@ -67,7 +68,7 @@ class TimerService with ReactiveServiceMixin {
   }
 
   void extendTime(final int seconds) {
-    _remainingTime.value += seconds;
+    _remainingTime.value += seconds ?? kDefaultExtendTimeByShake * 60;
 
     setMaxTime();
 

@@ -16,12 +16,10 @@ import dr.achim.sleep_timer.Messages.*;
 
 public class NotificationActionReceiver extends BroadcastReceiver {
     private static final String TAG = NotificationActionReceiver.class.toString();
-    private Context context;
     private FlutterTimerApi flutterTimerApi;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        this.context = context;
         initializeFlutter();
 
         Log.wtf(TAG, intent.getAction());
@@ -69,11 +67,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
     private void initializeFlutter() {
-        if (context == null) {
-            Log.e(TAG, "Context is null");
-            return;
-        }
-
         final FlutterEngine flutterEngine = FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID);
         if(flutterEngine != null) {
             flutterTimerApi = new Messages.FlutterTimerApi(flutterEngine.getDartExecutor().getBinaryMessenger());

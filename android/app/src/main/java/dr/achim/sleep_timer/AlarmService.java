@@ -8,8 +8,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -32,11 +36,16 @@ public class AlarmService extends Service {
     private static final int REQUEST_CODE_ALARM = 700;
     private PendingIntent pendingAlarmIntent;
 
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private ShakeDetector shakeDetector;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         initNotificationChannel();
+        initShakeDetector();
 
         final Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).build();
         startForeground(NOTIFICATION_ID, notification);
@@ -54,6 +63,13 @@ public class AlarmService extends Service {
         }
     }
 
+    private void initShakeDetector() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        shakeDetector = new ShakeDetector();
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         isRunning = true;
@@ -64,6 +80,7 @@ public class AlarmService extends Service {
                 final HashMap map = (HashMap) intent.getSerializableExtra(KEY_SHOW_NOTIFICATION);
                 final TimeNotificationRequest request = TimeNotificationRequest.fromMap(map);
                 _startAlarm(request);
+
                 final Intent showRunningIntent = new Intent(this, NotificationReceiver.class);
                 showRunningIntent.setAction(ACTION_SHOW_RUNNING);
                 showRunningIntent.putExtra(KEY_SHOW_NOTIFICATION, map);
@@ -90,6 +107,25 @@ public class AlarmService extends Service {
         pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         final AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() + request.getRemainingTime() * 1000, pendingAlarmIntent);
+
+        shakeDetector.setOnShakeListener(count -> {
+            final Intent intent = new Intent(this, NotificationActionReceiver.class);
+            intent.setAction(ACTION_EXTEND);
+
+            final ExtendTimeResponse response = new ExtendTimeResponse();
+            response.setTimerId(request.getTimerId());
+            intent.putExtra(KEY_EXTEND_RESPONSE, response.toMap());
+
+            sendBroadcast(intent);
+
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(500);
+            }
+        });
+        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
     private void _stopAlarm() {
@@ -108,10 +144,10 @@ public class AlarmService extends Service {
     public void onDestroy() {
         Log.wtf(TAG, "onDestroy Service");
         _stopAlarm();
+        sensorManager.unregisterListener(shakeDetector);
         isRunning = false;
     }
     public static boolean isRunning() {
         return isRunning;
     }
-
 }

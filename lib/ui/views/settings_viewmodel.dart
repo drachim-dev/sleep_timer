@@ -22,6 +22,11 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
 
   MyTheme get currentTheme => _themeService.myTheme;
   bool get glow => _themeService.showGlow;
+
+  int get extendTimeByShake =>
+      _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
+      kDefaultExtendTimeByShake;
+
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
@@ -44,6 +49,11 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
       await runBusyFuture(_purchaseService.updateProducts());
       notifyListeners();
     });
+  }
+
+  void onChangeExtendTimeByShake(final int value) async {
+    await _prefsService.setInt(kPrefKeyDefaultExtendTimeByShake, value);
+    notifyListeners();
   }
 
   void onChangeDeviceAdmin(final bool value) async {
