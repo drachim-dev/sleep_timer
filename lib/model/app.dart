@@ -13,8 +13,10 @@ class App {
   }
 
   static App fromMap(Map<dynamic, dynamic> pigeonMap) {
-    final result = App().title = pigeonMap['title'].icon =
-        pigeonMap['icon'].packageName = pigeonMap['packageName'];
+    final result = App()
+      ..title = pigeonMap['title']
+      ..icon = pigeonMap['icon']
+      ..packageName = pigeonMap['packageName'];
 
     return result;
   }

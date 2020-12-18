@@ -169,23 +169,21 @@ public class MethodChannelImpl implements HostTimerApi {
         apps.addAll(getAppsFromResolveInfo(videoList));
         apps.addAll(getAppsFromResolveInfo(mediaList));
 
-        try {
+
             List<String> packageNames = new ArrayList<>();
             packageNames.add("com.netflix.mediaclient");
             packageNames.add("com.google.android.apps.podcasts");
 
             for (String packageName : packageNames) {
-                final PackageInfo netflixPackage = manager.getPackageInfo(packageName, 0);
-                final ApplicationInfo applicationInfo = netflixPackage.applicationInfo;
-                if (applicationInfo != null && applicationInfo.enabled) {
-                    final Messages.Package app = getAppFromApplicationInfo(applicationInfo);
-                    apps.add(app);
-                }
+                try {
+                    final PackageInfo myPackage = manager.getPackageInfo(packageName, 0);
+                    final ApplicationInfo applicationInfo = myPackage.applicationInfo;
+                    if (applicationInfo != null && applicationInfo.enabled) {
+                        final Messages.Package app = getAppFromApplicationInfo(applicationInfo);
+                        apps.add(app);
+                    }
+                } catch (PackageManager.NameNotFoundException ignored) {}
             }
-
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
         final ArrayList<HashMap> distinctApps = getDistinctAppList(apps);
         response.setApps(distinctApps);
