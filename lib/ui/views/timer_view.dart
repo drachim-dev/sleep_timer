@@ -169,19 +169,22 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     return CustomScrollView(
       slivers: [
         _buildAppBar(theme),
-        SliverList(
-          delegate: SliverChildListDelegate.fixed([
-            Divider(height: 1),
-            SectionHeader(S.of(context).quickLaunchTitle,
-                leftPadding: kHorizontalPadding),
-            _buildQuickLaunch(),
-            SectionHeader(S.of(context).timerStartsActionsTitle,
-                leftPadding: kHorizontalPadding),
-            for (var action in _buildStartedActions(theme)) action,
-            SectionHeader(S.of(context).timerEndsActionsTitle,
-                leftPadding: kHorizontalPadding),
-            for (var action in _buildEndedActions(theme)) action,
-          ]),
+        SliverPadding(
+          padding: const EdgeInsets.only(bottom: kFloatingActionButtonHeight),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate.fixed([
+              Divider(height: 1),
+              SectionHeader(S.of(context).quickLaunchTitle,
+                  leftPadding: kHorizontalPadding),
+              _buildQuickLaunch(),
+              SectionHeader(S.of(context).timerStartsActionsTitle,
+                  leftPadding: kHorizontalPadding),
+              for (var action in _buildStartedActions(theme)) action,
+              SectionHeader(S.of(context).timerEndsActionsTitle,
+                  leftPadding: kHorizontalPadding),
+              for (var action in _buildEndedActions(theme)) action,
+            ]),
+          ),
         ),
       ],
     );

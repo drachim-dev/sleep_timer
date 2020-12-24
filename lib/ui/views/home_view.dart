@@ -98,35 +98,42 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildBody(final ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: kHorizontalPadding, vertical: kVerticalPaddingBig),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          model.hasActiveTimer ? _buildActiveTimers(theme) : SizedBox(),
-          TimerSlider(
-            minValue: 1,
-            initialValue: model.initialTime,
-            onUpdateLabel: (value) => S.of(context).numberOfMinutesShort(value),
-            onChange: (value) => model.setTime(value),
-            showGlow: model.showGlow,
+    return LayoutBuilder(builder: (context, constraint) {
+      return SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraint.maxHeight),
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                model.hasActiveTimer ? _buildActiveTimers(theme) : SizedBox(),
+                TimerSlider(
+                  minValue: 1,
+                  initialValue: model.initialTime,
+                  onUpdateLabel: (value) =>
+                      S.of(context).numberOfMinutesShort(value),
+                  onChange: (value) => model.setTime(value),
+                  showGlow: model.showGlow,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      bottom: kFloatingActionButtonHeight),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [10, 20, 30, 60].map((value) {
+                        return Expanded(
+                          child: RoundedRectButton(
+                              title: '$value',
+                              onPressed: () => model.updateTime(value)),
+                        );
+                      }).toList()),
+                ),
+              ],
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: kVerticalPaddingBig),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [10, 20, 30, 60].map((value) {
-                  return Expanded(
-                    child: RoundedRectButton(
-                        title: '$value',
-                        onPressed: () => model.updateTime(value)),
-                  );
-                }).toList()),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget _buildActiveTimers(ThemeData theme) {

@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.7.5+26
+version: 0.7.5+27
 
 environment:
   sdk: '>=2.11.0 <3.0.0'
@@ -24,16 +24,16 @@ dependencies:
   auto_route: ^0.6.9
   flushbar: ^1.10.4
   flutter_native_admob: ^2.1.0+3
-  get_it: ^5.0.1
+  get_it: ^5.0.3
   in_app_purchase: ^0.3.4+16
   injectable:
   introduction_screen: ^1.0.9
   logger: ^0.9.4
   observable_ish:
   preferences: ^5.2.1
-  provider: ^4.3.2+2
+  provider: ^4.3.2+3
   shared_preferences: '>=0.5.12+4 <2.0.0'
-  stacked: ^1.7.6
+  stacked: ^1.7.7
   stacked_services: ^0.6.0+1
   url_launcher: ^5.7.10
 
@@ -42,7 +42,7 @@ dependencies:
     # Add unpublished plugins from private repo
     # https://flutter.dev/docs/development/packages-and-plugins/using-packages#dependencies-on-unpublished-packages
     # git:
-    # url: git@github.com:FRiGiDiTy/device_functions.git
+    # url: git@github.com:drachim-dev/device_functions.git
 
   flutter:
     sdk: flutter
@@ -51,15 +51,15 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.1+1
+  cupertino_icons: ^1.0.2
 
 dev_dependencies:
   pedantic: ^1.9.2
   auto_route_generator:
   injectable_generator:
   build_runner:
-  pigeon:
-  flutter_test:
+  pigeon: ^0.1.17  
+flutter_test:
     sdk: flutter
 
 flutter_intl:

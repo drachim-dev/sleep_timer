@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const double kVerticalPaddingSmall = kVerticalPadding / 2;
 const double kVerticalPadding = 16;
 const double kVerticalPaddingBig = kVerticalPadding * 2;
+const double kFloatingActionButtonHeight = 72;
 const double kHorizontalPaddingSmall = kHorizontalPadding / 2;
 const double kHorizontalPadding = 16;
 const double kPreferenceTitleLeftPadding = 16;
