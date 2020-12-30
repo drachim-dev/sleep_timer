@@ -804,6 +804,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Not supported by device`
+  String get notSupported {
+    return Intl.message(
+      'Not supported by device',
+      name: 'notSupported',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

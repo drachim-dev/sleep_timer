@@ -63,8 +63,15 @@ class CancelResponse {
 class ExtendTimeResponse {
   String timerId;
 
-  /// The time in seconds the timer was extended by,
+  /// The time in seconds the timer was extended by.
   int additionalTime;
+}
+
+class CountDownRequest {
+  String timerId;
+
+  /// The new time after countdown in seconds.
+  int newTime;
 }
 
 class OpenRequest {
@@ -109,6 +116,7 @@ abstract class HostTimerApi {
 @FlutterApi()
 abstract class FlutterTimerApi {
   void onExtendTime(ExtendTimeResponse response);
+  void onCountDown(CountDownRequest request);
   void onContinueRequest(TimerRequest request);
   void onPauseRequest(TimerRequest request);
   void onCancelRequest(TimerRequest request);

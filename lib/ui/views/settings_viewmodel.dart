@@ -27,6 +27,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
       _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
       kDefaultExtendTimeByShake;
 
+  bool get hasAccelerometer => _deviceService.hasAccelerometer ?? true;
   bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;

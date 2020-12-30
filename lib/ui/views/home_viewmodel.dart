@@ -19,8 +19,8 @@ class HomeViewModel extends BaseViewModel {
   int _initialTime = kDefaultInitialTime;
   int get initialTime => _initialTime;
 
-  String _activeTimerId;
-  bool get hasActiveTimer => _activeTimerId != null;
+  String activeTimerId;
+  bool get hasActiveTimer => activeTimerId != null;
 
   HomeViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
@@ -45,7 +45,7 @@ class HomeViewModel extends BaseViewModel {
     final timerModel =
         TimerModel(_initialTime * 60, startActionList, actionList);
 
-    _activeTimerId = await _navigationService.navigateTo(Routes.timerView,
+    activeTimerId = await _navigationService.navigateTo(Routes.timerView,
         arguments: TimerViewArguments(timerModel: timerModel));
     notifyListeners();
   }
@@ -53,10 +53,10 @@ class HomeViewModel extends BaseViewModel {
   void openActiveTimer() async {
     if (hasActiveTimer) {
       final timerModel = TimerServiceManager.getInstance()
-          .getTimerService(_activeTimerId)
+          .getTimerService(activeTimerId)
           .timerModel;
 
-      _activeTimerId = await _navigationService.navigateTo(Routes.timerView,
+      activeTimerId = await _navigationService.navigateTo(Routes.timerView,
           arguments: TimerViewArguments(timerModel: timerModel));
       notifyListeners();
     }

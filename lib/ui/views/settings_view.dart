@@ -168,11 +168,14 @@ class _SettingsViewState extends State<SettingsView>
   List<Widget> _buildTimerSettings(final ThemeData theme) {
     return [
       PopupMenuButton(
+        enabled: model.hasAccelerometer,
         child: ListTile(
+          enabled: model.hasAccelerometer,
           leading: Icon(Icons.timer_outlined),
           title: Text(S.of(context).prefsExtendTimeOnShake),
-          subtitle:
-              Text(S.of(context).numberOfMinutesLong(model.extendTimeByShake)),
+          subtitle: model.hasAccelerometer
+              ? Text(S.of(context).numberOfMinutesLong(model.extendTimeByShake))
+              : Text(S.of(context).notSupported),
         ),
         tooltip: S.of(context).extendTimeByShakeMenuToolTip,
         offset: Offset(1, 0),

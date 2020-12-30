@@ -19,6 +19,7 @@ class NotificationReceiver : BroadcastReceiver() {
         const val ACTION_PAUSE_NOTIFICATION = "ACTION_PAUSE_NOTIFICATION"
         const val ACTION_ELAPSED_NOTIFICATION = "ACTION_ELAPSED_NOTIFICATION"
         const val ACTION_EXTEND = "ACTION_EXTEND"
+        const val ACTION_COUNTDOWN = "ACTION_COUNTDOWN"
         const val ACTION_CONTINUE_REQUEST = "ACTION_CONTINUE_REQUEST"
         const val ACTION_PAUSE_REQUEST = "ACTION_PAUSE_REQUEST"
         const val ACTION_RESTART_REQUEST = "ACTION_RESTART_REQUEST"
@@ -31,6 +32,7 @@ class NotificationReceiver : BroadcastReceiver() {
         const val KEY_PAUSE_REQUEST = "KEY_PAUSE_REQUEST"
         const val KEY_CANCEL_REQUEST = "KEY_CANCEL_REQUEST"
         const val KEY_EXTEND_RESPONSE = "KEY_EXTEND_RESPONSE"
+        const val KEY_COUNTDOWN_REQUEST = "KEY_COUNTDOWN_REQUEST"
         const val KEY_RESTART_REQUEST = "KEY_RESTART_REQUEST"
         const val KEY_TIMER_ID = "KEY_TIMER_ID"
         private const val REQUEST_CODE_OPEN = 100
@@ -45,7 +47,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         this.context = context
-        Log.wtf(TAG, intent.action)
+        Log.d(TAG, "intent action: ${intent.action}")
         val map: HashMap<*, *>?
         when (intent.action) {
             ACTION_SHOW_RUNNING -> {
@@ -75,7 +77,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setSmallIcon(R.drawable.ic_hourglass_full)
                 .setContentIntent(createOpenIntent(timerId))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(true)
                 .setUsesChronometer(true)
                 .setOngoing(true)
@@ -127,6 +129,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setContentTitle(request.title)
                 .setContentText(request.description)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
                 .setContentIntent(createOpenIntent(timerId))
@@ -146,6 +149,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(request.description))
                 .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
                 .setContentIntent(createOpenIntent(timerId))

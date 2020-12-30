@@ -127,7 +127,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   @override
   void onExtendTime(ExtendTimeResponse arg) {
     final timerId = arg.timerId;
-    log.i('extend time by: ${arg.additionalTime} for timer with id $timerId');
+    log.d('extend time by: ${arg.additionalTime} for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -135,16 +135,28 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
+  void onCountDown(CountDownRequest arg) {
+    final timerId = arg.timerId;
+    log.d(
+        'new time after countdown: ${arg.newTime} for timer with id $timerId');
+
+    final _timerService =
+        TimerServiceManager.getInstance().getTimerService(timerId);
+    _timerService.setRemainingTime(arg.newTime);
+  }
+
+  @override
   void onOpen(OpenRequest arg) {
     final timerId = arg.timerId;
-    log.i('onOpen called for timer with id $timerId');
+    log.d('onOpen called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
     final _navigationService = locator<NavigationService>();
 
     // Navigate to timer detail view
-    _navigationService.popUntil((route) => route.isFirst);
+    _navigationService.clearStackAndShow(Routes.homeView,
+        arguments: HomeViewArguments(timerId: _timerService.timerModel.id));
     _navigationService.navigateTo(Routes.timerView,
         arguments: TimerViewArguments(timerModel: _timerService.timerModel));
   }
@@ -152,7 +164,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   @override
   void onPauseRequest(TimerRequest arg) {
     final timerId = arg.timerId;
-    log.i('onPauseRequest requested for timer with id $timerId');
+    log.d('onPauseRequest requested for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -162,7 +174,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   @override
   void onCancelRequest(TimerRequest arg) {
     final timerId = arg.timerId;
-    log.i('onCancelRequest called for timer with id $timerId');
+    log.d('onCancelRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -172,7 +184,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   @override
   void onContinueRequest(TimerRequest arg) {
     final timerId = arg.timerId;
-    log.i('onContinueRequest called for timer with id $timerId');
+    log.d('onContinueRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
@@ -182,28 +194,28 @@ class FlutterApiHandler extends FlutterTimerApi {
   @override
   void onRestartRequest(TimerRequest arg) {
     final timerId = arg.timerId;
-    log.i('onRestartRequest called for timer with id $timerId');
+    log.d('onRestartRequest called for timer with id $timerId');
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.restartTimer();
+    _timerService.start();
   }
 
   @override
   void onAlarm(TimerRequest arg) {
-    log.i('onAlarm()');
+    log.d('onAlarm()');
     alarmCallback(arg.timerId);
   }
 
   @override
   WidgetUpdateResponse onWidgetUpdate() {
-    log.i('onWidgetUpdate called on dart side');
+    log.d('onWidgetUpdate called on dart side');
     return WidgetUpdateResponse()..title = 'Test ';
   }
 
   @override
   void onWidgetStartTimer() {
-    log.i('onWidgetStartTimer called on dart side');
+    log.d('onWidgetStartTimer called on dart side');
 
     final timerModel = TimerModel(120, startActionList, actionList);
     final _timerService = locator<TimerService>(param1: timerModel);

@@ -75,5 +75,6 @@
   "notificationTimerSet": "Zeit auf {time} Minuten festgelegt",
   "timerSettingsSectionTitle": "Timer",
   "prefsExtendTimeOnShake": "Verlängern durch Schütteln",
-  "extendTimeByShakeMenuToolTip": "Tippen, um die Zeit zu ändern"
+  "extendTimeByShakeMenuToolTip": "Tippen, um die Zeit zu ändern",
+  "notSupported": "Nicht vom Gerät unterstützt"
 }

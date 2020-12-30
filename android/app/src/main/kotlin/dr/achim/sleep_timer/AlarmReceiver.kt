@@ -18,9 +18,9 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         initializeFlutter()
         Log.e(TAG, "onReceive()")
-        val timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID)
-        val request = TimerRequest()
-        request.timerId = timerId
+        val request = TimerRequest().apply {
+            timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID)
+        }
         flutterTimerApi.onAlarm(request) { }
     }
 
@@ -30,6 +30,5 @@ class AlarmReceiver : BroadcastReceiver() {
             flutterTimerApi = FlutterTimerApi(flutterEngine.dartExecutor.binaryMessenger)
         }
     }
-
 
 }

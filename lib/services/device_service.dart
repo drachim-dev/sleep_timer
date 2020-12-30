@@ -22,6 +22,9 @@ class DeviceService with ReactiveServiceMixin {
   int _platformVersion = 0;
   int get platformVersion => _platformVersion;
 
+  bool _hasAccelerometer = true;
+  bool get hasAccelerometer => _hasAccelerometer;
+
   final RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
   bool get deviceAdmin => _deviceAdmin.value;
 
@@ -39,6 +42,7 @@ class DeviceService with ReactiveServiceMixin {
 
   Future<void> init() async {
     _platformVersion = await _deviceFunctionsPlatform.getPlatformVersion();
+    _hasAccelerometer = await _deviceFunctionsPlatform.hasAccelerometer();
     _deviceAdmin.value = await _deviceFunctionsPlatform.isDeviceAdminActive();
     _notificationSettingsAccess.value =
         await _deviceFunctionsPlatform.isNotificationAccessGranted();

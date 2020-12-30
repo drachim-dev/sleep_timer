@@ -75,5 +75,6 @@
   "notificationTimerSet": "Temporizador ajustado a {time} minutos",
   "timerSettingsSectionTitle": "Temporizador",
   "prefsExtendTimeOnShake": "Extiende el tiempo agitando",
-  "extendTimeByShakeMenuToolTip": "Toque para cambiar el tiempo"
+  "extendTimeByShakeMenuToolTip": "Toque para cambiar el tiempo",
+  "notSupported": "No es compatible con el dispositivo"
 }

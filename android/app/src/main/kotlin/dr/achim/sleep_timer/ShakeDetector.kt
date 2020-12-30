@@ -15,7 +15,8 @@ class ShakeDetector : SensorEventListener {
          * The gForce that is necessary to register as shake.
          * Must be greater than 1G (one earth gravity unit).
          */
-        private const val SHAKE_THRESHOLD_GRAVITY = 6.0f
+        private const val SHAKE_THRESHOLD_GRAVITY = 2.7f
+        private const val SHAKE_SLOP_TIME_MS = 200
         private const val SHAKE_COUNT_RESET_TIME_MS = 750
     }
 
@@ -49,13 +50,18 @@ class ShakeDetector : SensorEventListener {
             if (gForce > SHAKE_THRESHOLD_GRAVITY) {
                 val now = System.currentTimeMillis()
 
+                // ignore shake events too close to each other
+                if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now && mShakeTimestamp != 0L) {
+                    return
+                }
+
                 // reset the shake count after specified time of no shakes
                 if (mShakeTimestamp + SHAKE_COUNT_RESET_TIME_MS < now) {
                     mShakeCount = 0
                 }
                 mShakeTimestamp = now
                 mShakeCount++
-                if (mShakeCount == 3) {
+                if (mShakeCount >= 2) {
                     mListener!!.onShake(mShakeCount)
                 }
             }

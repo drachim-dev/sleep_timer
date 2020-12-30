@@ -55,8 +55,11 @@ class AutoRouter extends RouterBase {
       );
     },
     HomeView: (data) {
+      final args = data.getArgs<HomeViewArguments>(
+        orElse: () => HomeViewArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => HomeView(),
+        builder: (context) => HomeView(timerId: args.timerId),
         settings: data,
       );
     },
@@ -101,6 +104,12 @@ class AutoRouter extends RouterBase {
 /// ************************************************************************
 /// Arguments holder classes
 /// *************************************************************************
+
+/// HomeView arguments holder class
+class HomeViewArguments {
+  final String timerId;
+  HomeViewArguments({this.timerId});
+}
 
 /// TimerView arguments holder class
 class TimerViewArguments {

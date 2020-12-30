@@ -32,8 +32,8 @@ Future<GetIt> $initGetIt(
       () => thirdPartyServicesModule.iapService);
   gh.lazySingleton<NavigationService>(
       () => thirdPartyServicesModule.navigationService);
-  final sharedPreferences = await thirdPartyServicesModule.prefsService;
-  gh.factory<SharedPreferences>(() => sharedPreferences);
+  final resolvedSharedPreferences = await thirdPartyServicesModule.prefsService;
+  gh.factory<SharedPreferences>(() => resolvedSharedPreferences);
   gh.lazySingleton<ThemeService>(() => ThemeService());
   gh.factoryParam<TimerService, TimerModel, dynamic>(
       (timerModel, _) => TimerService(timerModel));

@@ -10,6 +10,10 @@ import 'home_viewmodel.dart';
 enum MenuOption { settings }
 
 class HomeView extends StatefulWidget {
+  final String timerId;
+
+  const HomeView({this.timerId});
+
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -44,7 +48,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
     return ViewModelBuilder<HomeViewModel>.reactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (model) => this.model = model,
+        onModelReady: (model) {
+          this.model = model;
+
+          if (widget.timerId != null) {
+            this.model.activeTimerId = widget.timerId;
+          }
+        },
         builder: (context, model, child) {
           return Scaffold(
             appBar: _buildAppBar(theme),

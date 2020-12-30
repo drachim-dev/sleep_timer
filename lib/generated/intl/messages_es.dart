@@ -74,6 +74,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "introMediaTitle" : MessageLookupByLibrary.simpleMessage("Escucha tu música favorita"),
     "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("No se distraiga con los mensajes o notificaciones entrantes"),
     "introNoInterruptionsTitle" : MessageLookupByLibrary.simpleMessage("Sin interrupciones"),
+    "notSupported" : MessageLookupByLibrary.simpleMessage("No es compatible con el dispositivo"),
     "notificationActionCancel" : MessageLookupByLibrary.simpleMessage("Cancelar"),
     "notificationActionContinue" : MessageLookupByLibrary.simpleMessage("Continúa"),
     "notificationActionPause" : MessageLookupByLibrary.simpleMessage("Pausa"),

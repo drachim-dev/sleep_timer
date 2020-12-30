@@ -10,7 +10,7 @@
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <uses-feature android:name="android.hardware.sensor.accelerometer" />
+    <uses-feature android:required="false" android:name="android.hardware.sensor.accelerometer" />
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.

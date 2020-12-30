@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:observable_ish/observable_ish.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -18,8 +19,8 @@ enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
 class TimerService with ReactiveServiceMixin {
   final Logger log = getLogger();
   final _deviceService = locator<DeviceService>();
+  final _prefsService = locator<SharedPreferences>();
   final TimerModel timerModel;
-  Timer _timer;
 
   final RxValue<TimerStatus> _status = RxValue(initial: TimerStatus.INITIAL);
   TimerStatus get status => _status.value;
@@ -33,27 +34,16 @@ class TimerService with ReactiveServiceMixin {
   final RxValue<int> _remainingTime;
   int get remainingTime => _remainingTime.value;
 
-  void setRemainingTime(final int value) {
-    _remainingTime.value = value;
-  }
-
   int _maxTime;
   int get maxTime => _maxTime;
 
   void start() {
-    const interval = Duration(seconds: 1);
-
     if (status == TimerStatus.ELAPSED) {
       _resetTime();
-    }
-
-    _timer = Timer.periodic(interval, (timer) {
-      remainingTime > 0 ? setRemainingTime(remainingTime - 1) : _elapseTimer();
-    });
-
-    if (status == TimerStatus.INITIAL) {
+    } else if (status == TimerStatus.INITIAL) {
       handleStartActions();
     }
+
     _status.value = TimerStatus.RUNNING;
 
     _deviceService.showRunningNotification(
@@ -62,14 +52,14 @@ class TimerService with ReactiveServiceMixin {
         remainingTime: remainingTime);
   }
 
-  void restartTimer() {
-    setRemainingTime(timerModel.initialTimeInSeconds);
-    start();
-  }
+  void setRemainingTime(final int seconds) => _remainingTime.value = seconds;
 
   void extendTime(final int seconds) {
-    _remainingTime.value += seconds ?? kDefaultExtendTimeByShake * 60;
+    final defaultExtendTime =
+        _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
+            kDefaultExtendTimeByShake;
 
+    _remainingTime.value += seconds ?? defaultExtendTime * 60;
     setMaxTime();
 
     if (status == TimerStatus.RUNNING) {
@@ -86,7 +76,6 @@ class TimerService with ReactiveServiceMixin {
     _status.value = TimerStatus.PAUSING;
     _deviceService.showPauseNotification(
         timerId: timerModel.id, remainingTime: remainingTime);
-    _disposeTimer();
   }
 
   Future<void> cancelTimer() async {
@@ -94,21 +83,10 @@ class TimerService with ReactiveServiceMixin {
     // ignore: unawaited_futures
     _deviceService.cancelNotification(timerId: timerModel.id);
     _resetTime();
-    _disposeTimer();
   }
 
   void _resetTime() {
-    setRemainingTime(timerModel.initialTimeInSeconds);
-  }
-
-  void _elapseTimer() {
-    _status.value = TimerStatus.ELAPSED;
-    _disposeTimer();
-  }
-
-  void _disposeTimer() {
-    _timer?.cancel();
-    _timer = null;
+    _remainingTime.value = timerModel.initialTimeInSeconds;
   }
 
   Future<void> handleStartActions() async {
@@ -129,6 +107,8 @@ class TimerService with ReactiveServiceMixin {
 
   Future<void> handleEndedActions() async {
     log.d('handleEndedActions()');
+    _status.value = TimerStatus.ELAPSED;
+    setRemainingTime(0);
 
     if (timerModel.mediaAction.enabled) await _deviceService.toggleMedia(false);
     if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29) {

@@ -40,6 +40,32 @@ public class Messages {
   }
 
   /** Generated class from Pigeon that represents data sent in messages. */
+  public static class CountDownRequest {
+    private String timerId;
+    public String getTimerId() { return timerId; }
+    public void setTimerId(String setterArg) { this.timerId = setterArg; }
+
+    private Long newTime;
+    public Long getNewTime() { return newTime; }
+    public void setNewTime(Long setterArg) { this.newTime = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("timerId", timerId);
+      toMapResult.put("newTime", newTime);
+      return toMapResult;
+    }
+    static CountDownRequest fromMap(HashMap map) {
+      CountDownRequest fromMapResult = new CountDownRequest();
+      Object timerId = map.get("timerId");
+      fromMapResult.timerId = (String)timerId;
+      Object newTime = map.get("newTime");
+      fromMapResult.newTime = (newTime == null) ? null : ((newTime instanceof Integer) ? (Integer)newTime : (Long)newTime);
+      return fromMapResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
   public static class TimerRequest {
     private String timerId;
     public String getTimerId() { return timerId; }
@@ -419,6 +445,14 @@ public class Messages {
     public void onExtendTime(ExtendTimeResponse argInput, Reply<Void> callback) {
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onExtendTime", new StandardMessageCodec());
+      HashMap inputMap = argInput.toMap();
+      channel.send(inputMap, channelReply -> {
+        callback.reply(null);
+      });
+    }
+    public void onCountDown(CountDownRequest argInput, Reply<Void> callback) {
+      BasicMessageChannel<Object> channel =
+          new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.FlutterTimerApi.onCountDown", new StandardMessageCodec());
       HashMap inputMap = argInput.toMap();
       channel.send(inputMap, channelReply -> {
         callback.reply(null);

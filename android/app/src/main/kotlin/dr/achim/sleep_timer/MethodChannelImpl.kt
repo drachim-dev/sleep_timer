@@ -34,7 +34,6 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             action = AlarmService.ACTION_START
             putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap())
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
         } else {
@@ -50,6 +49,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
     }
 
     override fun showRunningNotification(arg: TimeNotificationRequest): NotificationResponse {
+        stopForegroundService()
         val response = NotificationResponse().apply {
             timerId = arg.timerId
             success = true
@@ -59,7 +59,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             return response.apply { success = false }
         }
 
-        Log.wtf(TAG, "Request to show running notification for timer with id ${response.timerId}")
+        Log.d(TAG, "Request to show running notification for timer with id ${response.timerId}")
         startForegroundService(arg)
         // Notification will be triggered by broadcast when foreground service is ready
         return response
@@ -75,7 +75,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             return response.apply { success = false }
         }
 
-        Log.wtf(TAG, "Request to show pause notification for timer with id ${response.timerId}")
+        Log.d(TAG, "Request to show pause notification for timer with id ${response.timerId}")
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_PAUSE_NOTIFICATION
@@ -96,7 +96,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             return response.apply { success = false }
         }
 
-        Log.wtf(TAG, "Request to show elapsed notification for timer with id ${response.timerId}")
+        Log.d(TAG, "Request to show elapsed notification for timer with id ${response.timerId}")
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_ELAPSED_NOTIFICATION
@@ -116,7 +116,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         if (response.timerId == null) {
             return response.apply { success = false }
         }
-        Log.wtf(TAG, "Request to cancel notification for timer with id ${response.timerId}")
+        Log.d(TAG, "Request to cancel notification for timer with id ${response.timerId}")
         stopForegroundService()
         NotificationManagerCompat.from(context).cancel(NotificationReceiver.NOTIFICATION_ID)
 

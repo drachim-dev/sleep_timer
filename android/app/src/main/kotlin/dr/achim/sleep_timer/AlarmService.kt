@@ -3,6 +3,7 @@ package dr.achim.sleep_timer
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Build
@@ -27,8 +28,10 @@ class AlarmService : Service() {
         private const val REQUEST_CODE_ALARM = 700
     }
 
-    private lateinit var sensorManager: SensorManager
+    private var timer: Timer = Timer()
+    private lateinit var notification: Notification
 
+    private var sensorManager: SensorManager? = null
     private var shakeDetector: ShakeDetector? = null
     private var accelerometer: Sensor? = null
     private var pendingAlarmIntent: PendingIntent? = null
@@ -36,17 +39,19 @@ class AlarmService : Service() {
     override fun onCreate() {
         super.onCreate()
         initNotificationChannel()
-        initShakeDetector()
-        val notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
+        if(packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
+            initShakeDetector()
+        }
+        notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
         startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
-        Log.wtf(TAG, "AlarmService onCreate")
+        Log.d(TAG, "AlarmService onCreate")
     }
 
     private fun initNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_LOW
             val notificationChannel = NotificationChannel(NotificationReceiver.NOTIFICATION_CHANNEL_ID, "Active timer", importance)
             notificationChannel.description = "Notify about running or pausing timers"
             NotificationManagerCompat.from(this).createNotificationChannel(notificationChannel)
@@ -55,22 +60,38 @@ class AlarmService : Service() {
 
     private fun initShakeDetector() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        shakeDetector = ShakeDetector()
+        accelerometer = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        if(accelerometer != null) {
+            shakeDetector = ShakeDetector()
+        }
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         isRunning = true
-        Log.wtf(TAG, intent.action)
+        Log.d(TAG, "intent action: ${intent.action}")
         when (intent.action) {
             ACTION_START -> {
                 val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<*, *>?
                 val request: TimeNotificationRequest = TimeNotificationRequest.fromMap(map)
                 startAlarm(request)
-                val showRunningIntent = Intent(this, NotificationReceiver::class.java)
-                showRunningIntent.action = NotificationReceiver.ACTION_SHOW_RUNNING
-                showRunningIntent.putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, map)
+                val showRunningIntent = Intent(this, NotificationReceiver::class.java).apply {
+                    action = NotificationReceiver.ACTION_SHOW_RUNNING
+                    putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, map)
+                }
                 sendBroadcast(showRunningIntent)
+                timer.scheduleAtFixedRate(object : TimerTask() {
+                    override fun run() {
+                        val response = Messages.CountDownRequest().apply {
+                            timerId = request.timerId
+                            newTime = request.remainingTime--
+                        }
+                        val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                            action = NotificationReceiver.ACTION_COUNTDOWN
+                            putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap())
+                        }
+                        sendBroadcast(countDownIntent)
+                    }
+                }, 0, 1000)
             }
             ACTION_STOP -> {
                 stopForeground(true)
@@ -100,12 +121,13 @@ class AlarmService : Service() {
 
         shakeDetector?.setOnShakeListener(object : OnShakeListener {
             override fun onShake(count: Int) {
-                val intent = Intent(applicationContext, NotificationActionReceiver::class.java)
-                intent.action = NotificationReceiver.ACTION_EXTEND
-
                 val response = ExtendTimeResponse()
                 response.timerId = request.timerId
-                intent.putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap())
+
+                val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                    action = NotificationReceiver.ACTION_EXTEND
+                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap())
+                }
                 sendBroadcast(intent)
 
                 val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -117,13 +139,14 @@ class AlarmService : Service() {
             }
         })
 
-        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        sensorManager?.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
     }
 
     private fun stopAlarm() {
         if (pendingAlarmIntent != null) {
             val manager = getSystemService(ALARM_SERVICE) as AlarmManager
             manager.cancel(pendingAlarmIntent)
+            timer.cancel()
         }
     }
 
@@ -132,9 +155,10 @@ class AlarmService : Service() {
     }
 
     override fun onDestroy() {
-        Log.wtf(TAG, "onDestroy Service")
+        Log.d(TAG, "onDestroy Service")
         stopAlarm()
-        sensorManager.unregisterListener(shakeDetector)
+        timer.cancel()
+        sensorManager?.unregisterListener(shakeDetector)
         isRunning = false
     }
 

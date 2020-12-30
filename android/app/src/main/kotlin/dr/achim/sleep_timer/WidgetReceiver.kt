@@ -13,12 +13,10 @@ class WidgetReceiver : BroadcastReceiver() {
     }
 
     private lateinit var flutterTimerApi: FlutterTimerApi
-    private var context: Context? = null
 
     override fun onReceive(context: Context, intent: Intent) {
-        this.context = context
         initializeFlutter()
-        Log.wtf(TAG, intent.action)
+        Log.d(TAG, "intent action: ${intent.action}")
         when (intent.action) {
             TimerWidget.ACTION_CODE_WIDGET_START_TIMER -> flutterTimerApi.onWidgetStartTimer { }
             TimerWidget.ACTION_CODE_WIDGET_SETTINGS -> { }
@@ -27,15 +25,10 @@ class WidgetReceiver : BroadcastReceiver() {
     }
 
     private fun initializeFlutter() {
-        if (context == null) {
-            Log.e(TAG, "Context is null")
-            return
-        }
         val flutterEngine = FlutterEngineCache.getInstance()[MainActivity.ENGINE_ID]
         if (flutterEngine != null) {
             flutterTimerApi = FlutterTimerApi(flutterEngine.dartExecutor.binaryMessenger)
         }
     }
-
 
 }

@@ -75,5 +75,6 @@
   "notificationTimerSet": "Timer set to {time} minutes",
   "timerSettingsSectionTitle": "Timer settings",
   "prefsExtendTimeOnShake": "Extend on phone shake",
-  "extendTimeByShakeMenuToolTip": "Tap to change time"
+  "extendTimeByShakeMenuToolTip": "Tap to change time",
+  "notSupported": "Not supported by device"
 }

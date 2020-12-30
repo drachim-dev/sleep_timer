@@ -28,6 +28,27 @@ class ExtendTimeResponse {
   }
 }
 
+class CountDownRequest {
+  String timerId;
+  int newTime;
+
+  // ignore: unused_element
+  Object encode() {
+    final Map<Object, Object> pigeonMap = <Object, Object>{};
+    pigeonMap['timerId'] = timerId;
+    pigeonMap['newTime'] = newTime;
+    return pigeonMap;
+  }
+
+  // ignore: unused_element
+  static CountDownRequest decode(Object message) {
+    final Map<Object, Object> pigeonMap = message as Map<Object, Object>;
+    return CountDownRequest()
+      ..timerId = pigeonMap['timerId'] as String
+      ..newTime = pigeonMap['newTime'] as int;
+  }
+}
+
 class TimerRequest {
   String timerId;
 
@@ -306,6 +327,7 @@ class Package {
 
 abstract class FlutterTimerApi {
   void onExtendTime(ExtendTimeResponse arg);
+  void onCountDown(CountDownRequest arg);
   void onContinueRequest(TimerRequest arg);
   void onPauseRequest(TimerRequest arg);
   void onCancelRequest(TimerRequest arg);
@@ -327,6 +349,22 @@ abstract class FlutterTimerApi {
           }
           final ExtendTimeResponse input = ExtendTimeResponse.decode(message);
           api.onExtendTime(input);
+          return;
+        });
+      }
+    }
+    {
+      const BasicMessageChannel<Object> channel =
+          BasicMessageChannel<Object>('dev.flutter.pigeon.FlutterTimerApi.onCountDown', StandardMessageCodec());
+      if (api == null) {
+        channel.setMessageHandler(null);
+      } else {
+        channel.setMessageHandler((Object message) async {
+          if (message == null) {
+            return;
+          }
+          final CountDownRequest input = CountDownRequest.decode(message);
+          api.onCountDown(input);
           return;
         });
       }
