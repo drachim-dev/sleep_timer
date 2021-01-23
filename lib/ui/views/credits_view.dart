@@ -10,6 +10,9 @@ class CreditsView extends StatelessWidget {
   static final List _imageCredits = [
     'Icons from the Noun Project',
     Credit(
+        title: 'Philips Hue Bridge by Derrick Snider',
+        url: 'https://thenounproject.com/term/phillips-hue-bridge/2731255'),
+    Credit(
         title: 'Sleep by Nithinan Tatah',
         url: 'https://thenounproject.com/term/sleep/2411493/'),
     'Illustrations by Freepik Stories',
@@ -17,14 +20,20 @@ class CreditsView extends StatelessWidget {
         title: 'Creativity Illustrations | Cuate Style',
         url: 'https://stories.freepik.com/idea'),
     Credit(
-        title: 'Mobile marketing Illustrations | Pana Style',
-        url: 'https://stories.freepik.com/business'),
+        title: 'Flashlight Illustrations | Cuate Style',
+        url: 'https://stories.freepik.com/people'),
+    Credit(
+        title: 'Floating Illustrations | Bro Style',
+        url: 'https://stories.freepik.com/people'),
     Credit(
         title: 'Headphone Illustrations | Amico Style',
         url: 'https://stories.freepik.com/music'),
     Credit(
-        title: 'Floating | Bro Style',
-        url: 'https://stories.freepik.com/people'),
+        title: 'Mobile marketing Illustrations | Pana Style',
+        url: 'https://stories.freepik.com/business'),
+    Credit(
+        title: 'Web Illustrations | Cuate Style',
+        url: 'https://storyset.com/web'),
   ];
 
   static final List _packageCredits = [
@@ -35,6 +44,7 @@ class CreditsView extends StatelessWidget {
         title: 'flutter_native_admob',
         url: 'https://pub.dev/packages/flutter_native_admob'),
     Credit(title: 'get_it', url: 'https://pub.dev/packages/get_it'),
+    Credit(title: 'hue_dart', url: 'https://pub.dev/packages/hue_dart'),
     Credit(
         title: 'in_app_purchase',
         url: 'https://pub.dev/packages/in_app_purchase'),
@@ -42,6 +52,9 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'introduction_screen',
         url: 'https://pub.dev/packages/introduction_screen'),
+    Credit(
+        title: 'json_annotation',
+        url: 'https://pub.dev/packages/json_annotation'),
     Credit(title: 'logger', url: 'https://pub.dev/packages/logger'),
     Credit(
         title: 'observable_ish',

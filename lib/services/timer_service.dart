@@ -11,6 +11,7 @@ import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
+import 'package:sleep_timer/services/light_service.dart';
 import 'package:stacked/stacked.dart';
 
 enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
@@ -19,6 +20,7 @@ enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
 class TimerService with ReactiveServiceMixin {
   final Logger log = getLogger();
   final _deviceService = locator<DeviceService>();
+  final _lightService = locator<LightService>();
   final _prefsService = locator<SharedPreferences>();
   final TimerModel timerModel;
 
@@ -94,10 +96,9 @@ class TimerService with ReactiveServiceMixin {
       await _deviceService.setVolume(timerModel.volumeAction.value.truncate());
     }
 
-    if (timerModel.playMusicAction.enabled) {
-      print('Play music');
+    if (timerModel.lightAction.enabled) {
+      await _lightService.toggleLights(false);
     }
-    //_deviceService.setVolume(timerModel.volumeAction.value.truncate());
 
     if (timerModel.doNotDisturbAction.enabled &&
         _deviceService.notificationSettingsAccess) {

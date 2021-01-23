@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
-import 'package:preferences/preference_page.dart';
-import 'package:preferences/preferences.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
@@ -32,9 +31,10 @@ class _SettingsViewState extends State<SettingsView>
 
   SettingsViewModel model;
 
+  final ScrollController _scrollController = ScrollController();
   AnimationController _controller;
   Animatable<Color> blinkingFocus;
-  Duration snackBarDelay = const Duration(seconds: 2);
+  Duration snackBarDelay = const Duration(milliseconds: 200);
 
   @override
   void initState() {
@@ -47,17 +47,33 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      final message = widget.deviceAdminFocused
-          ? S.current.prefsHintEnableDeviceAdmin
-          : S.current.prefsHintEnableAccessToNotificationSettings;
+      var message = '';
 
-      WidgetsBinding.instance.addPostFrameCallback(
-          (_) => Future.delayed(snackBarDelay).then((value) {
-                mainScaffoldMessengerKey.currentState.showSnackBar(SnackBar(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    content: Text(message)));
-              }));
+      if (widget.deviceAdminFocused) {
+        message = S.current.prefsHintEnableDeviceAdmin;
+      }
+
+      if (widget.notificationSettingsAccessFocused) {
+        message = S.current.prefsHintEnableAccessToNotificationSettings;
+      }
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(snackBarDelay).then((value) {
+          mainScaffoldMessengerKey.currentState.showSnackBar(SnackBar(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              content: Text(message)));
+        });
+      });
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 500)).then((value) => {
+              _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: kThemeAnimationDuration,
+                  curve: Curves.easeOut)
+            });
+      });
     }
   }
 
@@ -99,9 +115,10 @@ class _SettingsViewState extends State<SettingsView>
     return AppBar(title: Text(S.of(context).settings));
   }
 
-  PreferencePage _buildBody(final ThemeData theme) {
-    return PreferencePage(
-      [
+  Widget _buildBody(final ThemeData theme) {
+    return ListView(
+      controller: _scrollController,
+      children: [
         SectionHeader(S.of(context).appearanceSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildAppearance(theme)) option,
@@ -260,16 +277,6 @@ class _SettingsViewState extends State<SettingsView>
                   onChanged: model.onChangeNotificationSettingsAccess),
             );
           }),
-      // TODO: Enable connection to philips hue
-      if (false)
-        SwitchListTile(
-            secondary: Icon(Icons.lightbulb_outline),
-            title: Text('Philips Hue'),
-            subtitle: Text(
-                'Connect to your Philips hue bridge. Enables light actions.'),
-            isThreeLine: true,
-            value: model.deviceAdmin,
-            onChanged: null),
     ];
   }
 }

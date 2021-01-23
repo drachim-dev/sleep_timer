@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleep_timer/generated/l10n.dart';
 
 class SliderDialog extends StatefulWidget {
   final String title;
@@ -45,11 +46,11 @@ class _SliderDialogState extends State<SliderDialog> {
         actions: [
           FlatButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('CANCEL'),
+            child: Text(S.of(context).dialogCancel),
           ),
           FlatButton(
             onPressed: () => Navigator.pop(context, _initialValue),
-            child: Text('DONE'),
+            child: Text(S.of(context).dialogDone),
           )
         ]);
   }

@@ -20,6 +20,7 @@ import 'package:sleep_timer/ui/widgets/sabt.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
 import 'package:sleep_timer/ui/widgets/timer_slider.dart';
+import 'package:sleep_timer/ui/widgets/toggle_button.dart';
 import 'package:stacked/stacked.dart';
 
 import 'timer_viewmodel.dart';
@@ -122,13 +123,13 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   SliverAppBar _buildAppBar(final ThemeData theme) {
-    final titleStyle = theme.textTheme.headline2
-        .copyWith(shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
+    final titleStyle = theme.textTheme.headline2.copyWith(
+        fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
         primary: true,
         pinned: true,
-        expandedHeight: 310,
+        expandedHeight: 286,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => model.navigateBack(),
@@ -148,17 +149,19 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         elevation: 0,
         flexibleSpace: FlexibleSpaceBar(
           background: Padding(
-            padding: const EdgeInsets.only(top: 72, bottom: 86),
-            child: TimerSlider(
-                initialValue: model.remainingTime,
-                maxValue: model.maxTime,
-                hasHandle: false,
-                showGlow: model.showGlow,
-                labelStyle: titleStyle,
-                size: 180,
-                onUpdateLabel: (value) {
-                  return Utils.secondsToString(value.round(), spacing: true);
-                }),
+            padding: const EdgeInsets.only(top: kVerticalPadding, bottom: 80),
+            child: SafeArea(
+              child: TimerSlider(
+                  initialValue: model.remainingTime,
+                  maxValue: model.maxTime,
+                  hasHandle: false,
+                  showGlow: model.showGlow,
+                  labelStyle: titleStyle,
+                  size: 180,
+                  onUpdateLabel: (value) {
+                    return Utils.secondsToString(value.round(), spacing: true);
+                  }),
+            ),
           ),
         ),
         bottom: PreferredSize(
@@ -179,10 +182,29 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               _buildQuickLaunch(),
               SectionHeader(S.of(context).timerStartsActionsTitle,
                   leftPadding: kHorizontalPadding),
-              for (var action in _buildStartedActions(theme)) action,
+              if (model.showLongPressHint)
+                Dismissible(
+                  key: UniqueKey(),
+                  child: Card(
+                    margin: EdgeInsets.symmetric(
+                        horizontal: kHorizontalPadding,
+                        vertical: kVerticalPaddingSmall),
+                    elevation: 0,
+                    child: ListTile(
+                      leading: Icon(Icons.info_outline),
+                      title: Text(S.of(context).longPressToAdjust),
+                      trailing: IconButton(
+                          icon: Icon(Icons.delete_sweep_outlined),
+                          onPressed: () => model.dismissLongPressHint()),
+                    ),
+                  ),
+                  onDismissed: (direction) => model.dismissLongPressHint(),
+                ),
+              _buildCompactStartedActions(theme),
+              if (!model.isAdFree) _buildAd(theme),
               SectionHeader(S.of(context).timerEndsActionsTitle,
                   leftPadding: kHorizontalPadding),
-              for (var action in _buildEndedActions(theme)) action,
+              _buildEndedActions(theme),
             ]),
           ),
         ),
@@ -271,7 +293,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       switch (notification.direction) {
         case ScrollDirection.forward:
           if (notification.metrics.maxScrollExtent !=
-              notification.metrics.minScrollExtent) {
+                  notification.metrics.minScrollExtent ||
+              _hideFabAnimController.value == 0.0) {
             _hideFabAnimController.forward();
           }
           break;
@@ -298,86 +321,96 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         }).toList());
   }
 
-  List<Widget> _buildStartedActions(final ThemeData theme) {
-    return [
-      ListTile(
-        leading: Icon(Icons.volume_down_outlined),
-        title: Text(model.timerModel.volumeAction.title),
-        subtitle: Text(model.timerModel.volumeAction.description),
-        onTap: () => _showVolumeLevelPicker(),
-        trailing: Switch(
-          value: model.timerModel.volumeAction.enabled,
-          onChanged: model.onChangeVolume,
-        ),
+  Widget _buildCompactStartedActions(final ThemeData theme) {
+    final size = 36.0;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ToggleButton(
+            label: '${model.timerModel.volumeAction.description}',
+            activeIcon: Icons.volume_down_outlined,
+            disabledIcon: Icons.volume_mute_outlined,
+            onChanged: (value) {
+              value && model.timerModel.volumeAction.value == null
+                  ? _showVolumeLevelPicker()
+                  : model.onChangeVolume(value);
+            },
+            onLongPress: _showVolumeLevelPicker,
+            value: model.timerModel.volumeAction.enabled,
+            size: size,
+          ),
+          ToggleButton(
+            label: model.timerModel.lightAction.title,
+            activeIcon: Icons.flash_off_outlined,
+            disabledIcon: Icons.flash_on_outlined,
+            onChanged: model.onChangeLight,
+            onLongPress: model.navigateToLightsGroups,
+            value: model.timerModel.lightAction.enabled,
+            size: size,
+          ),
+          ToggleButton(
+            label: model.timerModel.doNotDisturbAction.title,
+            activeIcon: Icons.do_not_disturb_on,
+            disabledIcon: Icons.do_not_disturb,
+            onChanged: model.hasNotificationSettingsAccess
+                ? model.onChangeDoNotDisturb
+                : (value) => model.navigateToSettings(
+                    notificationSettingsAccessFocused: true),
+            value: model.timerModel.doNotDisturbAction.enabled &&
+                model.hasNotificationSettingsAccess,
+            size: size,
+          ),
+        ],
       ),
-      if (!model.isAdFree) _buildAd(theme),
-      SwitchListTile(
-        secondary: Icon(Icons.do_not_disturb_on),
-        title: Text(model.timerModel.doNotDisturbAction.title),
-        subtitle: Text(model.timerModel.doNotDisturbAction.description),
-        value: model.timerModel.doNotDisturbAction.enabled &&
-            model.notificationSettingsAccess,
-        onChanged: model.notificationSettingsAccess
-            ? model.onChangeDoNotDisturb
-            : (value) => model.navigateToSettings(
-                notificationSettingsAccessFocused: true),
-      ),
-    ];
+    );
   }
 
-  List<Widget> _buildEndedActions(final ThemeData theme) {
-    return [
-      SwitchListTile(
-        secondary: Icon(Icons.music_off_outlined),
-        title: Text(model.timerModel.mediaAction.title),
-        subtitle: Text(model.timerModel.mediaAction.description),
-        value: model.timerModel.mediaAction.enabled,
-        onChanged: model.onChangeMedia,
-      ),
-      if (model.platformVersion < 29)
-        SwitchListTile(
-          secondary: Icon(Icons.wifi_off_outlined),
-          title: Text(model.timerModel.wifiAction.title),
-          subtitle: Text(model.timerModel.wifiAction.description),
-          value: model.timerModel.wifiAction.enabled,
-          onChanged: model.onChangeWifi,
-        ),
-      SwitchListTile(
-        secondary: Icon(Icons.bluetooth_disabled_outlined),
-        title: Text(model.timerModel.bluetoothAction.title),
-        subtitle: Text(model.timerModel.bluetoothAction.description),
-        value: model.timerModel.bluetoothAction.enabled,
-        onChanged: model.onChangeBluetooth,
-      ),
-      SwitchListTile(
-        secondary: Icon(Icons.tv_off_outlined),
-        title: Text(model.timerModel.screenAction.title),
-        subtitle: Text(model.timerModel.screenAction.description),
-        value: model.timerModel.screenAction.enabled && model.deviceAdmin,
-        onChanged: model.onChangeScreen,
-      ),
-      // TODO: Enable connection to philips hue
-      if (false)
-        SwitchListTile(
-          secondary: Icon(Icons.lightbulb_outline),
-          title: Text(model.timerModel.lightAction.title),
-          subtitle: Text(model.timerModel.lightAction.description),
-          value: model.timerModel.lightAction.enabled,
-          onChanged: model.onChangeLight,
-        ),
-      // TODO: Implement kill app
-      if (false)
-        ListTile(
-          leading: Icon(Icons.close_outlined),
-          title: Text(model.timerModel.appAction.title),
-          subtitle: Text(model.timerModel.appAction.description),
-          onTap: null,
-          trailing: Switch(
-            value: model.timerModel.appAction.enabled,
-            onChanged: model.onChangeApp,
+  Widget _buildEndedActions(final ThemeData theme) {
+    final size = 36.0;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ToggleButton(
+            label: model.timerModel.mediaAction.title,
+            activeIcon: Icons.music_off_outlined,
+            disabledIcon: Icons.music_note_outlined,
+            onChanged: model.onChangeMedia,
+            value: model.timerModel.mediaAction.enabled,
+            size: size,
           ),
-        ),
-    ];
+          ToggleButton(
+            label: model.timerModel.wifiAction.title,
+            activeIcon: Icons.wifi_off_outlined,
+            disabledIcon: Icons.wifi_outlined,
+            onChanged: model.onChangeWifi,
+            value: model.timerModel.wifiAction.enabled,
+            size: size,
+          ),
+          ToggleButton(
+            label: model.timerModel.bluetoothAction.title,
+            activeIcon: Icons.bluetooth_disabled_outlined,
+            disabledIcon: Icons.bluetooth_outlined,
+            onChanged: model.onChangeBluetooth,
+            value: model.timerModel.bluetoothAction.enabled,
+            size: size,
+          ),
+          ToggleButton(
+            label: model.timerModel.screenAction.title,
+            activeIcon: Icons.tv_off_outlined,
+            disabledIcon: Icons.tv_outlined,
+            onChanged: model.onChangeScreen,
+            value: model.timerModel.screenAction.enabled && model.isDeviceAdmin,
+            size: size,
+          ),
+        ],
+      ),
+    );
   }
 
   Container _buildAd(final ThemeData theme) {
@@ -456,10 +489,10 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             color: foregroundColor,
           ),
           label: Text(
-            model.timerStatus == TimerStatus.RUNNING
+            model.timerStatus == TimerStatus.RUNNING ||
+                    model.timerStatus == TimerStatus.INITIAL
                 ? S.of(context).buttonTimerPause
-                : model.timerStatus == TimerStatus.INITIAL ||
-                        model.timerStatus == TimerStatus.ELAPSED
+                : model.timerStatus == TimerStatus.ELAPSED
                     ? S.of(context).buttonTimerStart
                     : S.of(context).buttonTimerContinue,
             style: textStyle,

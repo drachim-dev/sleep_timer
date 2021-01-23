@@ -20,6 +20,8 @@ class TimerModel {
   List<ActionModel> get startActions => _startActions;
   ValueActionModel get volumeAction =>
       _startActions.singleWhere((action) => action.id == ActionType.VOLUME);
+  ActionModel get lightAction =>
+      _startActions.singleWhere((action) => action.id == ActionType.LIGHT);
   ActionModel get playMusicAction =>
       _startActions.singleWhere((action) => action.id == ActionType.PLAY_MUSIC);
   ActionModel get doNotDisturbAction =>
@@ -35,8 +37,6 @@ class TimerModel {
   ActionModel get screenAction =>
       _actions.singleWhere((action) => action.id == ActionType.SCREEN);
 
-  ActionModel get lightAction =>
-      _actions.singleWhere((action) => action.id == ActionType.LIGHT);
   ActionModel get appAction =>
       _actions.singleWhere((action) => action.id == ActionType.APP);
 }

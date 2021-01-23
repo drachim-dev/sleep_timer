@@ -88,10 +88,8 @@ class PurchaseService with ReactiveServiceMixin {
           consumable = false;
       }
 
-      final hasPurchased = purchases.firstWhere(
-              (element) => element.productID == e.id,
-              orElse: () => null) !=
-          null;
+      final hasPurchased =
+          purchases.any((element) => element.productID == e.id);
 
       log.d('Found product: ${e.id}, purchased: $hasPurchased');
 

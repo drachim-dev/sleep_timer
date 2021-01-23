@@ -10,10 +10,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../model/timer_model.dart';
+import '../ui/views/bridge_link_view.dart';
 import '../ui/views/credits_view.dart';
 import '../ui/views/faq_view.dart';
 import '../ui/views/home_view.dart';
 import '../ui/views/intro_view.dart';
+import '../ui/views/light_group_view.dart';
 import '../ui/views/settings_view.dart';
 import '../ui/views/timer_view.dart';
 
@@ -24,6 +26,8 @@ class Routes {
   static const String settingsView = '/settings-view';
   static const String fAQView = '/f-aq-view';
   static const String creditsView = '/credits-view';
+  static const String bridgeLinkView = '/bridge-link-view';
+  static const String lightGroupView = '/light-group-view';
   static const all = <String>{
     introView,
     homeView,
@@ -31,6 +35,8 @@ class Routes {
     settingsView,
     fAQView,
     creditsView,
+    bridgeLinkView,
+    lightGroupView,
   };
 }
 
@@ -44,6 +50,8 @@ class AutoRouter extends RouterBase {
     RouteDef(Routes.settingsView, page: SettingsView),
     RouteDef(Routes.fAQView, page: FAQView),
     RouteDef(Routes.creditsView, page: CreditsView),
+    RouteDef(Routes.bridgeLinkView, page: BridgeLinkView),
+    RouteDef(Routes.lightGroupView, page: LightGroupView),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -95,6 +103,18 @@ class AutoRouter extends RouterBase {
     CreditsView: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => CreditsView(),
+        settings: data,
+      );
+    },
+    BridgeLinkView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => BridgeLinkView(),
+        settings: data,
+      );
+    },
+    LightGroupView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => LightGroupView(),
         settings: data,
       );
     },

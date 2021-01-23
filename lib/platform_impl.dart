@@ -115,6 +115,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   Future<void> launchApp(final String packageName) async {
     await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName);
   }
+
 }
 
 class FlutterApiHandler extends FlutterTimerApi {
@@ -222,4 +223,5 @@ class FlutterApiHandler extends FlutterTimerApi {
     TimerServiceManager.getInstance().setTimerService(_timerService);
     _timerService.start();
   }
+
 }

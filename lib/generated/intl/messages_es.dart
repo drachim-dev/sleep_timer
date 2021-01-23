@@ -19,17 +19,23 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'es';
 
-  static m0(time) => "${time} expirado. ";
+  static m0(count) => "${Intl.plural(count, one: '1 dispositivo encontrado', other: '${count} dispositivos encontrados')}";
 
-  static m1(timeLeft) => "Tiempo restante: ${timeLeft}";
+  static m1(count) => "${count} luces";
 
-  static m2(time) => "Temporizador ajustado a ${time} minutos";
+  static m2(time) => "${time} expirado. ";
 
-  static m3(minutes) => "${minutes} minutos";
+  static m3(timeLeft) => "Tiempo restante: ${timeLeft}";
 
-  static m4(minutes) => "${minutes} min";
+  static m4(time) => "Temporizador ajustado a ${time} minutos";
 
-  static m5(durationString) => "${durationString} minutos";
+  static m5(minutes) => "${minutes} minutos";
+
+  static m6(minutes) => "${minutes} min";
+
+  static m7(durationString) => "${durationString} minutos";
+
+  static m8(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -39,19 +45,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "actionPlayMusicTitle" : MessageLookupByLibrary.simpleMessage("Toca música"),
     "actionToggleBluetoothDescription" : MessageLookupByLibrary.simpleMessage("Desactivar el bluetooth"),
     "actionToggleBluetoothTitle" : MessageLookupByLibrary.simpleMessage("Bluetooth"),
+    "actionToggleLightDescription" : MessageLookupByLibrary.simpleMessage("Apaga la luz"),
+    "actionToggleLightTitle" : MessageLookupByLibrary.simpleMessage("Luz"),
     "actionToggleMediaDescription" : MessageLookupByLibrary.simpleMessage("Detener la reproducción de medios"),
     "actionToggleMediaTitle" : MessageLookupByLibrary.simpleMessage("Media"),
     "actionToggleScreenDescription" : MessageLookupByLibrary.simpleMessage("Apagar la pantalla"),
     "actionToggleScreenTitle" : MessageLookupByLibrary.simpleMessage("Pantalla"),
     "actionToggleWifiDescription" : MessageLookupByLibrary.simpleMessage("Desactivar wifi"),
     "actionToggleWifiTitle" : MessageLookupByLibrary.simpleMessage("Wifi"),
-    "actionVolumeDescription" : MessageLookupByLibrary.simpleMessage("Ajustar el volumen del medio a"),
     "actionVolumeTitle" : MessageLookupByLibrary.simpleMessage("Volumen"),
     "adLoadFailure" : MessageLookupByLibrary.simpleMessage("No se ha cargado el anuncio"),
     "advancedSectionTitle" : MessageLookupByLibrary.simpleMessage("Avanzado"),
     "alreadyPurchased" : MessageLookupByLibrary.simpleMessage("Ya comprado"),
     "appearanceSectionTitle" : MessageLookupByLibrary.simpleMessage("Apariencia"),
     "buttonOpenSavedTimer" : MessageLookupByLibrary.simpleMessage("Toque aquí para ver su temporizador"),
+    "buttonSearchAgain" : MessageLookupByLibrary.simpleMessage("Busca de nuevo"),
     "buttonSetupTimer" : MessageLookupByLibrary.simpleMessage("Establezca su rutina"),
     "buttonShowAlarmApps" : MessageLookupByLibrary.simpleMessage("Alarma"),
     "buttonShowPlayerApps" : MessageLookupByLibrary.simpleMessage("Jugador"),
@@ -59,11 +67,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "buttonTimerPause" : MessageLookupByLibrary.simpleMessage("Pausa"),
     "buttonTimerStart" : MessageLookupByLibrary.simpleMessage("Iniciar"),
     "chooseThemeTitle" : MessageLookupByLibrary.simpleMessage("Tema"),
+    "connectionStateConnected" : MessageLookupByLibrary.simpleMessage("Conectado"),
+    "connectionStateFailed" : MessageLookupByLibrary.simpleMessage("Fallo de\nconexión"),
+    "countDevicesFound" : m0,
+    "countLights" : m1,
     "creditsAppTitle" : MessageLookupByLibrary.simpleMessage("Créditos"),
     "creditsLibraries" : MessageLookupByLibrary.simpleMessage("Bibliotecas"),
+    "dialogCancel" : MessageLookupByLibrary.simpleMessage("CANCELAR"),
+    "dialogConnect" : MessageLookupByLibrary.simpleMessage("CONECTAR"),
+    "dialogDone" : MessageLookupByLibrary.simpleMessage("HECHO"),
+    "dialogUnlink" : MessageLookupByLibrary.simpleMessage("UNLINK"),
+    "errorNoConnection" : MessageLookupByLibrary.simpleMessage("Compruebe su conexión"),
+    "errorNoDevices" : MessageLookupByLibrary.simpleMessage("No se encontraron dispositivos"),
     "extendTimeByShakeMenuToolTip" : MessageLookupByLibrary.simpleMessage("Toque para cambiar el tiempo"),
     "faqShort" : MessageLookupByLibrary.simpleMessage("FAQ"),
     "faqTitle" : MessageLookupByLibrary.simpleMessage("Preguntas frecuentes"),
+    "hintTurnsOffLightAction" : MessageLookupByLibrary.simpleMessage("This will turn off the light action."),
     "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("¿Estás cansado de ajustar los mismos ajustes cada noche para dormir bien?"),
     "introAutomateSleepRoutineTitle" : MessageLookupByLibrary.simpleMessage("Automatice su rutina diaria de sueño"),
     "introButtonDone" : MessageLookupByLibrary.simpleMessage("HECHO"),
@@ -74,6 +93,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "introMediaTitle" : MessageLookupByLibrary.simpleMessage("Escucha tu música favorita"),
     "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("No se distraiga con los mensajes o notificaciones entrantes"),
     "introNoInterruptionsTitle" : MessageLookupByLibrary.simpleMessage("Sin interrupciones"),
+    "linkBridge" : MessageLookupByLibrary.simpleMessage("Link el puente"),
+    "linkBridgeInstruction" : MessageLookupByLibrary.simpleMessage("1. Presiona el botón del puente\n2. Pulse en conectar"),
+    "longPressToAdjust" : MessageLookupByLibrary.simpleMessage("Long press to adjust settings"),
+    "noLightsFound" : MessageLookupByLibrary.simpleMessage("No se encontraron luces"),
     "notSupported" : MessageLookupByLibrary.simpleMessage("No es compatible con el dispositivo"),
     "notificationActionCancel" : MessageLookupByLibrary.simpleMessage("Cancelar"),
     "notificationActionContinue" : MessageLookupByLibrary.simpleMessage("Continúa"),
@@ -83,11 +106,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationStatusElapsed" : MessageLookupByLibrary.simpleMessage("Temporizador de sueño transcurrido"),
     "notificationStatusPausing" : MessageLookupByLibrary.simpleMessage("Temporizador de sueño en pausa"),
     "notificationStatusRunning" : MessageLookupByLibrary.simpleMessage("Temporizador de sueño funcionando"),
-    "notificationTimeExpired" : m0,
-    "notificationTimeLeft" : m1,
-    "notificationTimerSet" : m2,
-    "numberOfMinutesLong" : m3,
-    "numberOfMinutesShort" : m4,
+    "notificationTimeExpired" : m2,
+    "notificationTimeLeft" : m3,
+    "notificationTimerSet" : m4,
+    "numberOfMinutesLong" : m5,
+    "numberOfMinutesShort" : m6,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Otro"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Administrador del dispositivo"),
     "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Permite a la aplicación gestionar las funciones del dispositivo\nPermite de apagar la pantalla"),
@@ -103,6 +126,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "showTimerGlow" : MessageLookupByLibrary.simpleMessage("Efecto de brillo del temporizador"),
     "showTimerGlowDescription" : MessageLookupByLibrary.simpleMessage("Muestra un efecto de brillo alrededor de la barra de progreso"),
     "sleepTimer" : MessageLookupByLibrary.simpleMessage("Sleep Timer"),
+    "stateSearching" : MessageLookupByLibrary.simpleMessage("Buscando ..."),
+    "tapToConnect" : MessageLookupByLibrary.simpleMessage("Pulse para\nconectarse"),
     "timerEndsActionsTitle" : MessageLookupByLibrary.simpleMessage("Cuando se acabe"),
     "timerNoAlarm" : MessageLookupByLibrary.simpleMessage("El temporizador no funciona a veces"),
     "timerNoAlarmDescription" : MessageLookupByLibrary.simpleMessage("Asegúrate de que la optimización de la batería está desactivada para la aplicación. Algunos fabricantes de dispositivos como Samsung o Huawei requieren ajustes adicionales para permitir que la aplicación funcione en segundo plano"),
@@ -110,6 +135,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerNoWifiDescription" : MessageLookupByLibrary.simpleMessage("A partir de Android 10 ya no es posible desactivar el wifi"),
     "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Temporizador"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("Cuando comienza"),
-    "unitMinute" : m5
+    "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Grupos de luces"),
+    "unitMinute" : m7,
+    "unlinkBridgeName" : m8
   };
 }

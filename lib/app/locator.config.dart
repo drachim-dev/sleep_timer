@@ -11,6 +11,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/device_service.dart';
+import '../services/light_service.dart';
 import '../services/purchase_service.dart';
 import '../services/theme_service.dart';
 import '../services/third_party_services_module.dart';
@@ -30,6 +31,7 @@ Future<GetIt> $initGetIt(
   gh.lazySingleton<DeviceService>(() => DeviceService());
   gh.lazySingleton<InAppPurchaseConnection>(
       () => thirdPartyServicesModule.iapService);
+  gh.lazySingleton<LightService>(() => LightService());
   gh.lazySingleton<NavigationService>(
       () => thirdPartyServicesModule.navigationService);
   final resolvedSharedPreferences = await thirdPartyServicesModule.prefsService;

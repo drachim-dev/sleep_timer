@@ -78,6 +78,7 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       cursorColor: colorScheme.primary,
     ),
     dialogBackgroundColor: colorScheme.surface,
+    cardColor: colorScheme.surface,
     popupMenuTheme: PopupMenuThemeData(
       color: colorScheme.surface,
     ),

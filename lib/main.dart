@@ -59,9 +59,9 @@ class MyApp extends StatelessWidget {
         builder: (context, model, child) {
           return MaterialApp(
             theme: model.theme,
-            title: 'Sleep timer',
+            title: kAppTitle,
             scaffoldMessengerKey: mainScaffoldMessengerKey,
-            navigatorKey: locator<NavigationService>().navigatorKey,
+            navigatorKey: StackedService.navigatorKey,
             onGenerateRoute: AutoRouter(),
             initialRoute:
                 model.firstLaunch ? Routes.introView : Routes.homeView,

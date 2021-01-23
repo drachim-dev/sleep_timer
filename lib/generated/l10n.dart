@@ -285,10 +285,10 @@ class S {
     );
   }
 
-  /// `Continue`
+  /// `Resume`
   String get buttonTimerContinue {
     return Intl.message(
-      'Continue',
+      'Resume',
       name: 'buttonTimerContinue',
       desc: '',
       args: [],
@@ -530,16 +530,6 @@ class S {
     return Intl.message(
       'Volume',
       name: 'actionVolumeTitle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Set media volume to`
-  String get actionVolumeDescription {
-    return Intl.message(
-      'Set media volume to',
-      name: 'actionVolumeDescription',
       desc: '',
       args: [],
     );
@@ -810,6 +800,228 @@ class S {
     return Intl.message(
       'Not supported by device',
       name: 'notSupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Turn the lights off`
+  String get actionToggleLightDescription {
+    return Intl.message(
+      'Turn the lights off',
+      name: 'actionToggleLightDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Light`
+  String get actionToggleLightTitle {
+    return Intl.message(
+      'Light',
+      name: 'actionToggleLightTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Check your connection`
+  String get errorNoConnection {
+    return Intl.message(
+      'Check your connection',
+      name: 'errorNoConnection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No devices found`
+  String get errorNoDevices {
+    return Intl.message(
+      'No devices found',
+      name: 'errorNoDevices',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CANCEL`
+  String get dialogCancel {
+    return Intl.message(
+      'CANCEL',
+      name: 'dialogCancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DONE`
+  String get dialogDone {
+    return Intl.message(
+      'DONE',
+      name: 'dialogDone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `UNLINK`
+  String get dialogUnlink {
+    return Intl.message(
+      'UNLINK',
+      name: 'dialogUnlink',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search again`
+  String get buttonSearchAgain {
+    return Intl.message(
+      'Search again',
+      name: 'buttonSearchAgain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This will turn off the light action.`
+  String get hintTurnsOffLightAction {
+    return Intl.message(
+      'This will turn off the light action.',
+      name: 'hintTurnsOffLightAction',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching ...`
+  String get stateSearching {
+    return Intl.message(
+      'Searching ...',
+      name: 'stateSearching',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 device found} other{{count} devices found}}`
+  String countDevicesFound(num count) {
+    return Intl.plural(
+      count,
+      one: '1 device found',
+      other: '$count devices found',
+      name: 'countDevicesFound',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `1. Push the button on the bridge\n2. Tap on connect`
+  String get linkBridgeInstruction {
+    return Intl.message(
+      '1. Push the button on the bridge\n2. Tap on connect',
+      name: 'linkBridgeInstruction',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CONNECT`
+  String get dialogConnect {
+    return Intl.message(
+      'CONNECT',
+      name: 'dialogConnect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlink {bridge}`
+  String unlinkBridgeName(Object bridge) {
+    return Intl.message(
+      'Unlink $bridge',
+      name: 'unlinkBridgeName',
+      desc: '',
+      args: [bridge],
+    );
+  }
+
+  /// `Link bridge`
+  String get linkBridge {
+    return Intl.message(
+      'Link bridge',
+      name: 'linkBridge',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Light groups`
+  String get titleLightGroups {
+    return Intl.message(
+      'Light groups',
+      name: 'titleLightGroups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No lights found`
+  String get noLightsFound {
+    return Intl.message(
+      'No lights found',
+      name: 'noLightsFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} lights`
+  String countLights(Object count) {
+    return Intl.message(
+      '$count lights',
+      name: 'countLights',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Long press to adjust settings`
+  String get longPressToAdjust {
+    return Intl.message(
+      'Long press to adjust settings',
+      name: 'longPressToAdjust',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to\nconnect`
+  String get tapToConnect {
+    return Intl.message(
+      'Tap to\nconnect',
+      name: 'tapToConnect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected`
+  String get connectionStateConnected {
+    return Intl.message(
+      'Connected',
+      name: 'connectionStateConnected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed`
+  String get connectionStateFailed {
+    return Intl.message(
+      'Failed',
+      name: 'connectionStateFailed',
       desc: '',
       args: [],
     );

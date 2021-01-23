@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const String kAppTitle = String.fromEnvironment('APP_NAME');
+
 const double kVerticalPaddingSmall = kVerticalPadding / 2;
 const double kVerticalPadding = 16;
 const double kVerticalPaddingBig = kVerticalPadding * 2;
@@ -15,11 +17,19 @@ const Set<String> kProducts = {kProductRemoveAds, kProductDonation};
 
 const String kPrefKeyTheme = 'pref_key_theme';
 const String kPrefKeyGlow = 'pref_key_glow';
+const String kPrefKeyBridgeAccess = 'pref_key_bridge_access';
 const String kKeyVolumeLevel = 'pref_key_volume_level';
 const String kPrefKeyInitialTime = 'pref_key_initial_time';
 const String kPrefKeyFirstLaunch = 'pref_key_first_launch';
 const String kPrefKeyDefaultExtendTimeByShake =
     'pref_key_default_extend_time_by_shake';
+const String kPrefKeyShowLongPressHintForStartActions =
+    'key_show_long_press_hint_for_start_actions';
+
+const String kHueBridgeUsername = String.fromEnvironment('APP_NAME');
+const String kPrefKeyHueBridges = 'pref_key_hue_bridges';
+const String kPrefKeyHueBridgeId = 'pref_key_hue_bridge_id';
+const String kPrefKeyHueBridgeAuth = 'pref_key_hue_bridge_auth';
 
 const String kThemeKeyLightOrange = 'light_orange_theme';
 const String kThemeKeyLightGreen = 'light_green_theme';

@@ -23,7 +23,7 @@ class ActionModel {
       {@required this.id,
       @required this.title,
       @required this.description,
-      @required this.enabled});
+      this.enabled = false});
 }
 
 class ValueActionModel extends ActionModel {
@@ -32,14 +32,16 @@ class ValueActionModel extends ActionModel {
   final String key;
 
   @override
-  String get description => '${super.description} ${value.toInt()}$unit';
+  String get description {
+    return value == null ? title : '${value.toInt()}$unit';
+  }
 
   ValueActionModel(
-      {id,
-      title,
+      {@required id,
+      @required title,
       description,
-      enabled,
-      @required this.value,
+      enabled = false,
+      this.value,
       this.unit,
       this.key})
       : super(id: id, title: title, description: description, enabled: enabled);
@@ -49,23 +51,24 @@ List<ActionModel> startActionList = [
   ValueActionModel(
     id: ActionType.VOLUME,
     title: S.current.actionVolumeTitle,
-    description: S.current.actionVolumeDescription,
-    unit: ' %',
-    enabled: false,
     value: 10.0,
+    unit: ' %',
     key: kKeyVolumeLevel,
+  ),
+  ActionModel(
+    id: ActionType.LIGHT,
+    title: S.current.actionToggleLightTitle,
+    description: S.current.actionToggleLightDescription,
   ),
   ActionModel(
     id: ActionType.PLAY_MUSIC,
     title: S.current.actionPlayMusicTitle,
     description: "Peacock's Frenchcore Choice",
-    enabled: false,
   ),
   ActionModel(
     id: ActionType.DND,
     title: S.current.actionDoNotDisturbTitle,
     description: S.current.actionDoNotDisturbDescription,
-    enabled: false,
   ),
 ];
 
@@ -80,30 +83,20 @@ List<ActionModel> actionList = [
     id: ActionType.WIFI,
     title: S.current.actionToggleWifiTitle,
     description: S.current.actionToggleWifiDescription,
-    enabled: false,
   ),
   ActionModel(
     id: ActionType.BLUETOOTH,
     title: S.current.actionToggleBluetoothTitle,
     description: S.current.actionToggleBluetoothDescription,
-    enabled: false,
   ),
   ActionModel(
     id: ActionType.SCREEN,
     title: S.current.actionToggleScreenTitle,
     description: S.current.actionToggleScreenDescription,
-    enabled: false,
-  ),
-  ActionModel(
-    id: ActionType.LIGHT,
-    title: 'Light',
-    description: 'Turn 3 lights off',
-    enabled: false,
   ),
   ActionModel(
     id: ActionType.APP,
     title: 'App',
     description: 'Force close YouTube',
-    enabled: false,
   ),
 ];

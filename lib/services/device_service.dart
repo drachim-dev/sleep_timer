@@ -157,4 +157,5 @@ class DeviceService with ReactiveServiceMixin {
   Future<void> openPackage(final String packageName) async {
     return SleepTimerPlatform.getInstance().launchApp(packageName);
   }
+
 }

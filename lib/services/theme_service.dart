@@ -11,7 +11,7 @@ class ThemeService with ReactiveServiceMixin {
   }
 
   final RxValue<MyTheme> _myTheme = RxValue<MyTheme>(
-      initial: themeList.firstWhere((e) => e.id == kThemeKeyDarkYellow));
+      initial: themeList.firstWhere((e) => e.id == kThemeKeyDarkOrange));
   MyTheme get myTheme => _myTheme.value;
 
   final RxValue<bool> _showGlow = RxValue<bool>(initial: kDefaultGlow);
@@ -24,5 +24,4 @@ class ThemeService with ReactiveServiceMixin {
 
     if (theme != null) _myTheme.value = theme;
   }
-
 }

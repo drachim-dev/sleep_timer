@@ -19,13 +19,14 @@ import io.flutter.Log
 import java.io.ByteArrayOutputStream
 import java.util.*
 
-class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
+class MethodChannelImpl(private val context: Context) : HostTimerApi {
     companion object {
         private val TAG = MethodChannelImpl::class.java.toString()
     }
 
     override fun init(arg: InitializationRequest) {
+        Log.d(TAG, "init")
         CallbackHelper.setHandle(context, arg.callbackHandle)
     }
 
@@ -156,7 +157,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             } catch (ignored: PackageManager.NameNotFoundException) { }
         }
 
-        val packages = apps.distinctBy { it.packageName }.map { it.toMap() }.toList()
+        val packages = apps.distinctBy { it.packageName }.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
             this.apps = ArrayList(packages)
         }
@@ -167,7 +168,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         val alarmList = context.packageManager.queryIntentActivities(showAlarmsIntent, 0)
         val apps = getAppsFromResolveInfo(alarmList).distinctBy { it.packageName }
 
-        val packages = apps.map { it.toMap() }.toList()
+        val packages = apps.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
             this.apps =  ArrayList(packages)
         }
@@ -202,10 +203,6 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         context.startActivity(intent)
     }
 
-    override fun dummyApp(): Package? {
-        return null
-    }
-
     // https://stackoverflow.com/questions/44447056/convert-adaptiveicondrawable-to-bitmap-in-android-o-preview
     private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
         val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
@@ -221,6 +218,10 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)
+    }
+
+    override fun dummyApp(): Package? {
+        return null
     }
 
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:preferences/preference_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -43,6 +44,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
 
   @override
   Future initialise() async {
+    await PrefService.init();
     await _deviceService.init();
 
     stream.listen((data) async {

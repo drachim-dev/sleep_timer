@@ -1,7 +1,5 @@
 class App {
-  String title;
-  String icon;
-  String packageName;
+  String title, icon, packageName;
 
   Map<dynamic, dynamic> toMap() {
     final pigeonMap = <dynamic, dynamic>{

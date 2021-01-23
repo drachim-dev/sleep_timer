@@ -8,6 +8,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/app.dart';
+import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
@@ -28,9 +29,24 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   bool _newInstance;
 
-  bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
-  bool get notificationSettingsAccess =>
+  bool get isDeviceAdmin => _deviceService.deviceAdmin ?? false;
+  bool get hasNotificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
+
+  /// check if there is at least one bridge with a light action enabled
+  bool get hasEnabledLights {
+    final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
+    if (savedBridgesJson != null) {
+      final savedBridges = BridgeModel.decode(savedBridgesJson);
+      return savedBridges
+          .any((bridge) => bridge.groups.any((group) => group.actionEnabled));
+    } else {
+      return false;
+    }
+  }
+
+  bool get showLongPressHint =>
+      _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
   TimerViewModel(this._timerModel)
       : _timerService =
@@ -44,12 +60,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     }
 
     // Check for adFree in-app purchase
-    _isAdFree = _purchaseService.products.firstWhere(
-            (element) =>
-                element.productDetails.id == kProductRemoveAds &&
-                element.purchased,
-            orElse: () => null) !=
-        null;
+    _isAdFree = _purchaseService.products.any((element) =>
+        element.productDetails.id == kProductRemoveAds && element.purchased);
   }
 
   TimerModel get timerModel => _timerModel;
@@ -75,6 +87,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     await _deviceService.init();
     if (_newInstance) {
       await initActionPreferences();
+      await startTimer();
     }
   }
 
@@ -83,6 +96,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
         ActionType.VOLUME.toString(), _timerModel.volumeAction.enabled);
     await _prefsService.setDouble(
         _timerModel.volumeAction.key, _timerModel.volumeAction.value);
+    await _prefsService.setBool(
+        ActionType.LIGHT.toString(), _timerModel.lightAction.enabled);
     await _prefsService.setBool(
         ActionType.PLAY_MUSIC.toString(), _timerModel.playMusicAction.enabled);
     await _prefsService.setBool(
@@ -97,8 +112,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     await _prefsService.setBool(
         ActionType.SCREEN.toString(), _timerModel.screenAction.enabled);
 
-    await _prefsService.setBool(
-        ActionType.LIGHT.toString(), _timerModel.lightAction.enabled);
     await _prefsService.setBool(
         ActionType.APP.toString(), _timerModel.appAction.enabled);
   }
@@ -130,6 +143,15 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
                 notificationSettingsAccessFocused));
   }
 
+  Future<void> navigateToLightsGroups() async {
+    await _navigationService.navigateTo(Routes.lightGroupView);
+  }
+
+  void dismissLongPressHint() {
+    _prefsService.setBool(kPrefKeyShowLongPressHintForStartActions, false);
+    notifyListeners();
+  }
+
   void onExtendTime(int minutes) {
     final seconds = minutes * 60;
 
@@ -146,6 +168,18 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     _timerModel.volumeAction.value = value;
     _prefsService.setDouble(_timerModel.volumeAction.key, value);
     notifyListeners();
+  }
+
+  Future<void> onChangeLight(bool enabled) async {
+    if (enabled && !hasEnabledLights) {
+      await navigateToLightsGroups();
+    }
+
+    if (enabled && hasEnabledLights || !enabled) {
+      _timerModel.lightAction.enabled = enabled;
+      await _prefsService.setBool(ActionType.LIGHT.toString(), enabled);
+      notifyListeners();
+    }
   }
 
   void onChangePlayMusic(bool enabled) {
@@ -179,18 +213,13 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   void onChangeScreen(bool enabled) {
-    if (deviceAdmin) {
+    if (isDeviceAdmin) {
       _timerModel.screenAction.enabled = enabled;
       _prefsService.setBool(ActionType.SCREEN.toString(), enabled);
       notifyListeners();
     } else {
       navigateToSettings(deviceAdminFocused: true);
     }
-  }
-
-  void onChangeLight(bool enabled) {
-    _timerModel.lightAction.enabled = enabled;
-    notifyListeners();
   }
 
   void onChangeApp(bool enabled) {
