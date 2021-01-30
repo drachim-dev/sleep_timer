@@ -39,6 +39,9 @@ class CreditsView extends StatelessWidget {
   static final List _packageCredits = [
     S.current.creditsLibraries,
     Credit(title: 'auto_route', url: 'https://pub.dev/packages/auto_route'),
+    Credit(
+        title: 'firebase_crashlytics',
+        url: 'https://pub.dev/packages/firebase_crashlytics'),
     Credit(title: 'flushbar', url: 'https://pub.dev/packages/flushbar'),
     Credit(
         title: 'flutter_native_admob',
@@ -56,6 +59,9 @@ class CreditsView extends StatelessWidget {
         title: 'json_annotation',
         url: 'https://pub.dev/packages/json_annotation'),
     Credit(title: 'logger', url: 'https://pub.dev/packages/logger'),
+    Credit(
+        title: 'material_design_icons_flutter',
+        url: 'https://pub.dev/packages/material_design_icons_flutter'),
     Credit(
         title: 'observable_ish',
         url: 'https://pub.dev/packages/observable_ish'),
@@ -81,7 +87,10 @@ class CreditsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(S.of(context).creditsAppTitle)),
+        appBar: AppBar(
+          title: Text(S.of(context).creditsAppTitle),
+          backwardsCompatibility: false,
+        ),
         body: ListView.builder(
           itemCount: _creditList.length,
           // ignore: missing_return

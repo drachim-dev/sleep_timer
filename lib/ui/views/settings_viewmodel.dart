@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:get_it/get_it.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:preferences/preference_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,7 +46,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   @override
   Future initialise() async {
     await PrefService.init();
-    await _deviceService.init();
+    await GetIt.I.isReady<DeviceService>();
 
     stream.listen((data) async {
       setBusy(true);

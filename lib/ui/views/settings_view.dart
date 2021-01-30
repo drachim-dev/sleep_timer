@@ -5,7 +5,6 @@ import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
 import 'package:sleep_timer/generated/l10n.dart';
-import 'package:sleep_timer/main.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:stacked/stacked.dart';
@@ -34,7 +33,6 @@ class _SettingsViewState extends State<SettingsView>
   final ScrollController _scrollController = ScrollController();
   AnimationController _controller;
   Animatable<Color> blinkingFocus;
-  Duration snackBarDelay = const Duration(milliseconds: 200);
 
   @override
   void initState() {
@@ -47,27 +45,8 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      var message = '';
-
-      if (widget.deviceAdminFocused) {
-        message = S.current.prefsHintEnableDeviceAdmin;
-      }
-
-      if (widget.notificationSettingsAccessFocused) {
-        message = S.current.prefsHintEnableAccessToNotificationSettings;
-      }
-
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(snackBarDelay).then((value) {
-          mainScaffoldMessengerKey.currentState.showSnackBar(SnackBar(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              content: Text(message)));
-        });
-      });
-
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(milliseconds: 500)).then((value) => {
+        Future.delayed(Duration(milliseconds: 750)).then((value) => {
               _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
                   duration: kThemeAnimationDuration,
@@ -112,7 +91,10 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   AppBar _buildAppBar(final ThemeData theme) {
-    return AppBar(title: Text(S.of(context).settings));
+    return AppBar(
+      backwardsCompatibility: false,
+      title: Text(S.of(context).settings),
+    );
   }
 
   Widget _buildBody(final ThemeData theme) {

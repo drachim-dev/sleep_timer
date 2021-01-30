@@ -43,7 +43,7 @@ class TimerService with ReactiveServiceMixin {
     if (status == TimerStatus.ELAPSED) {
       _resetTime();
     } else if (status == TimerStatus.INITIAL) {
-      handleStartActions();
+      _handleStartActions();
     }
 
     _status.value = TimerStatus.RUNNING;
@@ -91,19 +91,31 @@ class TimerService with ReactiveServiceMixin {
     _remainingTime.value = timerModel.initialTimeInSeconds;
   }
 
-  Future<void> handleStartActions() async {
+  Future<void> _handleStartActions() async {
     if (timerModel.volumeAction.enabled) {
-      await _deviceService.setVolume(timerModel.volumeAction.value.truncate());
+      final value = timerModel.volumeAction.value.round();
+      await handleVolumeAction(value);
     }
-
     if (timerModel.lightAction.enabled) {
-      await _lightService.toggleLights(false);
+      await handleLightAction();
     }
 
     if (timerModel.doNotDisturbAction.enabled &&
         _deviceService.notificationSettingsAccess) {
-      await _deviceService.toggleDoNotDisturb(true);
+      await handleDoNotDisturbAction();
     }
+  }
+
+  void handleVolumeAction(int value) {
+    _deviceService.setVolume(value);
+  }
+
+  void handleLightAction() {
+    _lightService.toggleLights(false);
+  }
+
+  void handleDoNotDisturbAction() {
+    _deviceService.toggleDoNotDisturb(true);
   }
 
   Future<void> handleEndedActions() async {

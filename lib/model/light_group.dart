@@ -13,9 +13,10 @@ class LightGroup {
   LightGroup(
       {this.id,
       this.name,
-      this.className,
+      String className,
       this.numberOfLights,
-      this.actionEnabled = false});
+      this.actionEnabled = false})
+      : className = className ?? 'Other';
 
   factory LightGroup.fromJson(Map<String, dynamic> json) =>
       _$LightGroupFromJson(json);

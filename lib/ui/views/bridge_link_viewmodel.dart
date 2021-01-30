@@ -103,7 +103,6 @@ class BridgeLinkViewModel extends FutureViewModel {
   }
 
   void navigateBackToLights() {
-    print(Routes.lightGroupView);
     _navigationService
         .popUntil((route) => route.settings.name == Routes.lightGroupView);
   }

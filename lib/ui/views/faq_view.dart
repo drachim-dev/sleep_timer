@@ -7,7 +7,10 @@ class FAQView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(S.of(context).faqTitle)),
+      appBar: AppBar(
+        backwardsCompatibility: false,
+        title: Text(S.of(context).faqTitle),
+      ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: kHorizontalPadding),
         children: [

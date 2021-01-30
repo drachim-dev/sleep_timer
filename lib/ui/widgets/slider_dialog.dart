@@ -4,12 +4,14 @@ import 'package:sleep_timer/generated/l10n.dart';
 class SliderDialog extends StatefulWidget {
   final String title;
   final double initialValue, minValue, maxValue;
+  final Function(double) onChangeEnd;
 
   const SliderDialog(
       {@required this.title,
       @required this.initialValue,
       this.minValue = 0,
-      @required this.maxValue})
+      @required this.maxValue,
+      this.onChangeEnd})
       : assert(initialValue >= minValue && initialValue <= maxValue),
         assert(maxValue > minValue);
 
@@ -36,12 +38,14 @@ class _SliderDialogState extends State<SliderDialog> {
                   value: _initialValue,
                   min: widget.minValue,
                   max: widget.maxValue,
+                  divisions: widget.maxValue.round(),
                   onChanged: (value) {
                     setState(() => _initialValue = value);
                   },
+                  onChangeEnd: widget.onChangeEnd,
                 ),
               ),
-              SizedBox(width: 48, child: Text('${_initialValue.floor()} %'))
+              SizedBox(width: 48, child: Text('${_initialValue.round()} %'))
             ])),
         actions: [
           FlatButton(

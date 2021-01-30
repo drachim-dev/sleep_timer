@@ -51,7 +51,6 @@ List<ActionModel> startActionList = [
   ValueActionModel(
     id: ActionType.VOLUME,
     title: S.current.actionVolumeTitle,
-    value: 10.0,
     unit: ' %',
     key: kKeyVolumeLevel,
   ),

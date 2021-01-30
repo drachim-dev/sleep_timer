@@ -28,7 +28,6 @@ Future<GetIt> $initGetIt(
 }) async {
   final gh = GetItHelper(get, environment, environmentFilter);
   final thirdPartyServicesModule = _$ThirdPartyServicesModule();
-  gh.lazySingleton<DeviceService>(() => DeviceService());
   gh.lazySingleton<InAppPurchaseConnection>(
       () => thirdPartyServicesModule.iapService);
   gh.lazySingleton<LightService>(() => LightService());
@@ -41,6 +40,7 @@ Future<GetIt> $initGetIt(
       (timerModel, _) => TimerService(timerModel));
 
   // Eager singletons must be registered in the right order
+  gh.singletonAsync<DeviceService>(() => DeviceService.create());
   gh.singletonAsync<PurchaseService>(() => PurchaseService.create());
   return get;
 }

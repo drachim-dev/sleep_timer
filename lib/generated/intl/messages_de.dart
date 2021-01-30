@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(count) => "${Intl.plural(count, one: '1 Geräte gefunden', other: '${count} Geräte gefunden')}";
 
-  static m1(count) => "${count} Lichter";
+  static m1(count) => "${Intl.plural(count, one: '1 Licht', other: '${count} Lichter')}";
 
   static m2(time) => "${time} abgelaufen. ";
 
@@ -45,8 +45,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "actionPlayMusicTitle" : MessageLookupByLibrary.simpleMessage("Spielt Musik ab"),
     "actionToggleBluetoothDescription" : MessageLookupByLibrary.simpleMessage("Deaktiviert Bluetooth"),
     "actionToggleBluetoothTitle" : MessageLookupByLibrary.simpleMessage("Bluetooth"),
-    "actionToggleLightDescription" : MessageLookupByLibrary.simpleMessage("Schaltet das Licht aus"),
-    "actionToggleLightTitle" : MessageLookupByLibrary.simpleMessage("Licht"),
+    "actionToggleLightDescription" : MessageLookupByLibrary.simpleMessage("Schaltet deine Philips Hue Lampen aus"),
+    "actionToggleLightTitle" : MessageLookupByLibrary.simpleMessage("Lampen"),
     "actionToggleMediaDescription" : MessageLookupByLibrary.simpleMessage("Stoppt Medienwiedergabe"),
     "actionToggleMediaTitle" : MessageLookupByLibrary.simpleMessage("Medien"),
     "actionToggleScreenDescription" : MessageLookupByLibrary.simpleMessage("Schaltet das Display aus"),
@@ -60,7 +60,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "appearanceSectionTitle" : MessageLookupByLibrary.simpleMessage("Erscheinungsbild"),
     "buttonOpenSavedTimer" : MessageLookupByLibrary.simpleMessage("Hier tippen, um deinen Timer zu sehen"),
     "buttonSearchAgain" : MessageLookupByLibrary.simpleMessage("Suche wiederholen"),
-    "buttonSetupTimer" : MessageLookupByLibrary.simpleMessage("Schlafen gehen"),
     "buttonShowAlarmApps" : MessageLookupByLibrary.simpleMessage("Wecker"),
     "buttonShowPlayerApps" : MessageLookupByLibrary.simpleMessage("Player"),
     "buttonTimerContinue" : MessageLookupByLibrary.simpleMessage("Fortsetzen"),
@@ -83,7 +82,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "faqShort" : MessageLookupByLibrary.simpleMessage("FAQ"),
     "faqTitle" : MessageLookupByLibrary.simpleMessage("Häufig gestellte Fragen"),
     "hintTurnsOffLightAction" : MessageLookupByLibrary.simpleMessage("Dadurch wird die Lichtfunktion ausgeschaltet."),
-    "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Bist du es es leid, jede Nacht die gleichen Einstellungen vorzunehmen, um gut schlafen zu können?"),
+    "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Bist du es es leid, jede Nacht die gleichen Einstellungen vorzunehmen, um gut einschlafen zu können?"),
     "introAutomateSleepRoutineTitle" : MessageLookupByLibrary.simpleMessage("Automatisiere deine Schlafroutine"),
     "introButtonDone" : MessageLookupByLibrary.simpleMessage("FERTIG"),
     "introButtonNext" : MessageLookupByLibrary.simpleMessage("WEITER"),
@@ -91,12 +90,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "introGoodNightSubtitle" : MessageLookupByLibrary.simpleMessage("Stell einfach den Timer und fertig.\nEntspann dich und träum schön :)"),
     "introGoodNightTitle" : MessageLookupByLibrary.simpleMessage("Gute Nacht"),
     "introMediaTitle" : MessageLookupByLibrary.simpleMessage("Hör deine Lieblingsmusik"),
-    "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("Lass dich nicht durch eingehende Benachrichtigungen ablenken"),
+    "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("Lass dich nicht durch eingehende Benachrichtigungen ablenken."),
     "introNoInterruptionsTitle" : MessageLookupByLibrary.simpleMessage("Keine Unterbrechungen"),
     "linkBridge" : MessageLookupByLibrary.simpleMessage("Verbinde Bridge"),
     "linkBridgeInstruction" : MessageLookupByLibrary.simpleMessage("1. Drücke den Knopf auf der Bridge\n2. Tippe auf verbinden"),
-    "longPressToAdjust" : MessageLookupByLibrary.simpleMessage("Lange drücken zum Anpassen"),
-    "noLightsFound" : MessageLookupByLibrary.simpleMessage("Keine Lichter gefunden"),
+    "longPressToAdjustDesc" : MessageLookupByLibrary.simpleMessage("Einige Aktionen können konfiguriert werden. Halte die Aktion dazu gedrückt."),
+    "longPressToAdjustTitle" : MessageLookupByLibrary.simpleMessage("Gedrückthalten"),
+    "noLightsFound" : MessageLookupByLibrary.simpleMessage("Keine Philips Hue Lampen gefunden"),
     "notSupported" : MessageLookupByLibrary.simpleMessage("Nicht vom Gerät unterstützt"),
     "notificationActionCancel" : MessageLookupByLibrary.simpleMessage("Abbrechen"),
     "notificationActionContinue" : MessageLookupByLibrary.simpleMessage("Fortsetzen"),
@@ -113,12 +113,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfMinutesShort" : m6,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Sonstige"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Erweiterte Gerätefunktionen"),
-    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt Verwaltung von Gerätefunktionen\nErmöglicht Bildschirmabschaltung"),
+    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Verwaltung von Gerätefunktionen\nErmöglicht Ausschalten des Displays"),
     "prefsExtendTimeOnShake" : MessageLookupByLibrary.simpleMessage("Verlängern durch Schütteln"),
     "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Aktiviere den Zugriff auf Benachrichtigungs­einstellungen"),
     "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Aktiviere die erweiterten Gerätefunktionen"),
-    "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Zugriff auf \"Nicht stören\""),
-    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Erlaubt den Zugriff auf Benachrichtigungs­einstellungen"),
+    "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Zugriff auf Nicht stören"),
+    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Aktiviert die \"Nicht stören\"-Aktion"),
     "purchasesSectionTitle" : MessageLookupByLibrary.simpleMessage("In-App-Käufe"),
     "quickLaunchTitle" : MessageLookupByLibrary.simpleMessage("Schnellstart"),
     "setVolumeTitle" : MessageLookupByLibrary.simpleMessage("Lautstärke ändern"),
@@ -128,6 +128,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "sleepTimer" : MessageLookupByLibrary.simpleMessage("Sleep Timer"),
     "stateSearching" : MessageLookupByLibrary.simpleMessage("Suche ..."),
     "tapToConnect" : MessageLookupByLibrary.simpleMessage("Tippe zum\nVerbinden"),
+    "tapToToggleDesc" : MessageLookupByLibrary.simpleMessage("Startaktionen werden beim nächsten Start des Timers ausgeführt."),
+    "tapToToggleTitle" : MessageLookupByLibrary.simpleMessage("Antippen zum Aktivieren"),
     "timerEndsActionsTitle" : MessageLookupByLibrary.simpleMessage("Nach Ablauf der Zeit"),
     "timerNoAlarm" : MessageLookupByLibrary.simpleMessage("Der Timer löst manchmal nicht aus"),
     "timerNoAlarmDescription" : MessageLookupByLibrary.simpleMessage("Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann."),
@@ -135,7 +137,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerNoWifiDescription" : MessageLookupByLibrary.simpleMessage("Ab Android 10 ist es nicht mehr möglich, WLAN über eine App auszuschalten."),
     "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Timer"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("Beim Starten des Timers"),
-    "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Lichtgruppen"),
+    "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Lampen ausschalten"),
     "unitMinute" : m7,
     "unlinkBridgeName" : m8
   };

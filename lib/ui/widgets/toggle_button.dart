@@ -30,15 +30,12 @@ class _ToggleButtonState extends State<ToggleButton> {
     final theme = Theme.of(context);
     final toggleButtonsTheme = ToggleButtonsTheme.of(context);
 
-    final selectedColor =
-        toggleButtonsTheme.selectedColor ?? theme.colorScheme.primary;
-    final disabledColor = toggleButtonsTheme.disabledColor ??
-        theme.colorScheme.onSurface.withOpacity(0.38);
-    final currentColor = widget.value ? selectedColor : disabledColor;
+    final currentColor = widget.value
+        ? toggleButtonsTheme.selectedColor
+        : toggleButtonsTheme.disabledColor;
 
-    final fillColor = widget.value
-        ? selectedColor.withOpacity(0.1)
-        : toggleButtonsTheme.color;
+    final fillColor =
+        widget.value ? toggleButtonsTheme.fillColor : Colors.transparent;
 
     final currentTextStyle =
         toggleButtonsTheme.textStyle ?? theme.textTheme.bodyText2;

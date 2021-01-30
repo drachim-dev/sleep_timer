@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:device_functions/messages_generated.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -45,6 +46,11 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     }
   }
 
+  bool get showHints => showTapHint || showLongPressHint;
+
+  bool get showTapHint =>
+      _prefsService.getBool(kPrefKeyShowTapHintForStartActions) ?? true;
+
   bool get showLongPressHint =>
       _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
@@ -84,7 +90,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   @override
   Future<void> initialise() async {
-    await _deviceService.init();
+    await GetIt.I.isReady<DeviceService>();
     if (_newInstance) {
       await initActionPreferences();
       await startTimer();
@@ -145,6 +151,12 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   Future<void> navigateToLightsGroups() async {
     await _navigationService.navigateTo(Routes.lightGroupView);
+    notifyListeners();
+  }
+
+  void dismissTapHint() {
+    _prefsService.setBool(kPrefKeyShowTapHintForStartActions, false);
+    notifyListeners();
   }
 
   void dismissLongPressHint() {
@@ -159,15 +171,21 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   void onChangeVolume(bool enabled) {
-    _timerModel.volumeAction.enabled = enabled;
-    _prefsService.setBool(ActionType.VOLUME.toString(), enabled);
+    if (_timerModel.volumeAction.value != null) {
+      _timerModel.volumeAction.enabled = enabled;
+      _prefsService.setBool(ActionType.VOLUME.toString(), enabled);
+      notifyListeners();
+    }
+  }
+
+  Future<void> onChangeVolumeLevel(double value) async {
+    _timerModel.volumeAction.value = value;
+    await _prefsService.setDouble(_timerModel.volumeAction.key, value);
     notifyListeners();
   }
 
-  void onChangeVolumeLevel(double value) {
-    _timerModel.volumeAction.value = value;
-    _prefsService.setDouble(_timerModel.volumeAction.key, value);
-    notifyListeners();
+  void handleVolumeAction(int value) {
+    _timerService.handleVolumeAction(value);
   }
 
   Future<void> onChangeLight(bool enabled) async {
@@ -175,7 +193,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
       await navigateToLightsGroups();
     }
 
-    if (enabled && hasEnabledLights || !enabled) {
+    if ((enabled && hasEnabledLights) || !enabled) {
       _timerModel.lightAction.enabled = enabled;
       await _prefsService.setBool(ActionType.LIGHT.toString(), enabled);
       notifyListeners();
@@ -188,10 +206,16 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     notifyListeners();
   }
 
-  void onChangeDoNotDisturb(bool enabled) {
-    _timerModel.doNotDisturbAction.enabled = enabled;
-    _prefsService.setBool(ActionType.DND.toString(), enabled);
-    notifyListeners();
+  void onChangeDoNotDisturb(bool enabled) async {
+    if (enabled && !hasNotificationSettingsAccess) {
+      await navigateToSettings(notificationSettingsAccessFocused: true);
+    }
+
+    if ((enabled && hasNotificationSettingsAccess) || !enabled) {
+      _timerModel.doNotDisturbAction.enabled = enabled;
+      await _prefsService.setBool(ActionType.DND.toString(), enabled);
+      notifyListeners();
+    }
   }
 
   void onChangeMedia(bool enabled) {
@@ -212,13 +236,15 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     notifyListeners();
   }
 
-  void onChangeScreen(bool enabled) {
-    if (isDeviceAdmin) {
+  void onChangeScreen(bool enabled) async {
+    if (enabled && !isDeviceAdmin) {
+      await navigateToSettings(deviceAdminFocused: true);
+    }
+
+    if ((enabled && isDeviceAdmin) || !enabled) {
       _timerModel.screenAction.enabled = enabled;
-      _prefsService.setBool(ActionType.SCREEN.toString(), enabled);
+      await _prefsService.setBool(ActionType.SCREEN.toString(), enabled);
       notifyListeners();
-    } else {
-      navigateToSettings(deviceAdminFocused: true);
     }
   }
 

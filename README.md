@@ -2,55 +2,44 @@
 
 # Comfy Sleep Timer
 
-Comfy Sleep Timer helps you with your daily sleep routine. 
-Just start the timer and let it turn everything off after the given time.
+Turn off your music and video automatically when you fall asleep.
 
 <b>Do you like listening to music or watching a movie while falling asleep?</b>
+Comfy Sleep Timer turns it off after the desired time. Works with all popular music and video players such as Spotify, YouTube and many more.
 
-Comfy Sleep Timer turns it off after the desired time. Works with all popular media apps such as Spotify, YouTube, Netflix and many more.
-
-<b>The following actions are supported by now:</b>
-
-On timer start:
-* Turn on do not disturb
-* Set media volume
-
-When timer ends:
+<b>The following actions are supported</b>
 * Turn off music
-* Turn off wifi
 * Turn off bluetooth
 * Turn off screen
+* Turn off wifi (only for Android 9 and below) 
 
-Manual actions:
-* Extend time
-* Quick launch your music and video players
+On timer start
+* Set media volume
+* Turn off your lights (only with Philips Hue)
+* Turn on do not disturb
+
+Additional features
+* Quick launch your favorite music or video player
 * Quick launch your alarm app
+* Extend the timer by shaking your phone
+* Extend the timer directly from the notification
 
-<b>Choose between different themes:</b>
-* Light theme
-* Dark theme
-* Black theme
+<b>Simple and beautiful design</b>
+* Choose between different different themes
+* Sleek animations
 
-Everything is designed to be as easy and quick to use as possible.
+Everything is designed to be easy and pleasent to use.
 
 ## Screenshots
 
-<table>
-    <tr>
-        <td>
-            <img src="screenshots/intro_welcome.jpg" width="250"/>
-        </td>
-        <td>
-            <img src="screenshots/intro_music.jpg" width="250"/>
-        </td>
-        <td>
-            <img src="screenshots/home.jpg" width="250"/>
-        </td>
-        <td>
-            <img src="screenshots/timer.jpg" width="250"/>
-        </td>
-    </tr>
-</table>
+<p float="left">
+  <img src="screenshots/home.png" width="250" />
+  <img src="screenshots/intro_2.png" width="250" /> 
+  <img src="screenshots/timer.png" width="250" /> 
+  <img src="screenshots/lights.png" width="250" /> 
+</p>
+
+The Mockups were created by using previewed.app
 
 ## Download
 

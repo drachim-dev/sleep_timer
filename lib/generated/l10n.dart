@@ -45,10 +45,10 @@ class S {
     );
   }
 
-  /// `Are you tired of adjusting the same settings every night in order to sleep well?`
+  /// `Are you tired of adjusting the same settings every night in order to fall asleep well?`
   String get introAutomateSleepRoutineSubtitle {
     return Intl.message(
-      'Are you tired of adjusting the same settings every night in order to sleep well?',
+      'Are you tired of adjusting the same settings every night in order to fall asleep well?',
       name: 'introAutomateSleepRoutineSubtitle',
       desc: '',
       args: [],
@@ -65,10 +65,10 @@ class S {
     );
   }
 
-  /// `Don't get distracted by incoming messages or notifications`
+  /// `Don't get distracted by incoming messages or notifications.`
   String get introNoInterruptionsSubtitle {
     return Intl.message(
-      'Don\'t get distracted by incoming messages or notifications',
+      'Don\'t get distracted by incoming messages or notifications.',
       name: 'introNoInterruptionsSubtitle',
       desc: '',
       args: [],
@@ -135,10 +135,10 @@ class S {
     );
   }
 
-  /// `Next`
+  /// `NEXT`
   String get introButtonNext {
     return Intl.message(
-      'Next',
+      'NEXT',
       name: 'introButtonNext',
       desc: '',
       args: [],
@@ -190,16 +190,6 @@ class S {
     return Intl.message(
       'Tap here to see your timer',
       name: 'buttonOpenSavedTimer',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Set your routine`
-  String get buttonSetupTimer {
-    return Intl.message(
-      'Set your routine',
-      name: 'buttonSetupTimer',
       desc: '',
       args: [],
     );
@@ -455,50 +445,50 @@ class S {
     );
   }
 
-  /// `Allows app to manage device functions\nEnables screen off action`
+  /// `Manage device functions\nEnables screen off action`
   String get prefsDeviceAdminDescription {
     return Intl.message(
-      'Allows app to manage device functions\nEnables screen off action',
+      'Manage device functions\nEnables screen off action',
       name: 'prefsDeviceAdminDescription',
       desc: '',
       args: [],
     );
   }
 
-  /// `Notification Settings Access`
+  /// `Do Not Disturb Access`
   String get prefsNotificationSettingsAccess {
     return Intl.message(
-      'Notification Settings Access',
+      'Do Not Disturb Access',
       name: 'prefsNotificationSettingsAccess',
       desc: '',
       args: [],
     );
   }
 
-  /// `Allows access to notification settings\nEnables do not disturb action`
+  /// `Required for DND action`
   String get prefsNotificationSettingsAccessDescription {
     return Intl.message(
-      'Allows access to notification settings\nEnables do not disturb action',
+      'Required for DND action',
       name: 'prefsNotificationSettingsAccessDescription',
       desc: '',
       args: [],
     );
   }
 
-  /// `Please enable device admin`
+  /// `Please activate device admin`
   String get prefsHintEnableDeviceAdmin {
     return Intl.message(
-      'Please enable device admin',
+      'Please activate device admin',
       name: 'prefsHintEnableDeviceAdmin',
       desc: '',
       args: [],
     );
   }
 
-  /// `Please enable access to notification settings`
+  /// `Please allow Do Not Disturb access to enable DND action`
   String get prefsHintEnableAccessToNotificationSettings {
     return Intl.message(
-      'Please enable access to notification settings',
+      'Please allow Do Not Disturb access to enable DND action',
       name: 'prefsHintEnableAccessToNotificationSettings',
       desc: '',
       args: [],
@@ -695,10 +685,10 @@ class S {
     );
   }
 
-  /// `Continue`
+  /// `Resume`
   String get notificationActionContinue {
     return Intl.message(
-      'Continue',
+      'Resume',
       name: 'notificationActionContinue',
       desc: '',
       args: [],
@@ -755,10 +745,10 @@ class S {
     );
   }
 
-  /// `Timer set to {time} minutes`
+  /// `Time set to {time} minutes`
   String notificationTimerSet(Object time) {
     return Intl.message(
-      'Timer set to $time minutes',
+      'Time set to $time minutes',
       name: 'notificationTimerSet',
       desc: '',
       args: [time],
@@ -805,20 +795,20 @@ class S {
     );
   }
 
-  /// `Turn the lights off`
+  /// `Turns your hue lights off`
   String get actionToggleLightDescription {
     return Intl.message(
-      'Turn the lights off',
+      'Turns your hue lights off',
       name: 'actionToggleLightDescription',
       desc: '',
       args: [],
     );
   }
 
-  /// `Light`
+  /// `Hue lights`
   String get actionToggleLightTitle {
     return Intl.message(
-      'Light',
+      'Hue lights',
       name: 'actionToggleLightTitle',
       desc: '',
       args: [],
@@ -957,41 +947,53 @@ class S {
     );
   }
 
-  /// `Light groups`
+  /// `Turn off the light`
   String get titleLightGroups {
     return Intl.message(
-      'Light groups',
+      'Turn off the light',
       name: 'titleLightGroups',
       desc: '',
       args: [],
     );
   }
 
-  /// `No lights found`
+  /// `No Philips Hue lights found`
   String get noLightsFound {
     return Intl.message(
-      'No lights found',
+      'No Philips Hue lights found',
       name: 'noLightsFound',
       desc: '',
       args: [],
     );
   }
 
-  /// `{count} lights`
-  String countLights(Object count) {
-    return Intl.message(
-      '$count lights',
+  /// `{count, plural, one{1 light} other{{count} lights}}`
+  String countLights(num count) {
+    return Intl.plural(
+      count,
+      one: '1 light',
+      other: '$count lights',
       name: 'countLights',
       desc: '',
       args: [count],
     );
   }
 
-  /// `Long press to adjust settings`
-  String get longPressToAdjust {
+  /// `Press and hold`
+  String get longPressToAdjustTitle {
     return Intl.message(
-      'Long press to adjust settings',
-      name: 'longPressToAdjust',
+      'Press and hold',
+      name: 'longPressToAdjustTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some actions can be configured. Press and hold the action to do so.`
+  String get longPressToAdjustDesc {
+    return Intl.message(
+      'Some actions can be configured. Press and hold the action to do so.',
+      name: 'longPressToAdjustDesc',
       desc: '',
       args: [],
     );
@@ -1022,6 +1024,26 @@ class S {
     return Intl.message(
       'Failed',
       name: 'connectionStateFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to enable`
+  String get tapToToggleTitle {
+    return Intl.message(
+      'Tap to enable',
+      name: 'tapToToggleTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start actions will be executed next time you start the timer.`
+  String get tapToToggleDesc {
+    return Intl.message(
+      'Start actions will be executed next time you start the timer.',
+      name: 'tapToToggleDesc',
       desc: '',
       args: [],
     );

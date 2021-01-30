@@ -21,13 +21,13 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(count) => "${Intl.plural(count, one: '1 device found', other: '${count} devices found')}";
 
-  static m1(count) => "${count} lights";
+  static m1(count) => "${Intl.plural(count, one: '1 light', other: '${count} lights')}";
 
   static m2(time) => "${time} expired. ";
 
   static m3(timeLeft) => "Time left: ${timeLeft}";
 
-  static m4(time) => "Timer set to ${time} minutes";
+  static m4(time) => "Time set to ${time} minutes";
 
   static m5(minutes) => "${minutes} minutes";
 
@@ -45,8 +45,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "actionPlayMusicTitle" : MessageLookupByLibrary.simpleMessage("Play music"),
     "actionToggleBluetoothDescription" : MessageLookupByLibrary.simpleMessage("Disable bluetooth"),
     "actionToggleBluetoothTitle" : MessageLookupByLibrary.simpleMessage("Bluetooth"),
-    "actionToggleLightDescription" : MessageLookupByLibrary.simpleMessage("Turn the lights off"),
-    "actionToggleLightTitle" : MessageLookupByLibrary.simpleMessage("Light"),
+    "actionToggleLightDescription" : MessageLookupByLibrary.simpleMessage("Turns your hue lights off"),
+    "actionToggleLightTitle" : MessageLookupByLibrary.simpleMessage("Hue lights"),
     "actionToggleMediaDescription" : MessageLookupByLibrary.simpleMessage("Stop media playback"),
     "actionToggleMediaTitle" : MessageLookupByLibrary.simpleMessage("Media"),
     "actionToggleScreenDescription" : MessageLookupByLibrary.simpleMessage("Turn screen off"),
@@ -60,7 +60,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "appearanceSectionTitle" : MessageLookupByLibrary.simpleMessage("Appearance"),
     "buttonOpenSavedTimer" : MessageLookupByLibrary.simpleMessage("Tap here to see your timer"),
     "buttonSearchAgain" : MessageLookupByLibrary.simpleMessage("Search again"),
-    "buttonSetupTimer" : MessageLookupByLibrary.simpleMessage("Set your routine"),
     "buttonShowAlarmApps" : MessageLookupByLibrary.simpleMessage("Alarm"),
     "buttonShowPlayerApps" : MessageLookupByLibrary.simpleMessage("Player"),
     "buttonTimerContinue" : MessageLookupByLibrary.simpleMessage("Resume"),
@@ -83,23 +82,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "faqShort" : MessageLookupByLibrary.simpleMessage("FAQ"),
     "faqTitle" : MessageLookupByLibrary.simpleMessage("Frequently asked questions"),
     "hintTurnsOffLightAction" : MessageLookupByLibrary.simpleMessage("This will turn off the light action."),
-    "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Are you tired of adjusting the same settings every night in order to sleep well?"),
+    "introAutomateSleepRoutineSubtitle" : MessageLookupByLibrary.simpleMessage("Are you tired of adjusting the same settings every night in order to fall asleep well?"),
     "introAutomateSleepRoutineTitle" : MessageLookupByLibrary.simpleMessage("Automate your daily sleep routine"),
     "introButtonDone" : MessageLookupByLibrary.simpleMessage("DONE"),
-    "introButtonNext" : MessageLookupByLibrary.simpleMessage("Next"),
+    "introButtonNext" : MessageLookupByLibrary.simpleMessage("NEXT"),
     "introButtonSkip" : MessageLookupByLibrary.simpleMessage("SKIP"),
     "introGoodNightSubtitle" : MessageLookupByLibrary.simpleMessage("Just set the timer and you\'re done.\nRelax and let your dreams come true ..."),
     "introGoodNightTitle" : MessageLookupByLibrary.simpleMessage("Have a good night"),
     "introMediaTitle" : MessageLookupByLibrary.simpleMessage("Listen to your favorite music"),
-    "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("Don\'t get distracted by incoming messages or notifications"),
+    "introNoInterruptionsSubtitle" : MessageLookupByLibrary.simpleMessage("Don\'t get distracted by incoming messages or notifications."),
     "introNoInterruptionsTitle" : MessageLookupByLibrary.simpleMessage("No interruptions"),
     "linkBridge" : MessageLookupByLibrary.simpleMessage("Link bridge"),
     "linkBridgeInstruction" : MessageLookupByLibrary.simpleMessage("1. Push the button on the bridge\n2. Tap on connect"),
-    "longPressToAdjust" : MessageLookupByLibrary.simpleMessage("Long press to adjust settings"),
-    "noLightsFound" : MessageLookupByLibrary.simpleMessage("No lights found"),
+    "longPressToAdjustDesc" : MessageLookupByLibrary.simpleMessage("Some actions can be configured. Press and hold the action to do so."),
+    "longPressToAdjustTitle" : MessageLookupByLibrary.simpleMessage("Press and hold"),
+    "noLightsFound" : MessageLookupByLibrary.simpleMessage("No Philips Hue lights found"),
     "notSupported" : MessageLookupByLibrary.simpleMessage("Not supported by device"),
     "notificationActionCancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
-    "notificationActionContinue" : MessageLookupByLibrary.simpleMessage("Continue"),
+    "notificationActionContinue" : MessageLookupByLibrary.simpleMessage("Resume"),
     "notificationActionPause" : MessageLookupByLibrary.simpleMessage("Pause"),
     "notificationActionRestart" : MessageLookupByLibrary.simpleMessage("Restart"),
     "notificationNoActionsExecuted" : MessageLookupByLibrary.simpleMessage("No actions selected for execution."),
@@ -113,12 +113,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfMinutesShort" : m6,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Other"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Device admin"),
-    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Allows app to manage device functions\nEnables screen off action"),
+    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Manage device functions\nEnables screen off action"),
     "prefsExtendTimeOnShake" : MessageLookupByLibrary.simpleMessage("Extend on phone shake"),
-    "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Please enable access to notification settings"),
-    "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Please enable device admin"),
-    "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Notification Settings Access"),
-    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Allows access to notification settings\nEnables do not disturb action"),
+    "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Please allow Do Not Disturb access to enable DND action"),
+    "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Please activate device admin"),
+    "prefsNotificationSettingsAccess" : MessageLookupByLibrary.simpleMessage("Do Not Disturb Access"),
+    "prefsNotificationSettingsAccessDescription" : MessageLookupByLibrary.simpleMessage("Required for DND action"),
     "purchasesSectionTitle" : MessageLookupByLibrary.simpleMessage("Support me"),
     "quickLaunchTitle" : MessageLookupByLibrary.simpleMessage("Quick launch"),
     "setVolumeTitle" : MessageLookupByLibrary.simpleMessage("Set volume"),
@@ -128,6 +128,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "sleepTimer" : MessageLookupByLibrary.simpleMessage("Sleep Timer"),
     "stateSearching" : MessageLookupByLibrary.simpleMessage("Searching ..."),
     "tapToConnect" : MessageLookupByLibrary.simpleMessage("Tap to\nconnect"),
+    "tapToToggleDesc" : MessageLookupByLibrary.simpleMessage("Start actions will be executed next time you start the timer."),
+    "tapToToggleTitle" : MessageLookupByLibrary.simpleMessage("Tap to enable"),
     "timerEndsActionsTitle" : MessageLookupByLibrary.simpleMessage("When time is up"),
     "timerNoAlarm" : MessageLookupByLibrary.simpleMessage("The timer doesn\'t work sometimes"),
     "timerNoAlarmDescription" : MessageLookupByLibrary.simpleMessage("Make sure that battery optimization is disabled for the app. Some device manufacturers such as Samsung or Huawei require additional settings to allow the app to be running in background."),
@@ -135,7 +137,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerNoWifiDescription" : MessageLookupByLibrary.simpleMessage("Starting with Android 10 it is not possible to disable wifi anymore."),
     "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Timer settings"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("When timer starts"),
-    "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Light groups"),
+    "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Turn off the light"),
     "unitMinute" : m7,
     "unlinkBridgeName" : m8
   };

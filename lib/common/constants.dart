@@ -23,13 +23,13 @@ const String kPrefKeyInitialTime = 'pref_key_initial_time';
 const String kPrefKeyFirstLaunch = 'pref_key_first_launch';
 const String kPrefKeyDefaultExtendTimeByShake =
     'pref_key_default_extend_time_by_shake';
+const String kPrefKeyShowTapHintForStartActions =
+    'key_show_tap_hint_for_start_actions';
 const String kPrefKeyShowLongPressHintForStartActions =
     'key_show_long_press_hint_for_start_actions';
 
 const String kHueBridgeUsername = String.fromEnvironment('APP_NAME');
 const String kPrefKeyHueBridges = 'pref_key_hue_bridges';
-const String kPrefKeyHueBridgeId = 'pref_key_hue_bridge_id';
-const String kPrefKeyHueBridgeAuth = 'pref_key_hue_bridge_auth';
 
 const String kThemeKeyLightOrange = 'light_orange_theme';
 const String kThemeKeyLightGreen = 'light_green_theme';

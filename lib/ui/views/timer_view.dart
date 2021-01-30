@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:device_functions/messages_generated.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_native_admob/flutter_native_admob.dart';
 import 'package:flutter_native_admob/native_admob_controller.dart';
 import 'package:flutter_native_admob/native_admob_options.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
@@ -127,9 +129,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
+        backwardsCompatibility: false,
+        backgroundColor: theme.scaffoldBackgroundColor,
         primary: true,
         pinned: true,
-        expandedHeight: 286,
+        expandedHeight: 272,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => model.navigateBack(),
@@ -182,23 +186,18 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               _buildQuickLaunch(),
               SectionHeader(S.of(context).timerStartsActionsTitle,
                   leftPadding: kHorizontalPadding),
-              if (model.showLongPressHint)
-                Dismissible(
-                  key: UniqueKey(),
-                  child: Card(
-                    margin: EdgeInsets.symmetric(
-                        horizontal: kHorizontalPadding,
-                        vertical: kVerticalPaddingSmall),
-                    elevation: 0,
-                    child: ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(S.of(context).longPressToAdjust),
-                      trailing: IconButton(
-                          icon: Icon(Icons.delete_sweep_outlined),
-                          onPressed: () => model.dismissLongPressHint()),
-                    ),
-                  ),
-                  onDismissed: (direction) => model.dismissLongPressHint(),
+              if (model.showHints)
+                Stack(
+                  children: [
+                    if (model.showLongPressHint)
+                      _buildHint(
+                          S.of(context).longPressToAdjustTitle,
+                          S.of(context).longPressToAdjustDesc,
+                          model.dismissLongPressHint),
+                    if (model.showTapHint)
+                      _buildHint(S.of(context).tapToToggleTitle,
+                          S.of(context).tapToToggleDesc, model.dismissTapHint),
+                  ],
                 ),
               _buildCompactStartedActions(theme),
               if (!model.isAdFree) _buildAd(theme),
@@ -209,6 +208,33 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           ),
         ),
       ],
+    );
+  }
+
+  Card _buildHint(String title, String subtitle, void Function() onPressed) {
+    return Card(
+      margin: EdgeInsets.symmetric(
+          horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
+      elevation: 0,
+      child: ListTile(
+        leading: Container(
+            width: 40, alignment: Alignment.center, child: Icon(Icons.info)),
+        title: Text(title, overflow: TextOverflow.ellipsis),
+        subtitle: Text(subtitle),
+        isThreeLine: true,
+        minVerticalPadding: kVerticalPadding,
+        trailing: SizedBox(
+          height: 20,
+          width: 20,
+          child: IconButton(
+            iconSize: 20,
+            alignment: Alignment.topRight,
+            padding: EdgeInsets.zero,
+            icon: Icon(Icons.clear),
+            onPressed: onPressed,
+          ),
+        ),
+      ),
     );
   }
 
@@ -256,7 +282,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                   return GridView.builder(
                       padding: const EdgeInsets.all(kBottomSheetPadding),
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: gridSize),
                       itemBuilder: (_, index) {
@@ -333,10 +358,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             label: '${model.timerModel.volumeAction.description}',
             activeIcon: Icons.volume_down_outlined,
             disabledIcon: Icons.volume_mute_outlined,
-            onChanged: (value) {
-              value && model.timerModel.volumeAction.value == null
-                  ? _showVolumeLevelPicker()
-                  : model.onChangeVolume(value);
+            onChanged: (value) async {
+              // setup the volumeLevel if no value exists
+              if (value && model.timerModel.volumeAction.value == null) {
+                await _showVolumeLevelPicker();
+              }
+              model.onChangeVolume(value);
             },
             onLongPress: _showVolumeLevelPicker,
             value: model.timerModel.volumeAction.enabled,
@@ -344,8 +371,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           ),
           ToggleButton(
             label: model.timerModel.lightAction.title,
-            activeIcon: Icons.flash_off_outlined,
-            disabledIcon: Icons.flash_on_outlined,
+            activeIcon: MdiIcons.lightbulbOffOutline,
+            disabledIcon: MdiIcons.lightbulbOutline,
             onChanged: model.onChangeLight,
             onLongPress: model.navigateToLightsGroups,
             value: model.timerModel.lightAction.enabled,
@@ -353,12 +380,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           ),
           ToggleButton(
             label: model.timerModel.doNotDisturbAction.title,
-            activeIcon: Icons.do_not_disturb_on,
-            disabledIcon: Icons.do_not_disturb,
-            onChanged: model.hasNotificationSettingsAccess
-                ? model.onChangeDoNotDisturb
-                : (value) => model.navigateToSettings(
-                    notificationSettingsAccessFocused: true),
+            activeIcon: MdiIcons.doNotDisturb,
+            disabledIcon: MdiIcons.doNotDisturbOff,
+            onChanged: model.onChangeDoNotDisturb,
+            onLongPress: () => model.navigateToSettings(
+                notificationSettingsAccessFocused: true),
             value: model.timerModel.doNotDisturbAction.enabled &&
                 model.hasNotificationSettingsAccess,
             size: size,
@@ -384,14 +410,15 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             value: model.timerModel.mediaAction.enabled,
             size: size,
           ),
-          ToggleButton(
-            label: model.timerModel.wifiAction.title,
-            activeIcon: Icons.wifi_off_outlined,
-            disabledIcon: Icons.wifi_outlined,
-            onChanged: model.onChangeWifi,
-            value: model.timerModel.wifiAction.enabled,
-            size: size,
-          ),
+          if (model.platformVersion < 29)
+            ToggleButton(
+              label: model.timerModel.wifiAction.title,
+              activeIcon: Icons.wifi_off_outlined,
+              disabledIcon: Icons.wifi_outlined,
+              onChanged: model.onChangeWifi,
+              value: model.timerModel.wifiAction.enabled,
+              size: size,
+            ),
           ToggleButton(
             label: model.timerModel.bluetoothAction.title,
             activeIcon: Icons.bluetooth_disabled_outlined,
@@ -443,7 +470,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  void _showVolumeLevelPicker() async {
+  Future<void> _showVolumeLevelPicker() async {
     final volumeLevel = await showDialog<double>(
         context: context,
         builder: (context) => FutureBuilder<VolumeResponse>(
@@ -454,17 +481,20 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                 var maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
 
                 return SliderDialog(
-                    title: S.of(context).setVolumeTitle,
-                    initialValue:
-                        model.timerModel.volumeAction.value ?? currentLevel,
-                    maxValue: maxVolume);
+                  title: S.of(context).setVolumeTitle,
+                  initialValue:
+                      model.timerModel.volumeAction.value ?? currentLevel,
+                  maxValue: maxVolume,
+                  onChangeEnd: (value) =>
+                      model.handleVolumeAction(value.round()),
+                );
               } else {
                 return CircularProgressIndicator();
               }
             }));
 
     if (volumeLevel != null) {
-      model.onChangeVolumeLevel(volumeLevel);
+      await model.onChangeVolumeLevel(volumeLevel);
     }
   }
 

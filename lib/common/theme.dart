@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sleep_timer/common/constants.dart';
 
 class MyTheme {
@@ -49,6 +50,8 @@ List<MyTheme> themeList = [
 ];
 
 ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
+  final isLight = colorScheme.brightness == Brightness.light;
+
   return ThemeData(
     colorScheme: colorScheme,
     textTheme: _textTheme,
@@ -56,17 +59,24 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     primaryColorBrightness: colorScheme.brightness,
     appBarTheme: AppBarTheme(
       textTheme: _textTheme.apply(bodyColor: colorScheme.onBackground),
-      color: colorScheme.background,
+      backgroundColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: colorScheme.primary),
-      brightness: colorScheme.brightness,
+      systemOverlayStyle: isLight
+          ? SystemUiOverlayStyle.dark
+              .copyWith(statusBarColor: Colors.transparent)
+          : SystemUiOverlayStyle.light
+              .copyWith(statusBarColor: Colors.transparent),
     ),
     iconTheme: IconThemeData(color: colorScheme.onPrimary),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        selectedIconTheme: IconThemeData(color: colorScheme.primary),
-        backgroundColor: colorScheme.surface),
+      selectedIconTheme: IconThemeData(color: colorScheme.primary),
+      backgroundColor: colorScheme.surface,
+    ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-        foregroundColor: Colors.white, backgroundColor: colorScheme.secondary),
+      foregroundColor: Colors.white,
+      backgroundColor: colorScheme.secondary,
+    ),
     canvasColor: colorScheme.background,
     scaffoldBackgroundColor: colorScheme.background,
     highlightColor: Colors.transparent,
@@ -95,6 +105,11 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       ),
       contentTextStyle: _textTheme.subtitle1.apply(color: _darkFillColor),
     ),
+    toggleButtonsTheme: ToggleButtonsThemeData(
+      selectedColor: colorScheme.primary,
+      disabledColor: colorScheme.onSurface.withOpacity(0.38),
+      fillColor: colorScheme.primary.withOpacity(0.18),
+    ),
   );
 }
 
@@ -104,7 +119,7 @@ ColorScheme _lightOrangeColorScheme = ColorScheme(
   secondary: Colors.deepOrangeAccent[100],
   secondaryVariant: Colors.deepOrange[300],
   background: Color(0xFFFCFCFC),
-  surface: Color(0xFFFCFCFC),
+  surface: Color(0xFFF4F4F4),
   onBackground: Colors.grey[900],
   error: _lightFillColor,
   onError: _lightFillColor,
@@ -120,7 +135,7 @@ ColorScheme _lightGreenColorScheme = ColorScheme(
   secondary: Color(0xFF68D391),
   secondaryVariant: Color(0xFF48BB78),
   background: Color(0xFFFCFCFC),
-  surface: Color(0xFFFCFCFC),
+  surface: Color(0xFFF4F4F4),
   onBackground: Colors.grey[900],
   error: _lightFillColor,
   onError: _lightFillColor,

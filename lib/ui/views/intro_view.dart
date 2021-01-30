@@ -40,15 +40,15 @@ class _IntroViewState extends State<IntroView> {
                 decoration: pageDecoration,
               ),
               PageViewModel(
-                title: S.of(context).introNoInterruptionsTitle,
-                body: S.of(context).introNoInterruptionsSubtitle,
-                image: _buildImage('img_interruption.webp'),
-                decoration: pageDecoration,
-              ),
-              PageViewModel(
                 title: S.of(context).introMediaTitle,
                 body: S.of(context).IntroMediaSubtitle,
                 image: _buildImage('img_music.webp', bottomPadding: 24),
+                decoration: pageDecoration,
+              ),
+              PageViewModel(
+                title: S.of(context).introNoInterruptionsTitle,
+                body: S.of(context).introNoInterruptionsSubtitle,
+                image: _buildImage('img_interruption.webp'),
                 decoration: pageDecoration,
               ),
               PageViewModel(

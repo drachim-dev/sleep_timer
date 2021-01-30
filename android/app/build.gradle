@@ -30,12 +30,13 @@ if (keystorePropertiesFile.exists()) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 // Default values
 def dartEnvironmentVariables = [
         ADMOB_APP_ID: "",
-        APP_NAME: "Sleep Timer"
+        APP_NAME: "Comfy Sleep Timer"
 ]
 if (project.hasProperty('dart-defines')) {
     dartEnvironmentVariables = dartEnvironmentVariables + project.property('dart-defines')
@@ -97,7 +98,7 @@ android {
 
             signingConfig signingConfigs.release
             ndk {
-                // debugSymbolLevel 'FULL' // gradle plugin version needs to be >= 4.1.0 (no stable version yet)
+                debugSymbolLevel 'symbol_table'
             }
         }
     }

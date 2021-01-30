@@ -23,7 +23,10 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
         onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
           return Scaffold(
-            appBar: AppBar(title: Text(S.of(context).linkBridge)),
+            appBar: AppBar(
+              title: Text(S.of(context).linkBridge),
+              backwardsCompatibility: false,
+            ),
             body: _buildBody(theme),
             floatingActionButton: _buildFAB(theme),
             floatingActionButtonLocation:
@@ -193,21 +196,23 @@ class LinkDialog extends StatelessWidget {
     return StatefulBuilder(builder: (_, setState) {
       return AlertDialog(
           title: Text('${bridge.name}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(S.of(context).linkBridgeInstruction),
-              SizedBox(height: kVerticalPaddingBig),
-              Image.asset('assets/img_pushlink_bridge.webp',
-                  width: 96, color: theme.iconTheme.color),
-              if (model.connectionError.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: kVerticalPaddingBig),
-                  child: Text(model.connectionError,
-                      style: theme.textTheme.subtitle1
-                          .copyWith(color: theme.errorColor)),
-                )
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(S.of(context).linkBridgeInstruction),
+                if (model.connectionError.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: kVerticalPadding),
+                    child: Text(model.connectionError,
+                        style: theme.textTheme.subtitle1
+                            .copyWith(color: theme.errorColor)),
+                  ),
+                SizedBox(height: kVerticalPadding),
+                Image.asset('assets/img_pushlink_bridge.webp',
+                    width: 88, color: theme.iconTheme.color),
+              ],
+            ),
           ),
           actions: [
             FlatButton(

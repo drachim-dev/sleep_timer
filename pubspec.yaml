@@ -15,13 +15,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.7.5+32
+version: 1.0.1+39
 
 environment:
   sdk: '>=2.11.0 <3.0.0'
 
 dependencies:
   auto_route: ^0.6.9
+  firebase_crashlytics: ^0.4.0+1
   flushbar: ^1.10.4
   flutter_native_admob: ^2.1.0+3
   get_it: ^5.0.6
@@ -31,14 +32,15 @@ dependencies:
   introduction_screen: ^1.0.9
   json_annotation: ^3.1.1
   logger: ^0.9.4
-  observable_ish:
-  preferences: ^5.2.1
+  material_design_icons_flutter: ^4.0.5855
+  observable_ish: ^2.1.5  
+  preferences: ^5.2.1 
   provider: ^4.3.3
   shared_preferences: '>=0.5.12+4 <2.0.0'
   stacked: ^1.7.7
-  stacked_services: ^0.6.3
+  stacked_services: ^0.6.4
   url_launcher: ^5.7.10
-
+  
   device_functions:
     path: ../device_functions/
     # Add unpublished plugins from private repo
@@ -54,22 +56,19 @@ dependencies:
 dependency_overrides:
   intl: ^0.17.0-nullsafety.2
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-
 dev_dependencies:
-  pedantic: ^1.9.2
   auto_route_generator:
-  injectable_generator:
   build_runner:
+  injectable_generator:
   json_serializable: ^3.5.1
-  pigeon: ^0.1.17  
-flutter_test:
-    sdk: flutter
+  pedantic: ^1.9.2
+  pigeon: ^0.1.17
 
 flutter_intl:
   enabled: true
+
+flutter_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

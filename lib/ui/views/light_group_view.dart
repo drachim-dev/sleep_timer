@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
@@ -23,7 +24,10 @@ class _LightGroupViewState extends State<LightGroupView> {
         onModelReady: (model) => this.model = model,
         builder: (context, model, child) {
           return Scaffold(
-            appBar: AppBar(title: Text(S.of(context).titleLightGroups)),
+            appBar: AppBar(
+              title: Text(S.of(context).titleLightGroups),
+              backwardsCompatibility: false,
+            ),
             body: _buildBody(theme),
             floatingActionButton: _buildFab(theme),
           );
@@ -59,9 +63,7 @@ class _LightGroupViewState extends State<LightGroupView> {
     );
   }
 
-  Column _buildRoomsForBridge(
-      final BridgeModel bridgeModel) {
-
+  Column _buildRoomsForBridge(final BridgeModel bridgeModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -93,11 +95,10 @@ class _LightGroupViewState extends State<LightGroupView> {
   }
 
   Icon _buildIconForRoom(final String roomType) {
-    print(roomType.toLowerCase());
     var icon;
-    switch (roomType.toLowerCase()) {
+    switch (roomType?.toLowerCase()) {
       case 'living room':
-        icon = Icons.weekend_outlined;
+        icon = MdiIcons.sofaSingleOutline;
         break;
       case 'kitchen':
         icon = Icons.kitchen_outlined;
@@ -106,10 +107,10 @@ class _LightGroupViewState extends State<LightGroupView> {
         icon = Icons.local_dining_outlined;
         break;
       case 'bedroom':
-        icon = Icons.king_bed_outlined;
+        icon = MdiIcons.bedOutline;
         break;
       case 'kids bedroom':
-        icon = Icons.single_bed_outlined;
+        icon = MdiIcons.bedOutline;
         break;
       case 'bathroom':
         icon = Icons.bathtub_outlined;
@@ -121,7 +122,7 @@ class _LightGroupViewState extends State<LightGroupView> {
         icon = Icons.fitness_center_outlined;
         break;
       default:
-        icon = Icons.home_outlined;
+        icon = MdiIcons.lightbulbMultipleOutline;
     }
     return Icon(icon);
   }

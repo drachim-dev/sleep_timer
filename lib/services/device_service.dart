@@ -10,7 +10,7 @@ import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
 
-@lazySingleton
+@singleton
 class DeviceService with ReactiveServiceMixin {
   final DeviceFunctionsPlatform _deviceFunctionsPlatform =
       DeviceFunctionsPlatform.getInstance();
@@ -19,8 +19,10 @@ class DeviceService with ReactiveServiceMixin {
     listenToReactiveValues([_deviceAdmin, _notificationSettingsAccess]);
   }
 
-  int _platformVersion = 0;
-  int get platformVersion => _platformVersion;
+  DeviceInfoResponse _deviceInfo;
+  int get platformVersion => _deviceInfo.platformVersion ?? 0;
+  String get deviceManufacturer => _deviceInfo.deviceManufacturer ?? '';
+  String get deviceModel => _deviceInfo.deviceModel ?? '';
 
   bool _hasAccelerometer = true;
   bool get hasAccelerometer => _hasAccelerometer;
@@ -40,8 +42,15 @@ class DeviceService with ReactiveServiceMixin {
   Future<List<App>> get alarmApps async =>
       SleepTimerPlatform.getInstance().getInstalledAlarmApps();
 
+  @factoryMethod
+  static Future<DeviceService> create() async {
+    var instance = DeviceService();
+    await instance.init();
+    return instance;
+  }
+
   Future<void> init() async {
-    _platformVersion = await _deviceFunctionsPlatform.getPlatformVersion();
+    _deviceInfo = await _deviceFunctionsPlatform.getDeviceInfo();
     _hasAccelerometer = await _deviceFunctionsPlatform.hasAccelerometer();
     _deviceAdmin.value = await _deviceFunctionsPlatform.isDeviceAdminActive();
     _notificationSettingsAccess.value =
@@ -157,5 +166,4 @@ class DeviceService with ReactiveServiceMixin {
   Future<void> openPackage(final String packageName) async {
     return SleepTimerPlatform.getInstance().launchApp(packageName);
   }
-
 }

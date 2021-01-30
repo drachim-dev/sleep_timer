@@ -73,6 +73,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       preferredSize: Size.fromHeight(kToolbarHeight + padding + 4),
       child: SafeArea(
         child: AppBar(
+          backwardsCompatibility: false,
           centerTitle: true,
           flexibleSpace: Padding(
             padding: const EdgeInsets.only(top: padding),
@@ -175,7 +176,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         child: FloatingActionButton.extended(
           onPressed: () => model.startNewTimer(),
           icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
-          label: Text(S.of(context).buttonSetupTimer, style: textStyle),
+          label: Text(S.of(context).buttonTimerStart, style: textStyle),
         ),
       ),
     );

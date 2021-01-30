@@ -6,10 +6,13 @@ import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/light_group.dart';
+import 'package:sleep_timer/services/device_service.dart';
 
 @lazySingleton
 class LightService {
   final _prefsService = locator<SharedPreferences>();
+  final _deviceService = locator<DeviceService>();
+
   final Client _client = Client();
 
   Future<List<BridgeModel>> findBridges() async {
@@ -57,8 +60,10 @@ class LightService {
   }
 
   Future<String> _createUser(Bridge bridge) async {
+    final username =
+        '$kHueBridgeUsername#${_deviceService.deviceManufacturer} ${_deviceService.deviceModel}';
     try {
-      final whiteListItem = await bridge.createUser(kHueBridgeUsername);
+      final whiteListItem = await bridge.createUser(username);
       return whiteListItem.username;
     } on BridgeException {
       rethrow;
@@ -69,7 +74,7 @@ class LightService {
     final bridge = Bridge(_client, bridgeModel.ip, bridgeModel.auth);
     final groups = await bridge.groups();
     return groups
-        .where((e) => e.type.toLowerCase() != 'entertainment')
+        .where((e) => e.type?.toLowerCase() != 'entertainment')
         .map((e) => LightGroup(
             id: e.id.toString(),
             className: e.className,

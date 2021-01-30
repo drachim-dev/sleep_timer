@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_impl.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/logger.util.dart';
@@ -26,18 +30,36 @@ import 'services/theme_service.dart';
 Future<void> main() async {
   await Application.init();
 
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    var inDebug = false;
-    assert(() {
-      inDebug = true;
-      return true;
-    }());
+  ErrorWidget.builder = _buildErrorWidget;
 
-    return inDebug
-        ? ErrorWidget(details.stack)
-        : SingleChildScrollView(child: ErrorWidget(details.stack));
-  };
-  runApp(MyApp());
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, FirebaseCrashlytics.instance.recordError);
+}
+
+Builder _buildErrorWidget(FlutterErrorDetails details) {
+  var message = 'Error occured!\n\n' + details.exception.toString() + '\n\n';
+  var stackTrace = details.stack.toString().split('\n');
+
+  return Builder(builder: (context) {
+    final theme = Theme.of(context);
+    return kDebugMode
+        ? SingleChildScrollView(child: ErrorWidget('${message} ${stackTrace}'))
+        : Container(
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(MdiIcons.googleDownasaur, size: 64),
+                Text(
+                  "Oops, this shouldn't have happened.\nPlease try again!",
+                  style: theme.textTheme.headline6,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+  });
 }
 
 final mainScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -47,15 +69,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<MyAppViewModel>.reactive(
         viewModelBuilder: () => MyAppViewModel(),
-        onModelReady: (model) {
-          final systemUiOverlayStyle =
-              model.theme.brightness == Brightness.light
-                  ? SystemUiOverlayStyle.dark
-                  : SystemUiOverlayStyle.light;
-
-          SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle.copyWith(
-              statusBarColor: Colors.transparent));
-        },
         builder: (context, model, child) {
           return MaterialApp(
             theme: model.theme,
@@ -105,11 +118,26 @@ class MyAppViewModel extends ReactiveViewModel {
 class Application {
   final Logger log = getLogger();
 
-  static void init({Function onCallBack}) async {
+  static Future<void> init({Function onCallBack}) async {
     WidgetsFlutterBinding.ensureInitialized();
 
     // init Logger
     Logger.level = Level.debug;
+
+    // init Firebase Core
+    await Firebase.initializeApp();
+
+    // Enable crashlytics only in release mode
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+    // Pass all uncaught errors to Crashlytics.
+    Function originalOnError = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails errorDetails) async {
+      await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+      // Forward to original handler.
+      originalOnError(errorDetails);
+    };
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
