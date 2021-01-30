@@ -33,10 +33,9 @@ Everything is designed to be easy and pleasent to use.
 ## Screenshots
 
 <p float="left">
-  <img src="screenshots/home.png" width="250" />
-  <img src="screenshots/intro_2.png" width="250" /> 
-  <img src="screenshots/timer.png" width="250" /> 
-  <img src="screenshots/lights.png" width="250" /> 
+  <img src="screenshots/home.png" width="260" />
+  <img src="screenshots/intro_2.png" width="260" /> 
+  <img src="screenshots/timer.png" width="260" /> 
 </p>
 
 The Mockups were created by using previewed.app
