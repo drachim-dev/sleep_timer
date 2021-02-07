@@ -66,8 +66,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     }
 
     // Check for adFree in-app purchase
-    _isAdFree = _purchaseService.products.any((element) =>
-        element.productDetails.id == kProductRemoveAds && element.purchased);
+    _isAdFree = _purchaseService?.products?.any((element) =>
+        element.productDetails.id == kProductRemoveAds && element.purchased) ?? true;
   }
 
   TimerModel get timerModel => _timerModel;
