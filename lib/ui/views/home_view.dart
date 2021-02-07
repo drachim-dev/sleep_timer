@@ -148,15 +148,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildActiveTimers(ThemeData theme) {
-    return TextButton(
-      style: TextButton.styleFrom(
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         side: BorderSide(
-            color: theme.colorScheme.primary.withAlpha(50),
-            width: 3,
-          ),
-        shape: StadiumBorder(
-          
+          color: theme.colorScheme.primary.withAlpha(50),
+          width: 3,
         ),
       ),
       child: Text(S.of(context).buttonOpenSavedTimer),

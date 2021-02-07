@@ -183,7 +183,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               Divider(height: 1),
               SectionHeader(S.of(context).quickLaunchTitle,
                   leftPadding: kHorizontalPadding),
-              _buildQuickLaunch(),
+              _buildQuickLaunch(theme),
               SectionHeader(S.of(context).timerStartsActionsTitle,
                   leftPadding: kHorizontalPadding),
               if (model.showHints)
@@ -238,7 +238,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  SizedBox _buildQuickLaunch() {
+  SizedBox _buildQuickLaunch(final ThemeData theme) {
+    final isLight = theme.brightness == Brightness.light;
+
     return SizedBox(
       height: 56,
       child: ListView(
@@ -249,7 +251,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         children: [
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              shape: StadiumBorder(),
+              primary: isLight ? Colors.black87 : Colors.white,
             ),
             icon: Icon(Icons.play_arrow_outlined),
             label: Text(S.of(context).buttonShowPlayerApps),
@@ -258,7 +260,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           SizedBox(width: 12),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              shape: StadiumBorder(),
+              primary: isLight ? Colors.black87 : Colors.white,
             ),
             icon: Icon(Icons.alarm),
             label: Text(S.of(context).buttonShowAlarmApps),

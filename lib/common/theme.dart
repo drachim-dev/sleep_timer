@@ -110,6 +110,10 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       disabledColor: colorScheme.onSurface.withOpacity(0.38),
       fillColor: colorScheme.primary.withOpacity(0.18),
     ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+      shape: StadiumBorder(),
+    )),
   );
 }
 
