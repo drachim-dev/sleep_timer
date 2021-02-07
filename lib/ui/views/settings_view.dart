@@ -107,8 +107,9 @@ class _SettingsViewState extends State<SettingsView>
         SectionHeader(S.of(context).timerSettingsSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildTimerSettings(theme)) option,
-        SectionHeader(S.of(context).purchasesSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
+        if (model.products.isNotEmpty)
+          SectionHeader(S.of(context).purchasesSectionTitle,
+              dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var product in model.products) _buildProduct(theme, product),
         SectionHeader(S.of(context).advancedSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
