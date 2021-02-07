@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -66,7 +67,7 @@ class PurchaseService with ReactiveServiceMixin {
 
   Future<List<Product>> _getProducts() async {
     var purchases = await _getPurchases();
-    // if (!kReleaseMode) resetPurchases(purchases);
+    // if (kDebugMode) resetPurchases(purchases);
 
     final response = await _iap.queryProductDetails(kProducts);
 
