@@ -148,15 +148,19 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildActiveTimers(ThemeData theme) {
-    return FlatButton(
+    return TextButton(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        side: BorderSide(
+            color: theme.colorScheme.primary.withAlpha(50),
+            width: 3,
+          ),
+        shape: StadiumBorder(
+          
+        ),
+      ),
       child: Text(S.of(context).buttonOpenSavedTimer),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      shape: StadiumBorder(
-          side: BorderSide(
-        color: theme.colorScheme.primary.withAlpha(50),
-        width: 3,
-      )),
-      onPressed: () => model.openActiveTimer(),
+      onPressed: model.openActiveTimer,
     );
   }
 
@@ -174,7 +178,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           return ScaleTransition(child: child, scale: animation);
         },
         child: FloatingActionButton.extended(
-          onPressed: () => model.startNewTimer(),
+          onPressed: model.startNewTimer,
           icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
           label: Text(S.of(context).buttonTimerStart, style: textStyle),
         ),

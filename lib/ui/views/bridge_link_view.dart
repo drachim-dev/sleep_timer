@@ -76,11 +76,11 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
               title: Text(S.of(context).unlinkBridgeName(bridge.name)),
               content: Text(S.of(context).hintTurnsOffLightAction),
               actions: [
-                FlatButton(
+                TextButton(
                   onPressed: () => model.cancelDialog(),
                   child: Text(S.of(context).dialogCancel),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () => model.remove(bridge),
                   child: Text(S.of(context).dialogUnlink),
                 )
@@ -215,14 +215,14 @@ class LinkDialog extends StatelessWidget {
             ),
           ),
           actions: [
-            FlatButton(
+            TextButton(
               onPressed: () {
                 model.cancelDialog();
                 setState(() {});
               },
               child: Text(S.of(context).dialogCancel),
             ),
-            FlatButton(
+            TextButton(
               onPressed: () async {
                 await model.linkBridge(bridge);
                 setState(() {});

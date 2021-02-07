@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -116,7 +115,7 @@ class PurchaseService with ReactiveServiceMixin {
     return success;
   }
 
-  // TODO: only for internal testing
+  // only for internal testing
   void resetPurchases(List<PurchaseDetails> purchases) {
     log.d('Reset purchases');
     purchases.forEach((element) {

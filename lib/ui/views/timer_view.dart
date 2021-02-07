@@ -247,17 +247,21 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         children: [
-          OutlineButton.icon(
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              shape: StadiumBorder(),
+            ),
             icon: Icon(Icons.play_arrow_outlined),
             label: Text(S.of(context).buttonShowPlayerApps),
-            shape: StadiumBorder(),
             onPressed: () => _showAppSheet(model.playerApps),
           ),
           SizedBox(width: 12),
-          OutlineButton.icon(
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              shape: StadiumBorder(),
+            ),
             icon: Icon(Icons.alarm),
             label: Text(S.of(context).buttonShowAlarmApps),
-            shape: StadiumBorder(),
             onPressed: () => _showAppSheet(model.alarmApps),
           ),
         ],

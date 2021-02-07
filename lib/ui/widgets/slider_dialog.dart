@@ -48,11 +48,11 @@ class _SliderDialogState extends State<SliderDialog> {
               SizedBox(width: 48, child: Text('${_initialValue.round()} %'))
             ])),
         actions: [
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(S.of(context).dialogCancel),
           ),
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.pop(context, _initialValue),
             child: Text(S.of(context).dialogDone),
           )
