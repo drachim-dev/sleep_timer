@@ -25,10 +25,10 @@
   "buttonTimerStart": "Start timer",
   "buttonTimerContinue": "Resume",
   "faqTitle": "Frequently asked questions",
-  "timerNoAlarm": "The timer doesn't work sometimes",
+  "timerNoAlarm": "Timer doesn't work sometimes",
   "timerNoAlarmDescription": "Make sure that battery optimization is disabled for the app. Some device manufacturers such as Samsung or Huawei require additional settings to allow the app to be running in background.",
-  "timerNoWifi": "Wifi option is missing",
-  "timerNoWifiDescription": "Starting with Android 10 it is not possible to disable wifi anymore.",
+  "timerNoWifi": "Wifi option missing",
+  "timerNoWifiDescription": "Starting with Android 10, it is no longer possible to toggle Wifi from within an app.",
   "creditsAppTitle": "Credits",
   "appearanceSectionTitle": "Appearance",
   "purchasesSectionTitle": "Support me",
@@ -99,5 +99,7 @@
   "connectionStateConnected": "Connected",
   "connectionStateFailed": "Failed",
   "tapToToggleTitle": "Tap to enable",
-  "tapToToggleDesc": "Start actions will be executed next time you start the timer."
+  "tapToToggleDesc": "Start actions will be executed next time you start the timer.",
+  "cannotUninstallTitle": "Uninstall",
+  "cannotUninstallDesc": "If you can't uninstall the app, make sure that device admin is disabled in settings."
 }

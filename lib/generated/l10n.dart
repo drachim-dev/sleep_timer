@@ -295,10 +295,10 @@ class S {
     );
   }
 
-  /// `The timer doesn't work sometimes`
+  /// `Timer doesn't work sometimes`
   String get timerNoAlarm {
     return Intl.message(
-      'The timer doesn\'t work sometimes',
+      'Timer doesn\'t work sometimes',
       name: 'timerNoAlarm',
       desc: '',
       args: [],
@@ -315,20 +315,20 @@ class S {
     );
   }
 
-  /// `Wifi option is missing`
+  /// `Wifi option missing`
   String get timerNoWifi {
     return Intl.message(
-      'Wifi option is missing',
+      'Wifi option missing',
       name: 'timerNoWifi',
       desc: '',
       args: [],
     );
   }
 
-  /// `Starting with Android 10 it is not possible to disable wifi anymore.`
+  /// `Starting with Android 10, it is no longer possible to toggle Wifi from within an app.`
   String get timerNoWifiDescription {
     return Intl.message(
-      'Starting with Android 10 it is not possible to disable wifi anymore.',
+      'Starting with Android 10, it is no longer possible to toggle Wifi from within an app.',
       name: 'timerNoWifiDescription',
       desc: '',
       args: [],
@@ -1044,6 +1044,26 @@ class S {
     return Intl.message(
       'Start actions will be executed next time you start the timer.',
       name: 'tapToToggleDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uninstall`
+  String get cannotUninstallTitle {
+    return Intl.message(
+      'Uninstall',
+      name: 'cannotUninstallTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `If you can't uninstall the app, make sure that device admin is disabled in settings.`
+  String get cannotUninstallDesc {
+    return Intl.message(
+      'If you can\'t uninstall the app, make sure that device admin is disabled in settings.',
+      name: 'cannotUninstallDesc',
       desc: '',
       args: [],
     );

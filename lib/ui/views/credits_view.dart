@@ -51,6 +51,8 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'in_app_purchase',
         url: 'https://pub.dev/packages/in_app_purchase'),
+    Credit(
+        title: 'in_app_review', url: 'https://pub.dev/packages/in_app_review'),
     Credit(title: 'injectable', url: 'https://pub.dev/packages/injectable'),
     Credit(
         title: 'introduction_screen',

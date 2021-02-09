@@ -27,7 +27,7 @@
   "faqTitle": "Preguntas frecuentes",
   "timerNoAlarm": "El temporizador no funciona a veces",
   "timerNoAlarmDescription": "Asegúrate de que la optimización de la batería está desactivada para la aplicación. Algunos fabricantes de dispositivos como Samsung o Huawei requieren ajustes adicionales para permitir que la aplicación funcione en segundo plano",
-  "timerNoWifi": "Falta la opción de Wifi",
+  "timerNoWifi": "No opción de Wifi",
   "timerNoWifiDescription": "A partir de Android 10 ya no es posible desactivar el wifi",
   "creditsAppTitle": "Créditos",
   "appearanceSectionTitle": "Apariencia",
@@ -99,5 +99,7 @@
   "connectionStateConnected": "Conectado",
   "connectionStateFailed": "Fallo de\nconexión",
   "tapToToggleTitle": "Pulse para activar",
-  "tapToToggleDesc": "Acciones de inicio se ejecutarán en el siguiente inicio del temporizador."
+  "tapToToggleDesc": "Acciones de inicio se ejecutarán en el siguiente inicio del temporizador.",
+  "cannotUninstallTitle": "Desinstalar",
+  "cannotUninstallDesc": "Para poder desinstalar la aplicación, tienes que desactivar el Administrador de dispositivo en los ajustes."
 }

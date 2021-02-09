@@ -123,6 +123,9 @@ class TimerService with ReactiveServiceMixin {
     _status.value = TimerStatus.ELAPSED;
     setRemainingTime(0);
 
+    var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
+    await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++_numElapsed);
+
     if (timerModel.mediaAction.enabled) await _deviceService.toggleMedia(false);
     if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29) {
       await _deviceService.toggleWifi(false);

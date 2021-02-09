@@ -25,10 +25,10 @@
   "buttonTimerStart": "Timer starten",
   "buttonTimerContinue": "Fortsetzen",
   "faqTitle": "Häufig gestellte Fragen",
-  "timerNoAlarm": "Der Timer löst manchmal nicht aus",
+  "timerNoAlarm": "Timer löst manchmal nicht aus",
   "timerNoAlarmDescription": "Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann.",
-  "timerNoWifi": "Die WLAN Aktion fehlt",
-  "timerNoWifiDescription": "Ab Android 10 ist es nicht mehr möglich, WLAN über eine App auszuschalten.",
+  "timerNoWifi": "WLAN Aktion fehlt",
+  "timerNoWifiDescription": "Seit Android 10 ist es nicht mehr möglich, WLAN über eine App an- oder auszuschalten.",
   "creditsAppTitle": "Credits",
   "appearanceSectionTitle": "Erscheinungsbild",
   "purchasesSectionTitle": "In-App-Käufe",
@@ -99,5 +99,7 @@
   "connectionStateConnected": "Verbunden",
   "connectionStateFailed": "Fehlgeschlagen",
   "tapToToggleTitle": "Antippen zum Aktivieren",
-  "tapToToggleDesc": "Startaktionen werden beim nächsten Start des Timers ausgeführt."
+  "tapToToggleDesc": "Startaktionen werden beim nächsten Start des Timers ausgeführt.",
+  "cannotUninstallTitle": "Deinstallieren",
+  "cannotUninstallDesc": "Um die App deinstallieren zu können, muss \"Erweiterte Gerätefunktionen\" in den Einstellungen deaktiviert werden."
 }

@@ -1,7 +1,9 @@
 import 'package:hue_dart/hue_dart.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/services/light_service.dart';
@@ -9,6 +11,7 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class BridgeLinkViewModel extends FutureViewModel {
+  final Logger log = getLogger();
   final _navigationService = locator<NavigationService>();
   final _prefsService = locator<SharedPreferences>();
   final _lightService = locator<LightService>();
@@ -57,7 +60,7 @@ class BridgeLinkViewModel extends FutureViewModel {
     } on BridgeException catch (error) {
       connectionError = error.description.toUpperCase();
       notifyListeners();
-      print(error);
+      log.e(error);
     }
 
     notifyListeners();

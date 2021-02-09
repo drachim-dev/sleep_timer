@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/device_service.dart';
 import '../services/light_service.dart';
 import '../services/purchase_service.dart';
+import '../services/review_service.dart';
 import '../services/theme_service.dart';
 import '../services/third_party_services_module.dart';
 import '../model/timer_model.dart';
@@ -33,6 +34,7 @@ Future<GetIt> $initGetIt(
   gh.lazySingleton<LightService>(() => LightService());
   gh.lazySingleton<NavigationService>(
       () => thirdPartyServicesModule.navigationService);
+  gh.lazySingleton<ReviewService>(() => ReviewService());
   final resolvedSharedPreferences = await thirdPartyServicesModule.prefsService;
   gh.factory<SharedPreferences>(() => resolvedSharedPreferences);
   gh.lazySingleton<ThemeService>(() => ThemeService());

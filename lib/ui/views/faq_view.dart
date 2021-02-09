@@ -18,6 +18,8 @@ class FAQView extends StatelessWidget {
           Text(S.of(context).timerNoAlarmDescription),
           SectionHeader(S.of(context).timerNoWifi),
           Text(S.of(context).timerNoWifiDescription),
+          SectionHeader(S.of(context).cannotUninstallTitle),
+          Text(S.of(context).cannotUninstallDesc),
         ],
       ),
     );

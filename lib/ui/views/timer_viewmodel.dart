@@ -13,6 +13,7 @@ import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
+import 'package:sleep_timer/services/review_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
@@ -27,6 +28,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   final _themeService = locator<ThemeService>();
   final _purchaseService = locator<PurchaseService>();
   final _deviceService = locator<DeviceService>();
+  final _reviewService = locator<ReviewService>();
 
   bool _newInstance;
 
@@ -54,6 +56,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   bool get showLongPressHint =>
       _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
+  bool get shouldAskForReview => _reviewService.shouldAskForReview();
+  Future<void> requestReview() => _reviewService.requestReview();
+
   TimerViewModel(this._timerModel)
       : _timerService =
             TimerServiceManager.getInstance().getTimerService(_timerModel.id) ??
@@ -67,7 +72,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
     // Check for adFree in-app purchase
     _isAdFree = _purchaseService?.products?.any((element) =>
-        element.productDetails.id == kProductRemoveAds && element.purchased) ?? true;
+            element.productDetails.id == kProductRemoveAds &&
+            element.purchased) ??
+        true;
   }
 
   TimerModel get timerModel => _timerModel;

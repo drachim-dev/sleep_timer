@@ -50,13 +50,16 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   StreamSubscription _adControllerSubscription;
   double _adHeight = 0;
 
+  // lock variable once the timer is elapsed
+  bool lockTimerElapsed = false;
+
   @override
   void initState() {
+    super.initState();
+
     _adController.setTestDeviceIds(AdManager.testDeviceId);
     _adControllerSubscription =
         _adController.stateChanged.listen(_onStateChanged);
-
-    super.initState();
 
     initAnimations();
   }
@@ -173,6 +176,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   Widget _buildBody(final ThemeData theme) {
+    askForReview();
+
     return CustomScrollView(
       slivers: [
         _buildAppBar(theme),
@@ -541,5 +546,19 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             }
           }),
     );
+  }
+
+  /// Ask user for review when timer is elapsed, but only ask once
+  void askForReview() {
+    if (!lockTimerElapsed &&
+        model != null &&
+        model.timerStatus == TimerStatus.ELAPSED) {
+      // to prevent multiple calls during rebuild
+      lockTimerElapsed = true;
+      final shouldAsk = model.shouldAskForReview;
+      if (shouldAsk) {
+        model.requestReview();
+      }
+    }
   }
 }
