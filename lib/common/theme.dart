@@ -106,6 +106,7 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       contentTextStyle: _textTheme.subtitle1.apply(color: _darkFillColor),
     ),
     toggleButtonsTheme: ToggleButtonsThemeData(
+      constraints: BoxConstraints(minWidth: 80),
       selectedColor: colorScheme.primary,
       disabledColor: colorScheme.onSurface.withOpacity(0.38),
       fillColor: colorScheme.primary.withOpacity(0.18),

@@ -55,7 +55,7 @@ class _ToggleButtonState extends State<ToggleButton> {
             Icon(widget.value ? widget.activeIcon : widget.disabledIcon,
                 size: size),
             SizedBox(height: kVerticalPaddingSmall),
-            Text(widget.label),
+            Text(widget.label, maxLines: 1, overflow: TextOverflow.ellipsis,),
           ],
         ),
         fillColor: fillColor,
