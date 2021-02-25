@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/messages_generated.dart';
-import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/action_model.dart';
+import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/services/timer_service.dart';
@@ -115,7 +116,6 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   Future<void> launchApp(final String packageName) async {
     await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName);
   }
-
 }
 
 class FlutterApiHandler extends FlutterTimerApi {
@@ -153,13 +153,23 @@ class FlutterApiHandler extends FlutterTimerApi {
 
     final _timerService =
         TimerServiceManager.getInstance().getTimerService(timerId);
-    final _navigationService = locator<NavigationService>();
 
-    // Navigate to timer detail view
-    _navigationService.clearStackAndShow(Routes.homeView,
-        arguments: HomeViewArguments(timerId: _timerService.timerModel.id));
-    _navigationService.navigateTo(Routes.timerView,
-        arguments: TimerViewArguments(timerModel: _timerService.timerModel));
+    // Wait for Flutter engine to be attached and runApp to be active
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      final _navigationService = locator<NavigationService>();
+
+      // _timerService was terminated by system
+      if (_timerService == null) {
+        _navigationService.clearStackAndShow(Routes.homeView);
+      } else {
+        // Navigate to timer detail view
+        _navigationService.clearStackAndShow(Routes.homeView,
+            arguments: HomeViewArguments(timerId: _timerService.timerModel.id));
+        _navigationService.navigateTo(Routes.timerView,
+            arguments:
+                TimerViewArguments(timerModel: _timerService.timerModel));
+      }
+    });
   }
 
   @override
@@ -223,5 +233,4 @@ class FlutterApiHandler extends FlutterTimerApi {
     TimerServiceManager.getInstance().setTimerService(_timerService);
     _timerService.start();
   }
-
 }
