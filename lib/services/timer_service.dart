@@ -40,6 +40,10 @@ class TimerService with ReactiveServiceMixin {
   int get maxTime => _maxTime;
 
   void start() {
+    _prefsService.setInt(
+      kPrefKeyLastRunStartedDate,
+    DateTime.now().millisecondsSinceEpoch);
+    
     if (status == TimerStatus.ELAPSED) {
       _resetTime();
     } else if (status == TimerStatus.INITIAL) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:device_functions/messages_generated.dart';
 import 'package:get_it/get_it.dart';
@@ -32,6 +33,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   bool _newInstance;
 
+  // lock variable once the timer is elapsed
+  bool mayAskForReviewLocked = false;
+
   bool get isDeviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get hasNotificationSettingsAccess =>
       _deviceService.notificationSettingsAccess ?? false;
@@ -56,8 +60,17 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   bool get showLongPressHint =>
       _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
-  bool get shouldAskForReview => _reviewService.shouldAskForReview();
-  Future<void> requestReview() => _reviewService.requestReview();
+  Future<void> mayAskForReview() async {
+    if (!mayAskForReviewLocked && timerStatus == TimerStatus.ELAPSED) {
+      // to prevent multiple calls
+      mayAskForReviewLocked = true;
+      final shouldAsk = _reviewService.shouldAskForReview();
+      if (shouldAsk) {
+        await _reviewService.requestReview();
+      }
+    }
+
+  }
 
   TimerViewModel(this._timerModel)
       : _timerService =
@@ -79,7 +92,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   TimerModel get timerModel => _timerModel;
   int get initialTime => _timerModel.initialTimeInSeconds;
-  int get remainingTime => _timerService.remainingTime;
+  int get remainingTime => max(_timerService.remainingTime, 0);
   int get maxTime => _timerService.maxTime;
 
   TimerStatus get timerStatus => _timerService.status;

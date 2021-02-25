@@ -24,6 +24,7 @@ const String kPrefKeyAskForReview = 'pref_key_ask_for_review';
 const String kPrefKeyFirstLaunch = 'pref_key_first_launch';
 const String kPrefKeyNumTimerElapsed = 'pref_key_num_launches';
 const String kPrefKeyInstallDate = 'pref_key_install_date';
+const String kPrefKeyLastRunStartedDate = 'pref_key_last_run_started_date';
 const String kPrefKeyDefaultExtendTimeByShake =
     'pref_key_default_extend_time_by_shake';
 const String kPrefKeyShowTapHintForStartActions =

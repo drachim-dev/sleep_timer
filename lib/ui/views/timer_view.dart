@@ -50,9 +50,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   StreamSubscription _adControllerSubscription;
   double _adHeight = 0;
 
-  // lock variable once the timer is elapsed
-  bool lockTimerElapsed = false;
-
   @override
   void initState() {
     super.initState();
@@ -92,11 +89,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _adControllerSubscription.cancel();
-    _adController.dispose();
-    _scrollController.dispose();
-    _hideFabAnimController.dispose();
-    _fabAnimController.dispose();
+    _adControllerSubscription?.cancel();
+    _adController?.dispose();
+    _scrollController?.dispose();
+    _hideFabAnimController?.dispose();
+    _fabAnimController?.dispose();
 
     super.dispose();
   }
@@ -176,7 +173,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   Widget _buildBody(final ThemeData theme) {
-    askForReview();
+    mayAskForReview();
 
     return CustomScrollView(
       slivers: [
@@ -361,9 +358,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final size = 36.0;
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
+      child: Wrap(
+        alignment: WrapAlignment.spaceEvenly,
+        runSpacing: kVerticalPadding,
+        direction: Axis.horizontal,
         children: [
           ToggleButton(
             label: '${model.timerModel.volumeAction.description}',
@@ -409,9 +408,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final size = 36.0;
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
+      child: Wrap(
+        alignment: WrapAlignment.spaceEvenly,
+        runSpacing: kVerticalPadding,
+        direction: Axis.horizontal,
         children: [
           ToggleButton(
             label: model.timerModel.mediaAction.title,
@@ -549,16 +550,5 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   /// Ask user for review when timer is elapsed, but only ask once
-  void askForReview() {
-    if (!lockTimerElapsed &&
-        model != null &&
-        model.timerStatus == TimerStatus.ELAPSED) {
-      // to prevent multiple calls during rebuild
-      lockTimerElapsed = true;
-      final shouldAsk = model.shouldAskForReview;
-      if (shouldAsk) {
-        model.requestReview();
-      }
-    }
-  }
+  void mayAskForReview() => model?.mayAskForReview();
 }
