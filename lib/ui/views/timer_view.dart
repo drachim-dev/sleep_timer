@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
@@ -522,8 +523,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final titleTextColor = Theme.of(context).textTheme.subtitle1.color;
     final subtitleTextColor = Theme.of(context).textTheme.caption.color;
 
-    print('#${titleTextColor.value.toRadixString(16)}');
-
     _ad = NativeAd(
       adUnitId: AdManager.nativeAdUnitId,
       factoryId: 'listTileAdFactory',
@@ -537,7 +536,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           setState(() => _isAdLoaded = true);
         },
         onAdFailedToLoad: (_, error) {
-          print('Ad load failed (code=${error.code} message=${error.message})');
+          getLogger().e('Ad load failed (code=${error.code} message=${error.message})');
         },
       ),
     );

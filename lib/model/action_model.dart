@@ -71,7 +71,7 @@ List<ActionModel> startActionList = [
   ),
 ];
 
-List<ActionModel> actionList = [
+List<ActionModel> endActionList = [
   ActionModel(
     id: ActionType.MEDIA,
     title: S.current.actionToggleMediaTitle,

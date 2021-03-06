@@ -69,7 +69,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
         await _reviewService.requestReview();
       }
     }
-
   }
 
   TimerViewModel(this._timerModel)
@@ -112,34 +111,22 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   Future<void> initialise() async {
     await GetIt.I.isReady<DeviceService>();
     if (_newInstance) {
-      await initActionPreferences();
+      await initActionPreferences(_timerModel.startActions);
+      await initActionPreferences(_timerModel.endActions);
       await startTimer();
     }
   }
 
-  Future<void> initActionPreferences() async {
-    await _prefsService.setBool(
-        ActionType.VOLUME.toString(), _timerModel.volumeAction.enabled);
-    await _prefsService.setDouble(
-        _timerModel.volumeAction.key, _timerModel.volumeAction.value);
-    await _prefsService.setBool(
-        ActionType.LIGHT.toString(), _timerModel.lightAction.enabled);
-    await _prefsService.setBool(
-        ActionType.PLAY_MUSIC.toString(), _timerModel.playMusicAction.enabled);
-    await _prefsService.setBool(
-        ActionType.DND.toString(), _timerModel.doNotDisturbAction.enabled);
+  Future<void> initActionPreferences(List<ActionModel> actions) async {
+    await Future.forEach(actions, (element) async {
+      await _prefsService.setBool(element.id.toString(), element.enabled);
 
-    await _prefsService.setBool(
-        ActionType.MEDIA.toString(), _timerModel.mediaAction.enabled);
-    await _prefsService.setBool(
-        ActionType.WIFI.toString(), _timerModel.wifiAction.enabled);
-    await _prefsService.setBool(
-        ActionType.BLUETOOTH.toString(), _timerModel.bluetoothAction.enabled);
-    await _prefsService.setBool(
-        ActionType.SCREEN.toString(), _timerModel.screenAction.enabled);
-
-    await _prefsService.setBool(
-        ActionType.APP.toString(), _timerModel.appAction.enabled);
+      if (element is ValueActionModel) {
+        if (element.value != null) {
+          await _prefsService.setDouble(element.key, element.value);
+        }
+      }
+    });
   }
 
   Future<void> startTimer(

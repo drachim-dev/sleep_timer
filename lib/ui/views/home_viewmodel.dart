@@ -27,15 +27,14 @@ class HomeViewModel extends BaseViewModel {
 
     startActionList.forEach((element) {
       element.enabled =
-          _prefService.get(element.id.toString()) ?? element.enabled;
+          _prefService.getBool(element.id.toString()) ?? element.enabled;
 
       if (element is ValueActionModel) {
-        element.value =
-            _prefService.get(element.key.toString()) ?? element.value;
+        element.value = _prefService.getDouble(element.key) ?? element.value;
       }
     });
 
-    actionList.forEach((element) {
+    endActionList.forEach((element) {
       element.enabled =
           _prefService.get(element.id.toString()) ?? element.enabled;
     });
@@ -43,7 +42,7 @@ class HomeViewModel extends BaseViewModel {
 
   void startNewTimer() async {
     final timerModel =
-        TimerModel(_initialTime * 60, startActionList, actionList);
+        TimerModel(_initialTime * 60, startActionList, endActionList);
 
     activeTimerId = await _navigationService.navigateTo(Routes.timerView,
         arguments: TimerViewArguments(timerModel: timerModel));

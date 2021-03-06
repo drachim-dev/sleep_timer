@@ -8,9 +8,9 @@ class TimerModel {
   final String _id;
   final int _initialTimeInSeconds;
   final List<ActionModel> _startActions;
-  final List<ActionModel> _actions;
+  final List<ActionModel> _endActions;
 
-  TimerModel(this._initialTimeInSeconds, this._startActions, this._actions)
+  TimerModel(this._initialTimeInSeconds, this._startActions, this._endActions)
       : _id = Utils.random.nextInt(pow(2, 31)).toString();
 
   String get id => _id;
@@ -27,16 +27,16 @@ class TimerModel {
   ActionModel get doNotDisturbAction =>
       _startActions.singleWhere((action) => action.id == ActionType.DND);
 
-  List<ActionModel> get actions => _actions;
+  List<ActionModel> get endActions => _endActions;
   ActionModel get mediaAction =>
-      _actions.singleWhere((action) => action.id == ActionType.MEDIA);
+      _endActions.singleWhere((action) => action.id == ActionType.MEDIA);
   ActionModel get wifiAction =>
-      _actions.singleWhere((action) => action.id == ActionType.WIFI);
+      _endActions.singleWhere((action) => action.id == ActionType.WIFI);
   ActionModel get bluetoothAction =>
-      _actions.singleWhere((action) => action.id == ActionType.BLUETOOTH);
+      _endActions.singleWhere((action) => action.id == ActionType.BLUETOOTH);
   ActionModel get screenAction =>
-      _actions.singleWhere((action) => action.id == ActionType.SCREEN);
+      _endActions.singleWhere((action) => action.id == ActionType.SCREEN);
 
   ActionModel get appAction =>
-      _actions.singleWhere((action) => action.id == ActionType.APP);
+      _endActions.singleWhere((action) => action.id == ActionType.APP);
 }

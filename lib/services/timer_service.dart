@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
+import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/light_service.dart';
@@ -41,9 +42,8 @@ class TimerService with ReactiveServiceMixin {
 
   void start() {
     _prefsService.setInt(
-      kPrefKeyLastRunStartedDate,
-    DateTime.now().millisecondsSinceEpoch);
-    
+        kPrefKeyLastRunStartedDate, DateTime.now().millisecondsSinceEpoch);
+
     if (status == TimerStatus.ELAPSED) {
       _resetTime();
     } else if (status == TimerStatus.INITIAL) {
@@ -96,18 +96,24 @@ class TimerService with ReactiveServiceMixin {
   }
 
   void _handleStartActions() {
-    if (timerModel.volumeAction.enabled) {
-      final value = timerModel.volumeAction.value.round();
-      handleVolumeAction(value);
-    }
-    if (timerModel.lightAction.enabled) {
-      handleLightAction();
-    }
-
-    if (timerModel.doNotDisturbAction.enabled &&
-        _deviceService.notificationSettingsAccess) {
-      handleDoNotDisturbAction();
-    }
+    timerModel.startActions.forEach((element) {
+      if (element.enabled) {
+        switch (element.id) {
+          case ActionType.VOLUME:
+            handleVolumeAction((element as ValueActionModel).value.round());
+            break;
+          case ActionType.LIGHT:
+            handleLightAction();
+            break;
+          case ActionType.DND:
+            if (_deviceService.notificationSettingsAccess) {
+              handleDoNotDisturbAction();
+            }
+            break;
+          default:
+        }
+      }
+    });
   }
 
   void handleVolumeAction(int value) {
@@ -130,16 +136,27 @@ class TimerService with ReactiveServiceMixin {
     var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
     await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++_numElapsed);
 
-    if (timerModel.mediaAction.enabled) await _deviceService.toggleMedia(false);
-    if (timerModel.wifiAction.enabled && _deviceService.platformVersion < 29) {
-      await _deviceService.toggleWifi(false);
-    }
-    if (timerModel.bluetoothAction.enabled) {
-      await _deviceService.toggleBluetooth(false);
-    }
-    if (timerModel.screenAction.enabled && _deviceService.deviceAdmin) {
-      await _deviceService.toggleScreen(false);
-    }
+    timerModel.endActions.forEach((element) {
+      if (element.enabled) {
+        switch (element.id) {
+          case ActionType.MEDIA:
+            _deviceService.toggleMedia(false);
+            break;
+          case ActionType.WIFI:
+            _deviceService.toggleWifi(false);
+            break;
+          case ActionType.BLUETOOTH:
+            _deviceService.toggleBluetooth(false);
+            break;
+          case ActionType.SCREEN:
+            if (_deviceService.deviceAdmin) {
+              _deviceService.toggleScreen(false);
+            }
+            break;
+          default:
+        }
+      }
+    });
 
     await _deviceService.showElapsedNotification(timerModel: timerModel);
   }

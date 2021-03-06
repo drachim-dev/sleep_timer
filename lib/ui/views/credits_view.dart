@@ -67,7 +67,6 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'observable_ish',
         url: 'https://pub.dev/packages/observable_ish'),
-    Credit(title: 'preferences', url: 'https://pub.dev/packages/preferences'),
     Credit(title: 'provider', url: 'https://pub.dev/packages/provider'),
     Credit(
         title: 'shared_preferences',

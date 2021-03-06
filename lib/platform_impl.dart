@@ -228,7 +228,7 @@ class FlutterApiHandler extends FlutterTimerApi {
   void onWidgetStartTimer() {
     log.d('onWidgetStartTimer called on dart side');
 
-    final timerModel = TimerModel(120, startActionList, actionList);
+    final timerModel = TimerModel(120, startActionList, endActionList);
     final _timerService = locator<TimerService>(param1: timerModel);
     TimerServiceManager.getInstance().setTimerService(_timerService);
     _timerService.start();

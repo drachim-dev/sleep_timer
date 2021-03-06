@@ -130,7 +130,7 @@ class DeviceService with ReactiveServiceMixin {
 
     var description = S.current.notificationTimeExpired(time);
     final activeActions =
-        timerModel.actions.where((element) => element.enabled);
+        timerModel.endActions.where((element) => element.enabled);
     if (activeActions.isEmpty) {
       description += S.current.notificationNoActionsExecuted;
     } else {
