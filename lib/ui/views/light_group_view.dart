@@ -143,8 +143,8 @@ class _LightGroupViewState extends State<LightGroupView> {
 
   Widget _buildFab(final ThemeData theme) {
     return FloatingActionButton(
-      child: Icon(Icons.search_outlined),
       onPressed: model.navigateToLinkBridge,
+      child: Icon(Icons.search_outlined),
     );
   }
 }

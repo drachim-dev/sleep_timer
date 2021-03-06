@@ -44,29 +44,34 @@ class _ToggleButtonState extends State<ToggleButton> {
     final size = widget.size - padding;
 
     return RawMaterialButton(
-        elevation: 0,
-        focusElevation: 0,
-        highlightElevation: 0,
-        hoverElevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: padding),
-        textStyle: currentTextStyle.copyWith(color: currentColor),
-        child: Column(
-          children: [
-            Icon(widget.value ? widget.activeIcon : widget.disabledIcon,
-                size: size),
-            SizedBox(height: kVerticalPaddingSmall),
-            Text(widget.label, maxLines: 1, overflow: TextOverflow.ellipsis,),
-          ],
-        ),
-        fillColor: fillColor,
-        focusColor: toggleButtonsTheme.focusColor,
-        highlightColor: toggleButtonsTheme.highlightColor,
-        hoverColor: toggleButtonsTheme.hoverColor,
-        splashColor: toggleButtonsTheme.splashColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        onPressed: () {
-          widget.onChanged(!widget.value);
-        },
-        onLongPress: widget.onLongPress);
+      elevation: 0,
+      focusElevation: 0,
+      highlightElevation: 0,
+      hoverElevation: 0,
+      padding: const EdgeInsets.symmetric(vertical: padding),
+      textStyle: currentTextStyle.copyWith(color: currentColor),
+      fillColor: fillColor,
+      focusColor: toggleButtonsTheme.focusColor,
+      highlightColor: toggleButtonsTheme.highlightColor,
+      hoverColor: toggleButtonsTheme.hoverColor,
+      splashColor: toggleButtonsTheme.splashColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      onPressed: () {
+        widget.onChanged(!widget.value);
+      },
+      onLongPress: widget.onLongPress,
+      child: Column(
+        children: [
+          Icon(widget.value ? widget.activeIcon : widget.disabledIcon,
+              size: size),
+          SizedBox(height: kVerticalPaddingSmall),
+          Text(
+            widget.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -36,13 +36,13 @@ class ReviewService {
     final installDate = DateTime.fromMillisecondsSinceEpoch(_installDate);
     final daysSinceInstall = DateTime.now().difference(installDate).inDays;
 
-    log.d('daysUsed: ${daysSinceInstall}');
+    log.d('daysUsed: $daysSinceInstall');
     if (minDays != null && daysSinceInstall < minDays) {
       return false;
     }
 
     _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
-    log.d('numElapsed: ${_numElapsed}');
+    log.d('numElapsed: $_numElapsed');
     if (minElapsed != null && _numElapsed < minElapsed) {
       return false;
     }
@@ -55,7 +55,7 @@ class ReviewService {
     final hoursSinceRunStarted =
         DateTime.now().difference(_lastRunStartedDate).inHours;
 
-    log.d('hoursSinceRunStarted: ${hoursSinceRunStarted}');
+    log.d('hoursSinceRunStarted: $hoursSinceRunStarted');
     if (minHoursSinceRun != null && hoursSinceRunStarted < minHoursSinceRun) {
       return false;
     }

@@ -19,8 +19,9 @@ class RoundedRectButton extends StatelessWidget {
     );
 
     return TextButton(
-        style: buttonStyle,
-        child: Text(title, style: theme.textTheme.headline5),
-        onPressed: onPressed);
+      style: buttonStyle,
+      onPressed: onPressed,
+      child: Text(title, style: theme.textTheme.headline5),
+    );
   }
 }

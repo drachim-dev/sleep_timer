@@ -95,18 +95,18 @@ class TimerService with ReactiveServiceMixin {
     _remainingTime.value = timerModel.initialTimeInSeconds;
   }
 
-  Future<void> _handleStartActions() async {
+  void _handleStartActions() {
     if (timerModel.volumeAction.enabled) {
       final value = timerModel.volumeAction.value.round();
-      await handleVolumeAction(value);
+      handleVolumeAction(value);
     }
     if (timerModel.lightAction.enabled) {
-      await handleLightAction();
+      handleLightAction();
     }
 
     if (timerModel.doNotDisturbAction.enabled &&
         _deviceService.notificationSettingsAccess) {
-      await handleDoNotDisturbAction();
+      handleDoNotDisturbAction();
     }
   }
 

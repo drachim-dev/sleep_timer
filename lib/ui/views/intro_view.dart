@@ -86,11 +86,11 @@ class _IntroViewState extends State<IntroView> {
 
   Widget _buildImage(String assetName, {double bottomPadding = 0}) {
     return Align(
+      alignment: Alignment.bottomCenter,
       child: Padding(
         padding: EdgeInsets.only(bottom: bottomPadding),
         child: Image.asset('assets/intro/$assetName', width: 350.0),
       ),
-      alignment: Alignment.bottomCenter,
     );
   }
 

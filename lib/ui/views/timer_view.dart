@@ -117,47 +117,49 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
-        backwardsCompatibility: false,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        primary: true,
-        pinned: true,
-        expandedHeight: 272,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => model.navigateBack(),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-              icon: Icon(Icons.clear), onPressed: () => model.cancelTimer()),
-        ],
-        centerTitle: true,
-        title: SABT(
-            child: Text(
-                Utils.secondsToString(model.remainingTime.round(),
-                    spacing: true),
-                style: theme.textTheme.headline2
-                    .copyWith(fontSize: 40, color: Colors.white))),
-        elevation: 0,
-        flexibleSpace: FlexibleSpaceBar(
-          background: Padding(
-            padding: const EdgeInsets.only(top: kVerticalPadding, bottom: 80),
-            child: SafeArea(
-              child: TimerSlider(
-                  initialValue: model.remainingTime,
-                  maxValue: model.maxTime,
-                  hasHandle: false,
-                  showGlow: model.showGlow,
-                  labelStyle: titleStyle,
-                  size: 180,
-                  onUpdateLabel: (value) {
-                    return Utils.secondsToString(value.round(), spacing: true);
-                  }),
-            ),
+      backwardsCompatibility: false,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      primary: true,
+      pinned: true,
+      expandedHeight: 272,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () => model.navigateBack(),
+      ),
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+            icon: Icon(Icons.clear), onPressed: () => model.cancelTimer()),
+      ],
+      centerTitle: true,
+      title: SABT(
+          child: Text(
+              Utils.secondsToString(model.remainingTime.round(), spacing: true),
+              style: theme.textTheme.headline2
+                  .copyWith(fontSize: 40, color: Colors.white))),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Padding(
+          padding: const EdgeInsets.only(top: kVerticalPadding, bottom: 80),
+          child: SafeArea(
+            child: TimerSlider(
+                initialValue: model.remainingTime,
+                maxValue: model.maxTime,
+                hasHandle: false,
+                showGlow: model.showGlow,
+                labelStyle: titleStyle,
+                size: 180,
+                onUpdateLabel: (value) {
+                  return Utils.secondsToString(value.round(), spacing: true);
+                }),
           ),
         ),
-        bottom: PreferredSize(
-            child: _buildExtendTimeRow(), preferredSize: Size.fromHeight(80)));
+      ),
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: _buildExtendTimeRow(),
+      ),
+    );
   }
 
   Widget _buildBody(final ThemeData theme) {

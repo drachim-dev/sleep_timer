@@ -45,7 +45,7 @@ Builder _buildErrorWidget(FlutterErrorDetails details) {
   return Builder(builder: (context) {
     final theme = Theme.of(context);
     return kDebugMode
-        ? SingleChildScrollView(child: ErrorWidget('${message} ${stackTrace}'))
+        ? SingleChildScrollView(child: ErrorWidget('$message $stackTrace'))
         : Container(
             color: Colors.transparent,
             child: Column(

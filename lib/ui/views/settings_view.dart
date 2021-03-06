@@ -176,6 +176,16 @@ class _SettingsViewState extends State<SettingsView>
     return [
       PopupMenuButton(
         enabled: model.hasAccelerometer,
+        tooltip: S.of(context).extendTimeByShakeMenuToolTip,
+        offset: Offset(1, 0),
+        initialValue: model.extendTimeByShake,
+        onSelected: model.onChangeExtendTimeByShake,
+        itemBuilder: (context) => kExtendTimeByShakeOptions.map((minutes) {
+          return PopupMenuItem(
+            value: minutes,
+            child: Text(S.of(context).numberOfMinutesShort(minutes)),
+          );
+        }).toList(),
         child: ListTile(
           enabled: model.hasAccelerometer,
           leading: Icon(Icons.timer_outlined),
@@ -184,16 +194,6 @@ class _SettingsViewState extends State<SettingsView>
               ? Text(S.of(context).numberOfMinutesLong(model.extendTimeByShake))
               : Text(S.of(context).notSupported),
         ),
-        tooltip: S.of(context).extendTimeByShakeMenuToolTip,
-        offset: Offset(1, 0),
-        initialValue: model.extendTimeByShake,
-        onSelected: model.onChangeExtendTimeByShake,
-        itemBuilder: (context) => kExtendTimeByShakeOptions.map((minutes) {
-          return PopupMenuItem(
-            child: Text(S.of(context).numberOfMinutesShort(minutes)),
-            value: minutes,
-          );
-        }).toList(),
       ),
     ];
   }

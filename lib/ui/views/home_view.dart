@@ -88,8 +88,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               onSelected: _onMenuOption,
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  child: Text(S.of(context).settings),
                   value: MenuOption.settings,
+                  child: Text(S.of(context).settings),
                 ),
               ],
             ),
@@ -156,8 +156,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           width: 3,
         ),
       ),
-      child: Text(S.of(context).buttonOpenSavedTimer),
       onPressed: model.openActiveTimer,
+      child: Text(S.of(context).buttonOpenSavedTimer),
     );
   }
 
@@ -172,7 +172,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       child: AnimatedSwitcher(
         duration: kThemeAnimationDuration,
         transitionBuilder: (Widget child, Animation<double> animation) {
-          return ScaleTransition(child: child, scale: animation);
+          return ScaleTransition(scale: animation, child: child);
         },
         child: FloatingActionButton.extended(
           onPressed: model.startNewTimer,
