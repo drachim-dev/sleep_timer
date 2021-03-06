@@ -6,9 +6,7 @@ import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_native_admob/flutter_native_admob.dart';
-import 'package:flutter_native_admob/native_admob_controller.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -37,8 +35,7 @@ class TimerView extends StatefulWidget {
 }
 
 class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
-  final _adController = NativeAdmobController();
-  final _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   AnimationController _hideFabAnimController;
   AnimationController _fabAnimController;
   Animation<Color> _colorAnimation;
@@ -48,30 +45,15 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   _TimerViewState();
 
   StreamSubscription _adControllerSubscription;
-  double _adHeight = 0;
+
+  NativeAd _ad;
+  bool _isAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
 
-    _adController.setTestDeviceIds(AdManager.testDeviceId);
-    _adControllerSubscription =
-        _adController.stateChanged.listen(_onStateChanged);
-
     initAnimations();
-  }
-
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _adHeight = kAdHeight;
-        });
-        break;
-
-      default:
-        break;
-    }
   }
 
   void initAnimations() {
@@ -90,10 +72,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   @override
   void dispose() {
     _adControllerSubscription?.cancel();
-    _adController?.dispose();
     _scrollController?.dispose();
     _hideFabAnimController?.dispose();
     _fabAnimController?.dispose();
+
+    _ad?.dispose();
 
     super.dispose();
   }
@@ -104,7 +87,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
     return ViewModelBuilder<TimerViewModel>.reactive(
         viewModelBuilder: () => TimerViewModel(widget.timerModel),
-        onModelReady: (model) => this.model = model,
+        onModelReady: (model) {
+          this.model = model;
+          if (!model.isAdFree) {
+            initAd();
+          }
+        },
         builder: (context, model, child) {
           return WillPopScope(
             onWillPop: () async {
@@ -202,7 +190,13 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                   ],
                 ),
               _buildCompactStartedActions(theme),
-              if (!model.isAdFree) _buildAd(theme),
+              if (_isAdLoaded)
+                Container(
+                  height: kAdHeight,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: AdWidget(ad: _ad),
+                ),
               SectionHeader(S.of(context).timerEndsActionsTitle,
                   leftPadding: kHorizontalPadding),
               _buildEndedActions(theme),
@@ -452,36 +446,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  Container _buildAd(final ThemeData theme) {
-    return Container(
-      height: _adHeight,
-      padding: EdgeInsets.only(left: 16, right: 32, top: 8, bottom: 8),
-      margin: EdgeInsets.only(bottom: 16),
-      child: NativeAdmob(
-        adUnitID: AdManager.nativeAdUnitId,
-        loading: Center(child: CircularProgressIndicator()),
-        error: Text(S.of(context).adLoadFailure),
-        controller: _adController,
-        type: NativeAdmobType.banner,
-        options: NativeAdmobOptions(
-            showMediaContent: true,
-            ratingColor: Colors.red,
-            headlineTextStyle:
-                NativeTextStyle(color: theme.textTheme.subtitle1.color),
-            advertiserTextStyle:
-                NativeTextStyle(color: theme.textTheme.caption.color),
-            storeTextStyle:
-                NativeTextStyle(color: theme.textTheme.caption.color),
-            priceTextStyle:
-                NativeTextStyle(color: theme.textTheme.caption.color),
-            callToActionStyle: NativeTextStyle(
-              // color: theme.
-              backgroundColor: Colors.grey,
-            )),
-      ),
-    );
-  }
-
   Future<void> _showVolumeLevelPicker() async {
     final volumeLevel = await showDialog<double>(
         context: context,
@@ -551,4 +515,31 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   /// Ask user for review when timer is elapsed, but only ask once
   void mayAskForReview() => model?.mayAskForReview();
+
+  Future<void> initAd() async {
+    final titleTextColor = Theme.of(context).textTheme.subtitle1.color;
+    final subtitleTextColor = Theme.of(context).textTheme.caption.color;
+
+    print('#${titleTextColor.value.toRadixString(16)}');
+
+    _ad = NativeAd(
+      adUnitId: AdManager.nativeAdUnitId,
+      factoryId: 'listTileAdFactory',
+      customOptions: {
+        'titleTextColor': '#${titleTextColor.value.toRadixString(16)}',
+        'subtitleTextColor': '#${subtitleTextColor.value.toRadixString(16)}',
+      },
+      request: AdRequest(testDevices: AdManager.testDeviceId),
+      listener: AdListener(
+        onAdLoaded: (_) {
+          setState(() => _isAdLoaded = true);
+        },
+        onAdFailedToLoad: (_, error) {
+          print('Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    );
+
+    if (!await _ad.isLoaded()) await _ad.load();
+  }
 }

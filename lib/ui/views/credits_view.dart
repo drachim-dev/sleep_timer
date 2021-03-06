@@ -43,10 +43,10 @@ class CreditsView extends StatelessWidget {
         title: 'firebase_crashlytics',
         url: 'https://pub.dev/packages/firebase_crashlytics'),
     Credit(title: 'flushbar', url: 'https://pub.dev/packages/flushbar'),
-    Credit(
-        title: 'flutter_native_admob',
-        url: 'https://pub.dev/packages/flutter_native_admob'),
     Credit(title: 'get_it', url: 'https://pub.dev/packages/get_it'),
+    Credit(
+        title: 'google_mobile_ads',
+        url: 'https://pub.dev/packages/google_mobile_ads'),
     Credit(title: 'hue_dart', url: 'https://pub.dev/packages/hue_dart'),
     Credit(
         title: 'in_app_purchase',

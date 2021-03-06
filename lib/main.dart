@@ -8,6 +8,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -141,6 +142,10 @@ class Application {
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
+
+    // init Google Mobile Ads
+    // ignore: unawaited_futures
+    MobileAds.instance.initialize();
 
     // ignore: await_only_futures
     await setupLocator();
