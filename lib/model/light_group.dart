@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'light_group.g.dart';
 
-@JsonSerializable(nullable: true)
+@JsonSerializable()
 class LightGroup {
   final String id, name, className;
   final int numberOfLights;

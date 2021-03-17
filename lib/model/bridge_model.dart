@@ -8,7 +8,7 @@ part 'bridge_model.g.dart';
 
 enum Connection { unsaved, connected, failed }
 
-@JsonSerializable(nullable: true)
+@JsonSerializable()
 class BridgeModel {
   final String id, ip, mac, name;
   String auth;
