@@ -3,7 +3,7 @@ import 'package:sleep_timer/services/timer_service.dart';
 class TimerServiceManager {
   static TimerServiceManager _instance;
 
-  static TimerServiceManager getInstance({name, age}) {
+  static TimerServiceManager getInstance() {
     if (_instance == null) {
       _instance = TimerServiceManager();
       return _instance;

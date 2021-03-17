@@ -130,9 +130,9 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('extend time by: ${arg.additionalTime} for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.extendTime(arg.additionalTime);
+    TimerServiceManager.getInstance()
+        .getTimerService(timerId)
+        ?.extendTime(arg.additionalTime);
   }
 
   @override
@@ -141,9 +141,9 @@ class FlutterApiHandler extends FlutterTimerApi {
     log.d(
         'new time after countdown: ${arg.newTime} for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.setRemainingTime(arg.newTime);
+    TimerServiceManager.getInstance()
+        .getTimerService(timerId)
+        ?.setRemainingTime(arg.newTime);
   }
 
   @override
@@ -156,16 +156,17 @@ class FlutterApiHandler extends FlutterTimerApi {
 
     // Wait for Flutter engine to be attached and runApp to be active
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      final _navigationService = locator<NavigationService>();
-
       // _timerService was terminated by system
       if (_timerService == null) {
-        _navigationService.clearStackAndShow(Routes.homeView);
+        StackedService.navigatorKey.currentState
+            .pushNamedAndRemoveUntil(Routes.homeView, (route) => false);
       } else {
         // Navigate to timer detail view
-        _navigationService.clearStackAndShow(Routes.homeView,
+        StackedService.navigatorKey.currentState.pushNamedAndRemoveUntil(
+            Routes.homeView, (route) => false,
             arguments: HomeViewArguments(timerId: _timerService.timerModel.id));
-        _navigationService.navigateTo(Routes.timerView,
+
+        StackedService.navigatorKey.currentState.pushNamed(Routes.timerView,
             arguments:
                 TimerViewArguments(timerModel: _timerService.timerModel));
       }
@@ -177,9 +178,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onPauseRequest requested for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.pauseTimer();
+    TimerServiceManager.getInstance().getTimerService(timerId)?.pauseTimer();
   }
 
   @override
@@ -187,9 +186,10 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onCancelRequest called for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.cancelTimer();
+    TimerServiceManager.getInstance().getTimerService(timerId)?.cancelTimer();
+
+    StackedService.navigatorKey.currentState
+        .popUntil((route) => route.settings.name != Routes.timerView);
   }
 
   @override
@@ -197,9 +197,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onContinueRequest called for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.start();
+    TimerServiceManager.getInstance().getTimerService(timerId)?.start();
   }
 
   @override
@@ -207,9 +205,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onRestartRequest called for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
-    _timerService.start();
+    TimerServiceManager.getInstance().getTimerService(timerId)?.start();
   }
 
   @override
@@ -229,8 +225,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     log.d('onWidgetStartTimer called on dart side');
 
     final timerModel = TimerModel(120, startActionList, endActionList);
-    final _timerService = locator<TimerService>(param1: timerModel);
+    final _timerService = locator<TimerService>(param1: timerModel)..start();
     TimerServiceManager.getInstance().setTimerService(_timerService);
-    _timerService.start();
   }
 }
