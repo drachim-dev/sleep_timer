@@ -1068,6 +1068,36 @@ class S {
       args: [],
     );
   }
+
+  /// `Do you like the app?`
+  String get rateAppTitle {
+    return Intl.message(
+      'Do you like the app?',
+      name: 'rateAppTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Any feedback is appreciated`
+  String get rateAppSubtitle {
+    return Intl.message(
+      'Any feedback is appreciated',
+      name: 'rateAppSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Free`
+  String get rateAppPrice {
+    return Intl.message(
+      'Free',
+      name: 'rateAppPrice',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

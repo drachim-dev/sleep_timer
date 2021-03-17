@@ -101,5 +101,8 @@
   "tapToToggleTitle": "Antippen zum Aktivieren",
   "tapToToggleDesc": "Startaktionen werden beim nächsten Start des Timers ausgeführt.",
   "cannotUninstallTitle": "Deinstallieren",
-  "cannotUninstallDesc": "Um die App deinstallieren zu können, muss \"Erweiterte Gerätefunktionen\" in den Einstellungen deaktiviert werden."
+  "cannotUninstallDesc": "Um die App deinstallieren zu können, muss \"Erweiterte Gerätefunktionen\" in den Einstellungen deaktiviert werden.",
+  "rateAppTitle": "Gefällt dir die App?",
+  "rateAppSubtitle": "Ich bin für jede Bewertung dankbar",
+  "rateAppPrice": "Gratis"
 }

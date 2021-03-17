@@ -101,5 +101,8 @@
   "tapToToggleTitle": "Tap to enable",
   "tapToToggleDesc": "Start actions will be executed next time you start the timer.",
   "cannotUninstallTitle": "Uninstall",
-  "cannotUninstallDesc": "If you can't uninstall the app, make sure that device admin is disabled in settings."
+  "cannotUninstallDesc": "If you can't uninstall the app, make sure that device admin is disabled in settings.",
+  "rateAppTitle": "Do you like the app?",
+  "rateAppSubtitle": "Any feedback is appreciated",
+  "rateAppPrice": "Free"
 }

@@ -101,5 +101,8 @@
   "tapToToggleTitle": "Pulse para activar",
   "tapToToggleDesc": "Acciones de inicio se ejecutarán en el siguiente inicio del temporizador.",
   "cannotUninstallTitle": "Desinstalar",
-  "cannotUninstallDesc": "Para poder desinstalar la aplicación, tienes que desactivar el Administrador de dispositivo en los ajustes."
+  "cannotUninstallDesc": "Para poder desinstalar la aplicación, tienes que desactivar el Administrador de dispositivo en los ajustes.",
+  "rateAppTitle": "¿Te gusta la app?",
+  "rateAppSubtitle": "Agradezco cualquier valoración",
+  "rateAppPrice": "Gratis"
 }
