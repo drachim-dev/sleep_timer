@@ -51,7 +51,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         onModelReady: (model) {
           this.model = model;
 
-          if (widget.timerId != null) {
+          if (widget.timerId == null) {
+            this.model.mayAskForReview();
+          } else {
             this.model.activeTimerId = widget.timerId;
           }
         },

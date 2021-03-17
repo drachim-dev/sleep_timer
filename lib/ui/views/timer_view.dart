@@ -164,8 +164,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   Widget _buildBody(final ThemeData theme) {
-    mayAskForReview();
-
     return CustomScrollView(
       slivers: [
         _buildAppBar(theme),
@@ -193,7 +191,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                   ],
                 ),
               _buildCompactStartedActions(theme),
-              if (_isAdLoaded)
+              if (_isAdLoaded && !model.childWasDismissed)
                 Container(
                   height: kAdHeight,
                   padding:
@@ -516,9 +514,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  /// Ask user for review when timer is elapsed, but only ask once
-  void mayAskForReview() => model?.mayAskForReview();
-
   Future<void> initAd() async {
     final titleTextColor = Theme.of(context).textTheme.subtitle1.color;
     final subtitleTextColor = Theme.of(context).textTheme.caption.color;
@@ -536,7 +531,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           setState(() => _isAdLoaded = true);
         },
         onAdFailedToLoad: (_, error) {
-          getLogger().e('Ad load failed (code=${error.code} message=${error.message})');
+          getLogger().e(
+              'Ad load failed (code=${error.code} message=${error.message})');
         },
       ),
     );

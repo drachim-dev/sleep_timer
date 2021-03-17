@@ -10,16 +10,18 @@ import 'package:sleep_timer/common/theme.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
+import 'package:sleep_timer/services/review_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class SettingsViewModel extends ReactiveViewModel implements Initialisable {
+  final _deviceService = locator<DeviceService>();
   final _navigationService = locator<NavigationService>();
   final _prefsService = locator<SharedPreferences>();
-  final _themeService = locator<ThemeService>();
-  final _deviceService = locator<DeviceService>();
   final _purchaseService = locator<PurchaseService>();
+  final _reviewService = locator<ReviewService>();
+  final _themeService = locator<ThemeService>();
 
   MyTheme get currentTheme => _themeService.myTheme;
   bool get glow => _themeService.showGlow;
@@ -82,9 +84,10 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
     await _purchaseService.buyProduct(product);
   }
 
-  Future<void> navigateToCredits() async =>
+  Future<void> navigateToCredits() =>
       _navigationService.navigateTo(Routes.creditsView);
 
-  Future<void> navigateToFAQ() async =>
-      _navigationService.navigateTo(Routes.fAQView);
+  Future<void> navigateToFAQ() => _navigationService.navigateTo(Routes.fAQView);
+
+  Future<void> openStoreListing() => _reviewService.openStoreListing();
 }

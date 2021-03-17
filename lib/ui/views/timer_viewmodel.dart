@@ -14,7 +14,6 @@ import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/purchase_service.dart';
-import 'package:sleep_timer/services/review_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
@@ -29,12 +28,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   final _themeService = locator<ThemeService>();
   final _purchaseService = locator<PurchaseService>();
   final _deviceService = locator<DeviceService>();
-  final _reviewService = locator<ReviewService>();
 
-  bool _newInstance;
-
-  // lock variable once the timer is elapsed
-  bool mayAskForReviewLocked = false;
+  bool _newInstance = false;
 
   bool get isDeviceAdmin => _deviceService.deviceAdmin ?? false;
   bool get hasNotificationSettingsAccess =>
@@ -60,16 +55,11 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   bool get showLongPressHint =>
       _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
-  Future<void> mayAskForReview() async {
-    if (!mayAskForReviewLocked && timerStatus == TimerStatus.ELAPSED) {
-      // to prevent multiple calls
-      mayAskForReviewLocked = true;
-      final shouldAsk = _reviewService.shouldAskForReview();
-      if (shouldAsk) {
-        await _reviewService.requestReview();
-      }
-    }
-  }
+  /// TODO: Hide ad when hints have been dismissed by user
+  /// Workaround because of bug in google mobile sdk:
+  /// https://github.com/googleads/googleads-mobile-flutter/issues/36
+  bool _childWasDismissed = false;
+  bool get childWasDismissed => _childWasDismissed;
 
   TimerViewModel(this._timerModel)
       : _timerService =
@@ -161,13 +151,16 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     notifyListeners();
   }
 
-  void dismissTapHint() {
-    _prefsService.setBool(kPrefKeyShowTapHintForStartActions, false);
+  void dismissTapHint() async {
+    await _prefsService.setBool(kPrefKeyShowTapHintForStartActions, false);
+    _childWasDismissed = !showHints;
     notifyListeners();
   }
 
-  void dismissLongPressHint() {
-    _prefsService.setBool(kPrefKeyShowLongPressHintForStartActions, false);
+  void dismissLongPressHint() async {
+    await _prefsService.setBool(
+        kPrefKeyShowLongPressHintForStartActions, false);
+    _childWasDismissed = !showHints;
     notifyListeners();
   }
 

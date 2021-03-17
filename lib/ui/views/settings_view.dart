@@ -114,9 +114,15 @@ class _SettingsViewState extends State<SettingsView>
         SectionHeader(S.of(context).timerSettingsSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildTimerSettings(theme)) option,
-        if (model.products.isNotEmpty)
-          SectionHeader(S.of(context).purchasesSectionTitle,
-              dense: true, leftPadding: kPreferenceTitleLeftPadding),
+        SectionHeader(S.of(context).purchasesSectionTitle,
+            dense: true, leftPadding: kPreferenceTitleLeftPadding),
+        ListTile(
+          leading: Icon(Icons.star_outline_outlined),
+          title: Text(S.of(context).rateAppTitle),
+          subtitle: Text(S.of(context).rateAppSubtitle),
+          trailing: Text(S.of(context).rateAppPrice),
+          onTap: model.openStoreListing,
+        ),
         for (var product in model.products) _buildProduct(theme, product),
         SectionHeader(S.of(context).advancedSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
@@ -124,11 +130,13 @@ class _SettingsViewState extends State<SettingsView>
         SectionHeader(S.of(context).otherSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         ListTile(
-            title: Text(S.of(context).faqShort),
-            onTap: () => model.navigateToFAQ()),
+          title: Text(S.of(context).faqShort),
+          onTap: model.navigateToFAQ,
+        ),
         ListTile(
-            title: Text(S.of(context).creditsAppTitle),
-            onTap: () => model.navigateToCredits()),
+          title: Text(S.of(context).creditsAppTitle),
+          onTap: model.navigateToCredits,
+        ),
       ],
     );
   }

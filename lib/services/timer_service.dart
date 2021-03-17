@@ -15,7 +15,7 @@ import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/light_service.dart';
 import 'package:stacked/stacked.dart';
 
-enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
+enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED}
 
 @injectable
 class TimerService with ReactiveServiceMixin {
@@ -41,9 +41,6 @@ class TimerService with ReactiveServiceMixin {
   int get maxTime => _maxTime;
 
   void start() {
-    _prefsService.setInt(
-        kPrefKeyLastRunStartedDate, DateTime.now().millisecondsSinceEpoch);
-
     if (status == TimerStatus.ELAPSED) {
       _resetTime();
     } else if (status == TimerStatus.INITIAL) {
@@ -85,7 +82,7 @@ class TimerService with ReactiveServiceMixin {
   }
 
   Future<void> cancelTimer() async {
-    _status.value = TimerStatus.INITIAL;
+    _status.value = TimerStatus.ELAPSED;
     // ignore: unawaited_futures
     _deviceService.cancelNotification(timerId: timerModel.id);
     _resetTime();

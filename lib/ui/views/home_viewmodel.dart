@@ -5,6 +5,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
+import 'package:sleep_timer/services/review_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -12,6 +13,7 @@ import 'package:stacked_services/stacked_services.dart';
 class HomeViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
   final _prefService = locator<SharedPreferences>();
+  final _reviewService = locator<ReviewService>();
   final _themeService = locator<ThemeService>();
 
   bool get showGlow => _themeService.showGlow;
@@ -21,6 +23,9 @@ class HomeViewModel extends BaseViewModel {
 
   String activeTimerId;
   bool get hasActiveTimer => activeTimerId != null;
+
+  // lock variable to prevent multiple calls due to rebuild
+  bool mayAskForReviewLocked = false;
 
   HomeViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
@@ -70,6 +75,17 @@ class HomeViewModel extends BaseViewModel {
   void setTime(int value) {
     _initialTime = value;
     _prefService.setInt(kPrefKeyInitialTime, value);
+  }
+
+  Future<void> mayAskForReview() async {
+    if (!mayAskForReviewLocked && !hasActiveTimer) {
+      // to prevent multiple calls
+      mayAskForReviewLocked = true;
+      final shouldAsk = _reviewService.shouldAskForReview();
+      if (shouldAsk) {
+        await _reviewService.requestReview();
+      }
+    }
   }
 
   Future navigateToSettings() async {

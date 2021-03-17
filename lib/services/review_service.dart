@@ -9,12 +9,11 @@ import 'package:sleep_timer/common/constants.dart';
 @lazySingleton
 class ReviewService {
   final Logger log = getLogger();
-  final _prefsService = locator<SharedPreferences>();
   final InAppReview _inAppReview = InAppReview.instance;
+  final _prefsService = locator<SharedPreferences>();
 
-  final int minDays = 14;
-  final int minElapsed = 7;
-  final int minHoursSinceRun = 6;
+  final int minDays = 7;
+  final int minElapsed = 4;
 
   bool askForReview = true;
   int _installDate, _numElapsed;
@@ -47,25 +46,11 @@ class ReviewService {
       return false;
     }
 
-    final _lastRunStartedInMillis =
-        _prefsService.getInt(kPrefKeyLastRunStartedDate) ??
-            DateTime.now().millisecondsSinceEpoch;
-    final _lastRunStartedDate =
-        DateTime.fromMillisecondsSinceEpoch(_lastRunStartedInMillis);
-    final hoursSinceRunStarted =
-        DateTime.now().difference(_lastRunStartedDate).inHours;
-
-    log.d('hoursSinceRunStarted: $hoursSinceRunStarted');
-    if (minHoursSinceRun != null && hoursSinceRunStarted < minHoursSinceRun) {
-      return false;
-    }
-
     return true;
   }
 
   Future<void> requestReview() async {
     log.d('requestReview()');
-
     await _prefsService.setBool(kPrefKeyAskForReview, false);
     if (await _inAppReview.isAvailable()) {
       await _inAppReview.requestReview();
