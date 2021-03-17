@@ -1,6 +1,5 @@
 package dr.achim.sleep_timer
 
-import android.app.Application
 import dr.achim.sleep_timer.MainActivity.Companion.ENGINE_ID
 import io.flutter.app.FlutterApplication
 import io.flutter.embedding.engine.FlutterEngine

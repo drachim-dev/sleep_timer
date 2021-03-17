@@ -25,9 +25,8 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun initializeFlutter() {
-        val flutterEngine = FlutterEngineCache.getInstance()[MainActivity.ENGINE_ID]
-        if (flutterEngine != null) {
-            flutterTimerApi = FlutterTimerApi(flutterEngine.dartExecutor.binaryMessenger)
+        FlutterEngineCache.getInstance()[MainActivity.ENGINE_ID]?.let {
+            flutterTimerApi = FlutterTimerApi(it.dartExecutor.binaryMessenger)
         }
     }
 

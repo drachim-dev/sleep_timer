@@ -52,7 +52,7 @@ class MainActivity : FlutterActivity() {
     private fun launchedByNotification(intent: Intent) {
         flutterTimerApi = FlutterTimerApi(flutterEngine!!.dartExecutor.binaryMessenger)
 
-        val map = intent.getSerializableExtra(NotificationReceiver.KEY_OPEN_REQUEST) as HashMap<*, *>?
+        val map = intent.getSerializableExtra(NotificationReceiver.KEY_OPEN_REQUEST) as HashMap<String, Any>?
         if (map != null) {
             val request: OpenRequest = OpenRequest.fromMap(map)
             flutterTimerApi!!.onOpen(request) { }

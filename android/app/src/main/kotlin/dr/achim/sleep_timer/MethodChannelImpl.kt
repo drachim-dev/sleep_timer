@@ -18,6 +18,7 @@ import dr.achim.sleep_timer.Messages.*
 import io.flutter.Log
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class MethodChannelImpl(private val context: Context) : HostTimerApi {
@@ -33,7 +34,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
     private fun startForegroundService(arg: TimeNotificationRequest) {
         val intent = Intent(context, AlarmService::class.java).apply {
             action = AlarmService.ACTION_START
-            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap())
+            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap() as HashMap)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
@@ -80,7 +81,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_PAUSE_NOTIFICATION
-            putExtra(NotificationReceiver.KEY_PAUSE_NOTIFICATION, arg.toMap())
+            putExtra(NotificationReceiver.KEY_PAUSE_NOTIFICATION, arg.toMap() as HashMap)
         }
         context.sendBroadcast(intent)
 
@@ -101,7 +102,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_ELAPSED_NOTIFICATION
-            putExtra(NotificationReceiver.KEY_ELAPSED_NOTIFICATION, arg.toMap())
+            putExtra(NotificationReceiver.KEY_ELAPSED_NOTIFICATION, arg.toMap() as HashMap)
         }
         context.sendBroadcast(intent)
 
@@ -159,7 +160,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
         val packages = apps.distinctBy { it.packageName }.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
-            this.apps = ArrayList(packages)
+            this.apps = packages
         }
     }
 
@@ -170,7 +171,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
         val packages = apps.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
-            this.apps =  ArrayList(packages)
+            this.apps = packages
         }
     }
 

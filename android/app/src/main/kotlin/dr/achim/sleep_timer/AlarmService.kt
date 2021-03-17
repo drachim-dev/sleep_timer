@@ -73,7 +73,7 @@ class AlarmService : Service() {
         Log.d(TAG, "intent action: ${intent?.action}")
         when (intent?.action) {
             ACTION_START -> {
-                val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<*, *>?
+                val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<String, Any>?
                 val request: TimeNotificationRequest = TimeNotificationRequest.fromMap(map)
                 startAlarm(request)
                 val showRunningIntent = Intent(this, NotificationReceiver::class.java).apply {
@@ -89,7 +89,7 @@ class AlarmService : Service() {
                         }
                         val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                             action = NotificationReceiver.ACTION_COUNTDOWN
-                            putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap())
+                            putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
                         }
                         sendBroadcast(countDownIntent)
                     }
@@ -128,7 +128,7 @@ class AlarmService : Service() {
 
                 val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                     action = NotificationReceiver.ACTION_EXTEND
-                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap())
+                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
                 }
                 sendBroadcast(intent)
 

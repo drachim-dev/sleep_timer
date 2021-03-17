@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dr.achim.sleep_timer.Messages.*
 import java.util.*
+import kotlin.collections.HashMap
 
 class NotificationReceiver : BroadcastReceiver() {
     companion object {
@@ -51,15 +52,15 @@ class NotificationReceiver : BroadcastReceiver() {
         val map: HashMap<*, *>?
         when (intent.action) {
             ACTION_SHOW_RUNNING -> {
-                map = intent.getSerializableExtra(KEY_SHOW_NOTIFICATION) as HashMap<*, *>?
+                map = intent.getSerializableExtra(KEY_SHOW_NOTIFICATION) as HashMap<String, Any?>?
                 showRunningNotification(TimeNotificationRequest.fromMap(map))
             }
             ACTION_PAUSE_NOTIFICATION -> {
-                map = intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION) as HashMap<*, *>?
+                map = intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION) as HashMap<String, Any?>?
                 showPausingNotification(TimeNotificationRequest.fromMap(map))
             }
             ACTION_ELAPSED_NOTIFICATION -> {
-                map = intent.getSerializableExtra(KEY_ELAPSED_NOTIFICATION) as HashMap<*, *>?
+                map = intent.getSerializableExtra(KEY_ELAPSED_NOTIFICATION) as HashMap<String, Any?>?
                 showElapsedNotification(NotificationRequest.fromMap(map))
             }
         }
@@ -71,6 +72,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
     private fun showRunningNotification(request: TimeNotificationRequest) {
         val timerId = request.timerId
+
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.title)
                 .setContentText(request.description)
@@ -91,7 +93,7 @@ class NotificationReceiver : BroadcastReceiver() {
         showNotification(notification)
     }
 
-    private fun buildNotificationActions(timerId: String?, restartAction: String?, pauseAction: String?, continueAction: String?, cancelAction: String?, extendActions: ArrayList<*>?): List<NotificationCompat.Action> {
+    private fun buildNotificationActions(timerId: String?, restartAction: String?, pauseAction: String?, continueAction: String?, cancelAction: String?, extendActions: MutableList<Any>?): List<NotificationCompat.Action> {
         val actions: MutableList<NotificationCompat.Action> = ArrayList()
         if (restartAction != null && restartAction.isNotEmpty()) {
             val intent = createRestartRequestIntent(timerId)
@@ -113,8 +115,8 @@ class NotificationReceiver : BroadcastReceiver() {
             val action = NotificationCompat.Action(R.drawable.ic_baseline_clear_24, cancelAction.toUpperCase(Locale.getDefault()), intent)
             actions.add(action)
         }
-        if (extendActions != null) {
-            for (extendAction in extendActions as ArrayList<Int>) {
+        if(extendActions != null) {
+            for (extendAction in extendActions as MutableList<Int>) {
                 val intent = createExtendTimeIntent(timerId, extendAction * 60)
                 val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_5_24, "+$extendAction", intent)
                 actions.add(action)
@@ -125,6 +127,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
     private fun showPausingNotification(request: TimeNotificationRequest) {
         val timerId = request.timerId
+
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.title)
                 .setContentText(request.description)
@@ -143,6 +146,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
     private fun showElapsedNotification(request: NotificationRequest) {
         val timerId = request.timerId
+
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.title)
                 .setContentText(request.description)
@@ -162,13 +166,17 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createOpenIntent(timerId: String?): PendingIntent {
-        val intent = Intent(context, MainActivity::class.java)
-        intent.action = Intent.ACTION_MAIN
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val request = OpenRequest()
-        request.timerId = timerId
-        intent.putExtra(KEY_OPEN_REQUEST, request.toMap())
+        val request = OpenRequest().apply {
+            this.timerId = timerId
+        }
+
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = Intent.ACTION_MAIN
+            addCategory(Intent.CATEGORY_LAUNCHER)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            putExtra(KEY_OPEN_REQUEST, request.toMap() as HashMap)
+        }
+
         return PendingIntent.getActivity(
                 context,
                 REQUEST_CODE_OPEN,
@@ -177,11 +185,15 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createContinueRequestIntent(timerId: String?): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
-        intent.action = ACTION_CONTINUE_REQUEST
-        val request = TimerRequest()
-        request.timerId = timerId
-        intent.putExtra(KEY_CONTINUE_REQUEST, request.toMap())
+        val request = TimerRequest().apply {
+            this.timerId = timerId
+        }
+
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = ACTION_CONTINUE_REQUEST
+            putExtra(KEY_CONTINUE_REQUEST, request.toMap() as HashMap)
+        }
+
         return PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE_CONTINUE_REQUEST,
@@ -190,11 +202,15 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createPauseRequestIntent(timerId: String?): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
-        intent.action = ACTION_PAUSE_REQUEST
-        val request = TimerRequest()
-        request.timerId = timerId
-        intent.putExtra(KEY_PAUSE_REQUEST, request.toMap())
+        val request = TimerRequest().apply {
+            this.timerId = timerId
+        }
+
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = ACTION_PAUSE_REQUEST
+            putExtra(KEY_PAUSE_REQUEST, request.toMap() as HashMap)
+        }
+
         return PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE_PAUSE_REQUEST,
@@ -203,12 +219,16 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createCancelRequestIntent(timerId: String?): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
-        intent.action = ACTION_CANCEL_REQUEST
-        val response = CancelResponse()
-        response.timerId = timerId
-        response.success = true
-        intent.putExtra(KEY_CANCEL_REQUEST, response.toMap())
+        val response = CancelResponse().apply {
+            this.timerId = timerId
+            this.success = true
+        }
+
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = ACTION_CANCEL_REQUEST
+            putExtra(KEY_CANCEL_REQUEST, response.toMap() as HashMap)
+        }
+
         return PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE_CANCEL_REQUEST,
@@ -217,12 +237,15 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createExtendTimeIntent(timerId: String?, additionalTime: Int): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
-        intent.action = ACTION_EXTEND
-        val response = ExtendTimeResponse()
-        response.timerId = timerId
-        response.additionalTime = additionalTime.toLong()
-        intent.putExtra(KEY_EXTEND_RESPONSE, response.toMap())
+        val response = ExtendTimeResponse().apply {
+            this.timerId = timerId
+            this.additionalTime = additionalTime.toLong()
+        }
+
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = ACTION_EXTEND
+            putExtra(KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
+        }
         return PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE_EXTEND + additionalTime,
@@ -231,11 +254,15 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     private fun createRestartRequestIntent(timerId: String?): PendingIntent {
-        val intent = Intent(context, NotificationActionReceiver::class.java)
-        intent.action = ACTION_RESTART_REQUEST
-        val request = TimerRequest()
-        request.timerId = timerId
-        intent.putExtra(KEY_RESTART_REQUEST, request.toMap())
+        val request = TimerRequest().apply {
+            this.timerId = timerId
+        }
+
+        val intent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = ACTION_RESTART_REQUEST
+            putExtra(KEY_RESTART_REQUEST, request.toMap() as HashMap)
+        }
+
         return PendingIntent.getBroadcast(
                 context,
                 REQUEST_CODE_RESTART_REQUEST,
