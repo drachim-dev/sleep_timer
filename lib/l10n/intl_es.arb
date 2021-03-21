@@ -40,7 +40,7 @@
   "showTimerGlow": "Efecto de brillo del temporizador",
   "showTimerGlowDescription": "Muestra un efecto de brillo alrededor de la barra de progreso",
   "prefsDeviceAdmin": "Administrador del dispositivo",
-  "prefsDeviceAdminDescription": "Las funciones del dispositivo\nPermite de apagar la pantalla",
+  "prefsDeviceAdminDescription": "Necesario para poder apagar la pantalla",
   "prefsNotificationSettingsAccess": "Acceso a No molestar",
   "prefsNotificationSettingsAccessDescription": "Necesario para la acción de no molestar",
   "prefsHintEnableDeviceAdmin": "Por favor, permite el administrador del dispositivo",

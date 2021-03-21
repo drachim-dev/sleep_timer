@@ -445,10 +445,10 @@ class S {
     );
   }
 
-  /// `Manage device functions\nEnables screen off action`
+  /// `Required for the screen off action`
   String get prefsDeviceAdminDescription {
     return Intl.message(
-      'Manage device functions\nEnables screen off action',
+      'Required for the screen off action',
       name: 'prefsDeviceAdminDescription',
       desc: '',
       args: [],
@@ -465,10 +465,10 @@ class S {
     );
   }
 
-  /// `Required for DND action`
+  /// `Required for the DND action`
   String get prefsNotificationSettingsAccessDescription {
     return Intl.message(
-      'Required for DND action',
+      'Required for the DND action',
       name: 'prefsNotificationSettingsAccessDescription',
       desc: '',
       args: [],

@@ -115,7 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfMinutesShort" : m6,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Otro"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Administrador del dispositivo"),
-    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Las funciones del dispositivo\nPermite de apagar la pantalla"),
+    "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Necesario para poder apagar la pantalla"),
     "prefsExtendTimeOnShake" : MessageLookupByLibrary.simpleMessage("Agitar para añadir tiempo"),
     "prefsHintEnableAccessToNotificationSettings" : MessageLookupByLibrary.simpleMessage("Por favor, permite el acceso a No molestar"),
     "prefsHintEnableDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Por favor, permite el administrador del dispositivo"),
