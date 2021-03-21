@@ -26,6 +26,9 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   MyTheme get currentTheme => _themeService.myTheme;
   bool get glow => _themeService.showGlow;
 
+  bool get extendByShake =>
+      _prefsService.getBool(kPrefKeyExtendByShake) ?? kDefaultExtendByShake;
+
   int get extendTimeByShake =>
       _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
       kDefaultExtendTimeByShake;
@@ -55,6 +58,21 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
     });
   }
 
+  void setTheme(final String theme) {
+    _prefsService.setString(kPrefKeyTheme, theme);
+    _themeService.setTheme(theme);
+  }
+
+  void onChangeGlow(final bool value) {
+    _prefsService.setBool(kPrefKeyGlow, value);
+    _themeService.setShowGlow(value);
+  }
+
+  void onChangeExtendByShake(final bool value) async {
+    await _prefsService.setBool(kPrefKeyExtendByShake, value);
+    notifyListeners();
+  }
+
   void onChangeExtendTimeByShake(final int value) async {
     await _prefsService.setInt(kPrefKeyDefaultExtendTimeByShake, value);
     notifyListeners();
@@ -68,16 +86,6 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   void onChangeNotificationSettingsAccess(final bool value) async {
     await _deviceService.toggleNotificationSettingsAccess(value);
     notifyListeners();
-  }
-
-  void updateTheme(final String theme) {
-    _prefsService.setString(kPrefKeyTheme, theme);
-    _themeService.updateTheme(theme);
-  }
-
-  void onChangeGlow(bool value) {
-    _prefsService.setBool(kPrefKeyGlow, value);
-    _themeService.showGlow = value;
   }
 
   Future<void> buyProduct(final Product product) async {

@@ -53,7 +53,7 @@ class NotificationReceiver : BroadcastReceiver() {
         when (intent.action) {
             ACTION_SHOW_RUNNING -> {
                 map = intent.getSerializableExtra(KEY_SHOW_NOTIFICATION) as HashMap<String, Any?>?
-                showRunningNotification(TimeNotificationRequest.fromMap(map))
+                showRunningNotification(RunningNotificationRequest.fromMap(map))
             }
             ACTION_PAUSE_NOTIFICATION -> {
                 map = intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION) as HashMap<String, Any?>?
@@ -70,7 +70,7 @@ class NotificationReceiver : BroadcastReceiver() {
         NotificationManagerCompat.from(context!!).notify(NOTIFICATION_ID, notification)
     }
 
-    private fun showRunningNotification(request: TimeNotificationRequest) {
+    private fun showRunningNotification(request: RunningNotificationRequest) {
         val timerId = request.timerId
 
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)

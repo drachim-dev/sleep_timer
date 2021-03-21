@@ -173,7 +173,7 @@ class _SettingsViewState extends State<SettingsView>
                     title: Text(myTheme.title),
                     groupValue: model.currentTheme.id,
                     value: myTheme.id,
-                    onChanged: model.updateTheme);
+                    onChanged: model.setTheme);
               }).toList()),
         );
       },
@@ -181,26 +181,61 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   List<Widget> _buildTimerSettings(final ThemeData theme) {
+    final unselectedColor = model.hasAccelerometer
+        ? theme.textTheme.subtitle1.color
+        : theme.unselectedWidgetColor;
+
+    final selectedColor = theme.textTheme.subtitle1.color;
+
     return [
-      PopupMenuButton(
-        enabled: model.hasAccelerometer,
-        tooltip: S.of(context).extendTimeByShakeMenuToolTip,
-        offset: Offset(1, 0),
-        initialValue: model.extendTimeByShake,
-        onSelected: model.onChangeExtendTimeByShake,
-        itemBuilder: (context) => kExtendTimeByShakeOptions.map((minutes) {
-          return PopupMenuItem(
-            value: minutes,
-            child: Text(S.of(context).numberOfMinutesShort(minutes)),
-          );
-        }).toList(),
-        child: ListTile(
-          enabled: model.hasAccelerometer,
-          leading: Icon(Icons.timer_outlined),
-          title: Text(S.of(context).prefsExtendTimeOnShake),
-          subtitle: model.hasAccelerometer
-              ? Text(S.of(context).numberOfMinutesLong(model.extendTimeByShake))
-              : Text(S.of(context).notSupported),
+      Theme(
+        data: Theme.of(context).copyWith(
+          accentColor: selectedColor,
+          textTheme: theme.textTheme.apply(bodyColor: unselectedColor),
+          unselectedWidgetColor: unselectedColor,
+          dividerColor: Colors.transparent,
+        ),
+        child: IgnorePointer(
+          ignoring: !model.hasAccelerometer,
+          child: ExpansionTile(
+            leading: Icon(Icons.vibration_outlined),
+            onExpansionChanged: model.onChangeExtendByShake,
+            initiallyExpanded: model.hasAccelerometer && model.extendByShake,
+            title: Text(S.of(context).prefsExtendTimeOnShake),
+            subtitle: !model.hasAccelerometer
+                ? Text(S.of(context).notSupported)
+                : null,
+            trailing: IgnorePointer(
+              child: Switch(
+                value: model.hasAccelerometer && model.extendByShake,
+                onChanged: (_) {},
+              ),
+            ),
+            children: [
+              PopupMenuButton(
+                enabled: model.hasAccelerometer,
+                tooltip: S.of(context).extendTimeByShakeMenuToolTip,
+                offset: Offset(1, 0),
+                initialValue: model.extendTimeByShake,
+                onSelected: model.onChangeExtendTimeByShake,
+                itemBuilder: (context) =>
+                    kExtendTimeByShakeOptions.map((minutes) {
+                  return PopupMenuItem(
+                    value: minutes,
+                    child: Text(S.of(context).numberOfMinutesShort(minutes)),
+                  );
+                }).toList(),
+                child: ListTile(
+                  leading: SizedBox(),
+                  enabled: model.hasAccelerometer,
+                  title: Text(S
+                      .of(context)
+                      .numberOfMinutesLong(model.extendTimeByShake)),
+                  subtitle: Text(S.of(context).extendTimeByShakeMenuToolTip),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ];

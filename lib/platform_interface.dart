@@ -23,7 +23,8 @@ abstract class SleepTimerPlatform {
       final String cancelAction,
       final List<int> extendActions,
       @required final int duration,
-      @required final int remainingTime});
+      @required final int remainingTime,
+      @required final bool shakeToExtend});
   Future<bool> showPausingNotification(
       {@required final String timerId,
       @required final String title,

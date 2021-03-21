@@ -105,11 +105,11 @@ class MyAppViewModel extends ReactiveViewModel {
   ThemeData get theme => _themeService.myTheme.theme;
 
   MyAppViewModel() {
-    var savedTheme = _prefsService.getString(kPrefKeyTheme);
-    if (savedTheme != null) _themeService.updateTheme(savedTheme);
+    final savedTheme = _prefsService.getString(kPrefKeyTheme);
+    if (savedTheme != null) _themeService.setTheme(savedTheme);
 
-    var savedGlow = _prefsService.getBool(kPrefKeyGlow);
-    if (savedGlow != null) _themeService.showGlow = savedGlow;
+    final savedGlow = _prefsService.getBool(kPrefKeyGlow);
+    if (savedGlow != null) _themeService.setShowGlow(savedGlow);
   }
 
   @override

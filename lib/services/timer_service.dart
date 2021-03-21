@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
-import 'package:observable_ish/observable_ish.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
@@ -15,7 +14,7 @@ import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/light_service.dart';
 import 'package:stacked/stacked.dart';
 
-enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED}
+enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
 
 @injectable
 class TimerService with ReactiveServiceMixin {
@@ -25,17 +24,17 @@ class TimerService with ReactiveServiceMixin {
   final _prefsService = locator<SharedPreferences>();
   final TimerModel timerModel;
 
-  final RxValue<TimerStatus> _status = RxValue(initial: TimerStatus.INITIAL);
-  TimerStatus get status => _status.value;
+  TimerStatus _status = TimerStatus.INITIAL;
+  TimerStatus get status => _status;
 
   TimerService(@factoryParam this.timerModel)
-      : _remainingTime = RxValue<int>(initial: timerModel.initialTimeInSeconds),
+      : _remainingTime = timerModel.initialTimeInSeconds,
         _maxTime = timerModel.initialTimeInSeconds {
     listenToReactiveValues([_remainingTime, _status]);
   }
 
-  final RxValue<int> _remainingTime;
-  int get remainingTime => _remainingTime.value;
+  int _remainingTime;
+  int get remainingTime => _remainingTime;
 
   int _maxTime;
   int get maxTime => _maxTime;
@@ -47,50 +46,63 @@ class TimerService with ReactiveServiceMixin {
       _handleStartActions();
     }
 
-    _status.value = TimerStatus.RUNNING;
+    setTimerStatus(TimerStatus.RUNNING);
 
     _deviceService.showRunningNotification(
         timerId: timerModel.id,
         duration: maxTime,
-        remainingTime: remainingTime);
+        remainingTime: remainingTime,
+        shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
+            kDefaultExtendByShake);
   }
 
-  void setRemainingTime(final int seconds) => _remainingTime.value = seconds;
+  void setTimerStatus(TimerStatus status) {
+    _status = status;
+    notifyListeners();
+  }
+
+  void setRemainingTime(final int seconds) {
+    _remainingTime = seconds;
+    notifyListeners();
+  }
 
   void extendTime(final int seconds) {
     final defaultExtendTime =
         _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
             kDefaultExtendTimeByShake;
 
-    _remainingTime.value += seconds ?? defaultExtendTime * 60;
+    final newTime = _remainingTime += seconds ?? defaultExtendTime * 60;
+    setRemainingTime(newTime);
     setMaxTime();
 
     if (status == TimerStatus.RUNNING) {
       _deviceService.showRunningNotification(
           timerId: timerModel.id,
           duration: maxTime,
-          remainingTime: remainingTime);
+          remainingTime: remainingTime,
+          shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
+              kDefaultExtendByShake);
     } else if (status == TimerStatus.PAUSING) {
       pauseTimer();
     }
   }
 
   void pauseTimer() {
-    _status.value = TimerStatus.PAUSING;
+    setTimerStatus(TimerStatus.PAUSING);
+
     _deviceService.showPauseNotification(
         timerId: timerModel.id, remainingTime: remainingTime);
   }
 
   Future<void> cancelTimer() async {
-    _status.value = TimerStatus.ELAPSED;
+    setTimerStatus(TimerStatus.ELAPSED);
+
     // ignore: unawaited_futures
     _deviceService.cancelNotification(timerId: timerModel.id);
     _resetTime();
   }
 
-  void _resetTime() {
-    _remainingTime.value = timerModel.initialTimeInSeconds;
-  }
+  void _resetTime() => setRemainingTime(timerModel.initialTimeInSeconds);
 
   void _handleStartActions() {
     timerModel.startActions.forEach((element) {
@@ -127,7 +139,7 @@ class TimerService with ReactiveServiceMixin {
 
   Future<void> handleEndedActions() async {
     log.d('handleEndedActions()');
-    _status.value = TimerStatus.ELAPSED;
+    setTimerStatus(TimerStatus.ELAPSED);
     setRemainingTime(0);
 
     var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;

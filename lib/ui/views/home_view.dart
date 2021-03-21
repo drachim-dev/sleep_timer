@@ -125,7 +125,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                   initialValue: model.initialTime,
                   onUpdateLabel: (value) =>
                       S.of(context).numberOfMinutesShort(value),
-                  onChange: (value) => model.setTime(value),
+                  onChange: (value) => model.setTimeSilent(value),
                   showGlow: model.showGlow,
                 ),
                 Padding(
@@ -137,7 +137,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                         return Expanded(
                           child: RoundedRectButton(
                               title: '$value',
-                              onPressed: () => model.updateTime(value)),
+                              onPressed: () => model.setTime(value)),
                         );
                       }).toList()),
                 ),

@@ -66,15 +66,15 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  void updateTime(int value) {
+  /// Sets the time without notifying listeners.
+  void setTimeSilent(int value) {
     _initialTime = value;
     _prefService.setInt(kPrefKeyInitialTime, value);
-    notifyListeners();
   }
 
   void setTime(int value) {
-    _initialTime = value;
-    _prefService.setInt(kPrefKeyInitialTime, value);
+    setTimeSilent(value);
+    notifyListeners();
   }
 
   Future<void> mayAskForReview() async {

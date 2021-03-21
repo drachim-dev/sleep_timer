@@ -46,6 +46,41 @@ class TimeNotificationRequest implements NotificationRequest {
   int remainingTime;
 }
 
+class RunningNotificationRequest implements TimeNotificationRequest {
+  @override
+  String cancelAction;
+
+  @override
+  String continueAction;
+
+  @override
+  String description;
+
+  @override
+  int duration;
+
+  @override
+  List<int> extendActions;
+
+  @override
+  String pauseAction;
+
+  @override
+  int remainingTime;
+
+  @override
+  String restartAction;
+
+  @override
+  String timerId;
+
+  @override
+  String title;
+
+  /// Enable shake to extend functionality.
+  bool shakeToExtend;
+}
+
 class NotificationResponse {
   String timerId;
   bool success;
@@ -102,7 +137,7 @@ class LaunchAppRequest {
 @HostApi()
 abstract class HostTimerApi {
   void init(InitializationRequest request);
-  NotificationResponse showRunningNotification(TimeNotificationRequest request);
+  NotificationResponse showRunningNotification(RunningNotificationRequest request);
   NotificationResponse showPausingNotification(TimeNotificationRequest request);
   NotificationResponse showElapsedNotification(NotificationRequest request);
   CancelResponse cancelTimer(CancelRequest request);

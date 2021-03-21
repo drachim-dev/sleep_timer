@@ -31,7 +31,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         CallbackHelper.setHandle(context, arg.callbackHandle)
     }
 
-    private fun startForegroundService(arg: TimeNotificationRequest) {
+    private fun startForegroundService(arg: RunningNotificationRequest) {
         val intent = Intent(context, AlarmService::class.java).apply {
             action = AlarmService.ACTION_START
             putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap() as HashMap)
@@ -50,7 +50,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         }
     }
 
-    override fun showRunningNotification(arg: TimeNotificationRequest): NotificationResponse {
+    override fun showRunningNotification(arg: RunningNotificationRequest): NotificationResponse {
         stopForegroundService()
         val response = NotificationResponse().apply {
             timerId = arg.timerId

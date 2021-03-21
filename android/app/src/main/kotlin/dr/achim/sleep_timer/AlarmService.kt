@@ -14,7 +14,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dr.achim.sleep_timer.Messages.ExtendTimeResponse
-import dr.achim.sleep_timer.Messages.TimeNotificationRequest
+import dr.achim.sleep_timer.Messages.RunningNotificationRequest
 import dr.achim.sleep_timer.ShakeDetector.OnShakeListener
 import java.util.*
 
@@ -74,7 +74,7 @@ class AlarmService : Service() {
         when (intent?.action) {
             ACTION_START -> {
                 val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<String, Any>?
-                val request: TimeNotificationRequest = TimeNotificationRequest.fromMap(map)
+                val request: RunningNotificationRequest = RunningNotificationRequest.fromMap(map)
                 startAlarm(request)
                 val showRunningIntent = Intent(this, NotificationReceiver::class.java).apply {
                     action = NotificationReceiver.ACTION_SHOW_RUNNING
@@ -113,7 +113,7 @@ class AlarmService : Service() {
         return START_STICKY
     }
 
-    private fun startAlarm(request: TimeNotificationRequest) {
+    private fun startAlarm(request: RunningNotificationRequest) {
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
         alarmIntent.putExtra(NotificationReceiver.KEY_TIMER_ID, request.timerId)
         pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -121,25 +121,28 @@ class AlarmService : Service() {
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000, pendingAlarmIntent)
 
-        shakeDetector?.setOnShakeListener(object : OnShakeListener {
-            override fun onShake(count: Int) {
-                val response = ExtendTimeResponse()
-                response.timerId = request.timerId
+        if(request.shakeToExtend != null && request.shakeToExtend) {
+            shakeDetector?.setOnShakeListener(object : OnShakeListener {
+                override fun onShake(count: Int) {
+                    val response = ExtendTimeResponse()
+                    response.timerId = request.timerId
 
-                val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
-                    action = NotificationReceiver.ACTION_EXTEND
-                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
-                }
-                sendBroadcast(intent)
+                    val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                        action = NotificationReceiver.ACTION_EXTEND
+                        putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
+                    }
+                    sendBroadcast(intent)
 
-                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
-                } else {
-                    vibrator.vibrate(500)
+                    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        vibrator.vibrate(500)
+                    }
                 }
-            }
-        })
+            })
+        }
+
 
         sensorManager?.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
     }

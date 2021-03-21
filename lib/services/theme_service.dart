@@ -1,5 +1,4 @@
 import 'package:injectable/injectable.dart';
-import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
 import 'package:stacked/stacked.dart';
@@ -10,18 +9,24 @@ class ThemeService with ReactiveServiceMixin {
     listenToReactiveValues([_myTheme, _showGlow]);
   }
 
-  final RxValue<MyTheme> _myTheme = RxValue<MyTheme>(
-      initial: themeList.firstWhere((e) => e.id == kThemeKeyDarkOrange));
-  MyTheme get myTheme => _myTheme.value;
+  MyTheme _myTheme = themeList.firstWhere((e) => e.id == kThemeKeyDarkOrange);
+  MyTheme get myTheme => _myTheme;
 
-  final RxValue<bool> _showGlow = RxValue<bool>(initial: kDefaultGlow);
-  bool get showGlow => _showGlow.value;
-  set showGlow(final bool value) => _showGlow.value = value;
+  bool _showGlow = kDefaultGlow;
+  bool get showGlow => _showGlow;
 
-  void updateTheme(final String value) {
-    final theme =
+  void setShowGlow(final bool value) {
+    _showGlow = value;
+    notifyListeners();
+  }
+
+  void setTheme(final String value) {
+    final result =
         themeList.firstWhere((theme) => theme.id == value, orElse: () => null);
 
-    if (theme != null) _myTheme.value = theme;
+    if (result != null) {
+      _myTheme = result;
+      notifyListeners();
+    }
   }
 }

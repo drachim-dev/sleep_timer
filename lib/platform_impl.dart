@@ -33,9 +33,10 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       final String cancelAction,
       final List<int> extendActions,
       @required final int duration,
-      @required final int remainingTime}) async {
+      @required final int remainingTime,
+      @required final bool shakeToExtend}) async {
     final response =
-        await _hostApi.showRunningNotification(TimeNotificationRequest()
+        await _hostApi.showRunningNotification(RunningNotificationRequest()
           ..timerId = timerId
           ..title = title
           ..description = description
@@ -44,7 +45,8 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..cancelAction = cancelAction
           ..extendActions = extendActions
           ..duration = duration
-          ..remainingTime = remainingTime);
+          ..remainingTime = remainingTime
+          ..shakeToExtend = shakeToExtend);
     return response.success;
   }
 

@@ -2,7 +2,6 @@ import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:observable_ish/observable_ish.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/app.dart';
@@ -27,14 +26,13 @@ class DeviceService with ReactiveServiceMixin {
   bool _hasAccelerometer = true;
   bool get hasAccelerometer => _hasAccelerometer;
 
-  final RxValue<bool> _deviceAdmin = RxValue<bool>(initial: false);
-  bool get deviceAdmin => _deviceAdmin.value;
+  bool _deviceAdmin = false;
+  bool get deviceAdmin => _deviceAdmin;
 
   Future<VolumeResponse> get volume => _deviceFunctionsPlatform.getVolume();
 
-  final RxValue<bool> _notificationSettingsAccess =
-      RxValue<bool>(initial: false);
-  bool get notificationSettingsAccess => _notificationSettingsAccess.value;
+  bool _notificationSettingsAccess = false;
+  bool get notificationSettingsAccess => _notificationSettingsAccess;
 
   Future<List<App>> get playerApps async =>
       SleepTimerPlatform.getInstance().getInstalledPlayerApps();
@@ -52,8 +50,8 @@ class DeviceService with ReactiveServiceMixin {
   Future<void> init() async {
     _deviceInfo = await _deviceFunctionsPlatform.getDeviceInfo();
     _hasAccelerometer = await _deviceFunctionsPlatform.hasAccelerometer();
-    _deviceAdmin.value = await _deviceFunctionsPlatform.isDeviceAdminActive();
-    _notificationSettingsAccess.value =
+    _deviceAdmin = await _deviceFunctionsPlatform.isDeviceAdminActive();
+    _notificationSettingsAccess =
         await _deviceFunctionsPlatform.isNotificationAccessGranted();
   }
 
@@ -92,7 +90,8 @@ class DeviceService with ReactiveServiceMixin {
   Future<bool> showRunningNotification(
       {@required final String timerId,
       @required final int duration,
-      @required final int remainingTime}) async {
+      @required final int remainingTime,
+      @required final bool shakeToExtend}) async {
     final durationString =
         Utils.secondsToString(duration, trimTrailingZeros: true);
 
@@ -103,7 +102,8 @@ class DeviceService with ReactiveServiceMixin {
         pauseAction: S.current.notificationActionPause,
         extendActions: [5, 20],
         duration: duration,
-        remainingTime: remainingTime);
+        remainingTime: remainingTime,
+        shakeToExtend: shakeToExtend);
   }
 
   Future<bool> showPauseNotification(
@@ -154,13 +154,15 @@ class DeviceService with ReactiveServiceMixin {
   // Async response not yet possible with pigeon.
   // Workaround by using @FlutterApi() for callback.
   void setDeviceAdmin(final bool granted) {
-    _deviceAdmin.value = granted;
+    _deviceAdmin = granted;
+    notifyListeners();
   }
 
   // Async response not yet possible with pigeon.
   // Workaround by using @FlutterApi() for callback.
   void setNotificationAccess(final bool granted) {
-    _notificationSettingsAccess.value = granted;
+    _notificationSettingsAccess = granted;
+    notifyListeners();
   }
 
   Future<void> openPackage(final String packageName) async {

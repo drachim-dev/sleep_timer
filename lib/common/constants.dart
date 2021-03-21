@@ -28,6 +28,7 @@ const String kPrefKeyAskForReview = 'pref_key_ask_for_review_home';
 const String kPrefKeyFirstLaunch = 'pref_key_first_launch';
 const String kPrefKeyNumTimerElapsed = 'pref_key_num_launches';
 const String kPrefKeyInstallDate = 'pref_key_install_date';
+const String kPrefKeyExtendByShake = 'pref_key_extend_by_shake';
 const String kPrefKeyDefaultExtendTimeByShake =
     'pref_key_default_extend_time_by_shake';
 const String kPrefKeyShowTapHintForStartActions =
@@ -46,6 +47,7 @@ const String kThemeKeyBlackBlue = 'black_blue_theme';
 
 const int kDefaultInitialTime = 15;
 const bool kDefaultGlow = true;
+const bool kDefaultExtendByShake = true;
 const int kStartTimerDelay = 1500;
 const double kAdHeight = 90;
 const List<int> kExtendTimeByShakeOptions = [15, 30, 45, 60];
