@@ -55,12 +55,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   bool get showLongPressHint =>
       _prefsService.getBool(kPrefKeyShowLongPressHintForStartActions) ?? true;
 
-  /// TODO: Hide ad when hints have been dismissed by user
-  /// Workaround because of bug in google mobile sdk:
-  /// https://github.com/googleads/googleads-mobile-flutter/issues/36
-  bool _childWasDismissed = false;
-  bool get childWasDismissed => _childWasDismissed;
-
   TimerViewModel(this._timerModel)
       : _timerService =
             TimerServiceManager.getInstance().getTimerService(_timerModel.id) ??
@@ -153,14 +147,12 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   void dismissTapHint() async {
     await _prefsService.setBool(kPrefKeyShowTapHintForStartActions, false);
-    _childWasDismissed = !showHints;
     notifyListeners();
   }
 
   void dismissLongPressHint() async {
     await _prefsService.setBool(
         kPrefKeyShowLongPressHintForStartActions, false);
-    _childWasDismissed = !showHints;
     notifyListeners();
   }
 

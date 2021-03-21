@@ -281,7 +281,7 @@ packages:
       name: google_mobile_ads
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.0+3"
+    version: "0.11.0+4"
   graphs:
     dependency: transitive
     description:
@@ -512,7 +512,7 @@ packages:
       name: pigeon
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.22"
+    version: "0.1.23"
   platform:
     dependency: transitive
     description:
@@ -540,7 +540,7 @@ packages:
       name: process
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
+    version: "4.1.1"
   provider:
     dependency: "direct main"
     description:
@@ -575,7 +575,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.4"
+    version: "2.0.5"
   shared_preferences_linux:
     dependency: transitive
     description:

@@ -6,16 +6,14 @@ import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sleep_timer/app/logger.util.dart';
-import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/timer_service.dart';
+import 'package:sleep_timer/ui/widgets/native_ad.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/sabt.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
@@ -43,13 +41,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   TimerViewModel model;
 
-  _TimerViewState();
-
-  StreamSubscription _adControllerSubscription;
-
-  NativeAd _ad;
-  bool _isAdLoaded = false;
-
   @override
   void initState() {
     super.initState();
@@ -72,12 +63,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _adControllerSubscription?.cancel();
     _scrollController?.dispose();
     _hideFabAnimController?.dispose();
     _fabAnimController?.dispose();
-
-    _ad?.dispose();
 
     super.dispose();
   }
@@ -90,9 +78,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         viewModelBuilder: () => TimerViewModel(widget.timerModel),
         onModelReady: (model) {
           this.model = model;
-          if (!model.isAdFree) {
-            initAd();
-          }
         },
         builder: (context, model, child) {
           return WillPopScope(
@@ -182,22 +167,20 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                   children: [
                     if (model.showLongPressHint)
                       _buildHint(
-                          S.of(context).longPressToAdjustTitle,
-                          S.of(context).longPressToAdjustDesc,
-                          model.dismissLongPressHint),
+                        title: S.of(context).longPressToAdjustTitle,
+                        subtitle: S.of(context).longPressToAdjustDesc,
+                        onPressed: model.dismissLongPressHint,
+                      ),
                     if (model.showTapHint)
-                      _buildHint(S.of(context).tapToToggleTitle,
-                          S.of(context).tapToToggleDesc, model.dismissTapHint),
+                      _buildHint(
+                        title: S.of(context).tapToToggleTitle,
+                        subtitle: S.of(context).tapToToggleDesc,
+                        onPressed: model.dismissTapHint,
+                      ),
                   ],
                 ),
               _buildCompactStartedActions(theme),
-              if (_isAdLoaded && !model.childWasDismissed)
-                Container(
-                  height: kAdHeight,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: AdWidget(ad: _ad),
-                ),
+              if (!model.isAdFree) NativeAdWidget(),
               SectionHeader(S.of(context).timerEndsActionsTitle,
                   leftPadding: kHorizontalPadding),
               _buildEndedActions(theme),
@@ -208,16 +191,22 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  Card _buildHint(String title, String subtitle, void Function() onPressed) {
+  Card _buildHint(
+      {@required String title,
+      @required String subtitle,
+      @required void Function() onPressed}) {
     return Card(
       margin: EdgeInsets.symmetric(
           horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
       elevation: 0,
       child: ListTile(
-        leading: Container(
-            width: 40, alignment: Alignment.center, child: Icon(Icons.info)),
-        title: Text(title, overflow: TextOverflow.ellipsis),
-        subtitle: Text(subtitle),
+        leading: Icon(Icons.info),
+        title: Text(title, maxLines: 1),
+        subtitle: Text(
+          subtitle,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        ),
         isThreeLine: true,
         minVerticalPadding: kVerticalPadding,
         trailing: SizedBox(
@@ -512,31 +501,5 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             }
           }),
     );
-  }
-
-  Future<void> initAd() async {
-    final titleTextColor = Theme.of(context).textTheme.subtitle1.color;
-    final subtitleTextColor = Theme.of(context).textTheme.caption.color;
-
-    _ad = NativeAd(
-      adUnitId: AdManager.nativeAdUnitId,
-      factoryId: 'listTileAdFactory',
-      customOptions: {
-        'titleTextColor': '#${titleTextColor.value.toRadixString(16)}',
-        'subtitleTextColor': '#${subtitleTextColor.value.toRadixString(16)}',
-      },
-      request: AdRequest(testDevices: AdManager.testDeviceId),
-      listener: AdListener(
-        onAdLoaded: (_) {
-          setState(() => _isAdLoaded = true);
-        },
-        onAdFailedToLoad: (_, error) {
-          getLogger().e(
-              'Ad load failed (code=${error.code} message=${error.message})');
-        },
-      ),
-    );
-
-    if (!await _ad.isLoaded()) await _ad.load();
   }
 }
