@@ -42,7 +42,6 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'firebase_crashlytics',
         url: 'https://pub.dev/packages/firebase_crashlytics'),
-    Credit(title: 'flushbar', url: 'https://pub.dev/packages/flushbar'),
     Credit(title: 'get_it', url: 'https://pub.dev/packages/get_it'),
     Credit(
         title: 'google_mobile_ads',
