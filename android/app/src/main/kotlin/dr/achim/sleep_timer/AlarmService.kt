@@ -69,6 +69,7 @@ class AlarmService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
         isRunning = true
         Log.d(TAG, "intent action: ${intent?.action}")
         when (intent?.action) {
