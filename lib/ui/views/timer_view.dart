@@ -208,17 +208,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           overflow: TextOverflow.ellipsis,
         ),
         isThreeLine: true,
-        minVerticalPadding: kVerticalPadding,
-        trailing: SizedBox(
-          height: 20,
-          width: 20,
-          child: IconButton(
-            iconSize: 20,
-            alignment: Alignment.topRight,
-            padding: EdgeInsets.zero,
-            icon: Icon(Icons.clear),
-            onPressed: onPressed,
-          ),
+        trailing: IconButton(
+          alignment: Alignment.topRight,
+          padding: EdgeInsets.all(2),
+          icon: Icon(Icons.clear),
+          onPressed: onPressed,
         ),
       ),
     );
