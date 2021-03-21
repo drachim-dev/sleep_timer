@@ -35,7 +35,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 // Default values
 def dartEnvironmentVariables = [
-        ADMOB_APP_ID: "",
+        ADMOB_APP_ID: "ca-app-pub-3940256099942544~3347511713",
+        ADMOB_NATIVE_AD_ID: "ca-app-pub-3940256099942544/2247696110",
         APP_NAME: "Comfy Sleep Timer"
 ]
 if (project.hasProperty('dart-defines')) {
