@@ -12,31 +12,33 @@ class ReviewService {
   final InAppReview _inAppReview = InAppReview.instance;
   final _prefsService = locator<SharedPreferences>();
 
-  final int minDays = 7;
+  final int dayInterval = 14;
   final int minElapsed = 4;
+  final int maxAskForReview = 5;
 
-  bool askForReview = true;
-  int _installDate, _numElapsed;
+  int _calledDate, _numElapsed, _reviewCount;
 
   ReviewService() {
-    _installDate = _prefsService.getInt(kPrefKeyInstallDate);
-    if (_installDate == null) {
-      _installDate = DateTime.now().millisecondsSinceEpoch;
-      _prefsService.setInt(kPrefKeyInstallDate, _installDate);
+    _calledDate = _prefsService.getInt(kPrefKeyReviewCalledDate);
+    if (_calledDate == null) {
+      _calledDate = DateTime.now().millisecondsSinceEpoch;
+      _prefsService.setInt(kPrefKeyReviewCalledDate, _calledDate);
     }
+
+    _reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? 0;
   }
 
   bool shouldAskForReview() {
-    askForReview = _prefsService.getBool(kPrefKeyAskForReview) ?? askForReview;
-    if (!askForReview) {
+    log.d('reviewCount: $_reviewCount');
+    if (maxAskForReview != null && _reviewCount >= maxAskForReview) {
       return false;
     }
 
-    final installDate = DateTime.fromMillisecondsSinceEpoch(_installDate);
-    final daysSinceInstall = DateTime.now().difference(installDate).inDays;
+    final calledDate = DateTime.fromMillisecondsSinceEpoch(_calledDate);
+    final daysSinceLastCall = DateTime.now().difference(calledDate).inDays;
 
-    log.d('daysUsed: $daysSinceInstall');
-    if (minDays != null && daysSinceInstall < minDays) {
+    log.d('daysSinceLastCall: $daysSinceLastCall');
+    if (dayInterval != null && daysSinceLastCall < dayInterval) {
       return false;
     }
 
@@ -50,9 +52,13 @@ class ReviewService {
   }
 
   Future<void> requestReview() async {
-    log.d('requestReview()');
-    await _prefsService.setBool(kPrefKeyAskForReview, false);
     if (await _inAppReview.isAvailable()) {
+      log.d('requestReview()');
+
+      _calledDate = DateTime.now().millisecondsSinceEpoch;
+      await _prefsService.setInt(kPrefKeyReviewCalledDate, _calledDate);
+      await _prefsService.setInt(kPrefKeyReviewCount, ++_reviewCount);
+
       await _inAppReview.requestReview();
     }
   }
