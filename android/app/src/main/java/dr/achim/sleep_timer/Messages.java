@@ -170,37 +170,9 @@ public class Messages {
 
   /** Generated class from Pigeon that represents data sent in messages. */
   public static class RunningNotificationRequest {
-    private String cancelAction;
-    public String getCancelAction() { return cancelAction; }
-    public void setCancelAction(String setterArg) { this.cancelAction = setterArg; }
-
-    private String continueAction;
-    public String getContinueAction() { return continueAction; }
-    public void setContinueAction(String setterArg) { this.continueAction = setterArg; }
-
     private String description;
     public String getDescription() { return description; }
     public void setDescription(String setterArg) { this.description = setterArg; }
-
-    private Long duration;
-    public Long getDuration() { return duration; }
-    public void setDuration(Long setterArg) { this.duration = setterArg; }
-
-    private List<Object> extendActions;
-    public List<Object> getExtendActions() { return extendActions; }
-    public void setExtendActions(List<Object> setterArg) { this.extendActions = setterArg; }
-
-    private String pauseAction;
-    public String getPauseAction() { return pauseAction; }
-    public void setPauseAction(String setterArg) { this.pauseAction = setterArg; }
-
-    private Long remainingTime;
-    public Long getRemainingTime() { return remainingTime; }
-    public void setRemainingTime(Long setterArg) { this.remainingTime = setterArg; }
-
-    private String restartAction;
-    public String getRestartAction() { return restartAction; }
-    public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
 
     private String timerId;
     public String getTimerId() { return timerId; }
@@ -210,47 +182,82 @@ public class Messages {
     public String getTitle() { return title; }
     public void setTitle(String setterArg) { this.title = setterArg; }
 
+    private Long accentColor;
+    public Long getAccentColor() { return accentColor; }
+    public void setAccentColor(Long setterArg) { this.accentColor = setterArg; }
+
+    private String restartAction;
+    public String getRestartAction() { return restartAction; }
+    public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
+
+    private String continueAction;
+    public String getContinueAction() { return continueAction; }
+    public void setContinueAction(String setterArg) { this.continueAction = setterArg; }
+
+    private String pauseAction;
+    public String getPauseAction() { return pauseAction; }
+    public void setPauseAction(String setterArg) { this.pauseAction = setterArg; }
+
+    private String cancelAction;
+    public String getCancelAction() { return cancelAction; }
+    public void setCancelAction(String setterArg) { this.cancelAction = setterArg; }
+
+    private List<Object> extendActions;
+    public List<Object> getExtendActions() { return extendActions; }
+    public void setExtendActions(List<Object> setterArg) { this.extendActions = setterArg; }
+
+    private Long duration;
+    public Long getDuration() { return duration; }
+    public void setDuration(Long setterArg) { this.duration = setterArg; }
+
+    private Long remainingTime;
+    public Long getRemainingTime() { return remainingTime; }
+    public void setRemainingTime(Long setterArg) { this.remainingTime = setterArg; }
+
     private Boolean shakeToExtend;
     public Boolean getShakeToExtend() { return shakeToExtend; }
     public void setShakeToExtend(Boolean setterArg) { this.shakeToExtend = setterArg; }
 
     Map<String, Object> toMap() {
       Map<String, Object> toMapResult = new HashMap<>();
-      toMapResult.put("cancelAction", cancelAction);
-      toMapResult.put("continueAction", continueAction);
       toMapResult.put("description", description);
-      toMapResult.put("duration", duration);
-      toMapResult.put("extendActions", extendActions);
-      toMapResult.put("pauseAction", pauseAction);
-      toMapResult.put("remainingTime", remainingTime);
-      toMapResult.put("restartAction", restartAction);
       toMapResult.put("timerId", timerId);
       toMapResult.put("title", title);
+      toMapResult.put("accentColor", accentColor);
+      toMapResult.put("restartAction", restartAction);
+      toMapResult.put("continueAction", continueAction);
+      toMapResult.put("pauseAction", pauseAction);
+      toMapResult.put("cancelAction", cancelAction);
+      toMapResult.put("extendActions", extendActions);
+      toMapResult.put("duration", duration);
+      toMapResult.put("remainingTime", remainingTime);
       toMapResult.put("shakeToExtend", shakeToExtend);
       return toMapResult;
     }
     static RunningNotificationRequest fromMap(Map<String, Object> map) {
       RunningNotificationRequest fromMapResult = new RunningNotificationRequest();
-      Object cancelAction = map.get("cancelAction");
-      fromMapResult.cancelAction = (String)cancelAction;
-      Object continueAction = map.get("continueAction");
-      fromMapResult.continueAction = (String)continueAction;
       Object description = map.get("description");
       fromMapResult.description = (String)description;
-      Object duration = map.get("duration");
-      fromMapResult.duration = (duration == null) ? null : ((duration instanceof Integer) ? (Integer)duration : (Long)duration);
-      Object extendActions = map.get("extendActions");
-      fromMapResult.extendActions = (List<Object>)extendActions;
-      Object pauseAction = map.get("pauseAction");
-      fromMapResult.pauseAction = (String)pauseAction;
-      Object remainingTime = map.get("remainingTime");
-      fromMapResult.remainingTime = (remainingTime == null) ? null : ((remainingTime instanceof Integer) ? (Integer)remainingTime : (Long)remainingTime);
-      Object restartAction = map.get("restartAction");
-      fromMapResult.restartAction = (String)restartAction;
       Object timerId = map.get("timerId");
       fromMapResult.timerId = (String)timerId;
       Object title = map.get("title");
       fromMapResult.title = (String)title;
+      Object accentColor = map.get("accentColor");
+      fromMapResult.accentColor = (accentColor == null) ? null : ((accentColor instanceof Integer) ? (Integer)accentColor : (Long)accentColor);
+      Object restartAction = map.get("restartAction");
+      fromMapResult.restartAction = (String)restartAction;
+      Object continueAction = map.get("continueAction");
+      fromMapResult.continueAction = (String)continueAction;
+      Object pauseAction = map.get("pauseAction");
+      fromMapResult.pauseAction = (String)pauseAction;
+      Object cancelAction = map.get("cancelAction");
+      fromMapResult.cancelAction = (String)cancelAction;
+      Object extendActions = map.get("extendActions");
+      fromMapResult.extendActions = (List<Object>)extendActions;
+      Object duration = map.get("duration");
+      fromMapResult.duration = (duration == null) ? null : ((duration instanceof Integer) ? (Integer)duration : (Long)duration);
+      Object remainingTime = map.get("remainingTime");
+      fromMapResult.remainingTime = (remainingTime == null) ? null : ((remainingTime instanceof Integer) ? (Integer)remainingTime : (Long)remainingTime);
       Object shakeToExtend = map.get("shakeToExtend");
       fromMapResult.shakeToExtend = (Boolean)shakeToExtend;
       return fromMapResult;
@@ -271,6 +278,10 @@ public class Messages {
     public String getTitle() { return title; }
     public void setTitle(String setterArg) { this.title = setterArg; }
 
+    private Long accentColor;
+    public Long getAccentColor() { return accentColor; }
+    public void setAccentColor(Long setterArg) { this.accentColor = setterArg; }
+
     private String restartAction;
     public String getRestartAction() { return restartAction; }
     public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
@@ -304,6 +315,7 @@ public class Messages {
       toMapResult.put("description", description);
       toMapResult.put("timerId", timerId);
       toMapResult.put("title", title);
+      toMapResult.put("accentColor", accentColor);
       toMapResult.put("restartAction", restartAction);
       toMapResult.put("continueAction", continueAction);
       toMapResult.put("pauseAction", pauseAction);
@@ -321,6 +333,8 @@ public class Messages {
       fromMapResult.timerId = (String)timerId;
       Object title = map.get("title");
       fromMapResult.title = (String)title;
+      Object accentColor = map.get("accentColor");
+      fromMapResult.accentColor = (accentColor == null) ? null : ((accentColor instanceof Integer) ? (Integer)accentColor : (Long)accentColor);
       Object restartAction = map.get("restartAction");
       fromMapResult.restartAction = (String)restartAction;
       Object continueAction = map.get("continueAction");
@@ -353,6 +367,10 @@ public class Messages {
     public String getDescription() { return description; }
     public void setDescription(String setterArg) { this.description = setterArg; }
 
+    private Long accentColor;
+    public Long getAccentColor() { return accentColor; }
+    public void setAccentColor(Long setterArg) { this.accentColor = setterArg; }
+
     private String restartAction;
     public String getRestartAction() { return restartAction; }
     public void setRestartAction(String setterArg) { this.restartAction = setterArg; }
@@ -378,6 +396,7 @@ public class Messages {
       toMapResult.put("timerId", timerId);
       toMapResult.put("title", title);
       toMapResult.put("description", description);
+      toMapResult.put("accentColor", accentColor);
       toMapResult.put("restartAction", restartAction);
       toMapResult.put("continueAction", continueAction);
       toMapResult.put("pauseAction", pauseAction);
@@ -393,6 +412,8 @@ public class Messages {
       fromMapResult.title = (String)title;
       Object description = map.get("description");
       fromMapResult.description = (String)description;
+      Object accentColor = map.get("accentColor");
+      fromMapResult.accentColor = (accentColor == null) ? null : ((accentColor instanceof Integer) ? (Integer)accentColor : (Long)accentColor);
       Object restartAction = map.get("restartAction");
       fromMapResult.restartAction = (String)restartAction;
       Object continueAction = map.get("continueAction");

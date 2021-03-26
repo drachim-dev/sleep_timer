@@ -51,3 +51,5 @@ const List<int> kExtendTimeByShakeOptions = [15, 30, 45, 60];
 const int kDefaultExtendTimeByShake = 15;
 
 const Color kStatusBarOverlay = Colors.transparent;
+
+Color kNotificationActionColor = Colors.yellow[800];

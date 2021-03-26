@@ -129,30 +129,32 @@ class NotificationResponse {
 }
 
 class RunningNotificationRequest {
-  String cancelAction;
-  String continueAction;
   String description;
-  int duration;
-  List<Object> extendActions;
-  String pauseAction;
-  int remainingTime;
-  String restartAction;
   String timerId;
   String title;
+  int accentColor;
+  String restartAction;
+  String continueAction;
+  String pauseAction;
+  String cancelAction;
+  List<Object> extendActions;
+  int duration;
+  int remainingTime;
   bool shakeToExtend;
 
   Object encode() {
     final Map<Object, Object> pigeonMap = <Object, Object>{};
-    pigeonMap['cancelAction'] = cancelAction;
-    pigeonMap['continueAction'] = continueAction;
     pigeonMap['description'] = description;
-    pigeonMap['duration'] = duration;
-    pigeonMap['extendActions'] = extendActions;
-    pigeonMap['pauseAction'] = pauseAction;
-    pigeonMap['remainingTime'] = remainingTime;
-    pigeonMap['restartAction'] = restartAction;
     pigeonMap['timerId'] = timerId;
     pigeonMap['title'] = title;
+    pigeonMap['accentColor'] = accentColor;
+    pigeonMap['restartAction'] = restartAction;
+    pigeonMap['continueAction'] = continueAction;
+    pigeonMap['pauseAction'] = pauseAction;
+    pigeonMap['cancelAction'] = cancelAction;
+    pigeonMap['extendActions'] = extendActions;
+    pigeonMap['duration'] = duration;
+    pigeonMap['remainingTime'] = remainingTime;
     pigeonMap['shakeToExtend'] = shakeToExtend;
     return pigeonMap;
   }
@@ -160,16 +162,17 @@ class RunningNotificationRequest {
   static RunningNotificationRequest decode(Object message) {
     final Map<Object, Object> pigeonMap = message as Map<Object, Object>;
     return RunningNotificationRequest()
-      ..cancelAction = pigeonMap['cancelAction'] as String
-      ..continueAction = pigeonMap['continueAction'] as String
       ..description = pigeonMap['description'] as String
-      ..duration = pigeonMap['duration'] as int
-      ..extendActions = pigeonMap['extendActions'] as List<Object>
-      ..pauseAction = pigeonMap['pauseAction'] as String
-      ..remainingTime = pigeonMap['remainingTime'] as int
-      ..restartAction = pigeonMap['restartAction'] as String
       ..timerId = pigeonMap['timerId'] as String
       ..title = pigeonMap['title'] as String
+      ..accentColor = pigeonMap['accentColor'] as int
+      ..restartAction = pigeonMap['restartAction'] as String
+      ..continueAction = pigeonMap['continueAction'] as String
+      ..pauseAction = pigeonMap['pauseAction'] as String
+      ..cancelAction = pigeonMap['cancelAction'] as String
+      ..extendActions = pigeonMap['extendActions'] as List<Object>
+      ..duration = pigeonMap['duration'] as int
+      ..remainingTime = pigeonMap['remainingTime'] as int
       ..shakeToExtend = pigeonMap['shakeToExtend'] as bool;
   }
 }
@@ -178,6 +181,7 @@ class TimeNotificationRequest {
   String description;
   String timerId;
   String title;
+  int accentColor;
   String restartAction;
   String continueAction;
   String pauseAction;
@@ -191,6 +195,7 @@ class TimeNotificationRequest {
     pigeonMap['description'] = description;
     pigeonMap['timerId'] = timerId;
     pigeonMap['title'] = title;
+    pigeonMap['accentColor'] = accentColor;
     pigeonMap['restartAction'] = restartAction;
     pigeonMap['continueAction'] = continueAction;
     pigeonMap['pauseAction'] = pauseAction;
@@ -207,6 +212,7 @@ class TimeNotificationRequest {
       ..description = pigeonMap['description'] as String
       ..timerId = pigeonMap['timerId'] as String
       ..title = pigeonMap['title'] as String
+      ..accentColor = pigeonMap['accentColor'] as int
       ..restartAction = pigeonMap['restartAction'] as String
       ..continueAction = pigeonMap['continueAction'] as String
       ..pauseAction = pigeonMap['pauseAction'] as String
@@ -221,6 +227,7 @@ class NotificationRequest {
   String timerId;
   String title;
   String description;
+  int accentColor;
   String restartAction;
   String continueAction;
   String pauseAction;
@@ -232,6 +239,7 @@ class NotificationRequest {
     pigeonMap['timerId'] = timerId;
     pigeonMap['title'] = title;
     pigeonMap['description'] = description;
+    pigeonMap['accentColor'] = accentColor;
     pigeonMap['restartAction'] = restartAction;
     pigeonMap['continueAction'] = continueAction;
     pigeonMap['pauseAction'] = pauseAction;
@@ -246,6 +254,7 @@ class NotificationRequest {
       ..timerId = pigeonMap['timerId'] as String
       ..title = pigeonMap['title'] as String
       ..description = pigeonMap['description'] as String
+      ..accentColor = pigeonMap['accentColor'] as int
       ..restartAction = pigeonMap['restartAction'] as String
       ..continueAction = pigeonMap['continueAction'] as String
       ..pauseAction = pigeonMap['pauseAction'] as String

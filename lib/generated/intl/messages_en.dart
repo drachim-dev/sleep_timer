@@ -23,19 +23,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(count) => "${Intl.plural(count, one: '1 light', other: '${count} lights')}";
 
-  static m2(time) => "${time} expired. ";
+  static m2(timeLeft) => "Time left: ${timeLeft}";
 
-  static m3(timeLeft) => "Time left: ${timeLeft}";
+  static m3(time) => "Time set to ${time} minutes";
 
-  static m4(time) => "Time set to ${time} minutes";
+  static m4(minutes) => "${minutes} minutes";
 
-  static m5(minutes) => "${minutes} minutes";
+  static m5(minutes) => "${minutes} min";
 
-  static m6(minutes) => "${minutes} min";
+  static m6(durationString) => "${durationString} minutes";
 
-  static m7(durationString) => "${durationString} minutes";
-
-  static m8(bridge) => "Unlink ${bridge}";
+  static m7(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -74,10 +72,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "countLights" : m1,
     "creditsAppTitle" : MessageLookupByLibrary.simpleMessage("Credits"),
     "creditsLibraries" : MessageLookupByLibrary.simpleMessage("Libraries"),
-    "dialogCancel" : MessageLookupByLibrary.simpleMessage("CANCEL"),
-    "dialogConnect" : MessageLookupByLibrary.simpleMessage("CONNECT"),
-    "dialogDone" : MessageLookupByLibrary.simpleMessage("DONE"),
-    "dialogUnlink" : MessageLookupByLibrary.simpleMessage("UNLINK"),
+    "dialogCancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
+    "dialogConnect" : MessageLookupByLibrary.simpleMessage("Connect"),
+    "dialogDone" : MessageLookupByLibrary.simpleMessage("OK"),
+    "dialogUnlink" : MessageLookupByLibrary.simpleMessage("Unlink"),
     "errorNoConnection" : MessageLookupByLibrary.simpleMessage("Check your connection"),
     "errorNoDevices" : MessageLookupByLibrary.simpleMessage("No devices found"),
     "extendTimeByShakeMenuToolTip" : MessageLookupByLibrary.simpleMessage("Tap to change time"),
@@ -108,11 +106,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationStatusElapsed" : MessageLookupByLibrary.simpleMessage("Sleep Timer elapsed"),
     "notificationStatusPausing" : MessageLookupByLibrary.simpleMessage("Sleep Timer pausing"),
     "notificationStatusRunning" : MessageLookupByLibrary.simpleMessage("Sleep Timer running"),
-    "notificationTimeExpired" : m2,
-    "notificationTimeLeft" : m3,
-    "notificationTimerSet" : m4,
-    "numberOfMinutesLong" : m5,
-    "numberOfMinutesShort" : m6,
+    "notificationTimeExpired" : MessageLookupByLibrary.simpleMessage("Time\'s up. "),
+    "notificationTimeLeft" : m2,
+    "notificationTimerSet" : m3,
+    "numberOfMinutesLong" : m4,
+    "numberOfMinutesShort" : m5,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Other"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Device admin"),
     "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Required for the screen off action"),
@@ -143,7 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Timer settings"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("When timer starts"),
     "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Turn off the light"),
-    "unitMinute" : m7,
-    "unlinkBridgeName" : m8
+    "unitMinute" : m6,
+    "unlinkBridgeName" : m7
   };
 }

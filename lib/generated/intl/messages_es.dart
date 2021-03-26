@@ -23,19 +23,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(count) => "${Intl.plural(count, one: '1 luz', other: '${count} luces')}";
 
-  static m2(time) => "${time} expirado. ";
+  static m2(timeLeft) => "Tiempo restante: ${timeLeft}";
 
-  static m3(timeLeft) => "Tiempo restante: ${timeLeft}";
+  static m3(time) => "Tiempo ajustado a ${time} minutos";
 
-  static m4(time) => "Tiempo ajustado a ${time} minutos";
+  static m4(minutes) => "${minutes} minutos";
 
-  static m5(minutes) => "${minutes} minutos";
+  static m5(minutes) => "${minutes} min";
 
-  static m6(minutes) => "${minutes} min";
+  static m6(durationString) => "${durationString} minutos";
 
-  static m7(durationString) => "${durationString} minutos";
-
-  static m8(bridge) => "Unlink ${bridge}";
+  static m7(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -74,9 +72,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "countLights" : m1,
     "creditsAppTitle" : MessageLookupByLibrary.simpleMessage("Créditos"),
     "creditsLibraries" : MessageLookupByLibrary.simpleMessage("Bibliotecas"),
-    "dialogCancel" : MessageLookupByLibrary.simpleMessage("CANCELAR"),
+    "dialogCancel" : MessageLookupByLibrary.simpleMessage("Cancelar"),
     "dialogConnect" : MessageLookupByLibrary.simpleMessage("CONECTAR"),
-    "dialogDone" : MessageLookupByLibrary.simpleMessage("HECHO"),
+    "dialogDone" : MessageLookupByLibrary.simpleMessage("Aceptar"),
     "dialogUnlink" : MessageLookupByLibrary.simpleMessage("UNLINK"),
     "errorNoConnection" : MessageLookupByLibrary.simpleMessage("Compruebe su conexión"),
     "errorNoDevices" : MessageLookupByLibrary.simpleMessage("No se encontraron dispositivos"),
@@ -108,11 +106,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "notificationStatusElapsed" : MessageLookupByLibrary.simpleMessage("Sleep Timer detenido"),
     "notificationStatusPausing" : MessageLookupByLibrary.simpleMessage("Sleep Timer en pausa"),
     "notificationStatusRunning" : MessageLookupByLibrary.simpleMessage("Sleep Timer está activo"),
-    "notificationTimeExpired" : m2,
-    "notificationTimeLeft" : m3,
-    "notificationTimerSet" : m4,
-    "numberOfMinutesLong" : m5,
-    "numberOfMinutesShort" : m6,
+    "notificationTimeExpired" : MessageLookupByLibrary.simpleMessage("Tiempo agotado. "),
+    "notificationTimeLeft" : m2,
+    "notificationTimerSet" : m3,
+    "numberOfMinutesLong" : m4,
+    "numberOfMinutesShort" : m5,
     "otherSectionTitle" : MessageLookupByLibrary.simpleMessage("Otro"),
     "prefsDeviceAdmin" : MessageLookupByLibrary.simpleMessage("Administrador del dispositivo"),
     "prefsDeviceAdminDescription" : MessageLookupByLibrary.simpleMessage("Necesario para poder apagar la pantalla"),
@@ -143,7 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "timerSettingsSectionTitle" : MessageLookupByLibrary.simpleMessage("Temporizador"),
     "timerStartsActionsTitle" : MessageLookupByLibrary.simpleMessage("Cuando se inicia"),
     "titleLightGroups" : MessageLookupByLibrary.simpleMessage("Apagar la luz"),
-    "unitMinute" : m7,
-    "unlinkBridgeName" : m8
+    "unitMinute" : m6,
+    "unlinkBridgeName" : m7
   };
 }

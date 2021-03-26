@@ -18,6 +18,7 @@ abstract class SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
+      @required final int accentColor,
       final String restartAction,
       final String pauseAction,
       final String cancelAction,
@@ -29,6 +30,7 @@ abstract class SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
+      @required final int accentColor,
       final String restartAction,
       final String continueAction,
       final String cancelAction,
@@ -38,6 +40,7 @@ abstract class SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
+      @required final int accentColor,
       final String restartAction});
   Future<bool> cancelTimer(final String timerId);
   Future<List<App>> getInstalledPlayerApps();

@@ -1,7 +1,9 @@
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_interface.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/app.dart';
@@ -99,6 +101,7 @@ class DeviceService with ReactiveServiceMixin {
         timerId: timerId,
         title: S.current.notificationStatusRunning,
         description: S.current.notificationTimerSet(durationString),
+        accentColor: kNotificationActionColor.value,
         pauseAction: S.current.notificationActionPause,
         extendActions: [5, 20],
         duration: duration,
@@ -116,6 +119,7 @@ class DeviceService with ReactiveServiceMixin {
         timerId: timerId,
         title: S.current.notificationStatusPausing,
         description: S.current.notificationTimeLeft(timeLeft),
+        accentColor: kNotificationActionColor.value,
         cancelAction: S.current.notificationActionCancel,
         continueAction: S.current.notificationActionContinue,
         remainingTime: remainingTime);
@@ -123,12 +127,7 @@ class DeviceService with ReactiveServiceMixin {
 
   Future<bool> showElapsedNotification(
       {@required final TimerModel timerModel}) async {
-    final durationString = Utils.secondsToString(
-        timerModel.initialTimeInSeconds,
-        trimTrailingZeros: true);
-    final time = S.current.unitMinute(durationString);
-
-    var description = S.current.notificationTimeExpired(time);
+    var description = S.current.notificationTimeExpired;
     final activeActions =
         timerModel.endActions.where((element) => element.enabled);
     if (activeActions.isEmpty) {
@@ -144,6 +143,7 @@ class DeviceService with ReactiveServiceMixin {
         timerId: timerModel.id,
         title: S.current.notificationStatusElapsed,
         description: description,
+        accentColor: kNotificationActionColor.value,
         restartAction: S.current.notificationActionRestart);
   }
 

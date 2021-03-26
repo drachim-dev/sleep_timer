@@ -77,6 +77,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setContentTitle(request.title)
                 .setContentText(request.description)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setColor(request.accentColor.toInt())
                 .setContentIntent(createOpenIntent(timerId))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -97,22 +98,22 @@ class NotificationReceiver : BroadcastReceiver() {
         val actions: MutableList<NotificationCompat.Action> = ArrayList()
         if (restartAction != null && restartAction.isNotEmpty()) {
             val intent = createRestartRequestIntent(timerId)
-            val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_24, restartAction.toUpperCase(Locale.getDefault()), intent)
+            val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_24, restartAction, intent)
             actions.add(action)
         }
         if (pauseAction != null && pauseAction.isNotEmpty()) {
             val intent = createPauseRequestIntent(timerId)
-            val action = NotificationCompat.Action(R.drawable.ic_baseline_pause_24, pauseAction.toUpperCase(Locale.getDefault()), intent)
+            val action = NotificationCompat.Action(R.drawable.ic_baseline_pause_24, pauseAction, intent)
             actions.add(action)
         }
         if (continueAction != null && continueAction.isNotEmpty()) {
             val intent = createContinueRequestIntent(timerId)
-            val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_24, continueAction.toUpperCase(Locale.getDefault()), intent)
+            val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_24, continueAction, intent)
             actions.add(action)
         }
         if (cancelAction != null && cancelAction.isNotEmpty()) {
             val intent = createCancelRequestIntent(timerId)
-            val action = NotificationCompat.Action(R.drawable.ic_baseline_clear_24, cancelAction.toUpperCase(Locale.getDefault()), intent)
+            val action = NotificationCompat.Action(R.drawable.ic_baseline_clear_24, cancelAction, intent)
             actions.add(action)
         }
         if(extendActions != null) {
@@ -132,6 +133,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setContentTitle(request.title)
                 .setContentText(request.description)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setColor(request.accentColor.toInt())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setUsesChronometer(false)
@@ -153,6 +155,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(request.description))
                 .setSmallIcon(R.drawable.ic_hourglass_full)
+                .setColor(request.accentColor.toInt())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setUsesChronometer(false)

@@ -28,6 +28,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
+      @required final int accentColor,
       final String restartAction,
       final String pauseAction,
       final String cancelAction,
@@ -40,6 +41,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..timerId = timerId
           ..title = title
           ..description = description
+          ..accentColor = accentColor
           ..restartAction = restartAction
           ..pauseAction = pauseAction
           ..cancelAction = cancelAction
@@ -55,6 +57,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       {@required final String timerId,
       @required final String title,
       @required final String description,
+      @required final int accentColor,
       final String restartAction,
       final String continueAction,
       final String cancelAction,
@@ -65,6 +68,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..timerId = timerId
           ..title = title
           ..description = description
+          ..accentColor = accentColor
           ..restartAction = restartAction
           ..continueAction = continueAction
           ..cancelAction = cancelAction
@@ -78,6 +82,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
     @required final String timerId,
     @required final String title,
     @required final String description,
+    @required final int accentColor,
     final String restartAction,
   }) async {
     final response =
@@ -85,6 +90,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..timerId = timerId
           ..title = title
           ..description = description
+          ..accentColor = accentColor
           ..restartAction = restartAction);
     return response.success;
   }

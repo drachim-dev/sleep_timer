@@ -725,13 +725,13 @@ class S {
     );
   }
 
-  /// `{time} expired. `
-  String notificationTimeExpired(Object time) {
+  /// `Time's up. `
+  String get notificationTimeExpired {
     return Intl.message(
-      '$time expired. ',
+      'Time\'s up. ',
       name: 'notificationTimeExpired',
       desc: '',
-      args: [time],
+      args: [],
     );
   }
 
@@ -835,30 +835,30 @@ class S {
     );
   }
 
-  /// `CANCEL`
+  /// `Cancel`
   String get dialogCancel {
     return Intl.message(
-      'CANCEL',
+      'Cancel',
       name: 'dialogCancel',
       desc: '',
       args: [],
     );
   }
 
-  /// `DONE`
+  /// `OK`
   String get dialogDone {
     return Intl.message(
-      'DONE',
+      'OK',
       name: 'dialogDone',
       desc: '',
       args: [],
     );
   }
 
-  /// `UNLINK`
+  /// `Unlink`
   String get dialogUnlink {
     return Intl.message(
-      'UNLINK',
+      'Unlink',
       name: 'dialogUnlink',
       desc: '',
       args: [],
@@ -917,10 +917,10 @@ class S {
     );
   }
 
-  /// `CONNECT`
+  /// `Connect`
   String get dialogConnect {
     return Intl.message(
-      'CONNECT',
+      'Connect',
       name: 'dialogConnect',
       desc: '',
       args: [],
