@@ -13,7 +13,7 @@ class ReviewService {
   final _prefsService = locator<SharedPreferences>();
 
   final int dayInterval = 14;
-  final int minElapsed = 4;
+  final int minElapsed = 6;
   final int maxAskForReview = 5;
 
   int _calledDate, _numElapsed, _reviewCount;
