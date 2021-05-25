@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route_annotations.dart';
 import 'package:sleep_timer/ui/views/bridge_link_view.dart';
 import 'package:sleep_timer/ui/views/credits_view.dart';
 import 'package:sleep_timer/ui/views/faq_view.dart';
@@ -7,9 +6,10 @@ import 'package:sleep_timer/ui/views/intro_view.dart';
 import 'package:sleep_timer/ui/views/light_group_view.dart';
 import 'package:sleep_timer/ui/views/settings_view.dart';
 import 'package:sleep_timer/ui/views/timer_view.dart';
+import 'package:stacked/stacked_annotations.dart';
 
-@MaterialAutoRouter(
-  routes: <AutoRoute>[
+@StackedApp(
+  routes: [
     MaterialRoute(page: IntroView),
     MaterialRoute(page: HomeView),
     MaterialRoute(page: TimerView),
@@ -20,4 +20,4 @@ import 'package:sleep_timer/ui/views/timer_view.dart';
     MaterialRoute(page: LightGroupView),
   ],
 )
-class $AutoRouter {}
+class AppSetup {}

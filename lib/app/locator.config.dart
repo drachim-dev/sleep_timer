@@ -17,13 +17,14 @@ import '../services/purchase_service.dart' as _i12;
 import '../services/review_service.dart' as _i6;
 import '../services/theme_service.dart' as _i8;
 import '../services/third_party_services_module.dart' as _i13;
-import '../services/timer_service.dart'
-    as _i9; // ignore_for_file: unnecessary_lambdas
+import '../services/timer_service.dart' as _i9;
 
+const String _prod = 'prod';
+// ignore_for_file: unnecessary_lambdas
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
 Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
-    {String environment, _i2.EnvironmentFilter environmentFilter}) async {
+    {String? environment, _i2.EnvironmentFilter? environmentFilter}) async {
   final gh = _i2.GetItHelper(get, environment, environmentFilter);
   final thirdPartyServicesModule = _$ThirdPartyServicesModule();
   gh.lazySingleton<_i3.InAppPurchaseConnection>(
@@ -36,10 +37,11 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
       () => thirdPartyServicesModule.prefsService,
       preResolve: true);
   gh.lazySingleton<_i8.ThemeService>(() => _i8.ThemeService());
-  gh.factoryParam<_i9.TimerService, _i10.TimerModel, dynamic>(
+  gh.factoryParam<_i9.TimerService, _i10.TimerModel?, dynamic>(
       (timerModel, _) => _i9.TimerService(timerModel));
   gh.singletonAsync<_i11.DeviceService>(() => _i11.DeviceService.create());
-  gh.singletonAsync<_i12.PurchaseService>(() => _i12.PurchaseService.create());
+  gh.singletonAsync<_i12.PurchaseService>(() => _i12.PurchaseService.create(),
+      registerFor: {_prod});
   return get;
 }
 

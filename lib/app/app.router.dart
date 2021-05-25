@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// AutoRouteGenerator
+// StackedRouterGenerator
 // **************************************************************************
 
 // ignore_for_file: public_member_api_docs
 
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:stacked/stacked.dart';
 
 import '../model/timer_model.dart';
 import '../ui/views/bridge_link_view.dart';
@@ -40,7 +40,7 @@ class Routes {
   };
 }
 
-class AutoRouter extends RouterBase {
+class StackedRouter extends RouterBase {
   @override
   List<RouteDef> get routes => _routes;
   final _routes = <RouteDef>[
@@ -54,8 +54,8 @@ class AutoRouter extends RouterBase {
     RouteDef(Routes.lightGroupView, page: LightGroupView),
   ];
   @override
-  Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
-  final _pagesMap = <Type, AutoRouteFactory>{
+  Map<Type, StackedRouteFactory> get pagesMap => _pagesMap;
+  final _pagesMap = <Type, StackedRouteFactory>{
     IntroView: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => IntroView(),
@@ -63,7 +63,7 @@ class AutoRouter extends RouterBase {
       );
     },
     HomeView: (data) {
-      final args = data.getArgs<HomeViewArguments>(
+      var args = data.getArgs<HomeViewArguments>(
         orElse: () => HomeViewArguments(),
       );
       return MaterialPageRoute<dynamic>(
@@ -72,7 +72,7 @@ class AutoRouter extends RouterBase {
       );
     },
     TimerView: (data) {
-      final args = data.getArgs<TimerViewArguments>(nullOk: false);
+      var args = data.getArgs<TimerViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
         builder: (context) => TimerView(
           key: args.key,
@@ -82,7 +82,7 @@ class AutoRouter extends RouterBase {
       );
     },
     SettingsView: (data) {
-      final args = data.getArgs<SettingsViewArguments>(
+      var args = data.getArgs<SettingsViewArguments>(
         orElse: () => SettingsViewArguments(),
       );
       return MaterialPageRoute<dynamic>(
@@ -127,15 +127,15 @@ class AutoRouter extends RouterBase {
 
 /// HomeView arguments holder class
 class HomeViewArguments {
-  final String timerId;
+  final String? timerId;
   HomeViewArguments({this.timerId});
 }
 
 /// TimerView arguments holder class
 class TimerViewArguments {
-  final Key key;
-  final TimerModel timerModel;
-  TimerViewArguments({this.key, @required this.timerModel});
+  final Key? key;
+  final TimerModel? timerModel;
+  TimerViewArguments({this.key, required this.timerModel});
 }
 
 /// SettingsView arguments holder class

@@ -2,5 +2,6 @@ include: package:pedantic/analysis_options.yaml
 
 analyzer:
   exclude:
+    - lib/app/locator.config.dart
     - lib/messages_generated.dart
     - lib/generated/*

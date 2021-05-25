@@ -6,14 +6,14 @@ part 'light_group.g.dart';
 
 @JsonSerializable()
 class LightGroup {
-  final String id, name, className;
-  final int numberOfLights;
-  bool actionEnabled;
+  final String? id, name, className;
+  final int? numberOfLights;
+  bool? actionEnabled;
 
   LightGroup(
       {this.id,
       this.name,
-      String className,
+      String? className,
       this.numberOfLights,
       this.actionEnabled = false})
       : className = className ?? 'Other';

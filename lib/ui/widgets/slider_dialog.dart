@@ -4,13 +4,13 @@ import 'package:sleep_timer/generated/l10n.dart';
 class SliderDialog extends StatefulWidget {
   final String title;
   final double initialValue, minValue, maxValue;
-  final Function(double) onChangeEnd;
+  final Function(double)? onChangeEnd;
 
   const SliderDialog(
-      {@required this.title,
-      @required this.initialValue,
+      {required this.title,
+      required this.initialValue,
       this.minValue = 0,
-      @required this.maxValue,
+      required this.maxValue,
       this.onChangeEnd})
       : assert(initialValue >= minValue && initialValue <= maxValue),
         assert(maxValue > minValue);

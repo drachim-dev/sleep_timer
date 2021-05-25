@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sleep_timer/model/light_group.dart';
 
@@ -10,19 +9,19 @@ enum Connection { unsaved, connected, failed }
 
 @JsonSerializable()
 class BridgeModel {
-  final String id, ip, mac, name;
-  String auth;
-  Connection state;
+  final String? id, ip, mac, name;
+  String? auth;
+  Connection? state;
   List<LightGroup> groups;
 
   BridgeModel(
-      {@required this.id,
-      String ip,
-      String mac,
-      String name,
+      {required this.id,
+      String? ip,
+      String? mac,
+      String? name,
       this.auth,
       this.state = Connection.unsaved,
-      List<LightGroup> groups})
+      List<LightGroup>? groups})
       : ip = ip ?? '',
         mac = mac ?? '',
         name = name ?? 'Philips Hue Bridge',

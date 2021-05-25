@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:injectable/injectable.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
@@ -20,9 +21,9 @@ class ThemeService with ReactiveServiceMixin {
     notifyListeners();
   }
 
-  void setTheme(final String value) {
+  void setTheme(final String? value) {
     final result =
-        themeList.firstWhere((theme) => theme.id == value, orElse: () => null);
+        themeList.firstWhereOrNull((theme) => theme.id == value);
 
     if (result != null) {
       _myTheme = result;

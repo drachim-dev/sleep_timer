@@ -20,16 +20,16 @@ enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
 @injectable
 class TimerService with ReactiveServiceMixin {
   final Logger log = getLogger();
-  final _deviceService = locator<DeviceService>();
-  final _lightService = locator<LightService>();
-  final _prefsService = locator<SharedPreferences>();
-  final TimerModel timerModel;
+  final DeviceService _deviceService = locator<DeviceService>();
+  final LightService _lightService = locator<LightService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final TimerModel? timerModel;
 
   TimerStatus _status = TimerStatus.INITIAL;
   TimerStatus get status => _status;
 
   TimerService(@factoryParam this.timerModel)
-      : _remainingTime = timerModel.initialTimeInSeconds,
+      : _remainingTime = timerModel!.initialTimeInSeconds,
         _maxTime = timerModel.initialTimeInSeconds {
     listenToReactiveValues([_remainingTime, _status]);
   }
@@ -50,7 +50,7 @@ class TimerService with ReactiveServiceMixin {
     setTimerStatus(TimerStatus.RUNNING);
 
     _deviceService.showRunningNotification(
-        timerId: timerModel.id,
+        timerId: timerModel!.id,
         duration: maxTime,
         remainingTime: remainingTime,
         shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
@@ -62,12 +62,12 @@ class TimerService with ReactiveServiceMixin {
     notifyListeners();
   }
 
-  void setRemainingTime(final int seconds) {
-    _remainingTime = seconds;
+  void setRemainingTime(final int? seconds) {
+    _remainingTime = seconds ?? (_remainingTime - 1);
     notifyListeners();
   }
 
-  void extendTime(final int seconds) {
+  void extendTime(final int? seconds) {
     final defaultExtendTime =
         _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
             kDefaultExtendTimeByShake;
@@ -78,7 +78,7 @@ class TimerService with ReactiveServiceMixin {
 
     if (status == TimerStatus.RUNNING) {
       _deviceService.showRunningNotification(
-          timerId: timerModel.id,
+          timerId: timerModel!.id,
           duration: maxTime,
           remainingTime: remainingTime,
           shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
@@ -92,25 +92,25 @@ class TimerService with ReactiveServiceMixin {
     setTimerStatus(TimerStatus.PAUSING);
 
     _deviceService.showPauseNotification(
-        timerId: timerModel.id, remainingTime: remainingTime);
+        timerId: timerModel!.id, remainingTime: remainingTime);
   }
 
   Future<void> cancelTimer() async {
     setTimerStatus(TimerStatus.ELAPSED);
 
     // ignore: unawaited_futures
-    _deviceService.cancelNotification(timerId: timerModel.id);
+    _deviceService.cancelNotification(timerId: timerModel!.id);
     _resetTime();
   }
 
-  void _resetTime() => setRemainingTime(timerModel.initialTimeInSeconds);
+  void _resetTime() => setRemainingTime(timerModel!.initialTimeInSeconds);
 
   void _handleStartActions() {
-    timerModel.startActions.forEach((element) {
+    timerModel!.startActions.forEach((element) {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.VOLUME:
-            handleVolumeAction((element as ValueActionModel).value.round());
+            handleVolumeAction((element as ValueActionModel).value!.round());
             break;
           case ActionType.LIGHT:
             handleLightAction();
@@ -146,7 +146,7 @@ class TimerService with ReactiveServiceMixin {
     var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
     await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++_numElapsed);
 
-    timerModel.endActions.forEach((element) {
+    timerModel!.endActions.forEach((element) {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.MEDIA:
@@ -168,11 +168,11 @@ class TimerService with ReactiveServiceMixin {
       }
     });
 
-    await _deviceService.showElapsedNotification(timerModel: timerModel);
+    await _deviceService.showElapsedNotification(timerModel: timerModel!);
   }
 
   void setMaxTime() =>
-      _maxTime = max(timerModel.initialTimeInSeconds, remainingTime);
+      _maxTime = max(timerModel!.initialTimeInSeconds, remainingTime);
 }
 
 void onDeviceAdminCallback(final bool granted) async {

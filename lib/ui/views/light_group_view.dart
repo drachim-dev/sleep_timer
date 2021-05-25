@@ -13,7 +13,7 @@ class LightGroupView extends StatefulWidget {
 }
 
 class _LightGroupViewState extends State<LightGroupView> {
-  LightGroupViewModel model;
+  late LightGroupViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +21,8 @@ class _LightGroupViewState extends State<LightGroupView> {
 
     return ViewModelBuilder<LightGroupViewModel>.reactive(
         viewModelBuilder: () => LightGroupViewModel(),
-        onModelReady: (model) => this.model = model,
-        builder: (context, model, child) {
+        onModelReady: (viewModel) => this.viewModel = viewModel,
+        builder: (context, viewModel, _) {
           return Scaffold(
             appBar: AppBar(
               title: Text(S.of(context).titleLightGroups),
@@ -35,7 +35,7 @@ class _LightGroupViewState extends State<LightGroupView> {
   }
 
   Widget _buildBody(final ThemeData theme) {
-    if (model.isBusy) {
+    if (viewModel.isBusy) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -49,17 +49,17 @@ class _LightGroupViewState extends State<LightGroupView> {
     }
 
     // No saved bridges found
-    if (model.data == null || model.data.isEmpty) {
+    if (viewModel.data == null || viewModel.data.isEmpty) {
       return _buildNoResults(theme);
     }
 
     // build rooms for each connected bridge
     return ListView.builder(
       itemBuilder: (_, int index) {
-        final BridgeModel bridgeModel = model.data[index];
+        final BridgeModel bridgeModel = viewModel.data[index];
         return _buildRoomsForBridge(bridgeModel);
       },
-      itemCount: model.data.length,
+      itemCount: viewModel.data.length,
     );
   }
 
@@ -79,12 +79,12 @@ class _LightGroupViewState extends State<LightGroupView> {
             return SwitchListTile(
               secondary: _buildIconForRoom(group.className),
               title: Text('${group.name}'),
-              subtitle: Text(S.of(context).countLights(group.numberOfLights)),
+              subtitle: Text(S.of(context).countLights(group.numberOfLights!)),
               onChanged: (value) async {
                 group.actionEnabled = value;
-                model.onChangeRoom(value);
+                viewModel.onChangeRoom(value);
               },
-              value: group.actionEnabled,
+              value: group.actionEnabled!,
             );
           },
           itemCount: bridgeModel.groups.length,
@@ -94,7 +94,7 @@ class _LightGroupViewState extends State<LightGroupView> {
     );
   }
 
-  Icon _buildIconForRoom(final String roomType) {
+  Icon _buildIconForRoom(final String? roomType) {
     var icon;
     switch (roomType?.toLowerCase()) {
       case 'living room':
@@ -143,7 +143,7 @@ class _LightGroupViewState extends State<LightGroupView> {
 
   Widget _buildFab(final ThemeData theme) {
     return FloatingActionButton(
-      onPressed: model.navigateToLinkBridge,
+      onPressed: viewModel.navigateToLinkBridge,
       child: Icon(Icons.search_outlined),
     );
   }

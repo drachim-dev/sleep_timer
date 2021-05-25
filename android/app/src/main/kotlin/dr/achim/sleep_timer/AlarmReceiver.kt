@@ -16,8 +16,8 @@ class AlarmReceiver : BroadcastReceiver() {
     private lateinit var flutterTimerApi: FlutterTimerApi
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d(TAG, "onReceive()")
         initializeFlutter()
-        Log.e(TAG, "onReceive()")
         val request = TimerRequest().apply {
             timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID)
         }

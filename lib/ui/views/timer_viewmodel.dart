@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:device_functions/messages_generated.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/auto_router.gr.dart';
+import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
@@ -22,18 +22,18 @@ import 'package:stacked_services/stacked_services.dart';
 class TimerViewModel extends ReactiveViewModel implements Initialisable {
   final TimerService _timerService;
   final TimerModel _timerModel;
-  final _navigationService = locator<NavigationService>();
+  final NavigationService _navigationService = locator<NavigationService>();
 
-  final _prefsService = locator<SharedPreferences>();
-  final _themeService = locator<ThemeService>();
-  final _purchaseService = locator<PurchaseService>();
-  final _deviceService = locator<DeviceService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final ThemeService _themeService = locator<ThemeService>();
+  final PurchaseService _purchaseService = locator<PurchaseService>();
+  final DeviceService _deviceService = locator<DeviceService>();
 
   bool _newInstance = false;
 
-  bool get isDeviceAdmin => _deviceService.deviceAdmin ?? false;
+  bool get isDeviceAdmin => _deviceService.deviceAdmin;
   bool get hasNotificationSettingsAccess =>
-      _deviceService.notificationSettingsAccess ?? false;
+      _deviceService.notificationSettingsAccess;
 
   /// check if there is at least one bridge with a light action enabled
   bool get hasEnabledLights {
@@ -41,7 +41,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     if (savedBridgesJson != null) {
       final savedBridges = BridgeModel.decode(savedBridgesJson);
       return savedBridges
-          .any((bridge) => bridge.groups.any((group) => group.actionEnabled));
+          .any((bridge) => bridge.groups.any((group) => group.actionEnabled!));
     } else {
       return false;
     }
@@ -57,20 +57,17 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   TimerViewModel(this._timerModel)
       : _timerService =
-            TimerServiceManager.getInstance().getTimerService(_timerModel.id) ??
+            TimerServiceManager.instance.getTimerService(_timerModel.id) ??
                 locator<TimerService>(param1: _timerModel) {
     _newInstance =
-        TimerServiceManager.getInstance().getTimerService(timerModel.id) ==
-            null;
+        TimerServiceManager.instance.getTimerService(timerModel.id) == null;
     if (_newInstance) {
-      TimerServiceManager.getInstance().setTimerService(_timerService);
+      TimerServiceManager.instance.setTimerService(_timerService);
     }
 
     // Check for adFree in-app purchase
-    _isAdFree = _purchaseService?.products?.any((element) =>
-            element.productDetails.id == kProductRemoveAds &&
-            element.purchased) ??
-        true;
+    _isAdFree = _purchaseService.products.any((element) =>
+        element.productDetails.id == kProductRemoveAds && element.purchased);
   }
 
   TimerModel get timerModel => _timerModel;
@@ -102,12 +99,12 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   Future<void> initActionPreferences(List<ActionModel> actions) async {
-    await Future.forEach(actions, (element) async {
+    await Future.forEach(actions, (dynamic element) async {
       await _prefsService.setBool(element.id.toString(), element.enabled);
 
       if (element is ValueActionModel) {
         if (element.value != null) {
-          await _prefsService.setDouble(element.key, element.value);
+          await _prefsService.setDouble(element.key!, element.value!);
         }
       }
     });
@@ -131,8 +128,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   Future<void> navigateToSettings(
-      {final bool deviceAdminFocused,
-      final bool notificationSettingsAccessFocused}) async {
+      {final bool? deviceAdminFocused,
+      final bool? notificationSettingsAccessFocused}) async {
     await _navigationService.navigateTo(Routes.settingsView,
         arguments: SettingsViewArguments(
             deviceAdminFocused: deviceAdminFocused,
@@ -172,7 +169,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   Future<void> onChangeVolumeLevel(double value) async {
     _timerModel.volumeAction.value = value;
-    await _prefsService.setDouble(_timerModel.volumeAction.key, value);
+    await _prefsService.setDouble(_timerModel.volumeAction.key!, value);
     notifyListeners();
   }
 

@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
-import 'package:sleep_timer/app/auto_router.gr.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/messages_generated.dart';
@@ -12,6 +10,7 @@ import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import 'app/app.router.dart';
 import 'common/timer_service_manager.dart';
 
 class SleepTimerPlatformImpl implements SleepTimerPlatform {
@@ -25,17 +24,17 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
 
   @override
   Future<bool> showRunningNotification(
-      {@required final String timerId,
-      @required final String title,
-      @required final String description,
-      @required final int accentColor,
-      final String restartAction,
-      final String pauseAction,
-      final String cancelAction,
-      final List<int> extendActions,
-      @required final int duration,
-      @required final int remainingTime,
-      @required final bool shakeToExtend}) async {
+      {required final String timerId,
+      required final String title,
+      required final String description,
+      required final int accentColor,
+      final String? restartAction,
+      final String? pauseAction,
+      final String? cancelAction,
+      final List<int>? extendActions,
+      required final int duration,
+      required final int remainingTime,
+      required final bool shakeToExtend}) async {
     final response =
         await _hostApi.showRunningNotification(RunningNotificationRequest()
           ..timerId = timerId
@@ -49,20 +48,20 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..duration = duration
           ..remainingTime = remainingTime
           ..shakeToExtend = shakeToExtend);
-    return response.success;
+    return response.success ?? false;
   }
 
   @override
   Future<bool> showPausingNotification(
-      {@required final String timerId,
-      @required final String title,
-      @required final String description,
-      @required final int accentColor,
-      final String restartAction,
-      final String continueAction,
-      final String cancelAction,
-      final List<int> extendActions,
-      @required final int remainingTime}) async {
+      {required final String timerId,
+      required final String title,
+      required final String description,
+      required final int accentColor,
+      final String? restartAction,
+      final String? continueAction,
+      final String? cancelAction,
+      final List<int>? extendActions,
+      required final int remainingTime}) async {
     final response =
         await _hostApi.showPausingNotification(TimeNotificationRequest()
           ..timerId = timerId
@@ -74,16 +73,16 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..cancelAction = cancelAction
           ..extendActions = extendActions
           ..remainingTime = remainingTime);
-    return response.success;
+    return response.success ?? false;
   }
 
   @override
   Future<bool> showElapsedNotification({
-    @required final String timerId,
-    @required final String title,
-    @required final String description,
-    @required final int accentColor,
-    final String restartAction,
+    required final String timerId,
+    required final String title,
+    required final String description,
+    required final int accentColor,
+    final String? restartAction,
   }) async {
     final response =
         await _hostApi.showElapsedNotification(NotificationRequest()
@@ -91,23 +90,34 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
           ..title = title
           ..description = description
           ..accentColor = accentColor
-          ..restartAction = restartAction);
-    return response.success;
+          ..restartAction = restartAction!);
+    return response.success ?? false;
   }
 
   @override
   Future<bool> cancelTimer(final String timerId) async {
     final response =
         await _hostApi.cancelTimer(CancelRequest()..timerId = timerId);
-    return response.success;
+    return response.success ?? false;
+  }
+
+  @override
+  Future<void> toggleExtendByShake(final bool enable) async {
+    await _hostApi.toggleExtendByShake(ToggleRequest()..enable = enable);
   }
 
   @override
   Future<List<App>> getInstalledPlayerApps() async {
     final response = await _hostApi.getInstalledPlayerApps();
 
-    final apps = response.apps.map((e) => App.fromMap(e)).toList()
-      ..sort((a, b) => a.title.compareTo(b.title));
+    if (response.apps == null) {
+      return [];
+    }
+
+    final apps = response.apps!
+        .map((e) => App.fromMap(e as Map<dynamic, dynamic>))
+        .toList()
+          ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
 
@@ -115,30 +125,36 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   Future<List<App>> getInstalledAlarmApps() async {
     final response = await _hostApi.getInstalledAlarmApps();
 
-    final apps = response.apps.map((e) => App.fromMap(e)).toList()
-      ..sort((a, b) => a.title.compareTo(b.title));
+    if (response.apps == null) {
+      return [];
+    }
+
+    final apps = response.apps!
+        .map((e) => App.fromMap(e as Map<dynamic, dynamic>))
+        .toList()
+          ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
 
   @override
-  Future<void> launchApp(final String packageName) async {
-    await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName);
+  Future<void> launchApp(final String? packageName) async {
+    await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName!);
   }
 }
 
 class FlutterApiHandler extends FlutterTimerApi {
   final Logger log = getLogger();
-  final Function callback;
-  final Function alarmCallback;
+  final Function? callback;
+  final Function? alarmCallback;
 
   FlutterApiHandler({this.callback, this.alarmCallback});
 
   @override
-  void onExtendTime(ExtendTimeResponse arg) {
+  void onExtendTime(ExtendTimeRequest arg) {
     final timerId = arg.timerId;
     log.d('extend time by: ${arg.additionalTime} for timer with id $timerId');
 
-    TimerServiceManager.getInstance()
+    TimerServiceManager.instance
         .getTimerService(timerId)
         ?.extendTime(arg.additionalTime);
   }
@@ -149,7 +165,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     log.d(
         'new time after countdown: ${arg.newTime} for timer with id $timerId');
 
-    TimerServiceManager.getInstance()
+    TimerServiceManager.instance
         .getTimerService(timerId)
         ?.setRemainingTime(arg.newTime);
   }
@@ -159,22 +175,22 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onOpen called for timer with id $timerId');
 
-    final _timerService =
-        TimerServiceManager.getInstance().getTimerService(timerId);
+    final _timerService = TimerServiceManager.instance.getTimerService(timerId);
 
     // Wait for Flutter engine to be attached and runApp to be active
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       // _timerService was terminated by system
       if (_timerService == null) {
-        StackedService.navigatorKey.currentState
+        StackedService.navigatorKey!.currentState!
             .pushNamedAndRemoveUntil(Routes.homeView, (route) => false);
       } else {
         // Navigate to timer detail view
-        StackedService.navigatorKey.currentState.pushNamedAndRemoveUntil(
+        StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
             Routes.homeView, (route) => false,
-            arguments: HomeViewArguments(timerId: _timerService.timerModel.id));
+            arguments:
+                HomeViewArguments(timerId: _timerService.timerModel!.id));
 
-        StackedService.navigatorKey.currentState.pushNamed(Routes.timerView,
+        StackedService.navigatorKey!.currentState!.pushNamed(Routes.timerView,
             arguments:
                 TimerViewArguments(timerModel: _timerService.timerModel));
       }
@@ -186,7 +202,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onPauseRequest requested for timer with id $timerId');
 
-    TimerServiceManager.getInstance().getTimerService(timerId)?.pauseTimer();
+    TimerServiceManager.instance.getTimerService(timerId)?.pauseTimer();
   }
 
   @override
@@ -194,9 +210,9 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onCancelRequest called for timer with id $timerId');
 
-    TimerServiceManager.getInstance().getTimerService(timerId)?.cancelTimer();
+    TimerServiceManager.instance.getTimerService(timerId)?.cancelTimer();
 
-    StackedService.navigatorKey.currentState
+    StackedService.navigatorKey!.currentState!
         .popUntil((route) => route.settings.name != Routes.timerView);
   }
 
@@ -205,7 +221,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onContinueRequest called for timer with id $timerId');
 
-    TimerServiceManager.getInstance().getTimerService(timerId)?.start();
+    TimerServiceManager.instance.getTimerService(timerId)?.start();
   }
 
   @override
@@ -213,13 +229,13 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = arg.timerId;
     log.d('onRestartRequest called for timer with id $timerId');
 
-    TimerServiceManager.getInstance().getTimerService(timerId)?.start();
+    TimerServiceManager.instance.getTimerService(timerId)?.start();
   }
 
   @override
   void onAlarm(TimerRequest arg) {
     log.d('onAlarm()');
-    alarmCallback(arg.timerId);
+    alarmCallback!(arg.timerId);
   }
 
   @override
@@ -234,6 +250,6 @@ class FlutterApiHandler extends FlutterTimerApi {
 
     final timerModel = TimerModel(120, startActionList, endActionList);
     final _timerService = locator<TimerService>(param1: timerModel)..start();
-    TimerServiceManager.getInstance().setTimerService(_timerService);
+    TimerServiceManager.instance.setTimerService(_timerService);
   }
 }

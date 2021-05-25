@@ -10,7 +10,7 @@ import 'home_viewmodel.dart';
 enum MenuOption { settings }
 
 class HomeView extends StatefulWidget {
-  final String timerId;
+  final String? timerId;
 
   const HomeView({this.timerId});
 
@@ -19,10 +19,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _scaleAnimation;
+  AnimationController? _animationController;
+  late Animation<double> _scaleAnimation;
 
-  HomeViewModel model;
+  late HomeViewModel viewModel;
 
   @override
   void initState() {
@@ -31,8 +31,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
     _scaleAnimation = CurvedAnimation(
-        parent: _animationController, curve: Curves.easeInOutBack);
-    _animationController.forward();
+        parent: _animationController!, curve: Curves.easeInOutBack);
+    _animationController!.forward();
   }
 
   @override
@@ -48,16 +48,16 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
     return ViewModelBuilder<HomeViewModel>.reactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (model) {
-          this.model = model;
+        onModelReady: (viewModel) {
+          this.viewModel = viewModel;
 
           if (widget.timerId == null) {
-            this.model.mayAskForReview();
+            this.viewModel.mayAskForReview();
           } else {
-            this.model.activeTimerId = widget.timerId;
+            this.viewModel.activeTimerId = widget.timerId;
           }
         },
-        builder: (context, model, child) {
+        builder: (context, viewModel, _) {
           return Scaffold(
             appBar: _buildAppBar(theme),
             body: _buildBody(theme),
@@ -81,7 +81,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             padding: const EdgeInsets.only(top: padding),
             child: Text(
               S.of(context).sleepTimer,
-              style: theme.textTheme.headline2.copyWith(fontSize: 48),
+              style: theme.textTheme.headline2!.copyWith(fontSize: 48),
               textAlign: TextAlign.center,
             ),
           ),
@@ -104,7 +104,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void _onMenuOption(MenuOption option) {
     switch (option) {
       case MenuOption.settings:
-        model.navigateToSettings();
+        viewModel.navigateToSettings();
         break;
       default:
     }
@@ -119,14 +119,16 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                model.hasActiveTimer ? _buildActiveTimers(theme) : SizedBox(),
+                viewModel.hasActiveTimer
+                    ? _buildActiveTimers(theme)
+                    : SizedBox(),
                 TimerSlider(
                   minValue: 1,
-                  initialValue: model.initialTime,
+                  initialValue: viewModel.initialTime,
                   onUpdateLabel: (value) =>
                       S.of(context).numberOfMinutesShort(value),
-                  onChange: (value) => model.setTimeSilent(value),
-                  showGlow: model.showGlow,
+                  onChange: (value) => viewModel.setTimeSilent(value),
+                  showGlow: viewModel.showGlow,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -137,7 +139,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                         return Expanded(
                           child: RoundedRectButton(
                               title: '$value',
-                              onPressed: () => model.setTime(value)),
+                              onPressed: () => viewModel.setTime(value)),
                         );
                       }).toList()),
                 ),
@@ -158,7 +160,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           width: 3,
         ),
       ),
-      onPressed: model.openActiveTimer,
+      onPressed: viewModel.openActiveTimer,
       child: Text(S.of(context).buttonOpenSavedTimer),
     );
   }
@@ -167,7 +169,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
+        theme.accentTextTheme.headline6!.copyWith(color: foregroundColor);
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -177,7 +179,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           return ScaleTransition(scale: animation, child: child);
         },
         child: FloatingActionButton.extended(
-          onPressed: model.startNewTimer,
+          onPressed: viewModel.startNewTimer,
           icon: Icon(Icons.bedtime_outlined, color: foregroundColor),
           label: Text(S.of(context).buttonTimerStart, style: textStyle),
         ),

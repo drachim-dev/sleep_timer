@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/auto_router.gr.dart';
+import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
@@ -16,12 +16,12 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class SettingsViewModel extends ReactiveViewModel implements Initialisable {
-  final _deviceService = locator<DeviceService>();
-  final _navigationService = locator<NavigationService>();
-  final _prefsService = locator<SharedPreferences>();
-  final _purchaseService = locator<PurchaseService>();
-  final _reviewService = locator<ReviewService>();
-  final _themeService = locator<ThemeService>();
+  final DeviceService _deviceService = locator<DeviceService>();
+  final NavigationService _navigationService = locator<NavigationService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final PurchaseService _purchaseService = locator<PurchaseService>();
+  final ReviewService _reviewService = locator<ReviewService>();
+  final ThemeService _themeService = locator<ThemeService>();
 
   MyTheme get currentTheme => _themeService.myTheme;
   bool get glow => _themeService.showGlow;
@@ -33,10 +33,10 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
       _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
       kDefaultExtendTimeByShake;
 
-  bool get hasAccelerometer => _deviceService.hasAccelerometer ?? true;
-  bool get deviceAdmin => _deviceService.deviceAdmin ?? false;
+  bool get hasAccelerometer => _deviceService.hasAccelerometer;
+  bool get deviceAdmin => _deviceService.deviceAdmin;
   bool get notificationSettingsAccess =>
-      _deviceService.notificationSettingsAccess ?? false;
+      _deviceService.notificationSettingsAccess;
 
   Stream<List<PurchaseDetails>> get stream =>
       _purchaseService.purchaseUpdatedStream;
@@ -58,8 +58,8 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
     });
   }
 
-  void setTheme(final String theme) {
-    _prefsService.setString(kPrefKeyTheme, theme);
+  void setTheme(final String? theme) {
+    _prefsService.setString(kPrefKeyTheme, theme!);
     _themeService.setTheme(theme);
   }
 
@@ -70,6 +70,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
 
   void onChangeExtendByShake(final bool value) async {
     await _prefsService.setBool(kPrefKeyExtendByShake, value);
+    _deviceService.toggleExtendByShake(value);
     notifyListeners();
   }
 
@@ -92,10 +93,11 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
     await _purchaseService.buyProduct(product);
   }
 
-  Future<void> navigateToCredits() =>
+  Future<void>? navigateToCredits() =>
       _navigationService.navigateTo(Routes.creditsView);
 
-  Future<void> navigateToFAQ() => _navigationService.navigateTo(Routes.fAQView);
+  Future<void>? navigateToFAQ() =>
+      _navigationService.navigateTo(Routes.fAQView);
 
   Future<void> openStoreListing() => _reviewService.openStoreListing();
 }

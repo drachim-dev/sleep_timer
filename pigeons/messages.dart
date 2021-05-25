@@ -1,144 +1,143 @@
 import 'package:pigeon/pigeon.dart';
 
 class InitializationRequest {
-  int callbackHandle;
+  int? callbackHandle;
 }
 
 class NotificationRequest {
-  String timerId, title, description;
-
-  int accentColor;
-
-  String restartAction;
-  String continueAction;
-  String pauseAction;
-  String cancelAction;
-  List<int> extendActions;
+  String? timerId, title, description;
+  int? accentColor;
+  String? restartAction, continueAction, pauseAction, cancelAction;
+  List<int>? extendActions;
 }
 
 class TimeNotificationRequest implements NotificationRequest {
   @override
-  String description;
+  String? description;
 
   @override
-  String timerId;
+  String? timerId;
 
   @override
-  String title;
+  String? title;
 
   @override
-  int accentColor;
+  int? accentColor;
 
   @override
-  String restartAction;
+  String? restartAction;
 
   @override
-  String continueAction;
+  String? continueAction;
 
   @override
-  String pauseAction;
+  String? pauseAction;
 
   @override
-  String cancelAction;
+  String? cancelAction;
 
   @override
-  List<int> extendActions;
+  List<int>? extendActions;
 
   /// The initial number of minutes the timer was set to.
-  int duration;
+  int? duration;
 
   /// The number of seconds left for the timer.
-  int remainingTime;
+  int? remainingTime;
 }
 
 class RunningNotificationRequest implements TimeNotificationRequest {
   @override
-  String description;
+  String? description;
 
   @override
-  String timerId;
+  String? timerId;
 
   @override
-  String title;
+  String? title;
 
   @override
-  int accentColor;
+  int? accentColor;
 
   @override
-  String restartAction;
+  String? restartAction;
 
   @override
-  String continueAction;
+  String? continueAction;
 
   @override
-  String pauseAction;
+  String? pauseAction;
 
   @override
-  String cancelAction;
+  String? cancelAction;
 
   @override
-  List<int> extendActions;
+  List<int>? extendActions;
 
   @override
-  int duration;
+  int? duration;
 
   @override
-  int remainingTime;
+  int? remainingTime;
 
   /// Enable shake to extend functionality.
-  bool shakeToExtend;
+  bool? shakeToExtend;
 }
 
 class NotificationResponse {
-  String timerId;
-  bool success;
+  String? timerId;
+  bool? success;
 }
 
 class CancelRequest {
-  String timerId;
+  String? timerId;
 }
 
 class CancelResponse {
-  String timerId;
-  bool success;
+  String? timerId;
+  bool? success;
 }
 
-class ExtendTimeResponse {
-  String timerId;
+class ExtendTimeRequest {
+  String? timerId;
 
   /// The time in seconds the timer was extended by.
-  int additionalTime;
+  int? additionalTime;
 }
 
 class CountDownRequest {
-  String timerId;
+  String? timerId;
 
   /// The new time after countdown in seconds.
-  int newTime;
+  int? newTime;
 }
 
 class OpenRequest {
-  String timerId;
+  String? timerId;
 }
 
 class TimerRequest {
-  String timerId;
+  String? timerId;
 }
 
 class WidgetUpdateResponse {
-  String title;
+  String? title;
 }
 
 class Package {
-  String title, icon, packageName;
+  String? title, icon, packageName;
 }
 
 class InstalledAppsResponse {
-  List<Package> apps;
+  List<Package>? apps;
 }
 
 class LaunchAppRequest {
-  String packageName;
+  String? packageName;
+}
+
+class ToggleRequest {
+  bool? enable;
 }
 
 // Native methods
@@ -150,6 +149,7 @@ abstract class HostTimerApi {
   NotificationResponse showPausingNotification(TimeNotificationRequest request);
   NotificationResponse showElapsedNotification(NotificationRequest request);
   CancelResponse cancelTimer(CancelRequest request);
+  void toggleExtendByShake(ToggleRequest request);
   InstalledAppsResponse getInstalledPlayerApps();
   InstalledAppsResponse getInstalledAlarmApps();
   void launchApp(LaunchAppRequest request);
@@ -159,7 +159,7 @@ abstract class HostTimerApi {
 // Dart methods
 @FlutterApi()
 abstract class FlutterTimerApi {
-  void onExtendTime(ExtendTimeResponse response);
+  void onExtendTime(ExtendTimeRequest request);
   void onCountDown(CountDownRequest request);
   void onContinueRequest(TimerRequest request);
   void onPauseRequest(TimerRequest request);
@@ -174,5 +174,5 @@ abstract class FlutterTimerApi {
 void configurePigeon(PigeonOptions opts) {
   opts.dartOut = 'lib/messages_generated.dart';
   opts.javaOut = 'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
-  opts.javaOptions.package = 'dr.achim.sleep_timer';
+  opts.javaOptions?.package = 'dr.achim.sleep_timer';
 }

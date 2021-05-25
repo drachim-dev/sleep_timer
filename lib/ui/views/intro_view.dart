@@ -11,16 +11,16 @@ class IntroView extends StatefulWidget {
 
 class _IntroViewState extends State<IntroView> {
   final introKey = GlobalKey<IntroductionScreenState>();
-  IntroViewModel model;
+  late IntroViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     final pageDecoration = PageDecoration(
-      titleTextStyle: theme.textTheme.headline2.copyWith(fontSize: 36),
-      bodyTextStyle: theme.textTheme.headline6
-          .copyWith(color: theme.textTheme.headline2.color),
+      titleTextStyle: theme.textTheme.headline2!.copyWith(fontSize: 36),
+      bodyTextStyle: theme.textTheme.headline6!
+          .copyWith(color: theme.textTheme.headline2!.color),
       descriptionPadding: EdgeInsets.fromLTRB(16, 8, 16, 0),
       pageColor: theme.scaffoldBackgroundColor,
       imagePadding: EdgeInsets.zero,
@@ -28,8 +28,8 @@ class _IntroViewState extends State<IntroView> {
 
     return ViewModelBuilder<IntroViewModel>.reactive(
         viewModelBuilder: () => IntroViewModel(),
-        onModelReady: (model) => this.model = model,
-        builder: (context, model, child) {
+        onModelReady: (viewModel) => this.viewModel = viewModel,
+        builder: (context, viewModel, _) {
           return IntroductionScreen(
             key: introKey,
             pages: [
@@ -42,7 +42,7 @@ class _IntroViewState extends State<IntroView> {
               PageViewModel(
                 title: S.of(context).introMediaTitle,
                 body: S.of(context).IntroMediaSubtitle,
-                image: _buildImage('img_music.webp', bottomPadding: 24),
+                image: _buildImage('img_music.webp'),
                 decoration: pageDecoration,
               ),
               PageViewModel(
@@ -73,7 +73,7 @@ class _IntroViewState extends State<IntroView> {
             onDone: () => finishIntro(),
             dotsDecorator: DotsDecorator(
               size: Size(10, 10),
-              color: Colors.grey[350],
+              color: Colors.grey[350]!,
               activeColor: theme.accentColor,
               activeSize: Size(22, 10),
               activeShape: RoundedRectangleBorder(
@@ -94,5 +94,5 @@ class _IntroViewState extends State<IntroView> {
     );
   }
 
-  void finishIntro() => model.navigateToHome();
+  void finishIntro() => viewModel.navigateToHome();
 }

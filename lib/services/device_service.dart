@@ -1,26 +1,24 @@
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_interface.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sleep_timer/common/constants.dart';
-import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
 
+@prod
 @singleton
 class DeviceService with ReactiveServiceMixin {
-  final DeviceFunctionsPlatform _deviceFunctionsPlatform =
-      DeviceFunctionsPlatform.getInstance();
+  final DeviceFunctionsPlatform _deviceFunctions =
+      DeviceFunctionsPlatform.instance;
 
   DeviceService() {
     listenToReactiveValues([_deviceAdmin, _notificationSettingsAccess]);
   }
 
-  DeviceInfoResponse _deviceInfo;
+  late DeviceInfoResponse _deviceInfo;
   int get platformVersion => _deviceInfo.platformVersion ?? 0;
   String get deviceManufacturer => _deviceInfo.deviceManufacturer ?? '';
   String get deviceModel => _deviceInfo.deviceModel ?? '';
@@ -31,16 +29,16 @@ class DeviceService with ReactiveServiceMixin {
   bool _deviceAdmin = false;
   bool get deviceAdmin => _deviceAdmin;
 
-  Future<VolumeResponse> get volume => _deviceFunctionsPlatform.getVolume();
+  Future<VolumeResponse> get volume => _deviceFunctions.getVolume();
 
   bool _notificationSettingsAccess = false;
   bool get notificationSettingsAccess => _notificationSettingsAccess;
 
   Future<List<App>> get playerApps async =>
-      SleepTimerPlatform.getInstance().getInstalledPlayerApps();
+      SleepTimerPlatform.instance.getInstalledPlayerApps();
 
   Future<List<App>> get alarmApps async =>
-      SleepTimerPlatform.getInstance().getInstalledAlarmApps();
+      SleepTimerPlatform.instance.getInstalledAlarmApps();
 
   @factoryMethod
   static Future<DeviceService> create() async {
@@ -50,57 +48,54 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<void> init() async {
-    _deviceInfo = await _deviceFunctionsPlatform.getDeviceInfo();
-    _hasAccelerometer = await _deviceFunctionsPlatform.hasAccelerometer();
-    _deviceAdmin = await _deviceFunctionsPlatform.isDeviceAdminActive();
+    _deviceInfo = await _deviceFunctions.getDeviceInfo();
+    _hasAccelerometer = await _deviceFunctions.hasAccelerometer();
+    _deviceAdmin = await _deviceFunctions.isDeviceAdminActive();
     _notificationSettingsAccess =
-        await _deviceFunctionsPlatform.isNotificationAccessGranted();
+        await _deviceFunctions.isNotificationAccessGranted();
   }
 
   Future<bool> toggleMedia(final bool enable) {
-    return _deviceFunctionsPlatform.toggleMedia(enable);
+    return _deviceFunctions.toggleMedia(enable);
   }
 
   Future<bool> toggleWifi(final bool enable) {
-    return _deviceFunctionsPlatform.toggleWifi(enable);
+    return _deviceFunctions.toggleWifi(enable);
   }
 
   Future<bool> toggleBluetooth(final bool enable) {
-    return _deviceFunctionsPlatform.toggleBluetooth(enable);
+    return _deviceFunctions.toggleBluetooth(enable);
   }
 
   Future<bool> toggleScreen(final bool enable) {
-    return _deviceFunctionsPlatform.toggleScreen(enable);
+    return _deviceFunctions.toggleScreen(enable);
   }
 
   Future<VolumeResponse> setVolume(final int level) {
-    return _deviceFunctionsPlatform.setVolume(level);
+    return _deviceFunctions.setVolume(level);
   }
 
   Future<bool> toggleDoNotDisturb(final bool enable) {
-    return _deviceFunctionsPlatform.toggleDoNotDisturb(enable);
+    return _deviceFunctions.toggleDoNotDisturb(enable);
   }
 
-  Future<void> toggleDeviceAdmin(bool enable) async {
-    await _deviceFunctionsPlatform.toggleDeviceAdmin(enable);
+  Future<void> toggleDeviceAdmin(final bool enable) async {
+    await _deviceFunctions.toggleDeviceAdmin(enable);
   }
 
-  Future<void> toggleNotificationSettingsAccess(bool enable) async {
-    await _deviceFunctionsPlatform.toggleNotificationAccess(enable);
+  Future<void> toggleNotificationSettingsAccess(final bool enable) async {
+    await _deviceFunctions.toggleNotificationAccess(enable);
   }
 
   Future<bool> showRunningNotification(
-      {@required final String timerId,
-      @required final int duration,
-      @required final int remainingTime,
-      @required final bool shakeToExtend}) async {
-    final durationString =
-        Utils.secondsToString(duration, trimTrailingZeros: true);
-
-    return SleepTimerPlatform.getInstance().showRunningNotification(
+      {required final String timerId,
+      required final int duration,
+      required final int remainingTime,
+      required final bool shakeToExtend}) async {
+    return SleepTimerPlatform.instance.showRunningNotification(
         timerId: timerId,
-        title: S.current.notificationStatusRunning,
-        description: S.current.notificationTimerSet(durationString),
+        title: S.current.notificationTimeLeft,
+        description: S.current.notificationStatusActive,
         accentColor: kNotificationActionColor.value,
         pauseAction: S.current.notificationActionPause,
         extendActions: [5, 20],
@@ -110,15 +105,11 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<bool> showPauseNotification(
-      {@required final String timerId,
-      @required final int remainingTime}) async {
-    final timeLeft =
-        Utils.secondsToString(remainingTime, trimTrailingZeros: true);
-
-    return SleepTimerPlatform.getInstance().showPausingNotification(
+      {required final String timerId, required final int remainingTime}) async {
+    return SleepTimerPlatform.instance.showPausingNotification(
         timerId: timerId,
-        title: S.current.notificationStatusPausing,
-        description: S.current.notificationTimeLeft(timeLeft),
+        title: S.current.notificationTimeLeft,
+        description: S.current.notificationStatusPausing,
         accentColor: kNotificationActionColor.value,
         cancelAction: S.current.notificationActionCancel,
         continueAction: S.current.notificationActionContinue,
@@ -126,8 +117,8 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<bool> showElapsedNotification(
-      {@required final TimerModel timerModel}) async {
-    var description = S.current.notificationTimeExpired;
+      {required final TimerModel timerModel}) async {
+    var description = '';
     final activeActions =
         timerModel.endActions.where((element) => element.enabled);
     if (activeActions.isEmpty) {
@@ -139,7 +130,7 @@ class DeviceService with ReactiveServiceMixin {
       }
     }
 
-    return SleepTimerPlatform.getInstance().showElapsedNotification(
+    return SleepTimerPlatform.instance.showElapsedNotification(
         timerId: timerModel.id,
         title: S.current.notificationStatusElapsed,
         description: description,
@@ -147,8 +138,12 @@ class DeviceService with ReactiveServiceMixin {
         restartAction: S.current.notificationActionRestart);
   }
 
-  Future<bool> cancelNotification({@required final String timerId}) async {
-    return SleepTimerPlatform.getInstance().cancelTimer(timerId);
+  Future<bool> cancelNotification({required final String timerId}) async {
+    return SleepTimerPlatform.instance.cancelTimer(timerId);
+  }
+
+  void toggleExtendByShake(final bool enable) {
+    SleepTimerPlatform.instance.toggleExtendByShake(enable);
   }
 
   // Async response not yet possible with pigeon.
@@ -166,6 +161,6 @@ class DeviceService with ReactiveServiceMixin {
   }
 
   Future<void> openPackage(final String packageName) async {
-    return SleepTimerPlatform.getInstance().launchApp(packageName);
+    return SleepTimerPlatform.instance.launchApp(packageName);
   }
 }

@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/auto_router.gr.dart';
+import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/logger.util.dart';
+import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
@@ -76,7 +78,7 @@ class MyApp extends StatelessWidget {
             title: kAppTitle,
             scaffoldMessengerKey: mainScaffoldMessengerKey,
             navigatorKey: StackedService.navigatorKey,
-            onGenerateRoute: AutoRouter(),
+            onGenerateRoute: StackedRouter().onGenerateRoute,
             initialRoute:
                 model.firstLaunch ? Routes.introView : Routes.homeView,
             localizationsDelegates: [
@@ -97,8 +99,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppViewModel extends ReactiveViewModel {
-  final _prefsService = locator<SharedPreferences>();
-  final _themeService = locator<ThemeService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final ThemeService _themeService = locator<ThemeService>();
 
   bool get firstLaunch => _prefsService.getBool(kPrefKeyFirstLaunch) ?? true;
 
@@ -119,7 +121,7 @@ class MyAppViewModel extends ReactiveViewModel {
 class Application {
   final Logger log = getLogger();
 
-  static Future<void> init({Function onCallBack}) async {
+  static Future<void> init({Function? onCallBack}) async {
     WidgetsFlutterBinding.ensureInitialized();
 
     // init Logger
@@ -133,28 +135,27 @@ class Application {
         .setCrashlyticsCollectionEnabled(!kDebugMode);
 
     // Pass all uncaught errors to Crashlytics.
-    Function originalOnError = FlutterError.onError;
+    Function? originalOnError = FlutterError.onError;
     FlutterError.onError = (FlutterErrorDetails errorDetails) async {
       await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
       // Forward to original handler.
-      originalOnError(errorDetails);
+      originalOnError!(errorDetails);
     };
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
 
     // init Google Mobile Ads
-    // ignore: unawaited_futures
-    MobileAds.instance.initialize();
+    await MobileAds.instance.initialize();
+    await MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
 
-    // ignore: await_only_futures
-    await setupLocator();
+    configureInjection(Environment.prod);
 
     // initialize PlatformChannel for callback
     final sleepTimerCallback =
-        PluginUtilities.getCallbackHandle(onNativeSideCallback);
-    await SleepTimerPlatform.getInstance()
-        .init(sleepTimerCallback.toRawHandle());
+        PluginUtilities.getCallbackHandle(onNativeSideCallback)!;
+    await SleepTimerPlatform.instance.init(sleepTimerCallback.toRawHandle());
 
     // setup callback even when activity is destroyed
     FlutterTimerApi.setup(FlutterApiHandler(
@@ -180,8 +181,7 @@ void onAlarmCallback(final String timerId) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _timerService =
-      TimerServiceManager.getInstance().getTimerService(timerId);
+  final _timerService = TimerServiceManager.instance.getTimerService(timerId)!;
   await _timerService.handleEndedActions();
 }
 

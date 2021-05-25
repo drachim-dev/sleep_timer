@@ -1,15 +1,22 @@
 package dr.achim.sleep_timer
 
-import android.app.*
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.text.format.DateUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import dr.achim.sleep_timer.Messages.*
+import dr.achim.sleep_timer.Messages.CancelResponse
+import dr.achim.sleep_timer.Messages.ExtendTimeRequest
+import dr.achim.sleep_timer.Messages.NotificationRequest
+import dr.achim.sleep_timer.Messages.OpenRequest
+import dr.achim.sleep_timer.Messages.RunningNotificationRequest
+import dr.achim.sleep_timer.Messages.TimeNotificationRequest
+import dr.achim.sleep_timer.Messages.TimerRequest
 import java.util.*
-import kotlin.collections.HashMap
 
 class NotificationReceiver : BroadcastReceiver() {
     companion object {
@@ -42,6 +49,7 @@ class NotificationReceiver : BroadcastReceiver() {
         private const val REQUEST_CODE_PAUSE_REQUEST = 300
         private const val REQUEST_CODE_RESTART_REQUEST = 150
         private const val REQUEST_CODE_CANCEL_REQUEST = 400
+
     }
 
     private var context: Context? = null
@@ -74,19 +82,18 @@ class NotificationReceiver : BroadcastReceiver() {
         val timerId = request.timerId
 
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(request.title)
-                .setContentText(request.description)
-                .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
-                .setContentIntent(createOpenIntent(timerId))
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setShowWhen(true)
-                .setUsesChronometer(true)
-                .setOngoing(true)
-                .setAutoCancel(false)
-                .setWhen(System.currentTimeMillis() + request.remainingTime!! * 1000)
-        val actions = buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+            .setContentTitle(String.format(request.title, DateUtils.formatElapsedTime(request.remainingTime)))
+            .setContentText(request.description)
+            .setSmallIcon(R.drawable.ic_hourglass_full)
+            .setColor(request.accentColor.toInt())
+            .setContentIntent(createOpenIntent(timerId))
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setShowWhen(false)
+            .setOngoing(true)
+            .setAutoCancel(false)
+        val actions =
+            buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {
             builder.addAction(action)
         }
@@ -94,7 +101,14 @@ class NotificationReceiver : BroadcastReceiver() {
         showNotification(notification)
     }
 
-    private fun buildNotificationActions(timerId: String?, restartAction: String?, pauseAction: String?, continueAction: String?, cancelAction: String?, extendActions: MutableList<Any>?): List<NotificationCompat.Action> {
+    private fun buildNotificationActions(
+        timerId: String?,
+        restartAction: String?,
+        pauseAction: String?,
+        continueAction: String?,
+        cancelAction: String?,
+        extendActions: MutableList<Any>?
+    ): List<NotificationCompat.Action> {
         val actions: MutableList<NotificationCompat.Action> = ArrayList()
         if (restartAction != null && restartAction.isNotEmpty()) {
             val intent = createRestartRequestIntent(timerId)
@@ -116,7 +130,7 @@ class NotificationReceiver : BroadcastReceiver() {
             val action = NotificationCompat.Action(R.drawable.ic_baseline_clear_24, cancelAction, intent)
             actions.add(action)
         }
-        if(extendActions != null) {
+        if (extendActions != null) {
             for (extendAction in extendActions as MutableList<Int>) {
                 val intent = createExtendTimeIntent(timerId, extendAction * 60)
                 val action = NotificationCompat.Action(R.drawable.ic_baseline_replay_5_24, "+$extendAction", intent)
@@ -130,15 +144,15 @@ class NotificationReceiver : BroadcastReceiver() {
         val timerId = request.timerId
 
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(request.title)
-                .setContentText(request.description)
-                .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setShowWhen(false)
-                .setUsesChronometer(false)
-                .setContentIntent(createOpenIntent(timerId))
-        val actions = buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+            .setContentTitle(String.format(request.title, DateUtils.formatElapsedTime(request.remainingTime)))
+            .setContentText(request.description)
+            .setSmallIcon(R.drawable.ic_hourglass_full)
+            .setColor(request.accentColor.toInt())
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setShowWhen(false)
+            .setContentIntent(createOpenIntent(timerId))
+        val actions =
+            buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {
             builder.addAction(action)
         }
@@ -150,17 +164,19 @@ class NotificationReceiver : BroadcastReceiver() {
         val timerId = request.timerId
 
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(request.title)
-                .setContentText(request.description)
-                .setStyle(NotificationCompat.BigTextStyle()
-                        .bigText(request.description))
-                .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setShowWhen(false)
-                .setUsesChronometer(false)
-                .setContentIntent(createOpenIntent(timerId))
-        val actions = buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+            .setContentTitle(request.title)
+            .setContentText(request.description)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(request.description)
+            )
+            .setSmallIcon(R.drawable.ic_hourglass_full)
+            .setColor(request.accentColor.toInt())
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setShowWhen(false)
+            .setContentIntent(createOpenIntent(timerId))
+        val actions =
+            buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {
             builder.addAction(action)
         }
@@ -181,10 +197,11 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         return PendingIntent.getActivity(
-                context,
-                REQUEST_CODE_OPEN,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_OPEN,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun createContinueRequestIntent(timerId: String?): PendingIntent {
@@ -198,10 +215,11 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         return PendingIntent.getBroadcast(
-                context,
-                REQUEST_CODE_CONTINUE_REQUEST,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_CONTINUE_REQUEST,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun createPauseRequestIntent(timerId: String?): PendingIntent {
@@ -215,10 +233,11 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         return PendingIntent.getBroadcast(
-                context,
-                REQUEST_CODE_PAUSE_REQUEST,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_PAUSE_REQUEST,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun createCancelRequestIntent(timerId: String?): PendingIntent {
@@ -233,14 +252,15 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         return PendingIntent.getBroadcast(
-                context,
-                REQUEST_CODE_CANCEL_REQUEST,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_CANCEL_REQUEST,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun createExtendTimeIntent(timerId: String?, additionalTime: Int): PendingIntent {
-        val response = ExtendTimeResponse().apply {
+        val response = ExtendTimeRequest().apply {
             this.timerId = timerId
             this.additionalTime = additionalTime.toLong()
         }
@@ -250,10 +270,11 @@ class NotificationReceiver : BroadcastReceiver() {
             putExtra(KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
         }
         return PendingIntent.getBroadcast(
-                context,
-                REQUEST_CODE_EXTEND + additionalTime,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_EXTEND + additionalTime,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private fun createRestartRequestIntent(timerId: String?): PendingIntent {
@@ -267,10 +288,11 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         return PendingIntent.getBroadcast(
-                context,
-                REQUEST_CODE_RESTART_REQUEST,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            context,
+            REQUEST_CODE_RESTART_REQUEST,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
 }

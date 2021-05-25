@@ -6,6 +6,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:stacked/stacked.dart';
 
+@prod
 @singleton
 class PurchaseService with ReactiveServiceMixin {
   final Logger log = getLogger();
@@ -73,9 +74,9 @@ class PurchaseService with ReactiveServiceMixin {
     response.notFoundIDs.forEach((element) => log.d(element));
 
     if (response.error != null) {
-      log.e('error code: ${response.error.code}');
-      log.e('error message: ${response.error.message}');
-      log.e(response.error.details);
+      log.e('error code: ${response.error!.code}');
+      log.e('error message: ${response.error!.message}');
+      log.e(response.error!.details);
     }
 
     return response.productDetails.map((e) {
@@ -121,7 +122,7 @@ class PurchaseService with ReactiveServiceMixin {
     purchases.forEach((element) {
       log.d(element.productID);
       _iap.consumePurchase(
-          PurchaseDetails.fromPurchase(element.billingClientPurchase));
+          PurchaseDetails.fromPurchase(element.billingClientPurchase!));
     });
   }
 }

@@ -28,11 +28,11 @@ class _SettingsViewState extends State<SettingsView>
     with SingleTickerProviderStateMixin {
   final Logger log = getLogger();
 
-  SettingsViewModel model;
+  late SettingsViewModel viewModel;
 
   final ScrollController _scrollController = ScrollController();
-  AnimationController _controller;
-  Animatable<Color> blinkingFocus;
+  late AnimationController _controller;
+  late Animatable<Color?> blinkingFocus;
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
+      SchedulerBinding.instance!.addPostFrameCallback((_) {
         Future.delayed(Duration(milliseconds: 750)).then((value) => {
               _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
@@ -71,7 +71,7 @@ class _SettingsViewState extends State<SettingsView>
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
 
     super.dispose();
   }
@@ -82,14 +82,14 @@ class _SettingsViewState extends State<SettingsView>
 
     return ViewModelBuilder<SettingsViewModel>.reactive(
         viewModelBuilder: () => SettingsViewModel(),
-        onModelReady: (model) {
-          this.model = model;
+        onModelReady: (viewModel) {
+          this.viewModel = viewModel;
           if (widget.deviceAdminFocused ||
               widget.notificationSettingsAccessFocused) {
             initAnimations(theme);
           }
         },
-        builder: (context, model, child) {
+        builder: (context, viewModel, _) {
           return Scaffold(
             appBar: _buildAppBar(theme),
             body: _buildBody(theme),
@@ -121,9 +121,9 @@ class _SettingsViewState extends State<SettingsView>
           title: Text(S.of(context).rateAppTitle),
           subtitle: Text(S.of(context).rateAppSubtitle),
           trailing: Text(S.of(context).rateAppPrice),
-          onTap: model.openStoreListing,
+          onTap: viewModel.openStoreListing,
         ),
-        for (var product in model.products) _buildProduct(theme, product),
+        for (var product in viewModel.products) _buildProduct(theme, product),
         SectionHeader(S.of(context).advancedSectionTitle,
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         for (var option in _buildAdvanced(theme)) option,
@@ -131,11 +131,11 @@ class _SettingsViewState extends State<SettingsView>
             dense: true, leftPadding: kPreferenceTitleLeftPadding),
         ListTile(
           title: Text(S.of(context).faqShort),
-          onTap: model.navigateToFAQ,
+          onTap: viewModel.navigateToFAQ,
         ),
         ListTile(
           title: Text(S.of(context).creditsAppTitle),
-          onTap: model.navigateToCredits,
+          onTap: viewModel.navigateToCredits,
         ),
       ],
     );
@@ -145,7 +145,7 @@ class _SettingsViewState extends State<SettingsView>
     return [
       ListTile(
         title: Text(S.of(context).chooseThemeTitle),
-        subtitle: Text(model.currentTheme.title),
+        subtitle: Text(viewModel.currentTheme.title),
         leading: Icon(Icons.color_lens_outlined),
         onTap: _showThemeDialog,
       ),
@@ -154,8 +154,8 @@ class _SettingsViewState extends State<SettingsView>
         subtitle: Text(S.of(context).showTimerGlowDescription),
         isThreeLine: true,
         secondary: Icon(Icons.blur_on_outlined),
-        value: model.glow,
-        onChanged: model.onChangeGlow,
+        value: viewModel.glow,
+        onChanged: viewModel.onChangeGlow,
       ),
     ];
   }
@@ -171,9 +171,9 @@ class _SettingsViewState extends State<SettingsView>
               children: themeList.map((myTheme) {
                 return RadioListTile(
                     title: Text(myTheme.title),
-                    groupValue: model.currentTheme.id,
+                    groupValue: viewModel.currentTheme.id,
                     value: myTheme.id,
-                    onChanged: model.setTheme);
+                    onChanged: viewModel.setTheme);
               }).toList()),
         );
       },
@@ -181,11 +181,11 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   List<Widget> _buildTimerSettings(final ThemeData theme) {
-    final unselectedColor = model.hasAccelerometer
-        ? theme.textTheme.subtitle1.color
+    final unselectedColor = viewModel.hasAccelerometer
+        ? theme.textTheme.subtitle1!.color
         : theme.unselectedWidgetColor;
 
-    final selectedColor = theme.textTheme.subtitle1.color;
+    final selectedColor = theme.textTheme.subtitle1!.color;
 
     return [
       Theme(
@@ -196,28 +196,29 @@ class _SettingsViewState extends State<SettingsView>
           dividerColor: Colors.transparent,
         ),
         child: IgnorePointer(
-          ignoring: !model.hasAccelerometer,
+          ignoring: !viewModel.hasAccelerometer,
           child: ExpansionTile(
             leading: Icon(Icons.vibration_outlined),
-            onExpansionChanged: model.onChangeExtendByShake,
-            initiallyExpanded: model.hasAccelerometer && model.extendByShake,
+            onExpansionChanged: viewModel.onChangeExtendByShake,
+            initiallyExpanded:
+                viewModel.hasAccelerometer && viewModel.extendByShake,
             title: Text(S.of(context).prefsExtendTimeOnShake),
-            subtitle: !model.hasAccelerometer
+            subtitle: !viewModel.hasAccelerometer
                 ? Text(S.of(context).notSupported)
                 : null,
             trailing: IgnorePointer(
               child: Switch(
-                value: model.hasAccelerometer && model.extendByShake,
+                value: viewModel.hasAccelerometer && viewModel.extendByShake,
                 onChanged: (_) {},
               ),
             ),
             children: [
               PopupMenuButton(
-                enabled: model.hasAccelerometer,
+                enabled: viewModel.hasAccelerometer,
                 tooltip: S.of(context).extendTimeByShakeMenuToolTip,
                 offset: Offset(1, 0),
-                initialValue: model.extendTimeByShake,
-                onSelected: model.onChangeExtendTimeByShake,
+                initialValue: viewModel.extendTimeByShake,
+                onSelected: viewModel.onChangeExtendTimeByShake,
                 itemBuilder: (context) =>
                     kExtendTimeByShakeOptions.map((minutes) {
                   return PopupMenuItem(
@@ -227,10 +228,10 @@ class _SettingsViewState extends State<SettingsView>
                 }).toList(),
                 child: ListTile(
                   leading: SizedBox(),
-                  enabled: model.hasAccelerometer,
+                  enabled: viewModel.hasAccelerometer,
                   title: Text(S
                       .of(context)
-                      .numberOfMinutesLong(model.extendTimeByShake)),
+                      .byNumberOfMinutesLong(viewModel.extendTimeByShake)),
                   subtitle: Text(S.of(context).extendTimeByShakeMenuToolTip),
                 ),
               ),
@@ -242,7 +243,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   ListTile _buildProduct(ThemeData theme, Product product) {
-    IconData icon;
+    IconData? icon;
     switch (product.productDetails.id) {
       case kProductDonation:
         icon = Icons.local_cafe_outlined;
@@ -255,7 +256,7 @@ class _SettingsViewState extends State<SettingsView>
 
     final purchased = product.purchased;
     final priceStyle = purchased
-        ? theme.textTheme.bodyText1.copyWith(color: Colors.green)
+        ? theme.textTheme.bodyText1!.copyWith(color: Colors.green)
         : theme.textTheme.bodyText1;
 
     return ListTile(
@@ -269,7 +270,7 @@ class _SettingsViewState extends State<SettingsView>
         textAlign: TextAlign.center,
         style: priceStyle,
       ),
-      onTap: () => purchased ? null : model.buyProduct(product),
+      onTap: () => purchased ? null : viewModel.buyProduct(product),
     );
   }
 
@@ -288,8 +289,8 @@ class _SettingsViewState extends State<SettingsView>
                   title: Text(S.of(context).prefsDeviceAdmin),
                   subtitle: Text(S.of(context).prefsDeviceAdminDescription),
                   isThreeLine: true,
-                  value: model.deviceAdmin,
-                  onChanged: model.onChangeDeviceAdmin),
+                  value: viewModel.deviceAdmin,
+                  onChanged: viewModel.onChangeDeviceAdmin),
             );
           }),
       AnimatedBuilder(
@@ -306,8 +307,8 @@ class _SettingsViewState extends State<SettingsView>
                   subtitle: Text(
                       S.of(context).prefsNotificationSettingsAccessDescription),
                   isThreeLine: true,
-                  value: model.notificationSettingsAccess,
-                  onChanged: model.onChangeNotificationSettingsAccess),
+                  value: viewModel.notificationSettingsAccess,
+                  onChanged: viewModel.onChangeNotificationSettingsAccess),
             );
           }),
     ];

@@ -41,7 +41,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             NotificationReceiver.ACTION_EXTEND -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_EXTEND_RESPONSE) as HashMap<String, Any>?
                 if (map != null) {
-                    val extendTimeResponse: ExtendTimeResponse = ExtendTimeResponse.fromMap(map)
+                    val extendTimeResponse: ExtendTimeRequest = ExtendTimeRequest.fromMap(map)
                     flutterTimerApi.onExtendTime(extendTimeResponse) { }
                 }
             }

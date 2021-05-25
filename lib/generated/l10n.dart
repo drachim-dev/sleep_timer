@@ -10,28 +10,43 @@ import 'intl/messages_all.dart';
 
 // ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
 // ignore_for_file: join_return_with_assignment, prefer_final_in_for_each
-// ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: avoid_redundant_argument_values, avoid_escaping_inner_quotes
 
 class S {
   S();
-  
-  static S current;
-  
-  static const AppLocalizationDelegate delegate =
-    AppLocalizationDelegate();
+
+  static S? _current;
+
+  static S get current {
+    assert(_current != null,
+        'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.');
+    return _current!;
+  }
+
+  static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<S> load(Locale locale) {
-    final name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
-    final localeName = Intl.canonicalizedLocale(name); 
+    final name = (locale.countryCode?.isEmpty ?? false)
+        ? locale.languageCode
+        : locale.toString();
+    final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
-      S.current = S();
-      
-      return S.current;
+      final instance = S();
+      S._current = instance;
+
+      return instance;
     });
-  } 
+  }
 
   static S of(BuildContext context) {
+    final instance = S.maybeOf(context);
+    assert(instance != null,
+        'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?');
+    return instance!;
+  }
+
+  static S? maybeOf(BuildContext context) {
     return Localizations.of<S>(context, S);
   }
 
@@ -180,6 +195,16 @@ class S {
     return Intl.message(
       '$minutes minutes',
       name: 'numberOfMinutesLong',
+      desc: '',
+      args: [minutes],
+    );
+  }
+
+  /// `by {minutes} minutes`
+  String byNumberOfMinutesLong(Object minutes) {
+    return Intl.message(
+      'by $minutes minutes',
+      name: 'byNumberOfMinutesLong',
       desc: '',
       args: [minutes],
     );
@@ -445,10 +470,10 @@ class S {
     );
   }
 
-  /// `Required for the screen off action`
+  /// `Required to turn screen off`
   String get prefsDeviceAdminDescription {
     return Intl.message(
-      'Required for the screen off action',
+      'Required to turn screen off',
       name: 'prefsDeviceAdminDescription',
       desc: '',
       args: [],
@@ -465,10 +490,10 @@ class S {
     );
   }
 
-  /// `Required for the DND action`
+  /// `Required to enable DND`
   String get prefsNotificationSettingsAccessDescription {
     return Intl.message(
-      'Required for the DND action',
+      'Required to enable DND',
       name: 'prefsNotificationSettingsAccessDescription',
       desc: '',
       args: [],
@@ -635,21 +660,11 @@ class S {
     );
   }
 
-  /// `{durationString} minutes`
-  String unitMinute(Object durationString) {
+  /// `Sleep Timer active`
+  String get notificationStatusActive {
     return Intl.message(
-      '$durationString minutes',
-      name: 'unitMinute',
-      desc: '',
-      args: [durationString],
-    );
-  }
-
-  /// `Sleep Timer running`
-  String get notificationStatusRunning {
-    return Intl.message(
-      'Sleep Timer running',
-      name: 'notificationStatusRunning',
+      'Sleep Timer active',
+      name: 'notificationStatusActive',
       desc: '',
       args: [],
     );
@@ -665,10 +680,10 @@ class S {
     );
   }
 
-  /// `Sleep Timer pausing`
+  /// `Sleep Timer paused`
   String get notificationStatusPausing {
     return Intl.message(
-      'Sleep Timer pausing',
+      'Sleep Timer paused',
       name: 'notificationStatusPausing',
       desc: '',
       args: [],
@@ -725,33 +740,13 @@ class S {
     );
   }
 
-  /// `Time's up. `
-  String get notificationTimeExpired {
+  /// `Time left: %s`
+  String get notificationTimeLeft {
     return Intl.message(
-      'Time\'s up. ',
-      name: 'notificationTimeExpired',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Time left: {timeLeft}`
-  String notificationTimeLeft(Object timeLeft) {
-    return Intl.message(
-      'Time left: $timeLeft',
+      'Time left: %s',
       name: 'notificationTimeLeft',
       desc: '',
-      args: [timeLeft],
-    );
-  }
-
-  /// `Time set to {time} minutes`
-  String notificationTimerSet(Object time) {
-    return Intl.message(
-      'Time set to $time minutes',
-      name: 'notificationTimerSet',
-      desc: '',
-      args: [time],
+      args: [],
     );
   }
 
@@ -1119,11 +1114,9 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   bool shouldReload(AppLocalizationDelegate old) => false;
 
   bool _isSupported(Locale locale) {
-    if (locale != null) {
-      for (var supportedLocale in supportedLocales) {
-        if (supportedLocale.languageCode == locale.languageCode) {
-          return true;
-        }
+    for (var supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode) {
+        return true;
       }
     }
     return false;

@@ -9,15 +9,15 @@ class TimerSlider extends StatefulWidget {
   final bool hasHandle;
   final bool showGlow;
   final bool animationEnabled;
-  final TextStyle labelStyle;
-  final Function(int) onChange;
-  final String Function(int) onUpdateLabel;
+  final TextStyle? labelStyle;
+  final Function(int)? onChange;
+  final String Function(int)? onUpdateLabel;
 
   const TimerSlider({
-    this.size,
-    @required this.initialValue,
-    this.minValue,
-    this.maxValue,
+    this.size = 256,
+    required this.initialValue,
+    this.minValue = 0,
+    this.maxValue = 60,
     this.hasHandle = true,
     this.showGlow = kDefaultGlow,
     this.animationEnabled = true,
@@ -65,12 +65,12 @@ class _TimerSliderState extends State<TimerSlider> {
     );
 
     return SleekCircularSlider(
-        minValue: widget.minValue ?? 0,
-        maxValue: widget.maxValue ?? 60,
+        minValue: widget.minValue,
+        maxValue: widget.maxValue,
         initialValue: widget.initialValue,
         appearance: CircularSliderAppearance(
             animationEnabled: widget.animationEnabled,
-            size: widget.size ?? 256,
+            size: widget.size,
             customWidths: CustomSliderWidths(
               trackWidth: 15,
               progressBarWidth: 4,
@@ -80,8 +80,8 @@ class _TimerSliderState extends State<TimerSlider> {
             startAngle: 270,
             angleRange: 360,
             infoProperties: InfoProperties(
-                mainLabelStyle: widget.labelStyle ?? theme.textTheme.headline2,
-                modifier: (value) => widget.onUpdateLabel(value.round())),
+                mainLabelStyle: widget.labelStyle ?? theme.textTheme.headline2!,
+                modifier: (value) => widget.onUpdateLabel!(value.round())),
             customColors: colors),
         onChange: widget.hasHandle ? (_) {} : null,
         onChangeEnd: widget.hasHandle ? widget.onChange : null);

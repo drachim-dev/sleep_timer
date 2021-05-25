@@ -10,41 +10,43 @@ import 'package:sleep_timer/common/constants.dart';
 class ReviewService {
   final Logger log = getLogger();
   final InAppReview _inAppReview = InAppReview.instance;
-  final _prefsService = locator<SharedPreferences>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
 
   final int dayInterval = 14;
-  final int minElapsed = 6;
+  final int minElapsed = 10;
   final int maxAskForReview = 5;
 
-  int _calledDate, _numElapsed, _reviewCount;
-
-  ReviewService() {
-    _calledDate = _prefsService.getInt(kPrefKeyReviewCalledDate);
-    if (_calledDate == null) {
-      _calledDate = DateTime.now().millisecondsSinceEpoch;
-      _prefsService.setInt(kPrefKeyReviewCalledDate, _calledDate);
-    }
-
-    _reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? 0;
-  }
+  int _calledDate = DateTime.now().millisecondsSinceEpoch;
+  int _numElapsed = 0;
+  int _reviewCount = 0;
 
   bool shouldAskForReview() {
+    _reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? _reviewCount;
     log.d('reviewCount: $_reviewCount');
-    if (maxAskForReview != null && _reviewCount >= maxAskForReview) {
+    if (_reviewCount >= maxAskForReview) {
       return false;
     }
 
-    final calledDate = DateTime.fromMillisecondsSinceEpoch(_calledDate);
-    final daysSinceLastCall = DateTime.now().difference(calledDate).inDays;
+    final calledDateInMillisSinceEpoch =
+        _prefsService.getInt(kPrefKeyReviewCalledDate);
 
+    if (calledDateInMillisSinceEpoch == null) {
+      _prefsService.setInt(kPrefKeyReviewCalledDate, _calledDate);
+    } else {
+      _calledDate = calledDateInMillisSinceEpoch;
+    }
+
+    final daysSinceLastCall = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(_calledDate))
+        .inDays;
     log.d('daysSinceLastCall: $daysSinceLastCall');
-    if (dayInterval != null && daysSinceLastCall < dayInterval) {
+    if (daysSinceLastCall < dayInterval) {
       return false;
     }
 
-    _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
+    _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? _numElapsed;
     log.d('numElapsed: $_numElapsed');
-    if (minElapsed != null && _numElapsed < minElapsed) {
+    if (_numElapsed < minElapsed) {
       return false;
     }
 

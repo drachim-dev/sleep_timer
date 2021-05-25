@@ -6,21 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.gms.ads.formats.NativeAd
-import com.google.android.gms.ads.formats.UnifiedNativeAd
-import com.google.android.gms.ads.formats.UnifiedNativeAdView
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdView
 import io.flutter.plugins.googlemobileads.GoogleMobileAdsPlugin
 
-class ListTileNativeAdFactory(private val context: Context) :
-    GoogleMobileAdsPlugin.NativeAdFactory {
+class ListTileNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugin.NativeAdFactory {
 
-    override fun createNativeAd(
-        nativeAd: UnifiedNativeAd?,
-        customOptions: MutableMap<String, Any>?
-    ): UnifiedNativeAdView {
+    override fun createNativeAd(nativeAd: NativeAd, customOptions: MutableMap<String, Any>?): NativeAdView {
 
-        val nativeAdView = LayoutInflater.from(context)
-            .inflate(R.layout.list_tile_native_ad, null) as UnifiedNativeAdView
+        val nativeAdView = LayoutInflater.from(context).inflate(R.layout.list_tile_native_ad, null) as NativeAdView
 
         nativeAdView.setNativeAd(nativeAd)
 
@@ -42,7 +36,7 @@ class ListTileNativeAdFactory(private val context: Context) :
 
         // Icon
         val iconView = nativeAdView.findViewById(R.id.iv_list_tile_native_ad_icon) as ImageView
-        val icon: NativeAd.Image? = nativeAd!!.icon
+        val icon: NativeAd.Image? = nativeAd.icon
         if (icon != null) {
             attributionViewSmall.visibility = View.VISIBLE
             attributionViewLarge.visibility = View.INVISIBLE

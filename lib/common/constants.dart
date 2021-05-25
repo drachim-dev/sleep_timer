@@ -44,7 +44,7 @@ const String kThemeKeyBlackBlue = 'black_blue_theme';
 
 const int kDefaultInitialTime = 15;
 const bool kDefaultGlow = true;
-const bool kDefaultExtendByShake = true;
+const bool kDefaultExtendByShake = false;
 const int kStartTimerDelay = 1500;
 const double kAdHeight = 90;
 const List<int> kExtendTimeByShakeOptions = [15, 30, 45, 60];
@@ -52,4 +52,4 @@ const int kDefaultExtendTimeByShake = 15;
 
 const Color kStatusBarOverlay = Colors.transparent;
 
-Color kNotificationActionColor = Colors.yellow[800];
+Color kNotificationActionColor = Colors.yellow[800]!;

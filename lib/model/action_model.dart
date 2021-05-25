@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 
@@ -16,29 +15,30 @@ enum ActionType {
 
 class ActionModel {
   final ActionType id;
-  final String title, description;
+  final String title;
+  final String? description;
   bool enabled;
 
   ActionModel(
-      {@required this.id,
-      @required this.title,
-      @required this.description,
+      {required this.id,
+      required this.title,
+      required this.description,
       this.enabled = false});
 }
 
 class ValueActionModel extends ActionModel {
-  double value;
-  final String unit;
-  final String key;
+  double? value;
+  final String? unit;
+  final String? key;
 
   @override
   String get description {
-    return value == null ? title : '${value.toInt()}$unit';
+    return value == null ? title : '${value!.toInt()}$unit';
   }
 
   ValueActionModel(
-      {@required id,
-      @required title,
+      {required id,
+      required title,
       description,
       enabled = false,
       this.value,
@@ -58,11 +58,6 @@ List<ActionModel> startActionList = [
     id: ActionType.LIGHT,
     title: S.current.actionToggleLightTitle,
     description: S.current.actionToggleLightDescription,
-  ),
-  ActionModel(
-    id: ActionType.PLAY_MUSIC,
-    title: S.current.actionPlayMusicTitle,
-    description: "Peacock's Frenchcore Choice",
   ),
   ActionModel(
     id: ActionType.DND,
@@ -92,10 +87,5 @@ List<ActionModel> endActionList = [
     id: ActionType.SCREEN,
     title: S.current.actionToggleScreenTitle,
     description: S.current.actionToggleScreenDescription,
-  ),
-  ActionModel(
-    id: ActionType.APP,
-    title: 'App',
-    description: 'Force close YouTube',
   ),
 ];

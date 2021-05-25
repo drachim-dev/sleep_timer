@@ -13,7 +13,7 @@ import android.os.Vibrator
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import dr.achim.sleep_timer.Messages.ExtendTimeResponse
+import dr.achim.sleep_timer.Messages.ExtendTimeRequest
 import dr.achim.sleep_timer.Messages.RunningNotificationRequest
 import dr.achim.sleep_timer.ShakeDetector.OnShakeListener
 import java.util.*
@@ -24,12 +24,14 @@ class AlarmService : Service() {
         private val TAG = AlarmService::class.java.toString()
         var isRunning = false
         const val ACTION_START = "ACTION_START"
-        const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_TOGGLE_EXTEND_BY_SHAKE = "ACTION_TOGGLE_EXTEND_BY_SHAKE"
+        const val KEY_ENABLE_EXTEND_BY_SHAKE = "KEY_ENABLE_EXTEND_BY_SHAKE"
         private const val REQUEST_CODE_ALARM = 700
     }
 
+    private var timerId: String? = null
     private var timer: Timer = Timer()
-    private lateinit var notification: Notification
+    private var notification: Notification? = null
 
     private var sensorManager: SensorManager? = null
     private var shakeDetector: ShakeDetector? = null
@@ -38,13 +40,17 @@ class AlarmService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        initNotificationChannel()
-        if(packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
+        Log.d(TAG, "onCreate")
+
+        if(notification == null) {
+            initNotificationChannel()
+            notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
+        }
+        startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
+
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
             initShakeDetector()
         }
-        notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
-        startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
-        Log.d(TAG, "AlarmService onCreate")
     }
 
     private fun initNotificationChannel() {
@@ -61,15 +67,12 @@ class AlarmService : Service() {
     private fun initShakeDetector() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        if(accelerometer != null) {
+        if (accelerometer != null) {
             shakeDetector = ShakeDetector()
         }
     }
 
-
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
         isRunning = true
         Log.d(TAG, "intent action: ${intent?.action}")
         when (intent?.action) {
@@ -77,11 +80,7 @@ class AlarmService : Service() {
                 val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<String, Any>?
                 val request: RunningNotificationRequest = RunningNotificationRequest.fromMap(map)
                 startAlarm(request)
-                val showRunningIntent = Intent(this, NotificationReceiver::class.java).apply {
-                    action = NotificationReceiver.ACTION_SHOW_RUNNING
-                    putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, map)
-                }
-                sendBroadcast(showRunningIntent)
+
                 timer.scheduleAtFixedRate(object : TimerTask() {
                     override fun run() {
                         val response = Messages.CountDownRequest().apply {
@@ -93,19 +92,27 @@ class AlarmService : Service() {
                             putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
                         }
                         sendBroadcast(countDownIntent)
+
+                        val showRunningIntent = Intent(applicationContext, NotificationReceiver::class.java).apply {
+                            action = NotificationReceiver.ACTION_SHOW_RUNNING
+                            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toMap() as HashMap<String, Any>?)
+                        }
+                        sendBroadcast(showRunningIntent)
                     }
                 }, 0, 1000)
             }
-            ACTION_STOP -> {
-                stopForeground(true)
-                stopSelf()
+            ACTION_TOGGLE_EXTEND_BY_SHAKE -> {
+                val enable = intent.getBooleanExtra(KEY_ENABLE_EXTEND_BY_SHAKE, false)
+
                 if (isRunning) {
-                    isRunning = false
-                    stopForeground(true)
-                    stopSelf()
+                    if (enable) {
+                        startShakeListener(timerId)
+                    } else {
+                        sensorManager?.unregisterListener(shakeDetector)
+                    }
                 }
             }
-            else -> if (isRunning) {
+            else -> {
                 isRunning = false
                 stopForeground(true)
                 stopSelf()
@@ -122,50 +129,55 @@ class AlarmService : Service() {
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000, pendingAlarmIntent)
 
-        if(request.shakeToExtend != null && request.shakeToExtend) {
-            shakeDetector?.setOnShakeListener(object : OnShakeListener {
-                override fun onShake(count: Int) {
-                    val response = ExtendTimeResponse()
-                    response.timerId = request.timerId
-
-                    val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
-                        action = NotificationReceiver.ACTION_EXTEND
-                        putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
-                    }
-                    sendBroadcast(intent)
-
-                    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
-                    } else {
-                        vibrator.vibrate(500)
-                    }
-                }
-            })
+        timerId = request.timerId
+        if (request.shakeToExtend) {
+            startShakeListener(timerId)
         }
+    }
 
+    private fun startShakeListener(timerId: String?) {
+        shakeDetector?.setOnShakeListener(object : OnShakeListener {
+            override fun onShake(count: Int) {
+                val response = ExtendTimeRequest()
+                response.timerId = timerId ?: this@AlarmService.timerId
 
+                val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                    action = NotificationReceiver.ACTION_EXTEND
+                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
+                }
+                sendBroadcast(intent)
+
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(500)
+                }
+            }
+        })
         sensorManager?.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
     }
 
     private fun stopAlarm() {
+        Log.d(TAG, "stopAlarm")
         if (pendingAlarmIntent != null) {
             val manager = getSystemService(ALARM_SERVICE) as AlarmManager
             manager.cancel(pendingAlarmIntent)
-            timer.cancel()
         }
+        timer.cancel()
+        timerId = null
+        sensorManager?.unregisterListener(shakeDetector)
+        isRunning = false
     }
 
-    override fun onBind(intent: Intent): IBinder? {
+    override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy Service")
+        Log.d(TAG, "onDestroy")
         stopAlarm()
-        timer.cancel()
-        sensorManager?.unregisterListener(shakeDetector)
-        isRunning = false
         super.onDestroy()
     }
 

@@ -8,11 +8,11 @@ part of 'light_group.dart';
 
 LightGroup _$LightGroupFromJson(Map<String, dynamic> json) {
   return LightGroup(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    className: json['className'] as String,
-    numberOfLights: json['numberOfLights'] as int,
-    actionEnabled: json['actionEnabled'] as bool,
+    id: json['id'] as String?,
+    name: json['name'] as String?,
+    className: json['className'] as String?,
+    numberOfLights: json['numberOfLights'] as int?,
+    actionEnabled: json['actionEnabled'] as bool?,
   );
 }
 

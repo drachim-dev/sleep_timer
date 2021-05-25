@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'utils.dart';
 
 typedef ValueChangeAnimation = void Function(
@@ -11,29 +12,29 @@ class ValueChangedAnimationManager {
   final double maxValue;
 
   ValueChangedAnimationManager({
-    @required this.tickerProvider,
-    @required this.minValue,
-    @required this.maxValue,
+    required this.tickerProvider,
+    required this.minValue,
+    required this.maxValue,
     this.durationMultiplier = 1.0,
   });
 
-  Animation<double> _animation;
+  late final AnimationController _animController =
+      AnimationController(vsync: tickerProvider);
+  late Animation<double> _animation;
   bool _animationCompleted = false;
-  AnimationController _animController;
 
   void animate(
-      {double initialValue,
-      double oldValue,
-      double angle,
-      double oldAngle,
-      ValueChangeAnimation valueChangedAnimation}) {
+      {required double initialValue,
+      double? oldValue,
+      required double angle,
+      double? oldAngle,
+      required ValueChangeAnimation valueChangedAnimation}) {
     _animationCompleted = false;
 
     final duration = (durationMultiplier *
             valueToDuration(
                 initialValue, oldValue ?? minValue, minValue, maxValue))
         .toInt();
-    _animController ??= AnimationController(vsync: tickerProvider);
 
     _animController.duration = Duration(milliseconds: duration);
 

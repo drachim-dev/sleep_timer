@@ -12,7 +12,7 @@ class BridgeLinkView extends StatefulWidget {
 }
 
 class _BridgeLinkViewState extends State<BridgeLinkView> {
-  BridgeLinkViewModel model;
+  late BridgeLinkViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,8 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
 
     return ViewModelBuilder<BridgeLinkViewModel>.reactive(
         viewModelBuilder: () => BridgeLinkViewModel(),
-        onModelReady: (model) => this.model = model,
-        builder: (context, model, child) {
+        onModelReady: (viewModel) => this.viewModel = viewModel,
+        builder: (context, viewModel, _) {
           return Scaffold(
             appBar: AppBar(
               title: Text(S.of(context).linkBridge),
@@ -36,11 +36,11 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
   }
 
   Widget _buildBody(final ThemeData theme) {
-    if (model.hasError) {
+    if (viewModel.hasError) {
       return _buildNoConnection(theme);
-    } else if (model.isBusy) {
+    } else if (viewModel.isBusy) {
       return _buildLoading();
-    } else if (model.data.isEmpty) {
+    } else if (viewModel.data.isEmpty) {
       return _buildNoResults(theme);
     } else {
       return _buildBridges(theme);
@@ -51,10 +51,10 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.accentTextTheme.headline6.copyWith(color: foregroundColor);
+        theme.accentTextTheme.headline6!.copyWith(color: foregroundColor);
 
     return FloatingActionButton.extended(
-      onPressed: () => model.initialise(),
+      onPressed: () => viewModel.initialise(),
       icon: Icon(Icons.search_outlined, color: foregroundColor),
       label: Text(S.of(context).buttonSearchAgain, style: textStyle),
     );
@@ -64,7 +64,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
       final ThemeData theme, final BridgeModel bridge) {
     return showDialog<double>(
         context: context,
-        builder: (_) => LinkDialog(model: model, bridge: bridge));
+        builder: (_) => LinkDialog(model: viewModel, bridge: bridge));
   }
 
   Future<void> _buildDisconnectDialog(
@@ -73,15 +73,15 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
         context: context,
         builder: (context) {
           return AlertDialog(
-              title: Text(S.of(context).unlinkBridgeName(bridge.name)),
+              title: Text(S.of(context).unlinkBridgeName(bridge.name!)),
               content: Text(S.of(context).hintTurnsOffLightAction),
               actions: [
                 TextButton(
-                  onPressed: () => model.cancelDialog(),
+                  onPressed: () => viewModel.cancelDialog(),
                   child: Text(S.of(context).dialogCancel),
                 ),
                 TextButton(
-                  onPressed: () => model.remove(bridge),
+                  onPressed: () => viewModel.remove(bridge),
                   child: Text(S.of(context).dialogUnlink),
                 )
               ]);
@@ -137,15 +137,15 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SectionHeader(
-          S.of(context).countDevicesFound(model.data.length),
+          S.of(context).countDevicesFound(viewModel.data.length),
           leftPadding: kPreferenceTitleLeftPadding,
         ),
         ListView.separated(
           shrinkWrap: true,
           itemBuilder: (_, int index) {
-            final BridgeModel item = model.data[index];
+            final BridgeModel item = viewModel.data[index];
 
-            var connectionHint;
+            late var connectionHint;
             switch (item.state) {
               case Connection.unsaved:
                 connectionHint = S.of(context).tapToConnect;
@@ -171,7 +171,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
                     ? _buildDisconnectDialog(theme, item)
                     : _buildConnectDialog(theme, item));
           },
-          itemCount: model.data.length,
+          itemCount: viewModel.data.length,
           separatorBuilder: (_, int index) => Divider(),
         ),
       ],
@@ -181,12 +181,12 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
 
 class LinkDialog extends StatelessWidget {
   const LinkDialog({
-    Key key,
-    @required this.model,
-    @required this.bridge,
+    Key? key,
+    required this.model,
+    required this.bridge,
   }) : super(key: key);
 
-  final BridgeLinkViewModel model;
+  final BridgeLinkViewModel? model;
   final BridgeModel bridge;
 
   @override
@@ -201,11 +201,11 @@ class LinkDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).linkBridgeInstruction),
-                if (model.connectionError.isNotEmpty)
+                if (model!.connectionError.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: kVerticalPadding),
-                    child: Text(model.connectionError,
-                        style: theme.textTheme.subtitle1
+                    child: Text(model!.connectionError,
+                        style: theme.textTheme.subtitle1!
                             .copyWith(color: theme.errorColor)),
                   ),
                 SizedBox(height: kVerticalPadding),
@@ -217,14 +217,14 @@ class LinkDialog extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                model.cancelDialog();
+                model!.cancelDialog();
                 setState(() {});
               },
               child: Text(S.of(context).dialogCancel),
             ),
             TextButton(
               onPressed: () async {
-                await model.linkBridge(bridge);
+                await model!.linkBridge(bridge);
                 setState(() {});
               },
               child: Text(S.of(context).dialogConnect),

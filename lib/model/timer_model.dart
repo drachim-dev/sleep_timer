@@ -11,7 +11,7 @@ class TimerModel {
   final List<ActionModel> _endActions;
 
   TimerModel(this._initialTimeInSeconds, this._startActions, this._endActions)
-      : _id = Utils.random.nextInt(pow(2, 31)).toString();
+      : _id = Utils.random.nextInt(pow(2, 31) as int).toString();
 
   String get id => _id;
 
@@ -19,7 +19,7 @@ class TimerModel {
 
   List<ActionModel> get startActions => _startActions;
   ValueActionModel get volumeAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.VOLUME);
+      _startActions.singleWhere((action) => action.id == ActionType.VOLUME) as ValueActionModel;
   ActionModel get lightAction =>
       _startActions.singleWhere((action) => action.id == ActionType.LIGHT);
   ActionModel get playMusicAction =>

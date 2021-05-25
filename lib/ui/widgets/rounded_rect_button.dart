@@ -5,8 +5,8 @@ class RoundedRectButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const RoundedRectButton({
-    @required this.title,
-    @required this.onPressed,
+    required this.title,
+    required this.onPressed,
   });
 
   @override

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 class SABT extends StatefulWidget {
   final Widget child;
-  const SABT({
-    Key key,
-    @required this.child,
-  }) : super(key: key);
+
+  const SABT({required this.child});
+
   @override
   _SABTState createState() => _SABTState();
 }
 
 class _SABTState extends State<SABT> {
-  ScrollPosition _position;
-  bool _visible;
+  ScrollPosition? _position;
+  bool _visible = false;
+
   @override
   void dispose() {
     _removeListener();
@@ -38,14 +38,12 @@ class _SABTState extends State<SABT> {
 
   void _positionListener() {
     // ignore: omit_local_variable_types
-    final FlexibleSpaceBarSettings settings = context
+    final FlexibleSpaceBarSettings? settings = context
         .dependOnInheritedWidgetOfExactType(aspect: FlexibleSpaceBarSettings);
     var visible =
         settings == null || settings.currentExtent <= settings.minExtent;
     if (_visible != visible) {
-      setState(() {
-        _visible = visible;
-      });
+      setState(() => _visible = visible);
     }
   }
 

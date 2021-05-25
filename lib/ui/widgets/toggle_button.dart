@@ -6,18 +6,18 @@ class ToggleButton extends StatefulWidget {
   final IconData activeIcon;
   final IconData disabledIcon;
   final ValueChanged<bool> onChanged;
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
 
   final bool value;
-  final double size;
+  final double? size;
 
   ToggleButton({
-    this.label,
-    this.activeIcon,
-    this.disabledIcon,
-    this.onChanged,
+    required this.label,
+    required this.activeIcon,
+    required this.disabledIcon,
+    required this.onChanged,
     this.onLongPress,
-    this.value,
+    required this.value,
     this.size,
   });
   @override
@@ -38,10 +38,10 @@ class _ToggleButtonState extends State<ToggleButton> {
         widget.value ? toggleButtonsTheme.fillColor : Colors.transparent;
 
     final currentTextStyle =
-        toggleButtonsTheme.textStyle ?? theme.textTheme.bodyText2;
+        toggleButtonsTheme.textStyle ?? theme.textTheme.bodyText2!;
 
     const padding = 8.0;
-    final size = widget.size - padding;
+    final size = (widget.size ?? theme.iconTheme.size!) - padding;
 
     return RawMaterialButton(
       elevation: 0,
@@ -56,14 +56,14 @@ class _ToggleButtonState extends State<ToggleButton> {
       hoverColor: toggleButtonsTheme.hoverColor,
       splashColor: toggleButtonsTheme.splashColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      onPressed: () {
-        widget.onChanged(!widget.value);
-      },
+      onPressed: () => widget.onChanged(!widget.value),
       onLongPress: widget.onLongPress,
       child: Column(
         children: [
-          Icon(widget.value ? widget.activeIcon : widget.disabledIcon,
-              size: size),
+          Icon(
+            widget.value ? widget.activeIcon : widget.disabledIcon,
+            size: size,
+          ),
           SizedBox(height: kVerticalPaddingSmall),
           Text(
             widget.label,

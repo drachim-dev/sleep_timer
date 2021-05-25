@@ -6,7 +6,7 @@
     <item
         android:width="400dp"
         android:height="400dp"
-        android:gravity="center_vertical|center_horizontal"
+        android:gravity="center"
         android:drawable="@drawable/ic_launcher_foreground"/>
 
 </layer-list>

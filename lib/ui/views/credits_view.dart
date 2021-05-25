@@ -39,6 +39,7 @@ class CreditsView extends StatelessWidget {
   static final List _packageCredits = [
     S.current.creditsLibraries,
     Credit(title: 'auto_route', url: 'https://pub.dev/packages/auto_route'),
+    Credit(title: 'collection', url: 'https://pub.dev/packages/collection'),
     Credit(
         title: 'firebase_crashlytics',
         url: 'https://pub.dev/packages/firebase_crashlytics'),
@@ -93,7 +94,6 @@ class CreditsView extends StatelessWidget {
         ),
         body: ListView.builder(
           itemCount: _creditList.length,
-          // ignore: missing_return
           itemBuilder: (_, int index) {
             final item = _creditList[index];
 
@@ -105,12 +105,14 @@ class CreditsView extends StatelessWidget {
             if (item is Credit) {
               return Link(
                 uri: Uri.parse(item.url),
-                builder: (_, FollowLink followLink) => ListTile(
+                builder: (_, FollowLink? followLink) => ListTile(
                     title: Text(item.title),
                     subtitle: Text(item.url),
                     onTap: followLink),
               );
             }
+
+            return Container();
           },
         ));
   }
@@ -119,5 +121,5 @@ class CreditsView extends StatelessWidget {
 class Credit {
   final String title, url;
 
-  Credit({@required this.title, @required this.url});
+  Credit({required this.title, required this.url});
 }

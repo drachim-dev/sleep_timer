@@ -14,14 +14,26 @@ import android.provider.AlarmClock
 import android.provider.MediaStore
 import android.util.Base64
 import androidx.core.app.NotificationManagerCompat
-import dr.achim.sleep_timer.Messages.*
+import androidx.core.content.ContextCompat
+import dr.achim.sleep_timer.Messages.CancelRequest
+import dr.achim.sleep_timer.Messages.CancelResponse
+import dr.achim.sleep_timer.Messages.HostTimerApi
+import dr.achim.sleep_timer.Messages.InitializationRequest
+import dr.achim.sleep_timer.Messages.InstalledAppsResponse
+import dr.achim.sleep_timer.Messages.LaunchAppRequest
+import dr.achim.sleep_timer.Messages.NotificationRequest
+import dr.achim.sleep_timer.Messages.NotificationResponse
+import dr.achim.sleep_timer.Messages.Package
+import dr.achim.sleep_timer.Messages.RunningNotificationRequest
+import dr.achim.sleep_timer.Messages.TimeNotificationRequest
+import dr.achim.sleep_timer.Messages.ToggleRequest
 import io.flutter.Log
 import java.io.ByteArrayOutputStream
 import java.util.*
-import kotlin.collections.HashMap
 
 
 class MethodChannelImpl(private val context: Context) : HostTimerApi {
+
     companion object {
         private val TAG = MethodChannelImpl::class.java.toString()
     }
@@ -36,11 +48,8 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
             action = AlarmService.ACTION_START
             putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap() as HashMap)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
-        }
+
+        ContextCompat.startForegroundService(context, intent)
     }
 
     private fun stopForegroundService() {
@@ -125,7 +134,19 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         return response
     }
 
-    override fun getInstalledPlayerApps() : InstalledAppsResponse {
+    override fun toggleExtendByShake(arg: ToggleRequest) {
+        Log.d(TAG, "Request to toggle extend by shake: enable=${arg.enable}")
+        if (AlarmService.isRunning) {
+            val intent = Intent(context, AlarmService::class.java).apply {
+                action = AlarmService.ACTION_TOGGLE_EXTEND_BY_SHAKE
+                putExtra(AlarmService.KEY_ENABLE_EXTEND_BY_SHAKE, arg.enable)
+            }
+
+            context.startService(intent)
+        }
+    }
+
+    override fun getInstalledPlayerApps(): InstalledAppsResponse {
         val manager = context.packageManager
         val uriAudio = Uri.withAppendedPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, "1")
         val intentAudio = Intent(Intent.ACTION_VIEW).apply {
@@ -142,11 +163,11 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         val intentMedia = Intent(Intent.ACTION_MEDIA_BUTTON)
         val mediaList = manager.queryBroadcastReceivers(intentMedia, 0)
         val apps: Set<Package> = getAppsFromResolveInfo(audioList)
-                .union(getAppsFromResolveInfo(videoList))
-                .union(getAppsFromResolveInfo(mediaList))
+            .union(getAppsFromResolveInfo(videoList))
+            .union(getAppsFromResolveInfo(mediaList))
 
         val packageNames: List<String> =
-                arrayListOf("com.netflix.mediaclient", "com.google.android.apps.podcasts")
+            arrayListOf("com.netflix.mediaclient", "com.google.android.apps.podcasts")
         for (packageName in packageNames) {
             try {
                 val myPackage = manager.getPackageInfo(packageName, 0)
@@ -155,7 +176,8 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
                     val app = getAppFromApplicationInfo(applicationInfo)
                     apps.plus(app)
                 }
-            } catch (ignored: PackageManager.NameNotFoundException) { }
+            } catch (ignored: PackageManager.NameNotFoundException) {
+            }
         }
 
         val packages = apps.distinctBy { it.packageName }.mapNotNull { it.toMap() }.toList()
@@ -164,7 +186,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         }
     }
 
-    override fun getInstalledAlarmApps() : InstalledAppsResponse {
+    override fun getInstalledAlarmApps(): InstalledAppsResponse {
         val showAlarmsIntent = Intent(AlarmClock.ACTION_SHOW_ALARMS)
         val alarmList = context.packageManager.queryIntentActivities(showAlarmsIntent, 0)
         val apps = getAppsFromResolveInfo(alarmList).distinctBy { it.packageName }
