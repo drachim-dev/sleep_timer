@@ -6,5 +6,6 @@ import 'locator.config.dart';
 final locator = GetIt.instance;
 
 @injectableInit
-void configureInjection(String environment) =>
-    $initGetIt(locator, environment: environment);
+Future<void> configureInjection(String environment) async {
+  await $initGetIt(locator, environment: environment);
+}

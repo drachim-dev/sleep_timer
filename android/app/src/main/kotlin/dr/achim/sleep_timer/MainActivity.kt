@@ -25,19 +25,20 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
         Log.d(TAG, "configureFlutterEngine")
 
         HostTimerApi.setup(flutterEngine.dartExecutor, MethodChannelImpl(applicationContext))
         flutterTimerApi = FlutterTimerApi(flutterEngine.dartExecutor.binaryMessenger)
 
-        val factory = ListTileNativeAdFactory(applicationContext)
-        GoogleMobileAdsPlugin.registerNativeAdFactory(flutterEngine, "listTileAdFactory", factory)
+        // val factory = ListTileNativeAdFactory(layoutInflater)
+        // GoogleMobileAdsPlugin.registerNativeAdFactory(flutterEngine, "listTileAdFactory", factory)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         super.cleanUpFlutterEngine(flutterEngine)
 
-        GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "listTileAdFactory")
+        // GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "listTileAdFactory")
     }
 
     override fun onNewIntent(intent: Intent) {

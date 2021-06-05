@@ -50,22 +50,23 @@ class NativeAdState extends State<NativeAdWidget> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    _nativeAd?.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return _nativeAdIsLoaded && _nativeAd != null
+    final nativeAd = _nativeAd;
+    return _nativeAdIsLoaded && nativeAd != null
         ? Container(
             height: kAdHeight,
             padding: const EdgeInsets.symmetric(
               horizontal: kHorizontalPadding,
               vertical: kVerticalPaddingSmall,
             ),
-            child: AdWidget(ad: _nativeAd!),
+            child: AdWidget(ad: nativeAd),
           )
         : Container();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nativeAd?.dispose();
   }
 }

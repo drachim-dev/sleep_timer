@@ -31,11 +31,14 @@ import 'generated/l10n.dart';
 import 'services/theme_service.dart';
 
 Future<void> main() async {
-  await Application.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   ErrorWidget.builder = _buildErrorWidget;
 
-  runZonedGuarded(() {
+  await runZonedGuarded(() async {
+    await Application.init();
+
     runApp(MyApp());
   }, FirebaseCrashlytics.instance.recordError);
 }
@@ -122,40 +125,41 @@ class Application {
   final Logger log = getLogger();
 
   static Future<void> init({Function? onCallBack}) async {
-    WidgetsFlutterBinding.ensureInitialized();
-
     // init Logger
     Logger.level = Level.debug;
 
-    // init Firebase Core
-    await Firebase.initializeApp();
-
     // Enable crashlytics only in release mode
     await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+        .setCrashlyticsCollectionEnabled(kReleaseMode);
 
     // Pass all uncaught errors to Crashlytics.
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+/* 
     Function? originalOnError = FlutterError.onError;
-    FlutterError.onError = (FlutterErrorDetails errorDetails) async {
+    FlutterError.onError = (FlutterErrorDetails errorDetails) {
       await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
       // Forward to original handler.
       originalOnError!(errorDetails);
-    };
+    }; */
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
 
     // init Google Mobile Ads
-    await MobileAds.instance.initialize();
-    await MobileAds.instance.updateRequestConfiguration(
+    // ignore: unawaited_futures
+    MobileAds.instance.initialize();
+    // ignore: unawaited_futures
+    MobileAds.instance.updateRequestConfiguration(
         RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
 
-    configureInjection(Environment.prod);
+    await configureInjection(Environment.prod);
 
     // initialize PlatformChannel for callback
     final sleepTimerCallback =
         PluginUtilities.getCallbackHandle(onNativeSideCallback)!;
-    await SleepTimerPlatform.instance.init(sleepTimerCallback.toRawHandle());
+    // ignore: unawaited_futures
+    SleepTimerPlatform.instance.init(sleepTimerCallback.toRawHandle());
 
     // setup callback even when activity is destroyed
     FlutterTimerApi.setup(FlutterApiHandler(

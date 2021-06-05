@@ -13,7 +13,6 @@ import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/timer_service.dart';
-import 'package:sleep_timer/ui/widgets/native_ad.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/sabt.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
@@ -202,7 +201,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                   ],
                 ),
               _buildCompactStartedActions(theme),
-              if (!viewModel.isAdFree) NativeAdWidget(),
+              // if (!viewModel.isAdFree) NativeAdWidget(),
               SectionHeader(S.of(context).timerEndsActionsTitle,
                   leftPadding: kHorizontalPadding),
               _buildEndedActions(theme),
@@ -273,14 +272,14 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  Future _showAppSheet(final Future<List<App>> apps) {
+  void _showAppSheet(final Future<List<App>> apps) {
     const appSize = 40.0;
     const gridSize = 3;
     const labelMargin = 12.0;
 
-    return showModalBottomSheet(
+    showModalBottomSheet(
         context: context,
-        builder: (_) {
+        builder: (BuildContext context) {
           return FutureBuilder<List<App>>(
               future: apps,
               builder: (context, snapshot) {

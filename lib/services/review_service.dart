@@ -14,7 +14,6 @@ class ReviewService {
 
   final int dayInterval = 14;
   final int minElapsed = 10;
-  final int maxAskForReview = 5;
 
   int _calledDate = DateTime.now().millisecondsSinceEpoch;
   int _numElapsed = 0;
@@ -23,7 +22,7 @@ class ReviewService {
   bool shouldAskForReview() {
     _reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? _reviewCount;
     log.d('reviewCount: $_reviewCount');
-    if (_reviewCount >= maxAskForReview) {
+    if (_reviewCount >= kMaxAskForReview) {
       return false;
     }
 

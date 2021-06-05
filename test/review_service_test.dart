@@ -128,7 +128,7 @@ void main() {
       final date =
           DateTime.now().subtract(Duration(days: reviewService.dayInterval));
       final minElapsed = reviewService.minElapsed;
-      final alreadyAsked = reviewService.maxAskForReview;
+      final alreadyAsked = kMaxAskForReview;
 
       // mocking
       prefsService.setInt(
@@ -151,7 +151,7 @@ void main() {
       final date =
           DateTime.now().subtract(Duration(days: reviewService.dayInterval));
       final minElapsed = reviewService.minElapsed;
-      final alreadyAsked = reviewService.maxAskForReview - 2;
+      final alreadyAsked = kMaxAskForReview - 2;
 
       // mocking
       prefsService.setInt(

@@ -65,9 +65,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
       TimerServiceManager.instance.setTimerService(_timerService);
     }
 
-    // Check for adFree in-app purchase
-    _isAdFree = _purchaseService.products.any((element) =>
-        element.productDetails.id == kProductRemoveAds && element.purchased);
   }
 
   TimerModel get timerModel => _timerModel;
@@ -77,8 +74,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   TimerStatus get timerStatus => _timerService.status;
 
-  bool _isAdFree = false;
-  bool get isAdFree => _isAdFree;
+  bool get isAdFree => _purchaseService.adFree;
 
   Future<VolumeResponse> get volume => _deviceService.volume;
   int get platformVersion => _deviceService.platformVersion;

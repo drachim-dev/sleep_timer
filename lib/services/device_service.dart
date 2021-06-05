@@ -43,11 +43,11 @@ class DeviceService with ReactiveServiceMixin {
   @factoryMethod
   static Future<DeviceService> create() async {
     var instance = DeviceService();
-    await instance.init();
+    await instance._init();
     return instance;
   }
 
-  Future<void> init() async {
+  Future<void> _init() async {
     _deviceInfo = await _deviceFunctions.getDeviceInfo();
     _hasAccelerometer = await _deviceFunctions.hasAccelerometer();
     _deviceAdmin = await _deviceFunctions.isDeviceAdminActive();

@@ -1,6 +1,5 @@
 package dr.achim.sleep_timer
 
-import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +9,11 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import io.flutter.plugins.googlemobileads.GoogleMobileAdsPlugin
 
-class ListTileNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugin.NativeAdFactory {
+class ListTileNativeAdFactory(private val layoutInflater: LayoutInflater) : GoogleMobileAdsPlugin.NativeAdFactory {
 
     override fun createNativeAd(nativeAd: NativeAd, customOptions: MutableMap<String, Any>?): NativeAdView {
 
-        val nativeAdView = LayoutInflater.from(context).inflate(R.layout.list_tile_native_ad, null) as NativeAdView
+        val nativeAdView = layoutInflater.inflate(R.layout.list_tile_native_ad, null) as NativeAdView
 
         nativeAdView.setNativeAd(nativeAd)
 
