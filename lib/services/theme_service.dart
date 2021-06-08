@@ -4,7 +4,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
 import 'package:stacked/stacked.dart';
 
-@injectable
+@singleton
 class ThemeService with ReactiveServiceMixin {
   ThemeService() {
     listenToReactiveValues([_myTheme, _showGlow]);
