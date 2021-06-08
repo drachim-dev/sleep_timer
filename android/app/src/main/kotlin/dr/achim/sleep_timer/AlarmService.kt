@@ -17,6 +17,7 @@ import dr.achim.sleep_timer.Messages.ExtendTimeRequest
 import dr.achim.sleep_timer.Messages.RunningNotificationRequest
 import dr.achim.sleep_timer.ShakeDetector.OnShakeListener
 import java.util.*
+import kotlin.math.max
 
 class AlarmService : Service() {
 
@@ -85,8 +86,9 @@ class AlarmService : Service() {
                     override fun run() {
                         val response = Messages.CountDownRequest().apply {
                             timerId = request.timerId
-                            newTime = request.remainingTime--
+                            newTime = max(request.remainingTime--, 0)
                         }
+
                         val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                             action = NotificationReceiver.ACTION_COUNTDOWN
                             putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
