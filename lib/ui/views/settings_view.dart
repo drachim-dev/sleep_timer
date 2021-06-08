@@ -190,7 +190,6 @@ class _SettingsViewState extends State<SettingsView>
     return [
       Theme(
         data: Theme.of(context).copyWith(
-          accentColor: selectedColor,
           textTheme: theme.textTheme.apply(bodyColor: unselectedColor),
           unselectedWidgetColor: unselectedColor,
           dividerColor: Colors.transparent,
@@ -198,6 +197,8 @@ class _SettingsViewState extends State<SettingsView>
         child: IgnorePointer(
           ignoring: !viewModel.hasAccelerometer,
           child: ExpansionTile(
+            textColor: selectedColor,
+            iconColor: selectedColor,
             leading: Icon(Icons.vibration_outlined),
             onExpansionChanged: viewModel.onChangeExtendByShake,
             initiallyExpanded:
