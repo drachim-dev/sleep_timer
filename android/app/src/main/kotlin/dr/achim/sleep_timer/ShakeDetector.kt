@@ -9,8 +9,6 @@ import kotlin.math.sqrt
 class ShakeDetector : SensorEventListener {
 
     companion object {
-        private val TAG = ShakeDetector::class.java.toString()
-
         /**
          * The gForce that is necessary to register as shake.
          * Must be greater than 1G (one earth gravity unit).

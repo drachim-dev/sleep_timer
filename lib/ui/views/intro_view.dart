@@ -21,7 +21,7 @@ class _IntroViewState extends State<IntroView> {
       titleTextStyle: theme.textTheme.headline2!.copyWith(fontSize: 36),
       bodyTextStyle: theme.textTheme.headline6!
           .copyWith(color: theme.textTheme.headline2!.color),
-      descriptionPadding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+      descriptionPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       pageColor: theme.scaffoldBackgroundColor,
       imagePadding: EdgeInsets.zero,
     );
@@ -74,7 +74,7 @@ class _IntroViewState extends State<IntroView> {
             dotsDecorator: DotsDecorator(
               size: Size(10, 10),
               color: Colors.grey[350]!,
-              activeColor: theme.accentColor,
+              activeColor: theme.colorScheme.primary,
               activeSize: Size(22, 10),
               activeShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(25)),

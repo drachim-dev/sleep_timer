@@ -1,11 +1,10 @@
-import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/platform_impl.dart';
+import 'package:sleep_timer/messages_generated.dart';
 
 abstract class SleepTimerPlatform {
   static final SleepTimerPlatform _instance = SleepTimerPlatformImpl();
   static SleepTimerPlatform get instance => _instance;
 
-  Future<void> init(final int callbackHandle);
   Future<bool> showRunningNotification(
       {required final String timerId,
       required final String title,
@@ -36,7 +35,7 @@ abstract class SleepTimerPlatform {
       final String restartAction});
   Future<bool> cancelTimer(final String timerId);
   Future<void> toggleExtendByShake(final bool enable);
-  Future<List<App>> getInstalledPlayerApps();
-  Future<List<App>> getInstalledAlarmApps();
+  Future<List<Package>> getInstalledPlayerApps();
+  Future<List<Package>> getInstalledAlarmApps();
   Future<void> launchApp(String packageName);
 }

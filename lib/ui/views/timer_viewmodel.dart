@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:sleep_timer/messages_generated.dart';
 import 'package:device_functions/messages_generated.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,6 @@ import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
-import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
@@ -64,7 +64,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     if (_newInstance) {
       TimerServiceManager.instance.setTimerService(_timerService);
     }
-
   }
 
   TimerModel get timerModel => _timerModel;
@@ -81,8 +80,8 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   bool get showGlow => _themeService.showGlow;
 
-  Future<List<App>> get playerApps => _deviceService.playerApps;
-  Future<List<App>> get alarmApps => _deviceService.alarmApps;
+  Future<List<Package>> get playerApps => _deviceService.playerApps;
+  Future<List<Package>> get alarmApps => _deviceService.alarmApps;
 
   @override
   Future<void> initialise() async {
@@ -158,7 +157,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   void onChangeVolume(bool enabled) {
     if (_timerModel.volumeAction.value != null) {
       _timerModel.volumeAction.enabled = enabled;
-      _prefsService.setBool(ActionType.VOLUME.toString(), enabled);
+      _prefsService.setBool(ActionType.volume.toString(), enabled);
       notifyListeners();
     }
   }
@@ -180,14 +179,14 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
     if ((enabled && hasEnabledLights) || !enabled) {
       _timerModel.lightAction.enabled = enabled;
-      await _prefsService.setBool(ActionType.LIGHT.toString(), enabled);
+      await _prefsService.setBool(ActionType.light.toString(), enabled);
       notifyListeners();
     }
   }
 
   void onChangePlayMusic(bool enabled) {
     _timerModel.playMusicAction.enabled = enabled;
-    _prefsService.setBool(ActionType.PLAY_MUSIC.toString(), enabled);
+    _prefsService.setBool(ActionType.playMusic.toString(), enabled);
     notifyListeners();
   }
 
@@ -198,26 +197,26 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
     if ((enabled && hasNotificationSettingsAccess) || !enabled) {
       _timerModel.doNotDisturbAction.enabled = enabled;
-      await _prefsService.setBool(ActionType.DND.toString(), enabled);
+      await _prefsService.setBool(ActionType.dnd.toString(), enabled);
       notifyListeners();
     }
   }
 
   void onChangeMedia(bool enabled) {
     _timerModel.mediaAction.enabled = enabled;
-    _prefsService.setBool(ActionType.MEDIA.toString(), enabled);
+    _prefsService.setBool(ActionType.media.toString(), enabled);
     notifyListeners();
   }
 
   void onChangeWifi(bool enabled) {
     _timerModel.wifiAction.enabled = enabled;
-    _prefsService.setBool(ActionType.WIFI.toString(), enabled);
+    _prefsService.setBool(ActionType.wifi.toString(), enabled);
     notifyListeners();
   }
 
   void onChangeBluetooth(bool enabled) {
     _timerModel.bluetoothAction.enabled = enabled;
-    _prefsService.setBool(ActionType.BLUETOOTH.toString(), enabled);
+    _prefsService.setBool(ActionType.bluetooth.toString(), enabled);
     notifyListeners();
   }
 
@@ -228,7 +227,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
     if ((enabled && isDeviceAdmin) || !enabled) {
       _timerModel.screenAction.enabled = enabled;
-      await _prefsService.setBool(ActionType.SCREEN.toString(), enabled);
+      await _prefsService.setBool(ActionType.screen.toString(), enabled);
       notifyListeners();
     }
   }

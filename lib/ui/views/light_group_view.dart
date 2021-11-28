@@ -26,7 +26,6 @@ class _LightGroupViewState extends State<LightGroupView> {
           return Scaffold(
             appBar: AppBar(
               title: Text(S.of(context).titleLightGroups),
-              backwardsCompatibility: false,
             ),
             body: _buildBody(theme),
             floatingActionButton: _buildFab(theme),
@@ -95,7 +94,7 @@ class _LightGroupViewState extends State<LightGroupView> {
   }
 
   Icon _buildIconForRoom(final String? roomType) {
-    var icon;
+    IconData icon;
     switch (roomType?.toLowerCase()) {
       case 'living room':
         icon = MdiIcons.sofaSingleOutline;

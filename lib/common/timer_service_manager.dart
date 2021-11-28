@@ -6,8 +6,8 @@ class TimerServiceManager {
 
   final Map<String, TimerService> _timerServices = {};
 
-  TimerService? getTimerService(final String? id) {
-    return _timerServices[id!];
+  TimerService? getTimerService(final String id) {
+    return _timerServices[id];
   }
 
   void setTimerService(final TimerService timerService) {

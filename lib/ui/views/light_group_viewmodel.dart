@@ -33,13 +33,13 @@ class LightGroupViewModel extends FutureViewModel {
           var allGroups = await _lightService!.getRooms(bridge);
 
           // check for possible new groups
-          allGroups.forEach((group) {
+          for (var group in allGroups) {
             var exists =
                 bridge.groups.any((savedGroup) => savedGroup.id == group.id);
             if (!exists) {
               bridge.groups.add(group);
             }
-          });
+          }
         }
       }
     });

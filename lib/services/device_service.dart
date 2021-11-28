@@ -3,10 +3,10 @@ import 'package:device_functions/platform_interface.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
-import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:stacked/stacked.dart';
+import 'package:sleep_timer/messages_generated.dart';
 
 @prod
 @singleton
@@ -34,10 +34,10 @@ class DeviceService with ReactiveServiceMixin {
   bool _notificationSettingsAccess = false;
   bool get notificationSettingsAccess => _notificationSettingsAccess;
 
-  Future<List<App>> get playerApps async =>
+  Future<List<Package>> get playerApps async =>
       SleepTimerPlatform.instance.getInstalledPlayerApps();
 
-  Future<List<App>> get alarmApps async =>
+  Future<List<Package>> get alarmApps async =>
       SleepTimerPlatform.instance.getInstalledAlarmApps();
 
   @factoryMethod

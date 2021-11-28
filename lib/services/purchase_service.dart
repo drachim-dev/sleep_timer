@@ -34,7 +34,7 @@ class PurchaseService with ReactiveServiceMixin {
 
   void listenToPurchases() {
     _iap.purchaseUpdatedStream.listen((details) {
-      details.forEach((detail) {
+      for (var detail in details) {
         if (detail.status == PurchaseStatus.pending) {
           log.d('pending');
         } else {
@@ -48,7 +48,7 @@ class PurchaseService with ReactiveServiceMixin {
             _iap.completePurchase(detail);
           }
         }
-      });
+      }
     });
   }
 
@@ -72,7 +72,9 @@ class PurchaseService with ReactiveServiceMixin {
 
     final response = await _iap.queryProductDetails(kProducts);
 
-    response.notFoundIDs.forEach((element) => log.d(element));
+    for (var element in response.notFoundIDs) {
+      log.d(element);
+    }
 
     if (response.error != null) {
       log.e('error code: ${response.error!.code}');
@@ -120,10 +122,10 @@ class PurchaseService with ReactiveServiceMixin {
   // only for internal testing
   void resetPurchases(List<PurchaseDetails> purchases) {
     log.d('Reset purchases');
-    purchases.forEach((element) {
+    for (var element in purchases) {
       log.d(element.productID);
       _iap.consumePurchase(
           PurchaseDetails.fromPurchase(element.billingClientPurchase!));
-    });
+    }
   }
 }

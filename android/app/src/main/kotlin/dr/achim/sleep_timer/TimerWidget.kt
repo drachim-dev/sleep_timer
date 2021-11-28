@@ -27,10 +27,10 @@ class TimerWidget : AppWidgetProvider() {
             flutterTimerApi!!.onWidgetUpdate { reply: WidgetUpdateResponse -> updateWidget(reply.title + appWidgetId, appWidgetId, context) }
             val startTimerIntent = Intent(context, WidgetReceiver::class.java)
             startTimerIntent.action = ACTION_CODE_WIDGET_START_TIMER
-            val startTimerPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_START_WIDGET, startTimerIntent, 0)
+            val startTimerPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_START_WIDGET, startTimerIntent, PendingIntent.FLAG_IMMUTABLE)
             val widgetSettingsIntent = Intent(context, WidgetReceiver::class.java)
             widgetSettingsIntent.action = ACTION_CODE_WIDGET_SETTINGS
-            val widgetSettingsPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_WIDGET_SETTINGS, widgetSettingsIntent, 0)
+            val widgetSettingsPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_WIDGET_SETTINGS, widgetSettingsIntent, PendingIntent.FLAG_IMMUTABLE)
 
             // Get the layout for the Widget and attach an OnClickListener
             val views = RemoteViews(

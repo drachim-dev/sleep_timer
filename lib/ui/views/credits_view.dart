@@ -88,7 +88,6 @@ class CreditsView extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).creditsAppTitle),
-          backwardsCompatibility: false,
         ),
         body: ListView.builder(
           itemCount: _creditList.length,

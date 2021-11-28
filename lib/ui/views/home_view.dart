@@ -75,7 +75,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       preferredSize: Size.fromHeight(kToolbarHeight + padding + 4),
       child: SafeArea(
         child: AppBar(
-          backwardsCompatibility: false,
           centerTitle: true,
           flexibleSpace: Padding(
             padding: const EdgeInsets.only(top: padding),
@@ -169,7 +168,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.accentTextTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.headline6!.copyWith(color: foregroundColor);
 
     return ScaleTransition(
       scale: _scaleAnimation,

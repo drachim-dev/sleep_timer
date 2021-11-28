@@ -19,24 +19,24 @@ class TimerModel {
 
   List<ActionModel> get startActions => _startActions;
   ValueActionModel get volumeAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.VOLUME) as ValueActionModel;
+      _startActions.singleWhere((action) => action.id == ActionType.volume) as ValueActionModel;
   ActionModel get lightAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.LIGHT);
+      _startActions.singleWhere((action) => action.id == ActionType.light);
   ActionModel get playMusicAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.PLAY_MUSIC);
+      _startActions.singleWhere((action) => action.id == ActionType.playMusic);
   ActionModel get doNotDisturbAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.DND);
+      _startActions.singleWhere((action) => action.id == ActionType.dnd);
 
   List<ActionModel> get endActions => _endActions;
   ActionModel get mediaAction =>
-      _endActions.singleWhere((action) => action.id == ActionType.MEDIA);
+      _endActions.singleWhere((action) => action.id == ActionType.media);
   ActionModel get wifiAction =>
-      _endActions.singleWhere((action) => action.id == ActionType.WIFI);
+      _endActions.singleWhere((action) => action.id == ActionType.wifi);
   ActionModel get bluetoothAction =>
-      _endActions.singleWhere((action) => action.id == ActionType.BLUETOOTH);
+      _endActions.singleWhere((action) => action.id == ActionType.bluetooth);
   ActionModel get screenAction =>
-      _endActions.singleWhere((action) => action.id == ActionType.SCREEN);
+      _endActions.singleWhere((action) => action.id == ActionType.screen);
 
   ActionModel get appAction =>
-      _endActions.singleWhere((action) => action.id == ActionType.APP);
+      _endActions.singleWhere((action) => action.id == ActionType.app);
 }

@@ -8,7 +8,6 @@ class FAQView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backwardsCompatibility: false,
         title: Text(S.of(context).faqTitle),
       ),
       body: ListView(

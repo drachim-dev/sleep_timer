@@ -1,14 +1,22 @@
 import 'package:pigeon/pigeon.dart';
 
-class InitializationRequest {
-  int? callbackHandle;
-}
-
+@ConfigurePigeon(PigeonOptions(
+  javaOptions: JavaOptions(
+    package: 'dr.achim.sleep_timer',
+  ),
+  dartOut: 'lib/messages_generated.dart',
+  javaOut: 'android/app/src/main/java/dr/achim/sleep_timer/Messages.java',
+))
 class NotificationRequest {
-  String? timerId, title, description;
+  String? timerId;
+  String? title;
+  String? description;
   int? accentColor;
-  String? restartAction, continueAction, pauseAction, cancelAction;
-  List<int>? extendActions;
+  String? restartAction;
+  String? continueAction;
+  String? pauseAction;
+  String? cancelAction;
+  List<int?>? extendActions;
 }
 
 class TimeNotificationRequest implements NotificationRequest {
@@ -37,7 +45,7 @@ class TimeNotificationRequest implements NotificationRequest {
   String? cancelAction;
 
   @override
-  List<int>? extendActions;
+  List<int?>? extendActions;
 
   /// The initial number of minutes the timer was set to.
   int? duration;
@@ -72,7 +80,7 @@ class RunningNotificationRequest implements TimeNotificationRequest {
   String? cancelAction;
 
   @override
-  List<int>? extendActions;
+  List<int?>? extendActions;
 
   @override
   int? duration;
@@ -125,11 +133,13 @@ class WidgetUpdateResponse {
 }
 
 class Package {
-  String? title, icon, packageName;
+  String? title;
+  String? icon;
+  String? packageName;
 }
 
 class InstalledAppsResponse {
-  List<Package>? apps;
+  List<Package?>? apps;
 }
 
 class LaunchAppRequest {
@@ -143,7 +153,6 @@ class ToggleRequest {
 // Native methods
 @HostApi()
 abstract class HostTimerApi {
-  void init(InitializationRequest request);
   NotificationResponse showRunningNotification(
       RunningNotificationRequest request);
   NotificationResponse showPausingNotification(TimeNotificationRequest request);
@@ -169,10 +178,4 @@ abstract class FlutterTimerApi {
   void onAlarm(TimerRequest request);
   WidgetUpdateResponse onWidgetUpdate();
   void onWidgetStartTimer();
-}
-
-void configurePigeon(PigeonOptions opts) {
-  opts.dartOut = 'lib/messages_generated.dart';
-  opts.javaOut = 'android/app/src/main/java/dr/achim/sleep_timer/Messages.java';
-  opts.javaOptions?.package = 'dr.achim.sleep_timer';
 }

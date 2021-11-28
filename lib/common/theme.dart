@@ -55,10 +55,9 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
   return ThemeData(
     colorScheme: colorScheme,
     textTheme: _textTheme,
-    primaryColor: const Color(0xFF030303),
     primaryColorBrightness: colorScheme.brightness,
     appBarTheme: AppBarTheme(
-      textTheme: _textTheme.apply(bodyColor: colorScheme.onBackground),
+      // textTheme: _textTheme.apply(bodyColor: colorScheme.onBackground),
       backgroundColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: colorScheme.primary),
@@ -80,7 +79,6 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     canvasColor: colorScheme.background,
     scaffoldBackgroundColor: colorScheme.background,
     highlightColor: Colors.transparent,
-    accentColor: colorScheme.primary,
     toggleableActiveColor: colorScheme.primaryVariant,
     textSelectionTheme: TextSelectionThemeData(
       selectionColor: colorScheme.primary,

@@ -87,14 +87,14 @@ class LightService {
     if (savedBridgesJson != null) {
       final savedBridges = BridgeModel.decode(savedBridgesJson);
 
-      savedBridges.forEach((bridgeModel) async {
+      for (var bridgeModel in savedBridges) {
         final connectionState = await getConnectionState(bridgeModel);
 
         if (connectionState == Connection.connected) {
           final bridge = Bridge(_client, bridgeModel.ip!, bridgeModel.auth!);
           final groups = await bridge.groups();
 
-          bridgeModel.groups.forEach((group) {
+          for (var group in bridgeModel.groups) {
             if (group.actionEnabled!) {
               final foundGroup = groups
                   .singleWhere((element) => element.id.toString() == group.id);
@@ -110,9 +110,9 @@ class LightService {
                 });
               }
             }
-          });
+          }
         }
-      });
+      }
     }
   }
 }

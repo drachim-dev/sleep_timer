@@ -25,7 +25,6 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
           return Scaffold(
             appBar: AppBar(
               title: Text(S.of(context).linkBridge),
-              backwardsCompatibility: false,
             ),
             body: _buildBody(theme),
             floatingActionButton: _buildFAB(theme),
@@ -51,7 +50,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.accentTextTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.headline6!.copyWith(color: foregroundColor);
 
     return FloatingActionButton.extended(
       onPressed: () => viewModel.initialise(),
@@ -145,7 +144,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
           itemBuilder: (_, int index) {
             final BridgeModel item = viewModel.data[index];
 
-            late var connectionHint;
+            String connectionHint = '';
             switch (item.state) {
               case Connection.unsaved:
                 connectionHint = S.of(context).tapToConnect;

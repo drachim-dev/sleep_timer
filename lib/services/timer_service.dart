@@ -15,7 +15,7 @@ import 'package:sleep_timer/services/device_service.dart';
 import 'package:sleep_timer/services/light_service.dart';
 import 'package:stacked/stacked.dart';
 
-enum TimerStatus { INITIAL, PAUSING, RUNNING, ELAPSED }
+enum TimerStatus { initial, pausing, running, elapsed }
 
 @injectable
 class TimerService with ReactiveServiceMixin {
@@ -25,7 +25,7 @@ class TimerService with ReactiveServiceMixin {
   final SharedPreferences _prefsService = locator<SharedPreferences>();
   final TimerModel? timerModel;
 
-  TimerStatus _status = TimerStatus.INITIAL;
+  TimerStatus _status = TimerStatus.initial;
   TimerStatus get status => _status;
 
   TimerService(@factoryParam this.timerModel)
@@ -41,13 +41,13 @@ class TimerService with ReactiveServiceMixin {
   int get maxTime => _maxTime;
 
   void start() {
-    if (status == TimerStatus.ELAPSED) {
+    if (status == TimerStatus.elapsed) {
       _resetTime();
-    } else if (status == TimerStatus.INITIAL) {
+    } else if (status == TimerStatus.initial) {
       _handleStartActions();
     }
 
-    setTimerStatus(TimerStatus.RUNNING);
+    setTimerStatus(TimerStatus.running);
 
     _deviceService.showRunningNotification(
         timerId: timerModel!.id,
@@ -76,27 +76,27 @@ class TimerService with ReactiveServiceMixin {
     setRemainingTime(newTime);
     setMaxTime();
 
-    if (status == TimerStatus.RUNNING) {
+    if (status == TimerStatus.running) {
       _deviceService.showRunningNotification(
           timerId: timerModel!.id,
           duration: maxTime,
           remainingTime: remainingTime,
           shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
               kDefaultExtendByShake);
-    } else if (status == TimerStatus.PAUSING) {
+    } else if (status == TimerStatus.pausing) {
       pauseTimer();
     }
   }
 
   void pauseTimer() {
-    setTimerStatus(TimerStatus.PAUSING);
+    setTimerStatus(TimerStatus.pausing);
 
     _deviceService.showPauseNotification(
         timerId: timerModel!.id, remainingTime: remainingTime);
   }
 
   Future<void> cancelTimer() async {
-    setTimerStatus(TimerStatus.ELAPSED);
+    setTimerStatus(TimerStatus.elapsed);
 
     // ignore: unawaited_futures
     _deviceService.cancelNotification(timerId: timerModel!.id);
@@ -106,16 +106,16 @@ class TimerService with ReactiveServiceMixin {
   void _resetTime() => setRemainingTime(timerModel!.initialTimeInSeconds);
 
   void _handleStartActions() {
-    timerModel!.startActions.forEach((element) {
+    for (var element in timerModel!.startActions) {
       if (element.enabled) {
         switch (element.id) {
-          case ActionType.VOLUME:
+          case ActionType.volume:
             handleVolumeAction((element as ValueActionModel).value!.round());
             break;
-          case ActionType.LIGHT:
+          case ActionType.light:
             handleLightAction();
             break;
-          case ActionType.DND:
+          case ActionType.dnd:
             if (_deviceService.notificationSettingsAccess) {
               handleDoNotDisturbAction();
             }
@@ -123,7 +123,7 @@ class TimerService with ReactiveServiceMixin {
           default:
         }
       }
-    });
+    }
   }
 
   void handleVolumeAction(int value) {
@@ -140,33 +140,33 @@ class TimerService with ReactiveServiceMixin {
 
   Future<void> handleEndedActions() async {
     log.d('handleEndedActions()');
-    setTimerStatus(TimerStatus.ELAPSED);
+    setTimerStatus(TimerStatus.elapsed);
     setRemainingTime(0);
 
     var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
     await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++_numElapsed);
 
-    timerModel!.endActions.forEach((element) {
+    for (var element in timerModel!.endActions) {
       if (element.enabled) {
         switch (element.id) {
-          case ActionType.MEDIA:
-            _deviceService.toggleMedia(false);
+          case ActionType.media:
+            await _deviceService.toggleMedia(false);
             break;
-          case ActionType.WIFI:
-            _deviceService.toggleWifi(false);
+          case ActionType.wifi:
+            await _deviceService.toggleWifi(false);
             break;
-          case ActionType.BLUETOOTH:
-            _deviceService.toggleBluetooth(false);
+          case ActionType.bluetooth:
+            await _deviceService.toggleBluetooth(false);
             break;
-          case ActionType.SCREEN:
+          case ActionType.screen:
             if (_deviceService.deviceAdmin) {
-              _deviceService.toggleScreen(false);
+              await _deviceService.toggleScreen(false);
             }
             break;
           default:
         }
       }
-    });
+    }
 
     await _deviceService.showElapsedNotification(timerModel: timerModel!);
   }

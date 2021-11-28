@@ -20,7 +20,6 @@ import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
-import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -31,16 +30,19 @@ import 'generated/l10n.dart';
 import 'services/theme_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-  ErrorWidget.builder = _buildErrorWidget;
-
   await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+
+    ErrorWidget.builder = _buildErrorWidget;
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
     await Application.init();
 
     runApp(MyApp());
-  }, FirebaseCrashlytics.instance.recordError);
+  }, (error, stackTrace) {
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  });
 }
 
 Builder _buildErrorWidget(FlutterErrorDetails details) {
@@ -51,18 +53,19 @@ Builder _buildErrorWidget(FlutterErrorDetails details) {
     final theme = Theme.of(context);
     return kDebugMode
         ? SingleChildScrollView(child: ErrorWidget('$message $stackTrace'))
-        : Container(
-            color: Colors.transparent,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(MdiIcons.googleDownasaur, size: 64),
-                Text(
-                  "Oops, this shouldn't have happened.\nPlease try again!",
-                  style: theme.textTheme.headline6,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+        : Center(
+            child: Container(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  Icon(MdiIcons.googleDownasaur, size: 64),
+                  Text(
+                    "Oops, this shouldn't have happened.\nPlease try again!",
+                    style: theme.textTheme.headline6,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           );
   });
@@ -132,51 +135,23 @@ class Application {
     await FirebaseCrashlytics.instance
         .setCrashlyticsCollectionEnabled(kReleaseMode);
 
-    // Pass all uncaught errors to Crashlytics.
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-
-/* 
-    Function? originalOnError = FlutterError.onError;
-    FlutterError.onError = (FlutterErrorDetails errorDetails) {
-      await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
-      // Forward to original handler.
-      originalOnError!(errorDetails);
-    }; */
-
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
 
-    // init Google Mobile Ads
-    // ignore: unawaited_futures
-    MobileAds.instance.initialize();
-    // ignore: unawaited_futures
-    MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
-
     await configureInjection(Environment.prod);
 
-    // initialize PlatformChannel for callback
-    final sleepTimerCallback =
-        PluginUtilities.getCallbackHandle(onNativeSideCallback)!;
-    // ignore: unawaited_futures
-    SleepTimerPlatform.instance.init(sleepTimerCallback.toRawHandle());
+    // init Google Mobile Ads
+    await MobileAds.instance.initialize();
+    await MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
 
     // setup callback even when activity is destroyed
-    FlutterTimerApi.setup(FlutterApiHandler(
-        callback: onNativeSideCallback, alarmCallback: onAlarmCallback));
+    FlutterTimerApi.setup(FlutterApiHandler(alarmCallback: onAlarmCallback));
 
     FlutterDeviceFunctionsApi.setup(DeviceFunctionsApiHandler(
         onDeviceAdminCallback: onDeviceAdminCallback,
         onNotificationAccessCallback: onNotificationAccessCallback));
   }
-}
-
-void onNativeSideCallback() async {
-  final log = getLogger();
-  log.d(
-      '################################## onNativeSideCallback ##################################');
-
-  WidgetsFlutterBinding.ensureInitialized();
 }
 
 void onAlarmCallback(final String timerId) async {
@@ -185,8 +160,8 @@ void onAlarmCallback(final String timerId) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _timerService = TimerServiceManager.instance.getTimerService(timerId)!;
-  await _timerService.handleEndedActions();
+  final _timerService = TimerServiceManager.instance.getTimerService(timerId);
+  await _timerService?.handleEndedActions();
 }
 
 void onNativeSideDeviceFunctionsCallback() async {

@@ -4,7 +4,6 @@ import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/model/action_model.dart';
-import 'package:sleep_timer/model/app.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/platform_interface.dart';
 import 'package:sleep_timer/services/timer_service.dart';
@@ -13,14 +12,10 @@ import 'package:stacked_services/stacked_services.dart';
 import 'app/app.router.dart';
 import 'common/timer_service_manager.dart';
 
+import 'package:collection/collection.dart';
+
 class SleepTimerPlatformImpl implements SleepTimerPlatform {
   final HostTimerApi _hostApi = HostTimerApi();
-
-  @override
-  Future<void> init(final int callbackHandle) {
-    return _hostApi
-        .init(InitializationRequest()..callbackHandle = callbackHandle);
-  }
 
   @override
   Future<bool> showRunningNotification(
@@ -107,32 +102,28 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   }
 
   @override
-  Future<List<App>> getInstalledPlayerApps() async {
+  Future<List<Package>> getInstalledPlayerApps() async {
     final response = await _hostApi.getInstalledPlayerApps();
 
     if (response.apps == null) {
       return [];
     }
 
-    final apps = response.apps!
-        .map((e) => App.fromMap(e as Map<dynamic, dynamic>))
-        .toList()
-          ..sort((a, b) => a.title!.compareTo(b.title!));
+    final apps = response.apps!.whereNotNull().toList()
+      ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
 
   @override
-  Future<List<App>> getInstalledAlarmApps() async {
+  Future<List<Package>> getInstalledAlarmApps() async {
     final response = await _hostApi.getInstalledAlarmApps();
 
     if (response.apps == null) {
       return [];
     }
 
-    final apps = response.apps!
-        .map((e) => App.fromMap(e as Map<dynamic, dynamic>))
-        .toList()
-          ..sort((a, b) => a.title!.compareTo(b.title!));
+    final apps = response.apps!.whereNotNull().toList()
+      ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
 
@@ -144,38 +135,45 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
 
 class FlutterApiHandler extends FlutterTimerApi {
   final Logger log = getLogger();
-  final Function? callback;
   final Function? alarmCallback;
 
-  FlutterApiHandler({this.callback, this.alarmCallback});
+  FlutterApiHandler({this.alarmCallback});
 
   @override
-  void onExtendTime(ExtendTimeRequest arg) {
-    final timerId = arg.timerId;
-    log.d('extend time by: ${arg.additionalTime} for timer with id $timerId');
-
-    TimerServiceManager.instance
-        .getTimerService(timerId)
-        ?.extendTime(arg.additionalTime);
-  }
-
-  @override
-  void onCountDown(CountDownRequest arg) {
-    final timerId = arg.timerId;
+  void onExtendTime(ExtendTimeRequest request) {
+    final timerId = request.timerId;
     log.d(
-        'new time after countdown: ${arg.newTime} for timer with id $timerId');
+        'extend time by: ${request.additionalTime} for timer with id $timerId');
 
-    TimerServiceManager.instance
-        .getTimerService(timerId)
-        ?.setRemainingTime(arg.newTime);
+    if (timerId != null) {
+      TimerServiceManager.instance
+          .getTimerService(timerId)
+          ?.extendTime(request.additionalTime);
+    }
   }
 
   @override
-  void onOpen(OpenRequest arg) {
-    final timerId = arg.timerId;
+  void onCountDown(CountDownRequest request) {
+    final timerId = request.timerId;
+    log.d(
+        'new time after countdown: ${request.newTime} for timer with id $timerId');
+
+    if (timerId != null) {
+      TimerServiceManager.instance
+          .getTimerService(timerId)
+          ?.setRemainingTime(request.newTime);
+    }
+  }
+
+  @override
+  void onOpen(OpenRequest request) {
+    final timerId = request.timerId;
     log.d('onOpen called for timer with id $timerId');
 
-    final _timerService = TimerServiceManager.instance.getTimerService(timerId);
+    TimerService? _timerService;
+    if (timerId != null) {
+      _timerService = TimerServiceManager.instance.getTimerService(timerId);
+    }
 
     // Wait for Flutter engine to be attached and runApp to be active
     SchedulerBinding.instance!.addPostFrameCallback((_) {
@@ -198,44 +196,52 @@ class FlutterApiHandler extends FlutterTimerApi {
   }
 
   @override
-  void onPauseRequest(TimerRequest arg) {
-    final timerId = arg.timerId;
+  void onPauseRequest(TimerRequest request) {
+    final timerId = request.timerId;
     log.d('onPauseRequest requested for timer with id $timerId');
 
-    TimerServiceManager.instance.getTimerService(timerId)?.pauseTimer();
+    if (timerId != null) {
+      TimerServiceManager.instance.getTimerService(timerId)?.pauseTimer();
+    }
   }
 
   @override
-  void onCancelRequest(TimerRequest arg) {
-    final timerId = arg.timerId;
+  void onCancelRequest(TimerRequest request) {
+    final timerId = request.timerId;
     log.d('onCancelRequest called for timer with id $timerId');
 
-    TimerServiceManager.instance.getTimerService(timerId)?.cancelTimer();
+    if (timerId != null) {
+      TimerServiceManager.instance.getTimerService(timerId)?.cancelTimer();
+    }
 
     StackedService.navigatorKey!.currentState!
         .popUntil((route) => route.settings.name != Routes.timerView);
   }
 
   @override
-  void onContinueRequest(TimerRequest arg) {
-    final timerId = arg.timerId;
+  void onContinueRequest(TimerRequest request) {
+    final timerId = request.timerId;
     log.d('onContinueRequest called for timer with id $timerId');
 
-    TimerServiceManager.instance.getTimerService(timerId)?.start();
+    if (timerId != null) {
+      TimerServiceManager.instance.getTimerService(timerId)?.start();
+    }
   }
 
   @override
-  void onRestartRequest(TimerRequest arg) {
-    final timerId = arg.timerId;
+  void onRestartRequest(TimerRequest request) {
+    final timerId = request.timerId;
     log.d('onRestartRequest called for timer with id $timerId');
 
-    TimerServiceManager.instance.getTimerService(timerId)?.start();
+    if (timerId != null) {
+      TimerServiceManager.instance.getTimerService(timerId)?.start();
+    }
   }
 
   @override
-  void onAlarm(TimerRequest arg) {
+  void onAlarm(TimerRequest request) {
     log.d('onAlarm()');
-    alarmCallback!(arg.timerId);
+    alarmCallback!(request.timerId);
   }
 
   @override

@@ -99,7 +99,6 @@ class _SettingsViewState extends State<SettingsView>
 
   AppBar _buildAppBar(final ThemeData theme) {
     return AppBar(
-      backwardsCompatibility: false,
       title: Text(S.of(context).settings),
     );
   }

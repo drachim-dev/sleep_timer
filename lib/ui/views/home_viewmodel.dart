@@ -36,44 +36,48 @@ class HomeViewModel extends BaseViewModel {
   HomeViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
 
-    startActionList.forEach((element) {
+    for (var element in startActionList) {
       element.enabled =
           _prefService.getBool(element.id.toString()) ?? element.enabled;
 
       if (element is ValueActionModel) {
         element.value = _prefService.getDouble(element.key!) ?? element.value;
       }
-    });
+    }
 
-    endActionList.forEach((element) {
+    for (var element in endActionList) {
       element.enabled =
-          _prefService.get(element.id.toString()) as bool? ?? element.enabled;
-    });
-
-    _adService.createInterstitialAd();
+          _prefService.getBool(element.id.toString()) ?? element.enabled;
+    }
   }
 
-  void startNewTimer() async {
+  void startNewTimer() {
     if (!isAdFree) {
-      await _adService.mayShow();
+      _adService.mayShow();
     }
 
     final timerModel =
         TimerModel(_initialTime * 60, startActionList, endActionList);
 
-    activeTimerId = await (_navigationService.navigateTo(Routes.timerView,
-        arguments: TimerViewArguments(timerModel: timerModel)));
-    notifyListeners();
+    final resultFuture = _navigationService.navigateTo(Routes.timerView,
+        arguments: TimerViewArguments(timerModel: timerModel));
+
+    resultFuture?.then((value) {
+      activeTimerId = value;
+      notifyListeners();
+    });
   }
 
   void openActiveTimer() async {
-    if (hasActiveTimer) {
+    if (hasActiveTimer && activeTimerId != null) {
       final timerModel = TimerServiceManager.instance
-          .getTimerService(activeTimerId)!
+          .getTimerService(activeTimerId!)!
           .timerModel;
 
-      activeTimerId = await (_navigationService.navigateTo(Routes.timerView,
+      final result = await (_navigationService.navigateTo(Routes.timerView,
           arguments: TimerViewArguments(timerModel: timerModel)));
+
+      activeTimerId = result;
       notifyListeners();
     }
   }

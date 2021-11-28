@@ -2,15 +2,15 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 
 enum ActionType {
-  PLAY_MUSIC,
-  MEDIA,
-  WIFI,
-  BLUETOOTH,
-  SCREEN,
-  VOLUME,
-  DND,
-  LIGHT,
-  APP
+  playMusic,
+  media,
+  wifi,
+  bluetooth,
+  screen,
+  volume,
+  dnd,
+  light,
+  app
 }
 
 class ActionModel {
@@ -49,18 +49,18 @@ class ValueActionModel extends ActionModel {
 
 List<ActionModel> startActionList = [
   ValueActionModel(
-    id: ActionType.VOLUME,
+    id: ActionType.volume,
     title: S.current.actionVolumeTitle,
     unit: ' %',
     key: kKeyVolumeLevel,
   ),
   ActionModel(
-    id: ActionType.LIGHT,
+    id: ActionType.light,
     title: S.current.actionToggleLightTitle,
     description: S.current.actionToggleLightDescription,
   ),
   ActionModel(
-    id: ActionType.DND,
+    id: ActionType.dnd,
     title: S.current.actionDoNotDisturbTitle,
     description: S.current.actionDoNotDisturbDescription,
   ),
@@ -68,23 +68,23 @@ List<ActionModel> startActionList = [
 
 List<ActionModel> endActionList = [
   ActionModel(
-    id: ActionType.MEDIA,
+    id: ActionType.media,
     title: S.current.actionToggleMediaTitle,
     description: S.current.actionToggleMediaDescription,
     enabled: true,
   ),
   ActionModel(
-    id: ActionType.WIFI,
+    id: ActionType.wifi,
     title: S.current.actionToggleWifiTitle,
     description: S.current.actionToggleWifiDescription,
   ),
   ActionModel(
-    id: ActionType.BLUETOOTH,
+    id: ActionType.bluetooth,
     title: S.current.actionToggleBluetoothTitle,
     description: S.current.actionToggleBluetoothDescription,
   ),
   ActionModel(
-    id: ActionType.SCREEN,
+    id: ActionType.screen,
     title: S.current.actionToggleScreenTitle,
     description: S.current.actionToggleScreenDescription,
   ),

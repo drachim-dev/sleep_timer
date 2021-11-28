@@ -1,7 +1,14 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lints/recommended.yaml
 
 analyzer:
   exclude:
     - lib/app/locator.config.dart
     - lib/messages_generated.dart
     - lib/generated/*
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - sort_child_properties_last
+    - unawaited_futures
+    - always_declare_return_types

@@ -9,24 +9,12 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.provider.AlarmClock
 import android.provider.MediaStore
 import android.util.Base64
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import dr.achim.sleep_timer.Messages.CancelRequest
-import dr.achim.sleep_timer.Messages.CancelResponse
-import dr.achim.sleep_timer.Messages.HostTimerApi
-import dr.achim.sleep_timer.Messages.InitializationRequest
-import dr.achim.sleep_timer.Messages.InstalledAppsResponse
-import dr.achim.sleep_timer.Messages.LaunchAppRequest
-import dr.achim.sleep_timer.Messages.NotificationRequest
-import dr.achim.sleep_timer.Messages.NotificationResponse
-import dr.achim.sleep_timer.Messages.Package
-import dr.achim.sleep_timer.Messages.RunningNotificationRequest
-import dr.achim.sleep_timer.Messages.TimeNotificationRequest
-import dr.achim.sleep_timer.Messages.ToggleRequest
+import dr.achim.sleep_timer.Messages.*
 import io.flutter.Log
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -36,11 +24,40 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
     companion object {
         private val TAG = MethodChannelImpl::class.java.toString()
-    }
 
-    override fun init(arg: InitializationRequest) {
-        Log.d(TAG, "init")
-        CallbackHelper.setHandle(context, arg.callbackHandle)
+        private val audioPlayerPackages = listOf(
+                "com.spotify.music",
+                "com.google.android.youtube",
+                "deezer.android.app",
+                "com.apple.android.music",
+                "com.amazon.mp3",
+                "com.pandora.android",
+                "com.rhapsody",
+                "com.aspiro.tidal",
+                "com.soundcloud.android",
+                "com.google.android.apps.podcasts",
+                "com.sec.android.app.music",
+                "com.google.android.apps.youtube.music",
+        )
+
+        private val videoPlayerPackages = listOf(
+                "com.netflix.mediaclient",
+                "com.disney.disneyplus",
+                "com.amazon.avod.thirdpartyclient",
+                "com.disney.disneyplus",
+                "de.prosiebensat1digital.seventv",
+                "de.sky.bw",
+                "de.sky.online",
+                "com.dazn",
+                "com.plexapp.android",
+                "org.xbmc.kodi",
+                "com.vanced.android.youtube",
+        )
+
+        private val excludePackages = listOf(
+                "com.google.android.apps.docs",
+                "com.google.android.apps.photos",
+        )
     }
 
     private fun startForegroundService(arg: RunningNotificationRequest) {
@@ -148,6 +165,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
     override fun getInstalledPlayerApps(): InstalledAppsResponse {
         val manager = context.packageManager
+
         val uriAudio = Uri.withAppendedPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, "1")
         val intentAudio = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uriAudio, "audio/*")
@@ -162,27 +180,30 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
         val intentMedia = Intent(Intent.ACTION_MEDIA_BUTTON)
         val mediaList = manager.queryBroadcastReceivers(intentMedia, 0)
-        val apps: Set<Package> = getAppsFromResolveInfo(audioList)
-            .union(getAppsFromResolveInfo(videoList))
-            .union(getAppsFromResolveInfo(mediaList))
 
-        val packageNames: List<String> =
-            arrayListOf("com.netflix.mediaclient", "com.google.android.apps.podcasts")
+        val apps: MutableSet<Package> = getAppsFromResolveInfo(audioList)
+                .union(getAppsFromResolveInfo(videoList))
+                .union(getAppsFromResolveInfo(mediaList))
+                .filterNot { excludePackages.contains(it.packageName) }
+                .toMutableSet()
+
+        // Query by packageName
+        val packageNames = audioPlayerPackages + videoPlayerPackages
         for (packageName in packageNames) {
             try {
                 val myPackage = manager.getPackageInfo(packageName, 0)
                 val applicationInfo = myPackage.applicationInfo
                 if (applicationInfo != null && applicationInfo.enabled) {
                     val app = getAppFromApplicationInfo(applicationInfo)
-                    apps.plus(app)
+                    apps.add(app)
                 }
             } catch (ignored: PackageManager.NameNotFoundException) {
+                Log.d(TAG, "$packageName not found")
             }
         }
 
-        val packages = apps.distinctBy { it.packageName }.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
-            this.apps = packages
+            this.apps = apps.distinctBy { it.packageName }
         }
     }
 
@@ -191,9 +212,8 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         val alarmList = context.packageManager.queryIntentActivities(showAlarmsIntent, 0)
         val apps = getAppsFromResolveInfo(alarmList).distinctBy { it.packageName }
 
-        val packages = apps.mapNotNull { it.toMap() }.toList()
         return InstalledAppsResponse().apply {
-            this.apps = packages
+            this.apps = apps
         }
     }
 

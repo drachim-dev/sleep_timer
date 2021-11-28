@@ -10,7 +10,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
-import 'package:sleep_timer/model/app.dart';
+import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -40,10 +40,10 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   late TimerViewModel viewModel;
 
-  late Future<List<App>> alarmAppsFuture;
-  late Future<List<App>> playerAppsFuture;
+  late Future<List<Package>> alarmAppsFuture;
+  late Future<List<Package>> playerAppsFuture;
 
-  Map<String, MemoryImage>? cachedAppIcons;
+  Map<String, MemoryImage> cachedAppIcons = {};
 
   @override
   void initState() {
@@ -87,13 +87,13 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           playerAppsFuture = viewModel.playerApps;
 
           alarmAppsFuture.then((apps) {
-            cachedAppIcons?.addAll({
+            cachedAppIcons.addAll({
               for (var e in apps)
                 e.packageName!: MemoryImage(base64Decode(e.icon!))
             });
           });
           playerAppsFuture.then((apps) {
-            cachedAppIcons?.addAll({
+            cachedAppIcons.addAll({
               for (var e in apps)
                 e.packageName!: MemoryImage(base64Decode(e.icon!))
             });
@@ -272,63 +272,83 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  void _showAppSheet(final Future<List<App>> apps) {
+  void _showAppSheet(final Future<List<Package>> apps) {
     const appSize = 40.0;
     const gridSize = 3;
     const labelMargin = 12.0;
 
     showModalBottomSheet(
         context: context,
-        builder: (BuildContext context) {
-          return FutureBuilder<List<App>>(
-              future: apps,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final apps = snapshot.data!;
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(16),
+          ),
+        ),
+        isScrollControlled: true,
+        builder: (context) => DraggableScrollableSheet(
+            expand: false,
+            builder: (context, scrollController) {
+              return FutureBuilder<List<Package>>(
+                  future: apps,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final apps = snapshot.data!;
 
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(icon: Icon(Icons.drag_handle), onPressed: null),
-                      Expanded(
-                        child: GridView.builder(
-                            padding: const EdgeInsets.all(kBottomSheetPadding),
-                            shrinkWrap: true,
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: gridSize),
-                            itemBuilder: (_, index) {
-                              final app = snapshot.data![index];
+                      return Column(
+                        children: [
+                          Container(
+                            height: 5,
+                            width: 38,
+                            margin: const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: Colors.grey),
+                          ),
+                          Expanded(
+                            child: GridView.builder(
+                                padding:
+                                    const EdgeInsets.all(kBottomSheetPadding),
+                                controller: scrollController,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: gridSize),
+                                itemBuilder: (_, index) {
+                                  final app = snapshot.data![index];
 
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Ink.image(
-                                    width: appSize,
-                                    height: appSize,
-                                    image: cachedAppIcons?[app.packageName] ??
-                                        MemoryImage(base64Decode(app.icon!)),
-                                    child: InkWell(
-                                      onTap: () =>
-                                          viewModel.openPackage(app.packageName!),
-                                      customBorder: CircleBorder(),
-                                    ),
-                                  ),
-                                  SizedBox(height: labelMargin),
-                                  Text(app.title!,
-                                      overflow: TextOverflow.ellipsis, maxLines: 1),
-                                ],
-                              );
-                            },
-                            itemCount: apps.length),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              });
-        });
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Ink.image(
+                                        width: appSize,
+                                        height: appSize,
+                                        image:
+                                            cachedAppIcons[app.packageName] ??
+                                                MemoryImage(
+                                                    base64Decode(app.icon!)),
+                                        child: InkWell(
+                                          onTap: () => viewModel
+                                              .openPackage(app.packageName!),
+                                          customBorder: CircleBorder(),
+                                        ),
+                                      ),
+                                      SizedBox(height: labelMargin),
+                                      Text(app.title!,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1),
+                                    ],
+                                  );
+                                },
+                                itemCount: apps.length),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  });
+            }));
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
@@ -375,7 +395,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         direction: Axis.horizontal,
         children: [
           ToggleButton(
-            label: '${viewModel.timerModel.volumeAction.description}',
+            label: viewModel.timerModel.volumeAction.description,
             activeIcon: Icons.volume_down_outlined,
             disabledIcon: Icons.volume_mute_outlined,
             onChanged: (value) async {
@@ -400,8 +420,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           ),
           ToggleButton(
             label: viewModel.timerModel.doNotDisturbAction.title,
-            activeIcon: MdiIcons.doNotDisturb,
-            disabledIcon: MdiIcons.doNotDisturbOff,
+            activeIcon: MdiIcons.minusCircleOutline,
+            disabledIcon: MdiIcons.minusCircleOffOutline,
             onChanged: viewModel.onChangeDoNotDisturb,
             onLongPress: () => viewModel.navigateToSettings(
                 notificationSettingsAccessFocused: true),
@@ -494,9 +514,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   Widget _buildFAB(ThemeData theme) {
     final foregroundColor = Colors.white;
     final textStyle =
-        theme.accentTextTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.headline6!.copyWith(color: foregroundColor);
 
-    if (viewModel.timerStatus == TimerStatus.RUNNING) {
+    if (viewModel.timerStatus == TimerStatus.running) {
       _fabAnimController.reverse();
     } else {
       _fabAnimController.forward();
@@ -512,16 +532,16 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             color: foregroundColor,
           ),
           label: Text(
-            viewModel.timerStatus == TimerStatus.RUNNING ||
-                    viewModel.timerStatus == TimerStatus.INITIAL
+            viewModel.timerStatus == TimerStatus.running ||
+                    viewModel.timerStatus == TimerStatus.initial
                 ? S.of(context).buttonTimerPause
-                : viewModel.timerStatus == TimerStatus.ELAPSED
+                : viewModel.timerStatus == TimerStatus.elapsed
                     ? S.of(context).buttonTimerStart
                     : S.of(context).buttonTimerContinue,
             style: textStyle,
           ),
           onPressed: () {
-            if (viewModel.timerStatus == TimerStatus.RUNNING) {
+            if (viewModel.timerStatus == TimerStatus.running) {
               viewModel.pauseTimer();
             } else {
               viewModel.startTimer();
