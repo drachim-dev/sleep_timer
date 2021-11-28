@@ -42,8 +42,6 @@ The Mockups were created by using previewed.app
 
 ## Download
 
-[![playstore badge][]][playstore link]
-
-
-[playstore badge]: https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png
-[playstore link]: https://play.google.com/store/apps/details?id=dr.achim.sleep_timer
+<a href="https://play.google.com/store/apps/details?id=dr.achim.sleep_timer">
+  <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" width="260"/>
+</a>
