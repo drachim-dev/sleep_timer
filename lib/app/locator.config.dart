@@ -32,10 +32,8 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i4.LightService>(() => _i4.LightService());
   gh.lazySingleton<_i5.NavigationService>(
       () => thirdPartyServicesModule.navigationService);
-  await gh.factoryAsync<_i6.PurchaseService>(
-      () => thirdPartyServicesModule.purchaseService,
-      registerFor: {_prod},
-      preResolve: true);
+  gh.lazySingletonAsync<_i6.PurchaseService>(() => _i6.PurchaseService.create(),
+      registerFor: {_prod});
   gh.lazySingleton<_i7.ReviewService>(() => _i7.ReviewService());
   await gh.factoryAsync<_i8.SharedPreferences>(
       () => thirdPartyServicesModule.prefsService,
@@ -43,8 +41,8 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   gh.singleton<_i9.ThemeService>(_i9.ThemeService());
   gh.factoryParam<_i10.TimerService, _i11.TimerModel?, dynamic>(
       (timerModel, _) => _i10.TimerService(timerModel));
-  gh.singleton<_i12.AdService>(
-      _i12.AdService.create(get<_i8.SharedPreferences>()));
+  gh.lazySingletonAsync<_i12.AdService>(
+      () => _i12.AdService.create(get<_i8.SharedPreferences>()));
   return get;
 }
 

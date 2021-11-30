@@ -6,7 +6,7 @@ import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 
-@singleton
+@lazySingleton
 class AdService {
   final SharedPreferences _prefsService;
 
@@ -22,13 +22,18 @@ class AdService {
   AdService(this._prefsService);
 
   @factoryMethod
-  static AdService create(SharedPreferences _prefsService) {
+  static Future<AdService> create(SharedPreferences _prefsService) async {
     var instance = AdService(_prefsService);
-    instance._init();
+    await instance._init();
+
     return instance;
   }
 
   Future<void> _init() async {
+    await MobileAds.instance.initialize();
+    await MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
+
     _counter = _prefsService.getInt(kPrefKeyAdIntervalCounter) ?? _counter;
   }
 

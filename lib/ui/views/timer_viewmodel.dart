@@ -13,7 +13,6 @@ import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/device_service.dart';
-import 'package:sleep_timer/services/purchase_service.dart';
 import 'package:sleep_timer/services/theme_service.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:stacked/stacked.dart';
@@ -26,7 +25,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   final SharedPreferences _prefsService = locator<SharedPreferences>();
   final ThemeService _themeService = locator<ThemeService>();
-  final PurchaseService _purchaseService = locator<PurchaseService>();
   final DeviceService _deviceService = locator<DeviceService>();
 
   bool _newInstance = false;
@@ -72,8 +70,6 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   int get maxTime => _timerService.maxTime;
 
   TimerStatus get timerStatus => _timerService.status;
-
-  bool get isAdFree => _purchaseService.adFree;
 
   Future<VolumeResponse> get volume => _deviceService.volume;
   int get platformVersion => _deviceService.platformVersion;

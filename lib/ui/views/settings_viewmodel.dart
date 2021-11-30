@@ -19,7 +19,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   final DeviceService _deviceService = locator<DeviceService>();
   final NavigationService _navigationService = locator<NavigationService>();
   final SharedPreferences _prefsService = locator<SharedPreferences>();
-  final PurchaseService _purchaseService = locator<PurchaseService>();
+  final PurchaseService _purchaseService = locator.get<PurchaseService>();
   final ReviewService _reviewService = locator<ReviewService>();
   final ThemeService _themeService = locator<ThemeService>();
 
@@ -50,6 +50,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   @override
   Future initialise() async {
     await GetIt.I.isReady<DeviceService>();
+    await GetIt.I.isReady<PurchaseService>();
 
     stream.listen((data) async {
       setBusy(true);

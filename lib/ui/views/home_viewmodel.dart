@@ -17,8 +17,9 @@ class HomeViewModel extends BaseViewModel {
   final SharedPreferences _prefService = locator<SharedPreferences>();
   final ReviewService _reviewService = locator<ReviewService>();
   final ThemeService _themeService = locator<ThemeService>();
-  final AdService _adService = locator<AdService>();
-  final PurchaseService _purchaseService = locator<PurchaseService>();
+  final Future<AdService> _adService = locator.getAsync<AdService>();
+  final Future<PurchaseService> _purchaseService =
+      locator.getAsync<PurchaseService>();
 
   bool get showGlow => _themeService.showGlow;
 
@@ -30,8 +31,6 @@ class HomeViewModel extends BaseViewModel {
 
   // lock variable to prevent multiple calls due to rebuild
   bool mayAskForReviewLocked = false;
-
-  bool get isAdFree => _purchaseService.adFree;
 
   HomeViewModel() {
     _initialTime = _prefService.getInt(kPrefKeyInitialTime) ?? _initialTime;
@@ -52,9 +51,11 @@ class HomeViewModel extends BaseViewModel {
   }
 
   void startNewTimer() {
-    if (!isAdFree) {
-      _adService.mayShow();
-    }
+    _purchaseService.then((purchaseService) {
+      if (!purchaseService.adFree) {
+        _adService.then((adService) => adService.mayShow());
+      }
+    });
 
     final timerModel =
         TimerModel(_initialTime * 60, startActionList, endActionList);

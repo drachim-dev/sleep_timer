@@ -43,7 +43,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   late Future<List<Package>> alarmAppsFuture;
   late Future<List<Package>> playerAppsFuture;
 
-  Map<String, MemoryImage> cachedAppIcons = {};
+  Map<String, Image> cachedAppIcons = {};
 
   @override
   void initState() {
@@ -89,13 +89,21 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           alarmAppsFuture.then((apps) {
             cachedAppIcons.addAll({
               for (var e in apps)
-                e.packageName!: MemoryImage(base64Decode(e.icon!))
+                e.packageName!: Image.memory(
+                  base64Decode(e.icon!),
+                  width: kAppImageSize,
+                  height: kAppImageSize,
+                )
             });
           });
           playerAppsFuture.then((apps) {
             cachedAppIcons.addAll({
               for (var e in apps)
-                e.packageName!: MemoryImage(base64Decode(e.icon!))
+                e.packageName!: Image.memory(
+                  base64Decode(e.icon!),
+                  width: kAppImageSize,
+                  height: kAppImageSize,
+                )
             });
           });
         },
@@ -256,7 +264,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             ),
             icon: Icon(Icons.play_arrow_outlined),
             label: Text(S.of(context).buttonShowPlayerApps),
-            onPressed: () => _showAppSheet(viewModel.playerApps),
+            onPressed: () => _showAppSheet(theme, viewModel.playerApps),
           ),
           SizedBox(width: 12),
           OutlinedButton.icon(
@@ -265,17 +273,18 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             ),
             icon: Icon(Icons.alarm),
             label: Text(S.of(context).buttonShowAlarmApps),
-            onPressed: () => _showAppSheet(viewModel.alarmApps),
+            onPressed: () => _showAppSheet(theme, viewModel.alarmApps),
           ),
         ],
       ),
     );
   }
 
-  void _showAppSheet(final Future<List<Package>> apps) {
-    const appSize = 40.0;
+  void _showAppSheet(final ThemeData theme, final Future<List<Package>> apps) {
     const gridSize = 3;
     const labelMargin = 12.0;
+
+    final labelStyle = theme.textTheme.bodyText2;
 
     showModalBottomSheet(
         context: context,
@@ -315,29 +324,28 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                                 itemBuilder: (_, index) {
                                   final app = snapshot.data![index];
 
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Ink.image(
-                                        width: appSize,
-                                        height: appSize,
-                                        image:
-                                            cachedAppIcons[app.packageName] ??
-                                                MemoryImage(
-                                                    base64Decode(app.icon!)),
-                                        child: InkWell(
-                                          onTap: () => viewModel
-                                              .openPackage(app.packageName!),
-                                          customBorder: CircleBorder(),
-                                        ),
-                                      ),
-                                      SizedBox(height: labelMargin),
-                                      Text(app.title!,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1),
-                                    ],
+                                  return TextButton(
+                                    onPressed: () =>
+                                        viewModel.openPackage(app.packageName!),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        cachedAppIcons[app.packageName] ??
+                                            Image.memory(
+                                              base64Decode(app.icon!),
+                                              width: kAppImageSize,
+                                              height: kAppImageSize,
+                                            ),
+                                        SizedBox(height: labelMargin),
+                                        Text(app.title!,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: labelStyle,
+                                            maxLines: 1),
+                                      ],
+                                    ),
                                   );
                                 },
                                 itemCount: apps.length),

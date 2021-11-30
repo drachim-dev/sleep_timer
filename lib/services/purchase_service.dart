@@ -6,6 +6,8 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:stacked/stacked.dart';
 
+@prod
+@lazySingleton
 class PurchaseService with ReactiveServiceMixin {
   final Logger log = getLogger();
   final InAppPurchaseConnection _iap;

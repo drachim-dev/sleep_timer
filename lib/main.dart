@@ -8,7 +8,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
@@ -16,7 +15,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/logger.util.dart';
-import 'package:sleep_timer/common/ad_manager.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/platform_impl.dart';
@@ -39,7 +37,9 @@ Future<void> main() async {
 
     await Application.init();
 
+    await configureInjection(Environment.prod);
     runApp(MyApp());
+
   }, (error, stackTrace) {
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
   });
@@ -137,13 +137,6 @@ class Application {
 
     // init In-App purchases
     InAppPurchaseConnection.enablePendingPurchases();
-
-    await configureInjection(Environment.prod);
-
-    // init Google Mobile Ads
-    await MobileAds.instance.initialize();
-    await MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
 
     // setup callback even when activity is destroyed
     FlutterTimerApi.setup(FlutterApiHandler(alarmCallback: onAlarmCallback));
