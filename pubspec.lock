@@ -175,7 +175,7 @@ packages:
       path: "../device_functions"
       relative: true
     source: path
-    version: "0.0.2"
+    version: "0.0.3"
   dots_indicator:
     dependency: transitive
     description:
