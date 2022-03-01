@@ -21,7 +21,7 @@ class _IntroViewState extends State<IntroView> {
       titleTextStyle: theme.textTheme.headline2!.copyWith(fontSize: 36),
       bodyTextStyle: theme.textTheme.headline6!
           .copyWith(color: theme.textTheme.headline2!.color),
-      descriptionPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      bodyPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       pageColor: theme.scaffoldBackgroundColor,
       imagePadding: EdgeInsets.zero,
     );
@@ -58,7 +58,7 @@ class _IntroViewState extends State<IntroView> {
                 decoration: pageDecoration,
               ),
             ],
-            skipFlex: 0,
+            skipOrBackFlex: 0,
             nextFlex: 0,
             showSkipButton: true,
             showNextButton: true,

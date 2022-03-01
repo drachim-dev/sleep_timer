@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart' show IterableExtension;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/locator.dart';

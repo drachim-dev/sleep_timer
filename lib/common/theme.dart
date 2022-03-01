@@ -55,7 +55,6 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
   return ThemeData(
     colorScheme: colorScheme,
     textTheme: _textTheme,
-    primaryColorBrightness: colorScheme.brightness,
     appBarTheme: AppBarTheme(
       // textTheme: _textTheme.apply(bodyColor: colorScheme.onBackground),
       backgroundColor: Colors.transparent,
@@ -79,7 +78,7 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     canvasColor: colorScheme.background,
     scaffoldBackgroundColor: colorScheme.background,
     highlightColor: Colors.transparent,
-    toggleableActiveColor: colorScheme.primaryVariant,
+    toggleableActiveColor: colorScheme.primaryContainer,
     textSelectionTheme: TextSelectionThemeData(
       selectionColor: colorScheme.primary,
       selectionHandleColor: colorScheme.primary,
@@ -118,9 +117,9 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
 
 ColorScheme _lightOrangeColorScheme = ColorScheme(
   primary: Colors.blueGrey[600]!,
-  primaryVariant: Colors.deepOrangeAccent[100]!,
+  primaryContainer: Colors.deepOrangeAccent[100]!,
   secondary: Colors.deepOrangeAccent[100]!,
-  secondaryVariant: Colors.deepOrange[300]!,
+  secondaryContainer: Colors.deepOrange[300]!,
   background: Color(0xFFFCFCFC),
   surface: Color(0xFFF4F4F4),
   onBackground: Colors.grey[900]!,
@@ -134,9 +133,9 @@ ColorScheme _lightOrangeColorScheme = ColorScheme(
 
 ColorScheme _lightGreenColorScheme = ColorScheme(
   primary: Colors.blueGrey[600]!,
-  primaryVariant: Color(0xFF68D391),
+  primaryContainer: Color(0xFF68D391),
   secondary: Color(0xFF68D391),
-  secondaryVariant: Color(0xFF48BB78),
+  secondaryContainer: Color(0xFF48BB78),
   background: Color(0xFFFCFCFC),
   surface: Color(0xFFF4F4F4),
   onBackground: Colors.grey[900]!,
@@ -150,9 +149,9 @@ ColorScheme _lightGreenColorScheme = ColorScheme(
 
 ColorScheme _darkOrangeColorScheme = ColorScheme(
   primary: Colors.deepOrange[300]!,
-  primaryVariant: Colors.tealAccent,
+  primaryContainer: Colors.tealAccent,
   secondary: Colors.deepPurpleAccent,
-  secondaryVariant: Colors.deepPurple,
+  secondaryContainer: Colors.deepPurple,
   background: Color(0xFF1F1929),
   surface: Color(0xFF393343), // 241E30
   onBackground: Color(0x0DFFFFFF),
@@ -166,9 +165,9 @@ ColorScheme _darkOrangeColorScheme = ColorScheme(
 
 ColorScheme _darkYellowColorScheme = ColorScheme(
   primary: Colors.yellow[800]!,
-  primaryVariant: Colors.tealAccent[400]!,
+  primaryContainer: Colors.tealAccent[400]!,
   secondary: Colors.teal[700]!,
-  secondaryVariant: Colors.teal[800]!,
+  secondaryContainer: Colors.teal[800]!,
   background: Color(0xFF1b1b1b),
   surface: Color(0xFF373737),
   onBackground: Color(0x0DFFFFFF),
@@ -182,9 +181,9 @@ ColorScheme _darkYellowColorScheme = ColorScheme(
 
 ColorScheme _blackColorScheme = ColorScheme(
   primary: Colors.indigo[200]!,
-  primaryVariant: Colors.indigoAccent[100]!,
+  primaryContainer: Colors.indigoAccent[100]!,
   secondary: Colors.indigo[500]!,
-  secondaryVariant: Colors.indigo[400]!,
+  secondaryContainer: Colors.indigo[400]!,
   background: Colors.black,
   surface: Color(0xFF1A1A1A),
   onBackground: Color(0x0DFFFFFF),

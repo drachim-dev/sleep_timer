@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:device_functions/messages_generated.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -131,7 +129,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
-      backwardsCompatibility: false,
       backgroundColor: theme.scaffoldBackgroundColor,
       primary: true,
       pinned: true,

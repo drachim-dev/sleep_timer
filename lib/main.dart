@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_impl.dart';
