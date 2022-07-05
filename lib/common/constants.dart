@@ -16,6 +16,7 @@ const double kBottomSheetPadding = 24;
 const Color kStatusBarOverlay = Colors.transparent;
 Color kNotificationActionColor = Colors.yellow[800]!;
 const kAppImageSize = 40.0;
+const kToggleButtonSize = 36.0;
 
 // Ads
 const double kAdHeight = 90;

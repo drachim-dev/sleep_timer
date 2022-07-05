@@ -7,7 +7,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -38,14 +37,13 @@ Future<void> main() async {
 
     await configureInjection(Environment.prod);
     runApp(MyApp());
-
   }, (error, stackTrace) {
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
   });
 }
 
 Builder _buildErrorWidget(FlutterErrorDetails details) {
-  var message = 'Error occured!\n\n' + details.exception.toString() + '\n\n';
+  var message = 'Error occured!\n\n${details.exception}\n\n';
   var stackTrace = details.stack.toString().split('\n');
 
   return Builder(builder: (context) {
@@ -134,9 +132,6 @@ class Application {
     await FirebaseCrashlytics.instance
         .setCrashlyticsCollectionEnabled(kReleaseMode);
 
-    // init In-App purchases
-    InAppPurchaseConnection.enablePendingPurchases();
-
     // setup callback even when activity is destroyed
     FlutterTimerApi.setup(FlutterApiHandler(alarmCallback: onAlarmCallback));
 
@@ -152,8 +147,8 @@ void onAlarmCallback(final String timerId) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _timerService = TimerServiceManager.instance.getTimerService(timerId);
-  await _timerService?.handleEndedActions();
+  final timerService = TimerServiceManager.instance.getTimerService(timerId);
+  await timerService?.handleEndedActions();
 }
 
 void onNativeSideDeviceFunctionsCallback() async {
@@ -169,8 +164,8 @@ void onDeviceAdminCallback(final bool granted) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _deviceService = locator<DeviceService>();
-  _deviceService.setDeviceAdmin(granted);
+  final deviceService = locator<DeviceService>();
+  deviceService.setDeviceAdmin(granted);
 }
 
 void onNotificationAccessCallback(final bool granted) async {
@@ -179,6 +174,6 @@ void onNotificationAccessCallback(final bool granted) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final _deviceService = locator<DeviceService>();
-  _deviceService.setNotificationAccess(granted);
+  final deviceService = locator<DeviceService>();
+  deviceService.setNotificationAccess(granted);
 }

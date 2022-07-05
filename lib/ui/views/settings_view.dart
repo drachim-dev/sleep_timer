@@ -21,7 +21,7 @@ class SettingsView extends StatefulWidget {
             notificationSettingsAccessFocused ?? false;
 
   @override
-  _SettingsViewState createState() => _SettingsViewState();
+  State<SettingsView> createState() => _SettingsViewState();
 }
 
 class _SettingsViewState extends State<SettingsView>
@@ -45,7 +45,7 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      SchedulerBinding.instance!.addPostFrameCallback((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         Future.delayed(Duration(milliseconds: 750)).then((value) => {
               _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,

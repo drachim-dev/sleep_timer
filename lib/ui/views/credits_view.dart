@@ -36,8 +36,9 @@ class CreditsView extends StatelessWidget {
 
   static final List _packageCredits = [
     S.current.creditsLibraries,
-    Credit(title: 'auto_route', url: 'https://pub.dev/packages/auto_route'),
     Credit(title: 'collection', url: 'https://pub.dev/packages/collection'),
+    Credit(
+        title: 'firebase_core', url: 'https://pub.dev/packages/firebase_core'),
     Credit(
         title: 'firebase_crashlytics',
         url: 'https://pub.dev/packages/firebase_crashlytics'),
@@ -45,10 +46,15 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'google_mobile_ads',
         url: 'https://pub.dev/packages/google_mobile_ads'),
+    Credit(title: 'http', url: 'https://pub.dev/packages/http'),
     Credit(title: 'hue_dart', url: 'https://pub.dev/packages/hue_dart'),
+    Credit(title: 'intl', url: 'https://pub.dev/packages/intl'),
     Credit(
         title: 'in_app_purchase',
         url: 'https://pub.dev/packages/in_app_purchase'),
+    Credit(
+        title: 'in_app_purchase_android',
+        url: 'https://pub.dev/packages/in_app_purchase_android'),
     Credit(
         title: 'in_app_review', url: 'https://pub.dev/packages/in_app_review'),
     Credit(title: 'injectable', url: 'https://pub.dev/packages/injectable'),
@@ -63,8 +69,8 @@ class CreditsView extends StatelessWidget {
         title: 'material_design_icons_flutter',
         url: 'https://pub.dev/packages/material_design_icons_flutter'),
     Credit(
-        title: 'observable_ish',
-        url: 'https://pub.dev/packages/observable_ish'),
+        title: 'permission_handler',
+        url: 'https://pub.dev/packages/permission_handler'),
     Credit(title: 'provider', url: 'https://pub.dev/packages/provider'),
     Credit(
         title: 'shared_preferences',
@@ -76,9 +82,7 @@ class CreditsView extends StatelessWidget {
     Credit(
         title: 'stacked_services',
         url: 'https://pub.dev/packages/stacked_services'),
-    Credit(
-        title: 'url_launcher',
-        url: 'https://pub.dev/packages/url_launcher/install'),
+    Credit(title: 'url_launcher', url: 'https://pub.dev/packages/url_launcher'),
   ];
 
   static final List _creditList = _imageCredits + _packageCredits;

@@ -18,17 +18,17 @@ class ToggleButton extends StatefulWidget {
     required this.onChanged,
     this.onLongPress,
     required this.value,
-    this.size,
+    this.size = kToggleButtonSize,
   });
   @override
-  _ToggleButtonState createState() => _ToggleButtonState();
+  State<ToggleButton> createState() => _ToggleButtonState();
 }
 
 class _ToggleButtonState extends State<ToggleButton> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final toggleButtonsTheme = ToggleButtonsTheme.of(context);
+    final toggleButtonsTheme = theme.toggleButtonsTheme;
 
     final currentColor = widget.value
         ? toggleButtonsTheme.selectedColor

@@ -143,8 +143,8 @@ class TimerService with ReactiveServiceMixin {
     setTimerStatus(TimerStatus.elapsed);
     setRemainingTime(0);
 
-    var _numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
-    await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++_numElapsed);
+    var numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
+    await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++numElapsed);
 
     for (var element in timerModel!.endActions) {
       if (element.enabled) {

@@ -8,7 +8,7 @@ import 'package:stacked/stacked.dart';
 
 class BridgeLinkView extends StatefulWidget {
   @override
-  _BridgeLinkViewState createState() => _BridgeLinkViewState();
+  State<BridgeLinkView> createState() => _BridgeLinkViewState();
 }
 
 class _BridgeLinkViewState extends State<BridgeLinkView> {

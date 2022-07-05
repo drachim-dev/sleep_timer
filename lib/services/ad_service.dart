@@ -22,8 +22,8 @@ class AdService {
   AdService(this._prefsService);
 
   @factoryMethod
-  static Future<AdService> create(SharedPreferences _prefsService) async {
-    var instance = AdService(_prefsService);
+  static Future<AdService> create(SharedPreferences prefsService) async {
+    var instance = AdService(prefsService);
     await instance._init();
 
     return instance;
@@ -68,11 +68,11 @@ class AdService {
   /// every [_interval] times according to [_counter]
   /// or [force] to show an ad.
   Future<bool> mayShow({bool force = false}) async {
-    final _reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? 0;
-    log.d('mayShowAd reviewCount: $_reviewCount');
+    final reviewCount = _prefsService.getInt(kPrefKeyReviewCount) ?? 0;
+    log.d('mayShowAd reviewCount: $reviewCount');
 
     // Only if reviewCount is exceeded to prevent from showing both (review and ad).
-    if (force || _reviewCount >= kMaxAskForReview) {
+    if (force || reviewCount >= kMaxAskForReview) {
       await _prefsService.setInt(kPrefKeyAdIntervalCounter, ++_counter);
       log.d('mayShowAd counter: $_counter, interval: $_interval');
 

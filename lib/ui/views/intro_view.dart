@@ -6,7 +6,7 @@ import 'package:stacked/stacked.dart';
 
 class IntroView extends StatefulWidget {
   @override
-  _IntroViewState createState() => _IntroViewState();
+  State<IntroView> createState() => _IntroViewState();
 }
 
 class _IntroViewState extends State<IntroView> {
@@ -58,8 +58,6 @@ class _IntroViewState extends State<IntroView> {
                 decoration: pageDecoration,
               ),
             ],
-            skipOrBackFlex: 0,
-            nextFlex: 0,
             showSkipButton: true,
             showNextButton: true,
             skip: Text(

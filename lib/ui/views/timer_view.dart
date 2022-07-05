@@ -5,6 +5,7 @@ import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
@@ -27,7 +28,7 @@ class TimerView extends StatefulWidget {
   const TimerView({Key? key, required this.timerModel});
 
   @override
-  _TimerViewState createState() => _TimerViewState();
+  State<TimerView> createState() => _TimerViewState();
 }
 
 class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
@@ -390,8 +391,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   Widget _buildCompactStartedActions(final ThemeData theme) {
-    final size = 36.0;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
       child: Wrap(
@@ -412,7 +411,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             },
             onLongPress: _showVolumeLevelPicker,
             value: viewModel.timerModel.volumeAction.enabled,
-            size: size,
           ),
           ToggleButton(
             label: viewModel.timerModel.lightAction.title,
@@ -421,7 +419,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             onChanged: viewModel.onChangeLight,
             onLongPress: viewModel.navigateToLightsGroups,
             value: viewModel.timerModel.lightAction.enabled,
-            size: size,
           ),
           ToggleButton(
             label: viewModel.timerModel.doNotDisturbAction.title,
@@ -432,60 +429,100 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                 notificationSettingsAccessFocused: true),
             value: viewModel.timerModel.doNotDisturbAction.enabled &&
                 viewModel.hasNotificationSettingsAccess,
-            size: size,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEndedActions(final ThemeData theme) {
-    final size = 36.0;
+  Future<Map<Permission, PermissionStatus>> getPermissionStatus() async {
+    final permissions = viewModel.timerModel.endActions
+        .map((e) => e.permission)
+        .whereType<Permission>()
+        .toList();
 
+    final Map<Permission, PermissionStatus> permissionStatus = {};
+    await Future.forEach(permissions, (Permission permission) async {
+      final status = await permission.status;
+      permissionStatus[permission] = status;
+    });
+
+    return permissionStatus;
+  }
+
+  Widget _buildEndedActions(final ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
-      child: Wrap(
-        alignment: WrapAlignment.spaceEvenly,
-        runSpacing: kVerticalPadding,
-        direction: Axis.horizontal,
-        children: [
-          ToggleButton(
-            label: viewModel.timerModel.mediaAction.title,
-            activeIcon: Icons.music_off_outlined,
-            disabledIcon: Icons.music_note_outlined,
-            onChanged: viewModel.onChangeMedia,
-            value: viewModel.timerModel.mediaAction.enabled,
-            size: size,
-          ),
-          if (viewModel.platformVersion < 29)
-            ToggleButton(
-              label: viewModel.timerModel.wifiAction.title,
-              activeIcon: Icons.wifi_off_outlined,
-              disabledIcon: Icons.wifi_outlined,
-              onChanged: viewModel.onChangeWifi,
-              value: viewModel.timerModel.wifiAction.enabled,
-              size: size,
-            ),
-          ToggleButton(
-            label: viewModel.timerModel.bluetoothAction.title,
-            activeIcon: Icons.bluetooth_disabled_outlined,
-            disabledIcon: Icons.bluetooth_outlined,
-            onChanged: viewModel.onChangeBluetooth,
-            value: viewModel.timerModel.bluetoothAction.enabled,
-            size: size,
-          ),
-          ToggleButton(
-            label: viewModel.timerModel.screenAction.title,
-            activeIcon: Icons.tv_off_outlined,
-            disabledIcon: Icons.tv_outlined,
-            onChanged: viewModel.onChangeScreen,
-            value: viewModel.timerModel.screenAction.enabled &&
-                viewModel.isDeviceAdmin,
-            size: size,
-          ),
-        ],
-      ),
+      child: FutureBuilder<Map<Permission, PermissionStatus>>(
+          future: getPermissionStatus(),
+          builder: (context, snapshot) {
+            final permissionStatus = snapshot.data;
+
+            if (snapshot.hasData && permissionStatus != null) {
+              final bluetoothPermission =
+                  viewModel.timerModel.bluetoothAction.permission;
+              final bluetoothPermissionStatus =
+                  permissionStatus[bluetoothPermission];
+
+              return Wrap(
+                alignment: WrapAlignment.spaceEvenly,
+                runSpacing: kVerticalPadding,
+                direction: Axis.horizontal,
+                children: [
+                  ToggleButton(
+                      label: viewModel.timerModel.mediaAction.title,
+                      activeIcon: Icons.music_off_outlined,
+                      disabledIcon: Icons.music_note_outlined,
+                      onChanged: viewModel.onChangeMedia,
+                      value: viewModel.timerModel.mediaAction.enabled),
+                  if (viewModel.platformVersion < 29)
+                    ToggleButton(
+                        label: viewModel.timerModel.wifiAction.title,
+                        activeIcon: Icons.wifi_off_outlined,
+                        disabledIcon: Icons.wifi_outlined,
+                        onChanged: viewModel.onChangeWifi,
+                        value: viewModel.timerModel.wifiAction.enabled),
+                  _buildBluetoothToggleButton(
+                      bluetoothPermission, bluetoothPermissionStatus),
+                  ToggleButton(
+                      label: viewModel.timerModel.screenAction.title,
+                      activeIcon: Icons.tv_off_outlined,
+                      disabledIcon: Icons.tv_outlined,
+                      onChanged: viewModel.onChangeScreen,
+                      value: viewModel.timerModel.screenAction.enabled &&
+                          viewModel.isDeviceAdmin),
+                ],
+              );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
     );
+  }
+
+  ToggleButton _buildBluetoothToggleButton(
+      Permission? permission, PermissionStatus? permissionStatus) {
+    final needsAttention = permissionStatus?.isGranted == false ||
+        permissionStatus?.isPermanentlyDenied == true;
+
+    return ToggleButton(
+        label: viewModel.timerModel.bluetoothAction.title,
+        activeIcon: needsAttention
+            ? Icons.warning_amber_rounded
+            : Icons.bluetooth_disabled_outlined,
+        disabledIcon: Icons.bluetooth_outlined,
+        onChanged: (enable) async {
+          final permissionStatus = await permission?.request();
+
+          if (permissionStatus == null || permissionStatus.isGranted) {
+            viewModel.onChangeBluetooth(enable);
+          } else if (permissionStatus.isPermanentlyDenied == true) {
+            await openAppSettings();
+          }
+        },
+        value: viewModel.timerModel.bluetoothAction.enabled);
   }
 
   Future<void> _showVolumeLevelPicker() async {

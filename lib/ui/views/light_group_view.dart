@@ -9,7 +9,7 @@ import 'package:stacked/stacked.dart';
 
 class LightGroupView extends StatefulWidget {
   @override
-  _LightGroupViewState createState() => _LightGroupViewState();
+  State<LightGroupView> createState() => _LightGroupViewState();
 }
 
 class _LightGroupViewState extends State<LightGroupView> {

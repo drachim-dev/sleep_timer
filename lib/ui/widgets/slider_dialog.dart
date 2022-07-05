@@ -16,7 +16,7 @@ class SliderDialog extends StatefulWidget {
         assert(maxValue > minValue);
 
   @override
-  _SliderDialogState createState() => _SliderDialogState(initialValue);
+  State<SliderDialog> createState() => _SliderDialogState(initialValue);
 }
 
 class _SliderDialogState extends State<SliderDialog> {

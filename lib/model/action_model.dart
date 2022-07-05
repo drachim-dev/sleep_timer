@@ -1,3 +1,4 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 
@@ -17,12 +18,14 @@ class ActionModel {
   final ActionType id;
   final String title;
   final String? description;
+  final Permission? permission;
   bool enabled;
 
   ActionModel(
       {required this.id,
       required this.title,
       required this.description,
+      this.permission,
       this.enabled = false});
 }
 
@@ -82,6 +85,7 @@ List<ActionModel> endActionList = [
     id: ActionType.bluetooth,
     title: S.current.actionToggleBluetoothTitle,
     description: S.current.actionToggleBluetoothDescription,
+    permission: Permission.bluetoothConnect
   ),
   ActionModel(
     id: ActionType.screen,

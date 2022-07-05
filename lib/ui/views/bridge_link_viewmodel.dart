@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:hue_dart/hue_dart.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,18 +13,18 @@ import 'package:stacked_services/stacked_services.dart';
 
 class BridgeLinkViewModel extends FutureViewModel {
   final Logger log = getLogger();
-  final NavigationService? _navigationService = locator<NavigationService>();
-  final SharedPreferences? _prefsService = locator<SharedPreferences>();
-  final LightService? _lightService = locator<LightService>();
+  final NavigationService _navigationService = locator<NavigationService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final LightService _lightService = locator<LightService>();
 
   String connectionError = '';
 
   @override
   Future futureToRun() async {
     try {
-      final bridges = await _lightService!.findBridges();
+      final bridges = await _lightService.findBridges();
 
-      final savedBridgesJson = _prefsService!.getString(kPrefKeyHueBridges);
+      final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
 
       if (savedBridgesJson == null) return bridges;
 
@@ -35,7 +36,7 @@ class BridgeLinkViewModel extends FutureViewModel {
         if (savedEntry != null) {
           element
             ..auth = savedEntry.auth
-            ..state = await _lightService!.getConnectionState(element);
+            ..state = await _lightService.getConnectionState(element);
         }
       });
 
@@ -52,7 +53,7 @@ class BridgeLinkViewModel extends FutureViewModel {
 
   Future<void> linkBridge(final BridgeModel bridgeModel) async {
     try {
-      await _lightService!.linkBridge(bridgeModel);
+      await _lightService.linkBridge(bridgeModel);
       _resetError();
 
       navigateBackToLights();
@@ -66,10 +67,10 @@ class BridgeLinkViewModel extends FutureViewModel {
   }
 
   Future<bool> connect(final BridgeModel bridgeModel) async {
-    final success = await _lightService!.linkBridge(bridgeModel);
+    final success = await _lightService.linkBridge(bridgeModel);
 
     if (success) {
-      final savedBridgesJson = _prefsService!.getString(kPrefKeyHueBridges);
+      final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
       var savedBridges = <BridgeModel>[];
 
       if (savedBridgesJson != null) {
@@ -90,7 +91,7 @@ class BridgeLinkViewModel extends FutureViewModel {
       }
 
       // save updates
-      await _prefsService!.setString(
+      await _prefsService.setString(
           kPrefKeyHueBridges, BridgeModel.encode(savedBridges));
     }
 
@@ -98,18 +99,17 @@ class BridgeLinkViewModel extends FutureViewModel {
   }
 
   Future<void> remove(final BridgeModel bridgeModel) async {
-    await _prefsService!.remove(kPrefKeyHueBridges);
-    _navigationService!.back();
+    await _prefsService.remove(kPrefKeyHueBridges);
+    _navigationService.back();
     await initialise();
   }
 
   void navigateBackToLights() {
-    _navigationService!
-        .popUntil((route) => route.settings.name == Routes.lightGroupView);
+    _navigationService.popUntil((route) => route.settings.name == Routes.lightGroupView);
   }
 
   void cancelDialog() {
-    _navigationService!.back();
+    _navigationService.back();
     _resetError();
   }
 }

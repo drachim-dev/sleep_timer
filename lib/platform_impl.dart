@@ -170,15 +170,15 @@ class FlutterApiHandler extends FlutterTimerApi {
     final timerId = request.timerId;
     log.d('onOpen called for timer with id $timerId');
 
-    TimerService? _timerService;
+    TimerService? timerService;
     if (timerId != null) {
-      _timerService = TimerServiceManager.instance.getTimerService(timerId);
+      timerService = TimerServiceManager.instance.getTimerService(timerId);
     }
 
     // Wait for Flutter engine to be attached and runApp to be active
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       // _timerService was terminated by system
-      if (_timerService == null) {
+      if (timerService == null) {
         StackedService.navigatorKey!.currentState!
             .pushNamedAndRemoveUntil(Routes.homeView, (route) => false);
       } else {
@@ -186,11 +186,11 @@ class FlutterApiHandler extends FlutterTimerApi {
         StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
             Routes.homeView, (route) => false,
             arguments:
-                HomeViewArguments(timerId: _timerService.timerModel!.id));
+                HomeViewArguments(timerId: timerService.timerModel!.id));
 
         StackedService.navigatorKey!.currentState!.pushNamed(Routes.timerView,
             arguments:
-                TimerViewArguments(timerModel: _timerService.timerModel));
+                TimerViewArguments(timerModel: timerService.timerModel));
       }
     });
   }
@@ -255,7 +255,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     log.d('onWidgetStartTimer called on dart side');
 
     final timerModel = TimerModel(120, startActionList, endActionList);
-    final _timerService = locator<TimerService>(param1: timerModel)..start();
-    TimerServiceManager.instance.setTimerService(_timerService);
+    final timerService = locator<TimerService>(param1: timerModel)..start();
+    TimerServiceManager.instance.setTimerService(timerService);
   }
 }

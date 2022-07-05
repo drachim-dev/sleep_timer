@@ -45,7 +45,7 @@ class SleekCircularSlider extends StatefulWidget {
         assert(initialValue >= minValue && initialValue <= maxValue),
         super(key: key);
   @override
-  _SleekCircularSliderState createState() => _SleekCircularSliderState();
+  State<SleekCircularSlider> createState() => _SleekCircularSliderState();
 }
 
 class _SleekCircularSliderState extends State<SleekCircularSlider>

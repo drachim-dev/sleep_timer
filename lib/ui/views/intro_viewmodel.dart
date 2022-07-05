@@ -6,11 +6,11 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class IntroViewModel extends BaseViewModel {
-  final NavigationService? _navigationService = locator<NavigationService>();
-  final SharedPreferences? _prefsService = locator<SharedPreferences>();
+  final NavigationService _navigationService = locator<NavigationService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
 
   Future navigateToHome() async {
-    await _prefsService!.setBool(kPrefKeyFirstLaunch, false);
-    await _navigationService!.replaceWith(Routes.homeView);
+    await _prefsService.setBool(kPrefKeyFirstLaunch, false);
+    await _navigationService.replaceWith(Routes.homeView);
   }
 }

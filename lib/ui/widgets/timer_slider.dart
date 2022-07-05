@@ -27,7 +27,7 @@ class TimerSlider extends StatefulWidget {
   });
 
   @override
-  _TimerSliderState createState() => _TimerSliderState();
+  State<TimerSlider> createState() => _TimerSliderState();
 }
 
 class _TimerSliderState extends State<TimerSlider> {

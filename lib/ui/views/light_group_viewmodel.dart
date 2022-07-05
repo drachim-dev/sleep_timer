@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -8,13 +9,13 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class LightGroupViewModel extends FutureViewModel {
-  final NavigationService? _navigationService = locator<NavigationService>();
-  final SharedPreferences? _prefsService = locator<SharedPreferences>();
-  final LightService? _lightService = locator<LightService>();
+  final NavigationService _navigationService = locator<NavigationService>();
+  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final LightService _lightService = locator<LightService>();
 
   @override
   Future futureToRun() async {
-    final savedBridgesJson = _prefsService!.getString(kPrefKeyHueBridges);
+    final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
     var savedBridges = <BridgeModel>[];
     if (savedBridgesJson != null) {
       savedBridges = BridgeModel.decode(savedBridgesJson);
@@ -26,10 +27,10 @@ class LightGroupViewModel extends FutureViewModel {
 
       if (savedEntry != null) {
         bridge = savedEntry
-          ..state = await _lightService!.getConnectionState(bridge);
+          ..state = await _lightService.getConnectionState(bridge);
 
         if (bridge.state == Connection.connected) {
-          var allGroups = await _lightService!.getRooms(bridge);
+          var allGroups = await _lightService.getRooms(bridge);
 
           // check for possible new groups
           for (var group in allGroups) {
@@ -49,13 +50,12 @@ class LightGroupViewModel extends FutureViewModel {
   }
 
   void onChangeRoom(final bool value) async {
-    await _prefsService!
-        .setString(kPrefKeyHueBridges, BridgeModel.encode(data));
+    await _prefsService.setString(kPrefKeyHueBridges, BridgeModel.encode(data));
     notifyListeners();
   }
 
   Future<void> navigateToLinkBridge() async {
-    await _navigationService!.navigateTo(Routes.bridgeLinkView);
+    await _navigationService.navigateTo(Routes.bridgeLinkView);
     await initialise();
   }
 }

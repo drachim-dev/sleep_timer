@@ -38,8 +38,8 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   bool get notificationSettingsAccess =>
       _deviceService.notificationSettingsAccess;
 
-  Stream<List<PurchaseDetails>> get stream =>
-      _purchaseService.purchaseUpdatedStream;
+  Stream<List<PurchaseDetails>> get purchaseStream =>
+      _purchaseService.purchaseStream;
 
   List<Product> get products => _purchaseService.products;
 
@@ -52,7 +52,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
     await GetIt.I.isReady<DeviceService>();
     await GetIt.I.isReady<PurchaseService>();
 
-    stream.listen((data) async {
+    purchaseStream.listen((data) async {
       setBusy(true);
       await runBusyFuture(_purchaseService.updateProducts());
       notifyListeners();
