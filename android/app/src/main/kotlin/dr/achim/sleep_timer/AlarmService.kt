@@ -40,7 +40,7 @@ class AlarmService : Service() {
         super.onCreate()
         Log.d(TAG, "onCreate")
 
-        if(notification == null) {
+        if (notification == null) {
             initNotificationChannel()
             notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
         }
@@ -76,29 +76,34 @@ class AlarmService : Service() {
         when (intent?.action) {
             ACTION_START -> {
                 val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<String, Any>?
-                val request: RunningNotificationRequest = RunningNotificationRequest.fromMap(map)
-                startAlarm(request)
 
-                timer.scheduleAtFixedRate(object : TimerTask() {
-                    override fun run() {
-                        val response = Messages.CountDownRequest().apply {
-                            timerId = request.timerId
-                            newTime = max(request.remainingTime--, 0)
-                        }
+                if (map != null) {
+                    val request: RunningNotificationRequest = RunningNotificationRequest.fromMap(map)
+                    startAlarm(request)
 
-                        val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
-                            action = NotificationReceiver.ACTION_COUNTDOWN
-                            putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
-                        }
-                        sendBroadcast(countDownIntent)
+                    timer.scheduleAtFixedRate(object : TimerTask() {
+                        override fun run() {
+                            val response = Messages.CountDownRequest().apply {
+                                timerId = request.timerId
 
-                        val showRunningIntent = Intent(applicationContext, NotificationReceiver::class.java).apply {
-                            action = NotificationReceiver.ACTION_SHOW_RUNNING
-                            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toMap() as HashMap<String, Any>?)
+                                request.remainingTime = (request.remainingTime ?: 0L) - 1L
+                                newTime = max(request.remainingTime!!, 0L)
+                            }
+
+                            val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                                action = NotificationReceiver.ACTION_COUNTDOWN
+                                putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
+                            }
+                            sendBroadcast(countDownIntent)
+
+                            val showRunningIntent = Intent(applicationContext, NotificationReceiver::class.java).apply {
+                                action = NotificationReceiver.ACTION_SHOW_RUNNING
+                                putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toMap() as HashMap<String, Any>?)
+                            }
+                            sendBroadcast(showRunningIntent)
                         }
-                        sendBroadcast(showRunningIntent)
-                    }
-                }, 0, 1000)
+                    }, 0, 1000)
+                }
             }
             ACTION_TOGGLE_EXTEND_BY_SHAKE -> {
                 val enable = intent.getBooleanExtra(KEY_ENABLE_EXTEND_BY_SHAKE, false)
@@ -113,7 +118,7 @@ class AlarmService : Service() {
             }
             else -> {
                 isRunning = false
-                stopForeground(true)
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
         }
@@ -129,7 +134,7 @@ class AlarmService : Service() {
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000, pendingAlarmIntent)
 
         timerId = request.timerId
-        if (request.shakeToExtend) {
+        if (request.shakeToExtend == true) {
             startShakeListener(timerId)
         }
     }
@@ -146,8 +151,8 @@ class AlarmService : Service() {
                 }
                 sendBroadcast(intent)
 
-                val vibrator  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val vibratorManager =  getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
                     vibratorManager.defaultVibrator
                 } else {
                     @Suppress("DEPRECATION")

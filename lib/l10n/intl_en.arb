@@ -102,5 +102,11 @@
   "cannotUninstallDesc": "If you can't uninstall the app, make sure that device admin is disabled in settings.",
   "rateAppTitle": "Do you like the app?",
   "rateAppSubtitle": "Any feedback is appreciated",
-  "rateAppPrice": "Free"
+  "rateAppPrice": "Free",
+  "notificationsRequired": "Timer notifications required",
+  "timerNoBluetooth": "No bluetooth action",
+  "timerNoBluetoothDescription": "Starting with Android 10, it is no longer possible to toggle Wifi from within an app.",
+  "actionNotSupported": "Action not supported",
+  "bluetoothNotSupportedExplanation": "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.",
+  "commonDialogOk": "OK"
 }

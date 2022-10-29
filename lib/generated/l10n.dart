@@ -1093,6 +1093,66 @@ class S {
       args: [],
     );
   }
+
+  /// `Timer notifications required`
+  String get notificationsRequired {
+    return Intl.message(
+      'Timer notifications required',
+      name: 'notificationsRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No bluetooth action`
+  String get timerNoBluetooth {
+    return Intl.message(
+      'No bluetooth action',
+      name: 'timerNoBluetooth',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Starting with Android 10, it is no longer possible to toggle Wifi from within an app.`
+  String get timerNoBluetoothDescription {
+    return Intl.message(
+      'Starting with Android 10, it is no longer possible to toggle Wifi from within an app.',
+      name: 'timerNoBluetoothDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Action not supported`
+  String get actionNotSupported {
+    return Intl.message(
+      'Action not supported',
+      name: 'actionNotSupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.`
+  String get bluetoothNotSupportedExplanation {
+    return Intl.message(
+      'Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.',
+      name: 'bluetoothNotSupportedExplanation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OK`
+  String get commonDialogOk {
+    return Intl.message(
+      'OK',
+      name: 'commonDialogOk',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

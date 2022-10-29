@@ -55,15 +55,21 @@ class NotificationReceiver : BroadcastReceiver() {
         when (intent.action) {
             ACTION_SHOW_RUNNING -> {
                 map = intent.getSerializableExtra(KEY_SHOW_NOTIFICATION) as HashMap<String, Any?>?
-                showRunningNotification(RunningNotificationRequest.fromMap(map))
+                map?.let {
+                    showRunningNotification(RunningNotificationRequest.fromMap(it))
+                }
             }
             ACTION_PAUSE_NOTIFICATION -> {
                 map = intent.getSerializableExtra(KEY_PAUSE_NOTIFICATION) as HashMap<String, Any?>?
-                showPausingNotification(TimeNotificationRequest.fromMap(map))
+                map?.let {
+                    showPausingNotification(TimeNotificationRequest.fromMap(it))
+                }
             }
             ACTION_ELAPSED_NOTIFICATION -> {
                 map = intent.getSerializableExtra(KEY_ELAPSED_NOTIFICATION) as HashMap<String, Any?>?
-                showElapsedNotification(NotificationRequest.fromMap(map))
+                map?.let {
+                    showElapsedNotification(NotificationRequest.fromMap(it))
+                }
             }
         }
     }
@@ -75,17 +81,24 @@ class NotificationReceiver : BroadcastReceiver() {
     private fun showRunningNotification(request: RunningNotificationRequest) {
         val timerId = request.timerId
 
+        val title = String.format(request.title
+                ?: "", request.remainingTime?.run { DateUtils.formatElapsedTime(this) })
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(String.format(request.title, DateUtils.formatElapsedTime(request.remainingTime)))
+                .setContentTitle(title)
                 .setContentText(request.description)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
                 .setContentIntent(createOpenIntent(timerId))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setOngoing(true)
                 .setAutoCancel(false)
+                .apply {
+                    request.accentColor?.let {
+                        color = it.toInt()
+                    }
+                }
+
         val actions =
                 buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {
@@ -137,14 +150,21 @@ class NotificationReceiver : BroadcastReceiver() {
     private fun showPausingNotification(request: TimeNotificationRequest) {
         val timerId = request.timerId
 
+        val title = String.format(request.title
+                ?: "", request.remainingTime?.run { DateUtils.formatElapsedTime(this) })
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(String.format(request.title, DateUtils.formatElapsedTime(request.remainingTime)))
+                .setContentTitle(title)
                 .setContentText(request.description)
                 .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setContentIntent(createOpenIntent(timerId))
+                .apply {
+                    request.accentColor?.let {
+                        color = it.toInt()
+                    }
+                }
+
         val actions =
                 buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {
@@ -160,15 +180,17 @@ class NotificationReceiver : BroadcastReceiver() {
         val builder = NotificationCompat.Builder(context!!, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(request.title)
                 .setContentText(request.description)
-                .setStyle(
-                        NotificationCompat.BigTextStyle()
-                                .bigText(request.description)
-                )
+                .setStyle(NotificationCompat.BigTextStyle().bigText(request.description))
                 .setSmallIcon(R.drawable.ic_hourglass_full)
-                .setColor(request.accentColor.toInt())
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setShowWhen(false)
                 .setContentIntent(createOpenIntent(timerId))
+                .apply {
+                    request.accentColor?.let {
+                        color = it.toInt()
+                    }
+                }
+
         val actions =
                 buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
         for (action in actions) {

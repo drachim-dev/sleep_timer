@@ -15,6 +15,8 @@ class FAQView extends StatelessWidget {
         children: [
           SectionHeader(S.of(context).timerNoAlarm),
           Text(S.of(context).timerNoAlarmDescription),
+          SectionHeader(S.of(context).timerNoBluetooth),
+          Text(S.of(context).timerNoBluetoothDescription),
           SectionHeader(S.of(context).timerNoWifi),
           Text(S.of(context).timerNoWifiDescription),
           SectionHeader(S.of(context).cannotUninstallTitle),

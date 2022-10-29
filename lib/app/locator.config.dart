@@ -4,6 +4,7 @@
 // InjectableConfigGenerator
 // **************************************************************************
 
+// ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
 import 'package:shared_preferences/shared_preferences.dart' as _i8;
@@ -23,24 +24,41 @@ const String _prod = 'prod';
 // ignore_for_file: unnecessary_lambdas
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
-Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
-    {String? environment, _i2.EnvironmentFilter? environmentFilter}) async {
-  final gh = _i2.GetItHelper(get, environment, environmentFilter);
+Future<_i1.GetIt> $initGetIt(
+  _i1.GetIt get, {
+  String? environment,
+  _i2.EnvironmentFilter? environmentFilter,
+}) async {
+  final gh = _i2.GetItHelper(
+    get,
+    environment,
+    environmentFilter,
+  );
   final thirdPartyServicesModule = _$ThirdPartyServicesModule();
-  gh.singletonAsync<_i3.DeviceService>(() => _i3.DeviceService.create(),
-      registerFor: {_prod});
+  gh.singletonAsync<_i3.DeviceService>(
+    () => _i3.DeviceService.create(),
+    registerFor: {_prod},
+  );
   gh.lazySingleton<_i4.LightService>(() => _i4.LightService());
   gh.lazySingleton<_i5.NavigationService>(
       () => thirdPartyServicesModule.navigationService);
-  gh.lazySingletonAsync<_i6.PurchaseService>(() => _i6.PurchaseService.create(),
-      registerFor: {_prod});
+  gh.lazySingletonAsync<_i6.PurchaseService>(
+    () => _i6.PurchaseService.create(),
+    registerFor: {_prod},
+  );
   gh.lazySingleton<_i7.ReviewService>(() => _i7.ReviewService());
   await gh.factoryAsync<_i8.SharedPreferences>(
-      () => thirdPartyServicesModule.prefsService,
-      preResolve: true);
+    () => thirdPartyServicesModule.prefsService,
+    preResolve: true,
+  );
+  gh.lazySingleton<_i5.SnackbarService>(
+      () => thirdPartyServicesModule.snackBarService);
   gh.singleton<_i9.ThemeService>(_i9.ThemeService());
-  gh.factoryParam<_i10.TimerService, _i11.TimerModel?, dynamic>(
-      (timerModel, _) => _i10.TimerService(timerModel));
+  gh.factoryParam<_i10.TimerService, _i11.TimerModel?, dynamic>((
+    timerModel,
+    _,
+  ) =>
+      _i10.TimerService(timerModel));
   gh.lazySingletonAsync<_i12.AdService>(
       () => _i12.AdService.create(get<_i8.SharedPreferences>()));
   return get;
@@ -49,4 +67,6 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
 class _$ThirdPartyServicesModule extends _i13.ThirdPartyServicesModule {
   @override
   _i5.NavigationService get navigationService => _i5.NavigationService();
+  @override
+  _i5.SnackbarService get snackBarService => _i5.SnackbarService();
 }

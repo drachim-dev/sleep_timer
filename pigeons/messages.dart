@@ -162,7 +162,6 @@ abstract class HostTimerApi {
   InstalledAppsResponse getInstalledPlayerApps();
   InstalledAppsResponse getInstalledAlarmApps();
   void launchApp(LaunchAppRequest request);
-  Package dummyApp();
 }
 
 // Dart methods

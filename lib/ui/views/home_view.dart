@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -33,6 +35,42 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _scaleAnimation = CurvedAnimation(
         parent: _animationController!, curve: Curves.easeInOutBack);
     _animationController!.forward();
+
+    // Request notification permission
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Permission.notification.request().then((permissionStatus) => {
+            if (permissionStatus.isPermanentlyDenied)
+              {
+                Future.delayed(Duration(seconds: 1)).then((_) => {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(_buildSnackBar(context))
+                    })
+              }
+          });
+    });
+  }
+
+  SnackBar _buildSnackBar(context) {
+    final theme = Theme.of(context);
+
+    return SnackBar(
+      content: Row(
+        children: [
+          Icon(Icons.info_rounded, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Flexible(
+              child: Text(S.of(context).notificationsRequired,
+                  style: theme.textTheme.subtitle2)),
+        ],
+      ),
+      behavior: SnackBarBehavior.floating,
+      duration: Duration(seconds: 5),
+      shape: StadiumBorder(),
+      action: SnackBarAction(
+        label: S.of(context).settings,
+        onPressed: () => openAppSettings(),
+      ),
+    );
   }
 
   @override
@@ -119,7 +157,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 viewModel.hasActiveTimer
-                    ? _buildActiveTimers(theme)
+                    ? _buildActiveTimer(theme)
                     : SizedBox(),
                 TimerSlider(
                   minValue: 1,
@@ -150,7 +188,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     });
   }
 
-  Widget _buildActiveTimers(ThemeData theme) {
+  Widget _buildActiveTimer(ThemeData theme) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

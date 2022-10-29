@@ -4,31 +4,38 @@
 // StackedRouterGenerator
 // **************************************************************************
 
-// ignore_for_file: public_member_api_docs
-
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:flutter/material.dart' as _i10;
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
-import 'package:stacked/stacked_annotations.dart';
-
-import '../model/timer_model.dart';
-import '../ui/views/bridge_link_view.dart';
-import '../ui/views/credits_view.dart';
-import '../ui/views/faq_view.dart';
-import '../ui/views/home_view.dart';
-import '../ui/views/intro_view.dart';
-import '../ui/views/light_group_view.dart';
-import '../ui/views/settings_view.dart';
-import '../ui/views/timer_view.dart';
+import 'package:sleep_timer/model/timer_model.dart' as _i11;
+import 'package:sleep_timer/ui/views/bridge_link_view.dart' as _i8;
+import 'package:sleep_timer/ui/views/credits_view.dart' as _i7;
+import 'package:sleep_timer/ui/views/faq_view.dart' as _i6;
+import 'package:sleep_timer/ui/views/home_view.dart' as _i3;
+import 'package:sleep_timer/ui/views/intro_view.dart' as _i2;
+import 'package:sleep_timer/ui/views/light_group_view.dart' as _i9;
+import 'package:sleep_timer/ui/views/settings_view.dart' as _i5;
+import 'package:sleep_timer/ui/views/timer_view.dart' as _i4;
+import 'package:stacked/stacked.dart' as _i1;
+import 'package:stacked_services/stacked_services.dart' as _i12;
 
 class Routes {
-  static const String introView = '/intro-view';
-  static const String homeView = '/home-view';
-  static const String timerView = '/timer-view';
-  static const String settingsView = '/settings-view';
-  static const String fAQView = '/f-aq-view';
-  static const String creditsView = '/credits-view';
-  static const String bridgeLinkView = '/bridge-link-view';
-  static const String lightGroupView = '/light-group-view';
+  static const introView = '/intro-view';
+
+  static const homeView = '/home-view';
+
+  static const timerView = '/timer-view';
+
+  static const settingsView = '/settings-view';
+
+  static const fAQView = '/f-aq-view';
+
+  static const creditsView = '/credits-view';
+
+  static const bridgeLinkView = '/bridge-link-view';
+
+  static const lightGroupView = '/light-group-view';
+
   static const all = <String>{
     introView,
     homeView,
@@ -41,109 +48,259 @@ class Routes {
   };
 }
 
-class StackedRouter extends RouterBase {
-  @override
-  List<RouteDef> get routes => _routes;
-  final _routes = <RouteDef>[
-    RouteDef(Routes.introView, page: IntroView),
-    RouteDef(Routes.homeView, page: HomeView),
-    RouteDef(Routes.timerView, page: TimerView),
-    RouteDef(Routes.settingsView, page: SettingsView),
-    RouteDef(Routes.fAQView, page: FAQView),
-    RouteDef(Routes.creditsView, page: CreditsView),
-    RouteDef(Routes.bridgeLinkView, page: BridgeLinkView),
-    RouteDef(Routes.lightGroupView, page: LightGroupView),
+class StackedRouter extends _i1.RouterBase {
+  final _routes = <_i1.RouteDef>[
+    _i1.RouteDef(
+      Routes.introView,
+      page: _i2.IntroView,
+    ),
+    _i1.RouteDef(
+      Routes.homeView,
+      page: _i3.HomeView,
+    ),
+    _i1.RouteDef(
+      Routes.timerView,
+      page: _i4.TimerView,
+    ),
+    _i1.RouteDef(
+      Routes.settingsView,
+      page: _i5.SettingsView,
+    ),
+    _i1.RouteDef(
+      Routes.fAQView,
+      page: _i6.FAQView,
+    ),
+    _i1.RouteDef(
+      Routes.creditsView,
+      page: _i7.CreditsView,
+    ),
+    _i1.RouteDef(
+      Routes.bridgeLinkView,
+      page: _i8.BridgeLinkView,
+    ),
+    _i1.RouteDef(
+      Routes.lightGroupView,
+      page: _i9.LightGroupView,
+    ),
   ];
-  @override
-  Map<Type, StackedRouteFactory> get pagesMap => _pagesMap;
-  final _pagesMap = <Type, StackedRouteFactory>{
-    IntroView: (data) {
+
+  final _pagesMap = <Type, _i1.StackedRouteFactory>{
+    _i2.IntroView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => IntroView(),
+        builder: (context) => _i2.IntroView(),
         settings: data,
       );
     },
-    HomeView: (data) {
-      var args = data.getArgs<HomeViewArguments>(
-        orElse: () => HomeViewArguments(),
+    _i3.HomeView: (data) {
+      final args = data.getArgs<HomeViewArguments>(
+        orElse: () => const HomeViewArguments(),
       );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => HomeView(timerId: args.timerId),
+        builder: (context) => _i3.HomeView(timerId: args.timerId),
         settings: data,
       );
     },
-    TimerView: (data) {
-      var args = data.getArgs<TimerViewArguments>(nullOk: false);
+    _i4.TimerView: (data) {
+      final args = data.getArgs<TimerViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => TimerView(
-          key: args.key,
-          timerModel: args.timerModel,
-        ),
+        builder: (context) =>
+            _i4.TimerView(key: args.key, timerModel: args.timerModel),
         settings: data,
       );
     },
-    SettingsView: (data) {
-      var args = data.getArgs<SettingsViewArguments>(
-        orElse: () => SettingsViewArguments(),
+    _i5.SettingsView: (data) {
+      final args = data.getArgs<SettingsViewArguments>(
+        orElse: () => const SettingsViewArguments(),
       );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => SettingsView(
-          deviceAdminFocused: args.deviceAdminFocused,
-          notificationSettingsAccessFocused:
-              args.notificationSettingsAccessFocused,
-        ),
+        builder: (context) => _i5.SettingsView(
+            deviceAdminFocused: args.deviceAdminFocused,
+            notificationSettingsAccessFocused:
+                args.notificationSettingsAccessFocused),
         settings: data,
       );
     },
-    FAQView: (data) {
+    _i6.FAQView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => FAQView(),
+        builder: (context) => _i6.FAQView(),
         settings: data,
       );
     },
-    CreditsView: (data) {
+    _i7.CreditsView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => CreditsView(),
+        builder: (context) => _i7.CreditsView(),
         settings: data,
       );
     },
-    BridgeLinkView: (data) {
+    _i8.BridgeLinkView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => BridgeLinkView(),
+        builder: (context) => _i8.BridgeLinkView(),
         settings: data,
       );
     },
-    LightGroupView: (data) {
+    _i9.LightGroupView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => LightGroupView(),
+        builder: (context) => _i9.LightGroupView(),
         settings: data,
       );
     },
   };
+
+  @override
+  List<_i1.RouteDef> get routes => _routes;
+  @override
+  Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
-/// ************************************************************************
-/// Arguments holder classes
-/// *************************************************************************
-
-/// HomeView arguments holder class
 class HomeViewArguments {
+  const HomeViewArguments({this.timerId});
+
   final String? timerId;
-  HomeViewArguments({this.timerId});
 }
 
-/// TimerView arguments holder class
 class TimerViewArguments {
-  final Key? key;
-  final TimerModel? timerModel;
-  TimerViewArguments({this.key, required this.timerModel});
+  const TimerViewArguments({
+    this.key,
+    required this.timerModel,
+  });
+
+  final _i10.Key? key;
+
+  final _i11.TimerModel? timerModel;
 }
 
-/// SettingsView arguments holder class
 class SettingsViewArguments {
+  const SettingsViewArguments({
+    this.deviceAdminFocused = false,
+    this.notificationSettingsAccessFocused = false,
+  });
+
   final dynamic deviceAdminFocused;
+
   final dynamic notificationSettingsAccessFocused;
-  SettingsViewArguments(
-      {this.deviceAdminFocused = false,
-      this.notificationSettingsAccessFocused = false});
+}
+
+extension NavigatorStateExtension on _i12.NavigationService {
+  Future<dynamic> navigateToIntroView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.introView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToHomeView({
+    String? timerId,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.homeView,
+        arguments: HomeViewArguments(timerId: timerId),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToTimerView({
+    _i10.Key? key,
+    required _i11.TimerModel? timerModel,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.timerView,
+        arguments: TimerViewArguments(key: key, timerModel: timerModel),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToSettingsView({
+    dynamic deviceAdminFocused = false,
+    dynamic notificationSettingsAccessFocused = false,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return navigateTo<dynamic>(Routes.settingsView,
+        arguments: SettingsViewArguments(
+            deviceAdminFocused: deviceAdminFocused,
+            notificationSettingsAccessFocused:
+                notificationSettingsAccessFocused),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToFAQView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.fAQView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToCreditsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.creditsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToBridgeLinkView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.bridgeLinkView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToLightGroupView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.lightGroupView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
 }

@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/product.dart';
-import 'package:stacked/stacked.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:stacked/stacked.dart';
 
 @prod
 @lazySingleton
@@ -131,7 +130,7 @@ class PurchaseService with ReactiveServiceMixin {
   @Deprecated('Only for internal testing. Must not be used in production code.')
   // ignore: unused_element
   Future<void> _resetPurchases(List<PurchaseDetails> purchases) async {
-    final androidAddition = InAppPurchase.instance
+    final androidAddition = _inAppPurchase
         .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
 
     log.d('Reset purchases');

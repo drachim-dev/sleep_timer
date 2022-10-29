@@ -6,6 +6,8 @@ import 'package:stacked_services/stacked_services.dart';
 abstract class ThirdPartyServicesModule {
   @lazySingleton
   NavigationService get navigationService;
+  @lazySingleton
+  SnackbarService get snackBarService;
   @preResolve
   Future<SharedPreferences> get prefsService => SharedPreferences.getInstance();
 }

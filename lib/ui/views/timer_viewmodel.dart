@@ -210,10 +210,13 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     notifyListeners();
   }
 
-  void onChangeBluetooth(bool enabled) {
+  void onChangeBluetooth(bool enabled, {bool silent = false}) {
     _timerModel.bluetoothAction.enabled = enabled;
     _prefsService.setBool(ActionType.bluetooth.toString(), enabled);
-    notifyListeners();
+
+    if (!silent) {
+      notifyListeners();
+    }
   }
 
   void onChangeScreen(bool enabled) async {

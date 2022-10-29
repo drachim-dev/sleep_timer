@@ -42,6 +42,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Aktiviert \"Nicht stören\""),
         "actionDoNotDisturbTitle":
             MessageLookupByLibrary.simpleMessage("Nicht stören"),
+        "actionNotSupported":
+            MessageLookupByLibrary.simpleMessage("Action not supported"),
         "actionPlayMusicTitle":
             MessageLookupByLibrary.simpleMessage("Spielt Musik ab"),
         "actionToggleBluetoothDescription":
@@ -72,6 +74,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Bereits\ngekauft"),
         "appearanceSectionTitle":
             MessageLookupByLibrary.simpleMessage("Erscheinungsbild"),
+        "bluetoothNotSupportedExplanation": MessageLookupByLibrary.simpleMessage(
+            "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future."),
         "buttonOpenSavedTimer": MessageLookupByLibrary.simpleMessage(
             "Hier tippen, um deinen Timer zu sehen"),
         "buttonSearchAgain":
@@ -89,6 +93,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "cannotUninstallTitle":
             MessageLookupByLibrary.simpleMessage("Deinstallieren"),
         "chooseThemeTitle": MessageLookupByLibrary.simpleMessage("Theme"),
+        "commonDialogOk": MessageLookupByLibrary.simpleMessage("OK"),
         "connectionStateConnected":
             MessageLookupByLibrary.simpleMessage("Verbunden"),
         "connectionStateFailed":
@@ -160,6 +165,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Sleep Timer pausiert"),
         "notificationTimeLeft":
             MessageLookupByLibrary.simpleMessage("Verbleibende Zeit: %s"),
+        "notificationsRequired": MessageLookupByLibrary.simpleMessage(
+            "Timer-Benachrichtigungen erforderlich"),
         "numberOfMinutesLong": m3,
         "numberOfMinutesShort": m4,
         "otherSectionTitle": MessageLookupByLibrary.simpleMessage("Sonstige"),
@@ -209,6 +216,10 @@ class MessageLookup extends MessageLookupByLibrary {
             "Timer löst manchmal nicht aus"),
         "timerNoAlarmDescription": MessageLookupByLibrary.simpleMessage(
             "Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann."),
+        "timerNoBluetooth":
+            MessageLookupByLibrary.simpleMessage("No bluetooth action"),
+        "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
+            "Starting with Android 10, it is no longer possible to toggle Wifi from within an app."),
         "timerNoWifi":
             MessageLookupByLibrary.simpleMessage("WLAN Aktion fehlt"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(

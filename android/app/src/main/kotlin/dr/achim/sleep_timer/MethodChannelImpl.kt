@@ -263,8 +263,4 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 
-    override fun dummyApp(): Package? {
-        return null
-    }
-
 }

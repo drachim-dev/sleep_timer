@@ -258,7 +258,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         children: [
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              primary: isLight ? Colors.black87 : Colors.white,
+              foregroundColor: isLight ? Colors.black87 : Colors.white,
             ),
             icon: Icon(Icons.play_arrow_outlined),
             label: Text(S.of(context).buttonShowPlayerApps),
@@ -267,7 +267,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           SizedBox(width: 12),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              primary: isLight ? Colors.black87 : Colors.white,
+              foregroundColor: isLight ? Colors.black87 : Colors.white,
             ),
             icon: Icon(Icons.alarm),
             label: Text(S.of(context).buttonShowAlarmApps),
@@ -504,16 +504,43 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   ToggleButton _buildBluetoothToggleButton(
       Permission? permission, PermissionStatus? permissionStatus) {
+    final isActionAvailable = viewModel.platformVersion < 33;
     final needsAttention = permissionStatus?.isGranted == false ||
-        permissionStatus?.isPermanentlyDenied == true;
+        permissionStatus?.isPermanentlyDenied == true ||
+        !isActionAvailable;
+
+    // Disable action in prefs if it needs attention
+    if (needsAttention) {
+      viewModel.onChangeBluetooth(false, silent: true);
+    }
 
     return ToggleButton(
         label: viewModel.timerModel.bluetoothAction.title,
         activeIcon: needsAttention
             ? Icons.warning_amber_rounded
             : Icons.bluetooth_disabled_outlined,
-        disabledIcon: Icons.bluetooth_outlined,
+        disabledIcon: needsAttention
+            ? Icons.warning_amber_rounded
+            : Icons.bluetooth_outlined,
         onChanged: (enable) async {
+          if (!isActionAvailable) {
+            return showDialog<void>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text(S.of(context).notSupported),
+                    content:
+                        Text(S.of(context).bluetoothNotSupportedExplanation),
+                    actions: [
+                      TextButton(
+                        child: Text(S.of(context).commonDialogOk),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  );
+                });
+          }
+
           final permissionStatus = await permission?.request();
 
           if (permissionStatus == null || permissionStatus.isGranted) {
