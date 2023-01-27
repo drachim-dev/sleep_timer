@@ -121,10 +121,11 @@
 
         <!-- Audio player -->
         <package android:name="com.spotify.music" />
-        <package android:name="com.google.android.youtube" />
+        <package android:name="com.spotify.kids" />
         <package android:name="deezer.android.app" />
         <package android:name="com.apple.android.music" />
         <package android:name="com.amazon.mp3" />
+        <package android:name="com.audible.application" />
         <package android:name="com.pandora.android" />
         <package android:name="com.rhapsody" />
         <package android:name="com.aspiro.tidal" />
@@ -132,6 +133,22 @@
         <package android:name="com.google.android.apps.podcasts" />
         <package android:name="com.sec.android.app.music" />
         <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="tunein.player" />
+        <package android:name="radiotime.player" />
+        <package android:name="com.streema.simpleradio" />
+        <package android:name="musicplayer.musicapps.music.mp3player" />
+        <package android:name="com.shaiban.audioplayer.mplayer" />
+        <package android:name="media.music.musicplayer" />
+        <package android:name="com.musicplayer.player.mp3player.white" />
+        <package android:name="com.media.music.mp3.musicplayer" />
+        <package android:name="code.name.monkey.retromusic" />
+        <package android:name="media.audioplayer.musicplayer" />
+        <package android:name="com.clearchannel.iheartradio.controller" />
+        <package android:name="com.piyush.music" />
+        <package android:name="media.music.mp3player.musicplayer" />
+        <package android:name="com.bambuna.podcastaddict" />
+        <package android:name="de.danoeh.antennapod" />
+        <package android:name="fm.castbox.audiobook.radio.podcast" />
 
         <!-- Video player -->
         <package android:name="com.netflix.mediaclient" />
@@ -144,7 +161,16 @@
         <package android:name="com.dazn" />
         <package android:name="com.plexapp.android" />
         <package android:name="org.xbmc.kodi" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.apps.youtube.kids" />
         <package android:name="com.vanced.android.youtube" />
+        <package android:name="org.videolan.vlc" />
+        <package android:name="video.player.videoplayer" />
+        <package android:name="com.mxtech.videoplayer.ad" />
+        <package android:name="com.mxtech.videoplayer.pro" />
+        <package android:name="com.real.RealPlayerMobile" />
+        <package android:name="com.kmplayer.d" />
+        <package android:name="com.kmplayer" />
 
         <intent>
             <action android:name="android.intent.action.VIEW" />
