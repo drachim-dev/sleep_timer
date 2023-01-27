@@ -173,7 +173,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "prefsDeviceAdmin":
             MessageLookupByLibrary.simpleMessage("Erweiterte Gerätefunktionen"),
         "prefsDeviceAdminDescription": MessageLookupByLibrary.simpleMessage(
-            "Ermöglicht das Ausschalten des Displays"),
+            "Ermöglicht das Ausschalten des Displays. Vorm Deinstallieren deaktivieren."),
         "prefsExtendTimeOnShake":
             MessageLookupByLibrary.simpleMessage("Schütteln zum Verlängern"),
         "prefsHintEnableAccessToNotificationSettings":

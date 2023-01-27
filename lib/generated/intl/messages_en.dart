@@ -167,7 +167,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "prefsDeviceAdmin":
             MessageLookupByLibrary.simpleMessage("Device admin"),
         "prefsDeviceAdminDescription":
-            MessageLookupByLibrary.simpleMessage("Required to turn screen off"),
+            MessageLookupByLibrary.simpleMessage("Required to turn screen off. Disable before uninstall."),
         "prefsExtendTimeOnShake":
             MessageLookupByLibrary.simpleMessage("Extend on phone shake"),
         "prefsHintEnableAccessToNotificationSettings":

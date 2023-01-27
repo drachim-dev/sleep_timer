@@ -166,7 +166,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "prefsDeviceAdmin": MessageLookupByLibrary.simpleMessage(
             "Administrador del dispositivo"),
         "prefsDeviceAdminDescription": MessageLookupByLibrary.simpleMessage(
-            "Necesario para poder apagar la pantalla"),
+            "Necesario para apagar la pantalla. Desactivar antes de desinstalar."),
         "prefsExtendTimeOnShake":
             MessageLookupByLibrary.simpleMessage("Agitar para añadir tiempo"),
         "prefsHintEnableAccessToNotificationSettings":
