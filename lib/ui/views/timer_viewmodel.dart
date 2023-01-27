@@ -242,5 +242,5 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   @override
-  List<ReactiveServiceMixin> get reactiveServices => [_timerService];
+  List<ListenableServiceMixin> get listenableServices => [_timerService];
 }

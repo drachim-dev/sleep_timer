@@ -41,7 +41,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       Permission.notification.request().then((permissionStatus) => {
             if (permissionStatus.isPermanentlyDenied)
               {
-                Future.delayed(Duration(seconds: 1)).then((_) => {
+                Future.delayed(Duration(seconds: 1, milliseconds: 500)).then((_) => {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(_buildSnackBar(context))
                     })
@@ -86,7 +86,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
     return ViewModelBuilder<HomeViewModel>.reactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (viewModel) {
+        onViewModelReady: (viewModel) {
           this.viewModel = viewModel;
 
           if (widget.timerId == null) {

@@ -21,7 +21,7 @@ class _LightGroupViewState extends State<LightGroupView> {
 
     return ViewModelBuilder<LightGroupViewModel>.reactive(
         viewModelBuilder: () => LightGroupViewModel(),
-        onModelReady: (viewModel) => this.viewModel = viewModel,
+        onViewModelReady: (viewModel) => this.viewModel = viewModel,
         builder: (context, viewModel, _) {
           return Scaffold(
             appBar: AppBar(

@@ -11,7 +11,7 @@ import 'package:stacked/stacked.dart';
 
 @prod
 @lazySingleton
-class PurchaseService with ReactiveServiceMixin {
+class PurchaseService with ListenableServiceMixin {
   final Logger log = getLogger();
   final InAppPurchase _inAppPurchase;
 

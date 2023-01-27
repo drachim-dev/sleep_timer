@@ -44,7 +44,7 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   List<Product> get products => _purchaseService.products;
 
   @override
-  List<ReactiveServiceMixin> get reactiveServices =>
+  List<ListenableServiceMixin> get listenableServices =>
       [_themeService, _deviceService];
 
   @override

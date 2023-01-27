@@ -18,7 +18,7 @@ import 'package:stacked/stacked.dart';
 enum TimerStatus { initial, pausing, running, elapsed }
 
 @injectable
-class TimerService with ReactiveServiceMixin {
+class TimerService with ListenableServiceMixin {
   final Logger log = getLogger();
   final DeviceService _deviceService = locator<DeviceService>();
   final LightService _lightService = locator<LightService>();

@@ -20,7 +20,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
 
     return ViewModelBuilder<BridgeLinkViewModel>.reactive(
         viewModelBuilder: () => BridgeLinkViewModel(),
-        onModelReady: (viewModel) => this.viewModel = viewModel,
+        onViewModelReady: (viewModel) => this.viewModel = viewModel,
         builder: (context, viewModel, _) {
           return Scaffold(
             appBar: AppBar(

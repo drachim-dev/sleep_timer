@@ -82,7 +82,7 @@ class _SettingsViewState extends State<SettingsView>
 
     return ViewModelBuilder<SettingsViewModel>.reactive(
         viewModelBuilder: () => SettingsViewModel(),
-        onModelReady: (viewModel) {
+        onViewModelReady: (viewModel) {
           this.viewModel = viewModel;
           if (widget.deviceAdminFocused ||
               widget.notificationSettingsAccessFocused) {

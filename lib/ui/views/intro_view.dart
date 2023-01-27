@@ -28,7 +28,7 @@ class _IntroViewState extends State<IntroView> {
 
     return ViewModelBuilder<IntroViewModel>.reactive(
         viewModelBuilder: () => IntroViewModel(),
-        onModelReady: (viewModel) => this.viewModel = viewModel,
+        onViewModelReady: (viewModel) => this.viewModel = viewModel,
         builder: (context, viewModel, _) {
           return IntroductionScreen(
             key: introKey,

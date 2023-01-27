@@ -79,7 +79,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
     return ViewModelBuilder<TimerViewModel>.reactive(
         viewModelBuilder: () => TimerViewModel(widget.timerModel!),
-        onModelReady: (viewModel) {
+        onViewModelReady: (viewModel) {
           this.viewModel = viewModel;
 
           alarmAppsFuture = viewModel.alarmApps;

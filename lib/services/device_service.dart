@@ -10,7 +10,7 @@ import 'package:sleep_timer/messages_generated.dart';
 
 @prod
 @singleton
-class DeviceService with ReactiveServiceMixin {
+class DeviceService with ListenableServiceMixin {
   final DeviceFunctionsPlatform _deviceFunctions =
       DeviceFunctionsPlatform.instance;
 

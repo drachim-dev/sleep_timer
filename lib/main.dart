@@ -118,7 +118,7 @@ class MyAppViewModel extends ReactiveViewModel {
   }
 
   @override
-  List<ReactiveServiceMixin> get reactiveServices => [_themeService];
+  List<ListenableServiceMixin> get listenableServices => [_themeService];
 }
 
 class Application {
