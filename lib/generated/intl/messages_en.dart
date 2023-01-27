@@ -210,9 +210,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "timerNoBluetooth":
             MessageLookupByLibrary.simpleMessage("No bluetooth action"),
         "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
-            "Starting with Android 10, it is no longer possible to toggle Wifi from within an app."),
+            "Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app."),
         "timerNoWifi":
-            MessageLookupByLibrary.simpleMessage("Wifi option missing"),
+            MessageLookupByLibrary.simpleMessage("No wifi action"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(
             "Starting with Android 10, it is no longer possible to toggle Wifi from within an app."),
         "timerSettingsSectionTitle":

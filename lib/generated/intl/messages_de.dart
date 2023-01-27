@@ -217,9 +217,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "timerNoAlarmDescription": MessageLookupByLibrary.simpleMessage(
             "Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann."),
         "timerNoBluetooth":
-            MessageLookupByLibrary.simpleMessage("No bluetooth action"),
+            MessageLookupByLibrary.simpleMessage("Bluetooth Aktion fehlt"),
         "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
-            "Starting with Android 10, it is no longer possible to toggle Wifi from within an app."),
+            "Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten."),
         "timerNoWifi":
             MessageLookupByLibrary.simpleMessage("WLAN Aktion fehlt"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(
