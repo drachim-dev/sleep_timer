@@ -100,6 +100,7 @@ android {
             signingConfig signingConfigs.release
             ndk {
                 debugSymbolLevel 'symbol_table'
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
             }
         }
     }
