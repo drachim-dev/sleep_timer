@@ -43,7 +43,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "actionDoNotDisturbTitle":
             MessageLookupByLibrary.simpleMessage("Nicht stören"),
         "actionNotSupported":
-            MessageLookupByLibrary.simpleMessage("Action not supported"),
+            MessageLookupByLibrary.simpleMessage("Aktion nicht unterstützt"),
         "actionPlayMusicTitle":
             MessageLookupByLibrary.simpleMessage("Spielt Musik ab"),
         "actionToggleBluetoothDescription":
@@ -75,7 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "appearanceSectionTitle":
             MessageLookupByLibrary.simpleMessage("Erscheinungsbild"),
         "bluetoothNotSupportedExplanation": MessageLookupByLibrary.simpleMessage(
-            "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future."),
+            "Leider ist es seit Android 13 nicht mehr möglich, Bluetooth aus einer App heraus auszuschalten. Die Aktion wird in Zukunft entfernt."),
         "buttonOpenSavedTimer": MessageLookupByLibrary.simpleMessage(
             "Hier tippen, um deinen Timer zu sehen"),
         "buttonSearchAgain":
@@ -219,7 +219,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "timerNoBluetooth":
             MessageLookupByLibrary.simpleMessage("Bluetooth Aktion fehlt"),
         "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
-            "Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten."),
+            "Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten.."),
         "timerNoWifi":
             MessageLookupByLibrary.simpleMessage("WLAN Aktion fehlt"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(

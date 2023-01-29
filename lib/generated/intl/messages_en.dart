@@ -166,8 +166,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "otherSectionTitle": MessageLookupByLibrary.simpleMessage("Other"),
         "prefsDeviceAdmin":
             MessageLookupByLibrary.simpleMessage("Device admin"),
-        "prefsDeviceAdminDescription":
-            MessageLookupByLibrary.simpleMessage("Required to turn screen off. Disable before uninstall."),
+        "prefsDeviceAdminDescription": MessageLookupByLibrary.simpleMessage(
+            "Required to turn screen off. Disable before uninstall."),
         "prefsExtendTimeOnShake":
             MessageLookupByLibrary.simpleMessage("Extend on phone shake"),
         "prefsHintEnableAccessToNotificationSettings":
@@ -211,8 +211,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("No bluetooth action"),
         "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
             "Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app."),
-        "timerNoWifi":
-            MessageLookupByLibrary.simpleMessage("No wifi action"),
+        "timerNoWifi": MessageLookupByLibrary.simpleMessage("No wifi action"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(
             "Starting with Android 10, it is no longer possible to toggle Wifi from within an app."),
         "timerSettingsSectionTitle":

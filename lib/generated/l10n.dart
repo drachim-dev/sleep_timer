@@ -340,10 +340,10 @@ class S {
     );
   }
 
-  /// `Wifi option missing`
+  /// `No wifi action`
   String get timerNoWifi {
     return Intl.message(
-      'Wifi option missing',
+      'No wifi action',
       name: 'timerNoWifi',
       desc: '',
       args: [],
@@ -470,10 +470,10 @@ class S {
     );
   }
 
-  /// `Required to turn screen off`
+  /// `Required to turn screen off. Disable before uninstall.`
   String get prefsDeviceAdminDescription {
     return Intl.message(
-      'Required to turn screen off',
+      'Required to turn screen off. Disable before uninstall.',
       name: 'prefsDeviceAdminDescription',
       desc: '',
       args: [],
@@ -1114,10 +1114,10 @@ class S {
     );
   }
 
-  /// `Starting with Android 10, it is no longer possible to toggle Wifi from within an app.`
+  /// `Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app.`
   String get timerNoBluetoothDescription {
     return Intl.message(
-      'Starting with Android 10, it is no longer possible to toggle Wifi from within an app.',
+      'Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app.',
       name: 'timerNoBluetoothDescription',
       desc: '',
       args: [],

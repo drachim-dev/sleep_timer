@@ -43,7 +43,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "actionDoNotDisturbTitle":
             MessageLookupByLibrary.simpleMessage("No molestar"),
         "actionNotSupported":
-            MessageLookupByLibrary.simpleMessage("Action not supported"),
+            MessageLookupByLibrary.simpleMessage("Acción no compatible"),
         "actionPlayMusicTitle":
             MessageLookupByLibrary.simpleMessage("Toca música"),
         "actionToggleBluetoothDescription":
@@ -72,7 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "appearanceSectionTitle":
             MessageLookupByLibrary.simpleMessage("Apariencia"),
         "bluetoothNotSupportedExplanation": MessageLookupByLibrary.simpleMessage(
-            "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future."),
+            "Desde Android 13 ya no es posible activar el Bluetooth desde una aplicación. Esta acción se eliminará en el futuro."),
         "buttonOpenSavedTimer": MessageLookupByLibrary.simpleMessage(
             "Pulse aquí para ver su temporizador"),
         "buttonSearchAgain":

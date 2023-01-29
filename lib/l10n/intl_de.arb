@@ -41,7 +41,7 @@
   "showTimerGlow": "Timer Leuchteffekt",
   "showTimerGlowDescription": "Zeigt einen Leuchteffekt rund um den Fortschrittsbalken des Timers",
   "prefsDeviceAdmin": "Erweiterte Gerätefunktionen",
-  "prefsDeviceAdminDescription": "Ermöglicht das Ausschalten des Displays",
+  "prefsDeviceAdminDescription": "Ermöglicht das Ausschalten des Displays. Vorm Deinstallieren deaktivieren.",
   "prefsNotificationSettingsAccess": "Zugriff auf Nicht stören",
   "prefsNotificationSettingsAccessDescription": "Wird für die \"Nicht stören\"-Aktion benötigt",
   "prefsHintEnableDeviceAdmin": "Aktiviere die erweiterten Gerätefunktionen",
@@ -104,9 +104,9 @@
   "rateAppSubtitle": "Ich bin für jede Bewertung dankbar",
   "rateAppPrice": "Gratis",
   "notificationsRequired": "Timer-Benachrichtigungen erforderlich",
-  "timerNoBluetooth": "No bluetooth action",
-  "timerNoBluetoothDescription": "Starting with Android 10, it is no longer possible to toggle Wifi from within an app.",
-  "actionNotSupported": "Action not supported",
-  "bluetoothNotSupportedExplanation": "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.",
+  "timerNoBluetooth": "Bluetooth Aktion fehlt",
+  "timerNoBluetoothDescription": "Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten..",
+  "actionNotSupported": "Aktion nicht unterstützt",
+  "bluetoothNotSupportedExplanation": "Leider ist es seit Android 13 nicht mehr möglich, Bluetooth aus einer App heraus auszuschalten. Die Aktion wird in Zukunft entfernt.",
   "commonDialogOk": "OK"
 }
