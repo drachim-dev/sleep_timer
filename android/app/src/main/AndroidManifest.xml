@@ -150,6 +150,9 @@
         <package android:name="de.danoeh.antennapod" />
         <package android:name="fm.castbox.audiobook.radio.podcast" />
 
+        <!-- Sleep audio apps -->
+        <package android:name="com.aumio.app" />
+
         <!-- Video player -->
         <package android:name="com.netflix.mediaclient" />
         <package android:name="com.disney.disneyplus" />
