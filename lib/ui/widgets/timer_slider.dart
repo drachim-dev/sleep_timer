@@ -80,7 +80,7 @@ class _TimerSliderState extends State<TimerSlider> {
             startAngle: 270,
             angleRange: 360,
             infoProperties: InfoProperties(
-                mainLabelStyle: widget.labelStyle ?? theme.textTheme.headline2!,
+                mainLabelStyle: widget.labelStyle ?? theme.textTheme.displayMedium!,
                 modifier: (value) => widget.onUpdateLabel!(value.round())),
             customColors: colors),
         onChange: widget.hasHandle ? (_) {} : null,

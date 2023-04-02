@@ -20,8 +20,8 @@ class NativeAdState extends State<NativeAdWidget> {
     super.didChangeDependencies();
 
     // add custom options before ad load
-    final titleTextColor = Theme.of(context).textTheme.subtitle1!.color!;
-    final subtitleTextColor = Theme.of(context).textTheme.caption!.color!;
+    final titleTextColor = Theme.of(context).textTheme.titleMedium!.color!;
+    final subtitleTextColor = Theme.of(context).textTheme.bodySmall!.color!;
 
     _nativeAd = NativeAd(
       adUnitId: AdManager.nativeAdUnitId,

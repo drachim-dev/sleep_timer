@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
+import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/product.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
@@ -104,59 +105,82 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   Widget _buildBody(final ThemeData theme) {
-    return ListView(
+    return Scrollbar(
       controller: _scrollController,
-      children: [
-        SectionHeader(S.of(context).appearanceSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        for (var option in _buildAppearance(theme)) option,
-        SectionHeader(S.of(context).timerSettingsSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        for (var option in _buildTimerSettings(theme)) option,
-        SectionHeader(S.of(context).purchasesSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        ListTile(
-          leading: Icon(Icons.star_outline_outlined),
-          title: Text(S.of(context).rateAppTitle),
-          subtitle: Text(S.of(context).rateAppSubtitle),
-          trailing: Text(S.of(context).rateAppPrice),
-          onTap: viewModel.openStoreListing,
-        ),
-        for (var product in viewModel.products) _buildProduct(theme, product),
-        SectionHeader(S.of(context).advancedSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        for (var option in _buildAdvanced(theme)) option,
-        SectionHeader(S.of(context).otherSectionTitle,
-            dense: true, leftPadding: kPreferenceTitleLeftPadding),
-        ListTile(
-          title: Text(S.of(context).faqShort),
-          onTap: viewModel.navigateToFAQ,
-        ),
-        ListTile(
-          title: Text(S.of(context).creditsAppTitle),
-          onTap: viewModel.navigateToCredits,
-        ),
-      ],
+      thumbVisibility: true,
+      child: ListView(
+        padding: const EdgeInsets.all(kHorizontalPaddingSmall),
+        controller: _scrollController,
+        children: [
+          SectionHeader(S.of(context).appearanceSectionTitle,
+              dense: true, leftPadding: kHorizontalPaddingSmall),
+          _buildAppearance(theme),
+          SectionHeader(S.of(context).timerSettingsSectionTitle,
+              dense: true, leftPadding: kHorizontalPaddingSmall),
+          _buildTimerSettings(theme),
+          SectionHeader(S.of(context).purchasesSectionTitle,
+              dense: true, leftPadding: kHorizontalPaddingSmall),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.star_outline_outlined),
+                  title: Text(S.of(context).rateAppTitle),
+                  subtitle: Text(S.of(context).rateAppSubtitle),
+                  trailing: Text(S.of(context).rateAppPrice),
+                  onTap: viewModel.openStoreListing,
+                ),
+                for (var product in viewModel.products)
+                  _buildProduct(theme, product)
+              ]..withSeparator(),
+            ),
+          ),
+          SectionHeader(S.of(context).advancedSectionTitle,
+              dense: true, leftPadding: kHorizontalPaddingSmall),
+          _buildAdvanced(theme),
+          SectionHeader(S.of(context).otherSectionTitle,
+              dense: true, leftPadding: kHorizontalPaddingSmall),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Column(children: [
+              ListTile(
+                leading: Icon(Icons.question_answer_outlined),
+                title: Text(S.of(context).faqShort),
+                onTap: viewModel.navigateToFAQ,
+              ),
+              ListTile(
+                leading: Icon(Icons.description_outlined),
+                title: Text(S.of(context).creditsAppTitle),
+                onTap: viewModel.navigateToCredits,
+              ),
+            ]..withSeparator()),
+          )
+        ],
+      ),
     );
   }
 
-  List<Widget> _buildAppearance(final ThemeData theme) {
-    return [
-      ListTile(
-        title: Text(S.of(context).chooseThemeTitle),
-        subtitle: Text(viewModel.currentTheme.title),
-        leading: Icon(Icons.color_lens_outlined),
-        onTap: _showThemeDialog,
-      ),
-      SwitchListTile(
-        title: Text(S.of(context).showTimerGlow),
-        subtitle: Text(S.of(context).showTimerGlowDescription),
-        isThreeLine: true,
-        secondary: Icon(Icons.blur_on_outlined),
-        value: viewModel.glow,
-        onChanged: viewModel.onChangeGlow,
-      ),
-    ];
+  Widget _buildAppearance(final ThemeData theme) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: [
+        ListTile(
+          title: Text(S.of(context).chooseThemeTitle),
+          subtitle: Text(viewModel.currentTheme.title),
+          leading: Icon(Icons.color_lens_outlined),
+          onTap: _showThemeDialog,
+        ),
+        SwitchListTile(
+          title: Text(S.of(context).showTimerGlow),
+          subtitle: Text(S.of(context).showTimerGlowDescription),
+          isThreeLine: true,
+          secondary: Icon(Icons.blur_on_outlined),
+          value: viewModel.glow,
+          onChanged: viewModel.onChangeGlow,
+        ),
+      ]..withSeparator()),
+    );
   }
 
   Future<void> _showThemeDialog() {
@@ -179,25 +203,19 @@ class _SettingsViewState extends State<SettingsView>
     );
   }
 
-  List<Widget> _buildTimerSettings(final ThemeData theme) {
-    final unselectedColor = viewModel.hasAccelerometer
-        ? theme.textTheme.subtitle1!.color
-        : theme.unselectedWidgetColor;
+  Widget _buildTimerSettings(final ThemeData theme) {
+    final selectedColor = theme.textTheme.titleMedium!.color;
 
-    final selectedColor = theme.textTheme.subtitle1!.color;
-
-    return [
-      Theme(
-        data: Theme.of(context).copyWith(
-          textTheme: theme.textTheme.apply(bodyColor: unselectedColor),
-          unselectedWidgetColor: unselectedColor,
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: theme.copyWith(
           dividerColor: Colors.transparent,
         ),
         child: IgnorePointer(
           ignoring: !viewModel.hasAccelerometer,
           child: ExpansionTile(
             textColor: selectedColor,
-            iconColor: selectedColor,
             leading: Icon(Icons.vibration_outlined),
             onExpansionChanged: viewModel.onChangeExtendByShake,
             initiallyExpanded:
@@ -239,7 +257,7 @@ class _SettingsViewState extends State<SettingsView>
           ),
         ),
       ),
-    ];
+    );
   }
 
   ListTile _buildProduct(ThemeData theme, Product product) {
@@ -256,8 +274,8 @@ class _SettingsViewState extends State<SettingsView>
 
     final purchased = product.purchased;
     final priceStyle = purchased
-        ? theme.textTheme.bodyText1!.copyWith(color: Colors.green)
-        : theme.textTheme.bodyText1;
+        ? theme.textTheme.bodyLarge!.copyWith(color: Colors.green)
+        : theme.textTheme.bodyLarge;
 
     return ListTile(
       leading: Icon(icon),
@@ -274,43 +292,50 @@ class _SettingsViewState extends State<SettingsView>
     );
   }
 
-  List<Widget> _buildAdvanced(final ThemeData theme) {
-    return [
-      AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Container(
-              color: widget.deviceAdminFocused
-                  ? blinkingFocus
-                      .evaluate(AlwaysStoppedAnimation(_controller.value))
-                  : Colors.transparent,
-              child: SwitchListTile(
-                  secondary: Icon(Icons.security_outlined),
-                  title: Text(S.of(context).prefsDeviceAdmin),
-                  subtitle: Text(S.of(context).prefsDeviceAdminDescription),
-                  isThreeLine: true,
-                  value: viewModel.deviceAdmin,
-                  onChanged: viewModel.onChangeDeviceAdmin),
-            );
-          }),
-      AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Container(
-              color: widget.notificationSettingsAccessFocused
-                  ? blinkingFocus
-                      .evaluate(AlwaysStoppedAnimation(_controller.value))
-                  : Colors.transparent,
-              child: SwitchListTile(
-                  secondary: Icon(Icons.do_not_disturb_on),
-                  title: Text(S.of(context).prefsNotificationSettingsAccess),
-                  subtitle: Text(
-                      S.of(context).prefsNotificationSettingsAccessDescription),
-                  isThreeLine: true,
-                  value: viewModel.notificationSettingsAccess,
-                  onChanged: viewModel.onChangeNotificationSettingsAccess),
-            );
-          }),
-    ];
+  Widget _buildAdvanced(final ThemeData theme) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Container(
+                  color: widget.deviceAdminFocused
+                      ? blinkingFocus
+                          .evaluate(AlwaysStoppedAnimation(_controller.value))
+                      : Colors.transparent,
+                  child: SwitchListTile(
+                      secondary: Icon(Icons.security_outlined),
+                      title: Text(S.of(context).prefsDeviceAdmin),
+                      subtitle: Text(S.of(context).prefsDeviceAdminDescription),
+                      isThreeLine: true,
+                      value: viewModel.deviceAdmin,
+                      onChanged: viewModel.onChangeDeviceAdmin),
+                );
+              }),
+          AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Container(
+                  color: widget.notificationSettingsAccessFocused
+                      ? blinkingFocus
+                          .evaluate(AlwaysStoppedAnimation(_controller.value))
+                      : Colors.transparent,
+                  child: SwitchListTile(
+                      secondary: Icon(Icons.do_not_disturb_on),
+                      title:
+                          Text(S.of(context).prefsNotificationSettingsAccess),
+                      subtitle: Text(S
+                          .of(context)
+                          .prefsNotificationSettingsAccessDescription),
+                      isThreeLine: true,
+                      value: viewModel.notificationSettingsAccess,
+                      onChanged: viewModel.onChangeNotificationSettingsAccess),
+                );
+              }),
+        ]..withSeparator(),
+      ),
+    );
   }
 }

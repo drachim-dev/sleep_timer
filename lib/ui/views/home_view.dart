@@ -21,7 +21,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  AnimationController? _animationController;
+  late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
   late HomeViewModel viewModel;
@@ -33,8 +33,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 800), vsync: this);
     _scaleAnimation = CurvedAnimation(
-        parent: _animationController!, curve: Curves.easeInOutBack);
-    _animationController!.forward();
+        parent: _animationController, curve: Curves.easeInOutBack);
+    _animationController.forward();
 
     // Request notification permission
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -60,7 +60,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           const SizedBox(width: 8),
           Flexible(
               child: Text(S.of(context).notificationsRequired,
-                  style: theme.textTheme.subtitle2)),
+                  style: theme.textTheme.titleSmall)),
         ],
       ),
       behavior: SnackBarBehavior.floating,
@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _animationController?.dispose();
+    _animationController.dispose();
 
     super.dispose();
   }
@@ -118,7 +118,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             padding: const EdgeInsets.only(top: padding),
             child: Text(
               S.of(context).sleepTimer,
-              style: theme.textTheme.headline2!.copyWith(fontSize: 48),
+              style: theme.textTheme.displayMedium!.copyWith(fontSize: 48),
               textAlign: TextAlign.center,
             ),
           ),
@@ -206,7 +206,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.textTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.titleLarge!.copyWith(color: foregroundColor);
 
     return ScaleTransition(
       scale: _scaleAnimation,

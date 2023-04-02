@@ -9,8 +9,8 @@ const double kVerticalPaddingBig = kVerticalPadding * 2;
 const double kFloatingActionButtonHeight = 72;
 const double kHorizontalPaddingSmall = kHorizontalPadding / 2;
 const double kHorizontalPadding = 16;
-const double kPreferenceTitleLeftPadding = 16;
 const double kBottomSheetPadding = 24;
+const double kBorderRadius = 16.0;
 
 // Ui
 const Color kStatusBarOverlay = Colors.transparent;

@@ -38,7 +38,7 @@ class _ToggleButtonState extends State<ToggleButton> {
         widget.value ? toggleButtonsTheme.fillColor : Colors.transparent;
 
     final currentTextStyle =
-        toggleButtonsTheme.textStyle ?? theme.textTheme.bodyText2!;
+        toggleButtonsTheme.textStyle ?? theme.textTheme.bodyMedium!;
 
     const padding = 8.0;
     final size = (widget.size ?? theme.iconTheme.size!) - padding;

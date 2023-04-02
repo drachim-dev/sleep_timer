@@ -58,7 +58,7 @@ Builder _buildErrorWidget(FlutterErrorDetails details) {
                   Icon(MdiIcons.googleDownasaur, size: 64),
                   Text(
                     "Oops, this shouldn't have happened.\nPlease try again!",
-                    style: theme.textTheme.headline6,
+                    style: theme.textTheme.titleLarge,
                     textAlign: TextAlign.center,
                   ),
                 ],

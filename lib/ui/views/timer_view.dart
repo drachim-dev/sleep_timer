@@ -126,7 +126,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   SliverAppBar _buildAppBar(final ThemeData theme) {
-    final titleStyle = theme.textTheme.headline2!.copyWith(
+    final titleStyle = theme.textTheme.displayMedium!.copyWith(
         fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
 
     return SliverAppBar(
@@ -148,7 +148,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           child: Text(
               Utils.secondsToString(viewModel.remainingTime.round(),
                   spacing: true),
-              style: theme.textTheme.headline2!
+              style: theme.textTheme.displayMedium!
                   .copyWith(fontSize: 40, color: Colors.white))),
       elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
@@ -225,7 +225,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     return Card(
       margin: EdgeInsets.symmetric(
           horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
-      elevation: 0,
       child: ListTile(
         leading: Icon(Icons.info),
         title: Text(title, maxLines: 1),
@@ -282,7 +281,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     const gridSize = 3;
     const labelMargin = 12.0;
 
-    final labelStyle = theme.textTheme.bodyText2;
+    final labelStyle = theme.textTheme.bodyMedium;
 
     showModalBottomSheet(
         context: context,
@@ -583,7 +582,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   Widget _buildFAB(ThemeData theme) {
     final foregroundColor = Colors.white;
     final textStyle =
-        theme.textTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.titleLarge!.copyWith(color: foregroundColor);
 
     if (viewModel.timerStatus == TimerStatus.running) {
       _fabAnimController.reverse();

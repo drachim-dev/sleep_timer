@@ -18,9 +18,9 @@ class _IntroViewState extends State<IntroView> {
     final theme = Theme.of(context);
 
     final pageDecoration = PageDecoration(
-      titleTextStyle: theme.textTheme.headline2!.copyWith(fontSize: 36),
-      bodyTextStyle: theme.textTheme.headline6!
-          .copyWith(color: theme.textTheme.headline2!.color),
+      titleTextStyle: theme.textTheme.displayMedium!.copyWith(fontSize: 36),
+      bodyTextStyle: theme.textTheme.titleLarge!
+          .copyWith(color: theme.textTheme.displayMedium!.color),
       bodyPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       pageColor: theme.scaffoldBackgroundColor,
       imagePadding: EdgeInsets.zero,

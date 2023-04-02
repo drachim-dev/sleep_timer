@@ -68,7 +68,7 @@ class _LightGroupViewState extends State<LightGroupView> {
       children: [
         SectionHeader(
           '${bridgeModel.name}',
-          leftPadding: kPreferenceTitleLeftPadding,
+          leftPadding: kHorizontalPadding,
         ),
         ListView.separated(
           shrinkWrap: true,
@@ -133,7 +133,7 @@ class _LightGroupViewState extends State<LightGroupView> {
         children: [
           Image.asset('assets/img_no_results.webp', width: 200),
           SizedBox(height: kVerticalPadding),
-          Text(S.of(context).noLightsFound, style: theme.textTheme.headline6),
+          Text(S.of(context).noLightsFound, style: theme.textTheme.titleLarge),
           SizedBox(height: kVerticalPaddingBig),
         ],
       ),

@@ -50,7 +50,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
     final foregroundColor = Colors.white;
 
     final textStyle =
-        theme.textTheme.headline6!.copyWith(color: foregroundColor);
+        theme.textTheme.titleLarge!.copyWith(color: foregroundColor);
 
     return FloatingActionButton.extended(
       onPressed: () => viewModel.initialise(),
@@ -110,7 +110,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
           Image.asset('assets/img_no_connection.webp', width: 200),
           SizedBox(height: kVerticalPadding),
           Text(S.of(context).errorNoConnection,
-              style: theme.textTheme.headline6),
+              style: theme.textTheme.titleLarge),
           SizedBox(height: kVerticalPaddingBig),
         ],
       ),
@@ -124,7 +124,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
         children: [
           Image.asset('assets/img_no_results.webp', width: 200),
           SizedBox(height: kVerticalPadding),
-          Text(S.of(context).errorNoDevices, style: theme.textTheme.headline6),
+          Text(S.of(context).errorNoDevices, style: theme.textTheme.titleLarge),
           SizedBox(height: kVerticalPaddingBig),
         ],
       ),
@@ -137,7 +137,7 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
       children: [
         SectionHeader(
           S.of(context).countDevicesFound(viewModel.data.length),
-          leftPadding: kPreferenceTitleLeftPadding,
+          leftPadding: kHorizontalPadding,
         ),
         ListView.separated(
           shrinkWrap: true,
@@ -204,8 +204,8 @@ class LinkDialog extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: kVerticalPadding),
                     child: Text(model!.connectionError,
-                        style: theme.textTheme.subtitle1!
-                            .copyWith(color: theme.errorColor)),
+                        style: theme.textTheme.titleMedium!
+                            .copyWith(color: theme.colorScheme.error)),
                   ),
                 SizedBox(height: kVerticalPadding),
                 Image.asset('assets/img_pushlink_bridge.webp',
