@@ -105,6 +105,7 @@ class AlarmService : Service() {
                     }, 0, 1000)
                 }
             }
+
             ACTION_TOGGLE_EXTEND_BY_SHAKE -> {
                 val enable = intent.getBooleanExtra(KEY_ENABLE_EXTEND_BY_SHAKE, false)
 
@@ -116,6 +117,7 @@ class AlarmService : Service() {
                     }
                 }
             }
+
             else -> {
                 isRunning = false
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -131,7 +133,19 @@ class AlarmService : Service() {
         pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000, pendingAlarmIntent)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || manager.canScheduleExactAlarms()) {
+            manager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
+                    pendingAlarmIntent,
+            )
+        } else {
+            manager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
+                    pendingAlarmIntent,
+            )
+        }
 
         timerId = request.timerId
         if (request.shakeToExtend == true) {
