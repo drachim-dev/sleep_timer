@@ -16,10 +16,10 @@ import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
 import 'package:sleep_timer/ui/widgets/sabt.dart';
 import 'package:sleep_timer/ui/widgets/section_header.dart';
 import 'package:sleep_timer/ui/widgets/slider_dialog.dart';
-import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:sleep_timer/ui/widgets/toggle_button.dart';
 import 'package:stacked/stacked.dart';
 
+import '../widgets/timer_slider.dart';
 import 'timer_viewmodel.dart';
 
 class TimerView extends StatefulWidget {
@@ -156,21 +156,34 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           padding: const EdgeInsets.only(top: kVerticalPadding, bottom: 80),
           child: SafeArea(
             child: TimerSlider(
-                initialValue: viewModel.remainingTime,
-                maxValue: viewModel.maxTime,
-                hasHandle: false,
-                showGlow: viewModel.showGlow,
-                labelStyle: titleStyle,
-                size: 180,
-                onUpdateLabel: (value) {
-                  return Utils.secondsToString(value.round(), spacing: true);
-                }),
+              initialValue: viewModel.remainingTime,
+              maxValue: viewModel.maxTime,
+              hasHandle: false,
+              showGlow: viewModel.showGlow,
+              labelStyle: titleStyle,
+              size: 180,
+              child: _buildTimeLabel,
+            ),
           ),
         ),
       ),
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: _buildExtendTimeRow(),
+      ),
+    );
+  }
+
+  Widget _buildTimeLabel(int minutes, int seconds) {
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+
+    final formattedSeconds = Utils.secondsToString(seconds, spacing: true);
+
+    return Center(
+      child: Text(
+        formattedSeconds,
+        style: textTheme.headlineLarge,
       ),
     );
   }

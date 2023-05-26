@@ -4,9 +4,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
-import 'package:sleep_timer/ui/widgets/timer_slider.dart';
 import 'package:stacked/stacked.dart';
 
+import '../widgets/timer_slider.dart';
 import 'home_viewmodel.dart';
 
 enum MenuOption { settings }
@@ -41,10 +41,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       Permission.notification.request().then((permissionStatus) => {
             if (permissionStatus.isPermanentlyDenied)
               {
-                Future.delayed(Duration(seconds: 1, milliseconds: 500)).then((_) => {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(_buildSnackBar(context))
-                    })
+                Future.delayed(Duration(seconds: 1, milliseconds: 500)).then(
+                    (_) => {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(_buildSnackBar(context))
+                        })
               }
           });
     });
@@ -161,11 +162,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                     : SizedBox(),
                 TimerSlider(
                   minValue: 1,
+                  maxValue: 60,
                   initialValue: viewModel.initialTime,
-                  onUpdateLabel: (value) =>
-                      S.of(context).numberOfMinutesShort(value),
-                  onChange: (value) => viewModel.setTimeSilent(value),
                   showGlow: viewModel.showGlow,
+                  onChange: (hours, minutes) {
+                    final minutesTotal = hours * 60 + minutes;
+                    viewModel.setTimeSilent(minutesTotal.round());
+                  },
+                  child: _buildTimeLabel,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -186,6 +190,29 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         ),
       );
     });
+  }
+
+  Widget _buildTimeLabel(int hours, int minutes) {
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+
+    final minuteStyle = textTheme.displayMedium;
+    final hourStyle =
+        textTheme.headlineSmall?.copyWith(color: theme.colorScheme.primary);
+
+    final formattedMinutes = S.of(context).numberOfMinutesShort(minutes);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(formattedMinutes, style: minuteStyle),
+        if (hours > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: kVerticalPaddingSmall),
+            child: Text('+ $hours h', style: hourStyle),
+          ),
+      ],
+    );
   }
 
   Widget _buildActiveTimer(ThemeData theme) {

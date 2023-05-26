@@ -53,9 +53,9 @@ double calculateRawAngle(
     required double angleRange,
     required double selectedAngle,
     bool counterClockwise = false}) {
-  var angle = radiansToDegrees(selectedAngle);
+  double angle = radiansToDegrees(selectedAngle);
 
-  var calcAngle = 0.0;
+  double calcAngle = 0.0;
   if (!counterClockwise) {
     if (angle >= startAngle && angle <= 360.0) {
       calcAngle = angle - startAngle;
@@ -82,7 +82,7 @@ double calculateAngle(
     return defaultAngle;
   }
 
-  var calcAngle = calculateRawAngle(
+  double calcAngle = calculateRawAngle(
       startAngle: startAngle,
       angleRange: angleRange,
       selectedAngle: selectedAngle,
@@ -103,7 +103,7 @@ bool isAngleWithinRange(
     required touchAngle,
     required previousAngle,
     bool counterClockwise = false}) {
-  var calcAngle = calculateRawAngle(
+  double calcAngle = calculateRawAngle(
       startAngle: startAngle,
       angleRange: angleRange,
       selectedAngle: touchAngle,
@@ -120,16 +120,16 @@ int valueToDuration(double value, double previous, double min, double max) {
   return divider != 0 ? (value - previous).abs() ~/ divider * 15 : 0;
 }
 
-double valueToPercentage(int value, int min, int max) {
+double valueToPercentage(double value, double min, double max) {
   return value / ((max - min) / 100);
 }
 
-double valueToAngle(int value, int min, int max, double angleRange) {
+double valueToAngle(double value, double min, double max, double angleRange) {
   return percentageToAngle(
       valueToPercentage(value - min, min, max), angleRange);
 }
 
-double percentageToValue(double percentage, int min, int max) {
+double percentageToValue(double percentage, double min, double max) {
   return ((max - min) / 100) * percentage + min;
 }
 
@@ -143,7 +143,7 @@ double percentageToAngle(double percentage, double angleRange) {
   return percentage * step;
 }
 
-double angleToValue(double angle, int min, int max, double angleRange) {
+double angleToValue(double angle, double min, double max, double angleRange) {
   return percentageToValue(angleToPercentage(angle, angleRange), min, max);
 }
 

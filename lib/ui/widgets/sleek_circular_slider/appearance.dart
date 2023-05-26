@@ -34,12 +34,9 @@ class CircularSliderAppearance {
   final double startAngle;
   final double angleRange;
   final bool animationEnabled;
-  final bool spinnerMode;
-  final bool counterClockwise;
   final double animDurationMultiplier;
-  final int spinnerDuration;
   final CustomSliderWidths? customWidths;
-  final ValueNotifier<CustomSliderColors?>? customColors;
+  final CustomSliderColors? customColors;
   final InfoProperties? infoProperties;
 
   double? get _customTrackWidth => customWidths?.trackWidth;
@@ -52,32 +49,32 @@ class CircularSliderAppearance {
   double get handlerSize => _customHandlerSize ?? progressBarWidth / 5.0;
   double get shadowWidth => _customShadowWidth ?? progressBarWidth * 1.4;
 
-  Color? get _customTrackColor => customColors?.value?.trackColor;
+  Color? get _customTrackColor => customColors?.trackColor;
   List<Color>? get _customProgressBarColors {
-    if (customColors?.value != null) {
-      if (customColors!.value!.progressBarColors != null) {
-        return customColors!.value!.progressBarColors;
-      } else if (customColors!.value!.progressBarColor != null) {
-        return [customColors!.value!.progressBarColor!, customColors!.value!.progressBarColor!];
+    if (customColors != null) {
+      if (customColors!.progressBarColors != null) {
+        return customColors!.progressBarColors;
+      } else if (customColors!.progressBarColor != null) {
+        return [customColors!.progressBarColor!, customColors!.progressBarColor!];
       }
     }
     return null;
   }
 
   List<Color>? get _customTrackColors {
-  	return customColors?.value?.trackColors;
+  	return customColors?.trackColors;
   }
 
-  double? get _gradientStartAngle => customColors?.value?.gradientStartAngle;
-  double? get _gradientEndAngle => customColors?.value?.gradientEndAngle;
-  double? get _trackGradientStartAngle => customColors?.value?.trackGradientStartAngle;
-  double? get _trackGradientEndAngle => customColors?.value?.trackGradientEndAngle;
-  bool? get _dynamicGradient => customColors?.value?.dynamicGradient;
-  Color? get _customShadowColor => customColors?.value?.shadowColor;
-  double? get _customShadowMaxOpacity => customColors?.value?.shadowMaxOpacity;
-  double? get _customShadowStep => customColors?.value?.shadowStep;
-  Color? get _customDotColor => customColors?.value?.dotColor;
-  bool? get _hideShadow => customColors?.value?.hideShadow;
+  double? get _gradientStartAngle => customColors?.gradientStartAngle;
+  double? get _gradientEndAngle => customColors?.gradientEndAngle;
+  double? get _trackGradientStartAngle => customColors?.trackGradientStartAngle;
+  double? get _trackGradientEndAngle => customColors?.trackGradientEndAngle;
+  bool? get _dynamicGradient => customColors?.dynamicGradient;
+  Color? get _customShadowColor => customColors?.shadowColor;
+  double? get _customShadowMaxOpacity => customColors?.shadowMaxOpacity;
+  double? get _customShadowStep => customColors?.shadowStep;
+  Color? get _customDotColor => customColors?.dotColor;
+  bool? get _hideShadow => customColors?.hideShadow;
 
   Color get trackColor => _customTrackColor ?? _defaultTrackColor;
   List<Color>? get trackColors => _customTrackColors;
@@ -98,37 +95,10 @@ class CircularSliderAppearance {
   double? get shadowStep => _customShadowStep;
   Color get dotColor => _customDotColor ?? _defaultDotColor;
 
-  String? get _topLabelText => infoProperties?.topLabelText;
-  String? get _bottomLabelText => infoProperties?.bottomLabelText;
-  TextStyle? get _mainLabelStyle => infoProperties?.mainLabelStyle;
-  TextStyle? get _topLabelStyle => infoProperties?.topLabelStyle;
-  TextStyle? get _bottomLabelStyle => infoProperties?.bottomLabelStyle;
   PercentageModifier? get _modifier => infoProperties?.modifier;
 
   PercentageModifier get infoModifier =>
       _modifier ?? _defaultPercentageModifier;
-  String? get infoTopLabelText => _topLabelText;
-  String? get infoBottomLabelText => _bottomLabelText;
-  TextStyle get infoMainLabelStyle {
-    return _mainLabelStyle ?? TextStyle(
-        fontWeight: FontWeight.w100,
-        fontSize: size / 5.0,
-        color: Color.fromRGBO(30, 0, 59, 1.0));
-  }
-
-  TextStyle get infoTopLabelStyle {
-    return _topLabelStyle ?? TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: size / 10.0,
-        color: Color.fromRGBO(147, 81, 120, 1.0));
-  }
-
-  TextStyle get infoBottomLabelStyle {
-    return _bottomLabelStyle ?? TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: size / 10.0,
-        color: Color.fromRGBO(147, 81, 120, 1.0));
-  }
 
   const CircularSliderAppearance(
       {this.customWidths,
@@ -138,9 +108,6 @@ class CircularSliderAppearance {
       this.angleRange = _defaultAngleRange,
       this.infoProperties,
       this.animationEnabled = true,
-      this.counterClockwise = false,
-      this.spinnerMode = false,
-      this.spinnerDuration = 1500,
       this.animDurationMultiplier = 1.0});
 }
 

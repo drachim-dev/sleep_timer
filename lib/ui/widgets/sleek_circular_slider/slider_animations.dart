@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'utils.dart';
 
-typedef ValueChangeAnimation = void Function(
-    double animation, bool animationFinished);
+typedef ValueChangeAnimation = void Function(double animation, bool animationFinished);
 
 class ValueChangedAnimationManager {
   final TickerProvider tickerProvider;
@@ -18,10 +16,10 @@ class ValueChangedAnimationManager {
     this.durationMultiplier = 1.0,
   });
 
-  late final AnimationController _animController =
-      AnimationController(vsync: tickerProvider);
   late Animation<double> _animation;
+  late final AnimationController _animController = AnimationController(vsync: tickerProvider);
   bool _animationCompleted = false;
+
 
   void animate(
       {required double initialValue,
@@ -51,7 +49,6 @@ class ValueChangedAnimationManager {
           ..addStatusListener((status) {
             if (status == AnimationStatus.completed) {
               _animationCompleted = true;
-
               _animController.reset();
             }
           });

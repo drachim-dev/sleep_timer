@@ -1,11 +1,11 @@
 part of circular_slider;
 
-class CustomPanGestureRecognizer extends OneSequenceGestureRecognizer {
+class _CustomPanGestureRecognizer extends OneSequenceGestureRecognizer {
   final Function onPanDown;
   final Function onPanUpdate;
   final Function onPanEnd;
 
-  CustomPanGestureRecognizer({
+  _CustomPanGestureRecognizer({
     required this.onPanDown,
     required this.onPanUpdate,
     required this.onPanEnd,

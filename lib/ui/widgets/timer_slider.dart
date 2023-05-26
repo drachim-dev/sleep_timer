@@ -10,8 +10,8 @@ class TimerSlider extends StatefulWidget {
   final bool showGlow;
   final bool animationEnabled;
   final TextStyle? labelStyle;
-  final Function(int)? onChange;
-  final String Function(int)? onUpdateLabel;
+  final OnChange? onChange;
+  final Widget Function(int lapIndex, int currentLapValue)? child;
 
   const TimerSlider({
     this.size = 256,
@@ -23,7 +23,7 @@ class TimerSlider extends StatefulWidget {
     this.animationEnabled = true,
     this.labelStyle,
     this.onChange,
-    this.onUpdateLabel,
+    this.child,
   });
 
   @override
@@ -65,25 +65,24 @@ class _TimerSliderState extends State<TimerSlider> {
     );
 
     return SleekCircularSlider(
-        minValue: widget.minValue,
-        maxValue: widget.maxValue,
-        initialValue: widget.initialValue,
-        appearance: CircularSliderAppearance(
-            animationEnabled: widget.animationEnabled,
-            size: widget.size,
-            customWidths: CustomSliderWidths(
-              trackWidth: 15,
-              progressBarWidth: 4,
-              handlerSize: widget.hasHandle ? 12 : 0,
-              shadowWidth: shadowWidth,
-            ),
-            startAngle: 270,
-            angleRange: 360,
-            infoProperties: InfoProperties(
-                mainLabelStyle: widget.labelStyle ?? theme.textTheme.displayMedium!,
-                modifier: (value) => widget.onUpdateLabel!(value.round())),
-            customColors: colors),
-        onChange: widget.hasHandle ? (_) {} : null,
-        onChangeEnd: widget.hasHandle ? widget.onChange : null);
+      min: widget.minValue.toDouble(),
+      max: widget.maxValue.toDouble(),
+      initial: widget.initialValue.toDouble(),
+      appearance: CircularSliderAppearance(
+        animationEnabled: widget.animationEnabled,
+        size: widget.size,
+        customWidths: CustomSliderWidths(
+          trackWidth: 15,
+          progressBarWidth: 4,
+          handlerSize: widget.hasHandle ? 12 : 0,
+          shadowWidth: shadowWidth,
+        ),
+        startAngle: 270,
+        angleRange: 360,
+        customColors: colors.value,
+      ),
+      onChange: widget.hasHandle ? widget.onChange : null,
+      child: widget.child,
+    );
   }
 }
