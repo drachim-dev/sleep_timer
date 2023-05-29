@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:device_functions/messages_generated.dart';
 import 'package:flutter/material.dart';
@@ -146,8 +147,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       centerTitle: true,
       title: SABT(
           child: Text(
-              Utils.secondsToString(viewModel.remainingTime.round(),
-                  spacing: true),
+              Utils.secondsToString(viewModel.remainingTime, spacing: true),
               style: theme.textTheme.displayMedium!
                   .copyWith(fontSize: 40, color: Colors.white))),
       elevation: 0,
@@ -157,12 +157,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           child: SafeArea(
             child: TimerSlider(
               initialValue: viewModel.remainingTime,
-              maxValue: viewModel.maxTime,
+              maxValue: max(viewModel.maxTime, viewModel.initialTime),
               hasHandle: false,
               showGlow: viewModel.showGlow,
               labelStyle: titleStyle,
               size: 180,
-              child: _buildTimeLabel,
+              child: (_, __) => _buildTimeLabel(),
             ),
           ),
         ),
@@ -174,11 +174,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTimeLabel(int minutes, int seconds) {
+  Widget _buildTimeLabel() {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
-    final formattedSeconds = Utils.secondsToString(seconds, spacing: true);
+    final formattedSeconds =
+        Utils.secondsToString(viewModel.remainingTime, spacing: true);
 
     return Center(
       child: Text(

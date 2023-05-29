@@ -64,7 +64,7 @@ class _TimerSliderState extends State<TimerSlider> {
       hideShadow: !widget.showGlow,
     );
 
-    return SleekCircularSlider(
+    return CircularSlider(
       min: widget.minValue.toDouble(),
       max: widget.maxValue.toDouble(),
       initial: widget.initialValue.toDouble(),
