@@ -55,7 +55,7 @@ List<ActionModel> startActionList = [
     id: ActionType.volume,
     title: S.current.actionVolumeTitle,
     unit: ' %',
-    key: kKeyVolumeLevel,
+    key: kKeyVolumeStartLevel,
   ),
   ActionModel(
     id: ActionType.light,
@@ -76,17 +76,22 @@ List<ActionModel> endActionList = [
     description: S.current.actionToggleMediaDescription,
     enabled: true,
   ),
+  ValueActionModel(
+    id: ActionType.volume,
+    title: S.current.actionVolumeTitle,
+    unit: ' %',
+    key: kKeyVolumeEndLevel,
+  ),
   ActionModel(
     id: ActionType.wifi,
     title: S.current.actionToggleWifiTitle,
     description: S.current.actionToggleWifiDescription,
   ),
   ActionModel(
-    id: ActionType.bluetooth,
-    title: S.current.actionToggleBluetoothTitle,
-    description: S.current.actionToggleBluetoothDescription,
-    permission: Permission.bluetoothConnect
-  ),
+      id: ActionType.bluetooth,
+      title: S.current.actionToggleBluetoothTitle,
+      description: S.current.actionToggleBluetoothDescription,
+      permission: Permission.bluetoothConnect),
   ActionModel(
     id: ActionType.screen,
     title: S.current.actionToggleScreenTitle,

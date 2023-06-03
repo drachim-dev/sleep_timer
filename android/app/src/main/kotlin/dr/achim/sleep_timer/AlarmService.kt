@@ -75,10 +75,10 @@ class AlarmService : Service() {
         Log.d(TAG, "intent action: ${intent?.action}")
         when (intent?.action) {
             ACTION_START -> {
-                val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as HashMap<String, Any>?
+                val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as ArrayList<Any>?
 
                 if (map != null) {
-                    val request: RunningNotificationRequest = RunningNotificationRequest.fromMap(map)
+                    val request: RunningNotificationRequest = RunningNotificationRequest.fromList(map)
                     startAlarm(request)
 
                     timer.scheduleAtFixedRate(object : TimerTask() {
@@ -92,13 +92,13 @@ class AlarmService : Service() {
 
                             val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                                 action = NotificationReceiver.ACTION_COUNTDOWN
-                                putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toMap() as HashMap)
+                                putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toList())
                             }
                             sendBroadcast(countDownIntent)
 
                             val showRunningIntent = Intent(applicationContext, NotificationReceiver::class.java).apply {
                                 action = NotificationReceiver.ACTION_SHOW_RUNNING
-                                putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toMap() as HashMap<String, Any>?)
+                                putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toList())
                             }
                             sendBroadcast(showRunningIntent)
                         }
@@ -161,7 +161,7 @@ class AlarmService : Service() {
 
                 val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
                     action = NotificationReceiver.ACTION_EXTEND
-                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toMap() as HashMap)
+                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toList())
                 }
                 sendBroadcast(intent)
 

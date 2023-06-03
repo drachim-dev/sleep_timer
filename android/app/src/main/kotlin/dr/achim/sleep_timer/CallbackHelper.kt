@@ -15,8 +15,8 @@ object CallbackHelper {
         editor.apply()
     }
 
-    fun getRawHandle(context: Context?): Long {
-        return context!!.getSharedPreferences(
+    fun getRawHandle(context: Context): Long {
+        return context.getSharedPreferences(
                 ENTRY_POINT_HELPER_PREF,
                 Context.MODE_PRIVATE
         ).getLong(CALLBACK_HANDLE_KEY, NO_HANDLE)

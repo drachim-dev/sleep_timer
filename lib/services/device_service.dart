@@ -55,8 +55,8 @@ class DeviceService with ListenableServiceMixin {
         await _deviceFunctions.isNotificationAccessGranted();
   }
 
-  Future<bool> toggleMedia(final bool enable) {
-    return _deviceFunctions.toggleMedia(enable);
+  Future<bool> toggleMedia(final bool enable, final int? endLevel) {
+    return _deviceFunctions.toggleMedia(enable, endLevel);
   }
 
   Future<bool> toggleWifi(final bool enable) {

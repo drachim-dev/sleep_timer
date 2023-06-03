@@ -107,6 +107,7 @@
   "timerNoBluetooth": "Bluetooth Aktion fehlt",
   "timerNoBluetoothDescription": "Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten..",
   "actionNotSupported": "Aktion nicht unterstützt",
-  "bluetoothNotSupportedExplanation": "Leider ist es seit Android 13 nicht mehr möglich, Bluetooth aus einer App heraus auszuschalten. Die Aktion wird in Zukunft entfernt.",
-  "commonDialogOk": "OK"
+  "bluetoothNotSupportedExplanation": "Seit Android 13 ist das Deaktivieren von Bluetooth nicht mehr möglich.",
+  "commonDialogOk": "OK",
+  "bluetoothToggleNotSupportedTitle": "Bluetooth-Aktion entfernt"
 }

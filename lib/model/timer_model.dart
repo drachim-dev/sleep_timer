@@ -18,18 +18,22 @@ class TimerModel {
   int get initialTimeInSeconds => _initialTimeInSeconds;
 
   List<ActionModel> get startActions => _startActions;
-  ValueActionModel get volumeAction =>
-      _startActions.singleWhere((action) => action.id == ActionType.volume) as ValueActionModel;
-  ActionModel get lightAction =>
+  ValueActionModel get volumeStartAction =>
+      _startActions.singleWhere((action) => action.id == ActionType.volume)
+          as ValueActionModel;
+  ActionModel get lightStartAction =>
       _startActions.singleWhere((action) => action.id == ActionType.light);
-  ActionModel get playMusicAction =>
+  ActionModel get playMusicStartAction =>
       _startActions.singleWhere((action) => action.id == ActionType.playMusic);
-  ActionModel get doNotDisturbAction =>
+  ActionModel get doNotDisturbStartAction =>
       _startActions.singleWhere((action) => action.id == ActionType.dnd);
 
   List<ActionModel> get endActions => _endActions;
   ActionModel get mediaAction =>
       _endActions.singleWhere((action) => action.id == ActionType.media);
+  ValueActionModel get volumeAction =>
+      _endActions.singleWhere((action) => action.id == ActionType.volume)
+          as ValueActionModel;
   ActionModel get wifiAction =>
       _endActions.singleWhere((action) => action.id == ActionType.wifi);
   ActionModel get bluetoothAction =>

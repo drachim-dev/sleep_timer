@@ -11,6 +11,7 @@ import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/utils.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/messages_generated.dart';
+import 'package:sleep_timer/model/action_model.dart';
 import 'package:sleep_timer/model/timer_model.dart';
 import 'package:sleep_timer/services/timer_service.dart';
 import 'package:sleep_timer/ui/widgets/rounded_rect_button.dart';
@@ -203,7 +204,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               _buildQuickLaunch(theme),
               SectionHeader(S.of(context).timerStartsActionsTitle,
                   leftPadding: kHorizontalPadding),
-              if (viewModel.showHints)
+              if (viewModel.showStartActionHints)
                 Stack(
                   children: [
                     if (viewModel.showLongPressHint)
@@ -220,10 +221,22 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                       ),
                   ],
                 ),
-              _buildCompactStartedActions(theme),
+              _buildStartActions(theme),
               // if (!viewModel.isAdFree) NativeAdWidget(),
               SectionHeader(S.of(context).timerEndsActionsTitle,
                   leftPadding: kHorizontalPadding),
+              if (viewModel.showEndActionHints)
+                Stack(
+                  children: [
+                    if (viewModel.showBluetoothNotSupportedHint)
+                      _buildHint(
+                        title: S.of(context).bluetoothToggleNotSupportedTitle,
+                        subtitle:
+                            S.of(context).bluetoothNotSupportedExplanation,
+                        onPressed: viewModel.dismissBluetoothHint,
+                      ),
+                  ],
+                ),
               _buildEndedActions(theme),
             ]),
           ),
@@ -238,7 +251,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       required void Function() onPressed}) {
     return Card(
       margin: EdgeInsets.symmetric(
-          horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
+        horizontal: kHorizontalPadding,
+        vertical: kVerticalPaddingSmall,
+      ),
       child: ListTile(
         leading: Icon(Icons.info),
         title: Text(title, maxLines: 1),
@@ -250,7 +265,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         isThreeLine: true,
         trailing: IconButton(
           alignment: Alignment.topRight,
-          padding: EdgeInsets.all(2),
+          padding: EdgeInsets.zero,
           icon: Icon(Icons.clear),
           onPressed: onPressed,
         ),
@@ -403,7 +418,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         }).toList());
   }
 
-  Widget _buildCompactStartedActions(final ThemeData theme) {
+  Widget _buildStartActions(final ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
       child: Wrap(
@@ -411,40 +426,59 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         runSpacing: kVerticalPadding,
         direction: Axis.horizontal,
         children: [
-          ToggleButton(
-            label: viewModel.timerModel.volumeAction.description,
-            activeIcon: Icons.volume_down_outlined,
-            disabledIcon: Icons.volume_mute_outlined,
-            onChanged: (value) async {
-              // setup the volumeLevel if no value exists
-              if (value && viewModel.timerModel.volumeAction.value == null) {
-                await _showVolumeLevelPicker();
-              }
-              viewModel.onChangeVolume(value);
+          _buildVolumeToggle(
+            actionModel: viewModel.timerModel.volumeStartAction,
+            onToggle: viewModel.onChangeVolumeStartAction,
+            onChangeSliderLevel: (value) {
+              viewModel.handleSetVolumeAction(value.round());
             },
-            onLongPress: _showVolumeLevelPicker,
-            value: viewModel.timerModel.volumeAction.enabled,
           ),
           ToggleButton(
-            label: viewModel.timerModel.lightAction.title,
+            label: viewModel.timerModel.lightStartAction.title,
             activeIcon: MdiIcons.lightbulbOffOutline,
             disabledIcon: MdiIcons.lightbulbOutline,
             onChanged: viewModel.onChangeLight,
             onLongPress: viewModel.navigateToLightsGroups,
-            value: viewModel.timerModel.lightAction.enabled,
+            value: viewModel.timerModel.lightStartAction.enabled,
           ),
           ToggleButton(
-            label: viewModel.timerModel.doNotDisturbAction.title,
+            label: viewModel.timerModel.doNotDisturbStartAction.title,
             activeIcon: MdiIcons.minusCircleOutline,
             disabledIcon: MdiIcons.minusCircleOffOutline,
             onChanged: viewModel.onChangeDoNotDisturb,
             onLongPress: () => viewModel.navigateToSettings(
                 notificationSettingsAccessFocused: true),
-            value: viewModel.timerModel.doNotDisturbAction.enabled &&
+            value: viewModel.timerModel.doNotDisturbStartAction.enabled &&
                 viewModel.hasNotificationSettingsAccess,
           ),
         ],
       ),
+    );
+  }
+
+  ToggleButton _buildVolumeToggle(
+      {required ValueActionModel actionModel,
+      required void Function(bool value) onToggle,
+      void Function(double)? onChangeSliderLevel}) {
+    return ToggleButton(
+      label: actionModel.description,
+      activeIcon: Icons.volume_down_outlined,
+      disabledIcon: Icons.volume_mute_outlined,
+      onChanged: (value) async {
+        // setup the volumeLevel if no value exists
+        if (value && actionModel.value == null) {
+          await _showVolumeLevelPicker(
+            actionModel: actionModel,
+            onChangeEnd: onChangeSliderLevel,
+          );
+        }
+        onToggle(value);
+      },
+      onLongPress: () => _showVolumeLevelPicker(
+        actionModel: actionModel,
+        onChangeEnd: onChangeSliderLevel,
+      ),
+      value: actionModel.enabled,
     );
   }
 
@@ -488,15 +522,19 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                       disabledIcon: Icons.music_note_outlined,
                       onChanged: viewModel.onChangeMedia,
                       value: viewModel.timerModel.mediaAction.enabled),
-                  if (viewModel.platformVersion < 29)
+                  _buildVolumeToggle(
+                      actionModel: viewModel.timerModel.volumeAction,
+                      onToggle: viewModel.onChangeVolumeEndAction),
+                  if (viewModel.wifiSupported)
                     ToggleButton(
                         label: viewModel.timerModel.wifiAction.title,
                         activeIcon: Icons.wifi_off_outlined,
                         disabledIcon: Icons.wifi_outlined,
                         onChanged: viewModel.onChangeWifi,
                         value: viewModel.timerModel.wifiAction.enabled),
-                  _buildBluetoothToggleButton(
-                      bluetoothPermission, bluetoothPermissionStatus),
+                  if (viewModel.bluetoothSupported)
+                    _buildBluetoothToggleButton(
+                        bluetoothPermission, bluetoothPermissionStatus),
                   ToggleButton(
                       label: viewModel.timerModel.screenAction.title,
                       activeIcon: Icons.tv_off_outlined,
@@ -517,10 +555,8 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   ToggleButton _buildBluetoothToggleButton(
       Permission? permission, PermissionStatus? permissionStatus) {
-    final isActionAvailable = viewModel.platformVersion < 33;
     final needsAttention = permissionStatus?.isGranted == false ||
-        permissionStatus?.isPermanentlyDenied == true ||
-        !isActionAvailable;
+        permissionStatus?.isPermanentlyDenied == true;
 
     // Disable action in prefs if it needs attention
     if (needsAttention) {
@@ -536,24 +572,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             ? Icons.warning_amber_rounded
             : Icons.bluetooth_outlined,
         onChanged: (enable) async {
-          if (!isActionAvailable) {
-            return showDialog<void>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(S.of(context).notSupported),
-                    content:
-                        Text(S.of(context).bluetoothNotSupportedExplanation),
-                    actions: [
-                      TextButton(
-                        child: Text(S.of(context).commonDialogOk),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  );
-                });
-          }
-
           final permissionStatus = await permission?.request();
 
           if (permissionStatus == null || permissionStatus.isGranted) {
@@ -565,23 +583,25 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         value: viewModel.timerModel.bluetoothAction.enabled);
   }
 
-  Future<void> _showVolumeLevelPicker() async {
+  Future<void> _showVolumeLevelPicker(
+      {required ValueActionModel actionModel,
+      void Function(double)? onChangeEnd}) async {
     final volumeLevel = await showDialog<double>(
         context: context,
         builder: (context) => FutureBuilder<VolumeResponse>(
             future: viewModel.volume,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                var currentLevel = snapshot.data?.currentLevel?.toDouble() ?? 3;
-                var maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
+                final currentLevel =
+                    snapshot.data?.currentLevel?.toDouble() ?? 3;
+                final maxVolume =
+                    snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
 
                 return SliderDialog(
                   title: S.of(context).setVolumeTitle,
-                  initialValue:
-                      viewModel.timerModel.volumeAction.value ?? currentLevel,
+                  initialValue: actionModel.value ?? currentLevel,
                   maxValue: maxVolume,
-                  onChangeEnd: (value) =>
-                      viewModel.handleVolumeAction(value.round()),
+                  onChangeEnd: onChangeEnd,
                 );
               } else {
                 return CircularProgressIndicator();
@@ -589,7 +609,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             }));
 
     if (volumeLevel != null) {
-      await viewModel.onChangeVolumeLevel(volumeLevel);
+      await viewModel.onChangeVolumeLevel(actionModel, volumeLevel);
     }
   }
 

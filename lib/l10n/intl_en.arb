@@ -107,6 +107,7 @@
   "timerNoBluetooth": "No bluetooth action",
   "timerNoBluetoothDescription": "Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app.",
   "actionNotSupported": "Action not supported",
-  "bluetoothNotSupportedExplanation": "Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.",
-  "commonDialogOk": "OK"
+  "bluetoothNotSupportedExplanation": "Since Android 13, toggling bluetooth is not possible anymore.",
+  "commonDialogOk": "OK",
+  "bluetoothToggleNotSupportedTitle": "Bluetooth action removed"
 }

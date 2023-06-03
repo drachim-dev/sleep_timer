@@ -63,7 +63,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
     private fun startForegroundService(arg: RunningNotificationRequest) {
         val intent = Intent(context, AlarmService::class.java).apply {
             action = AlarmService.ACTION_START
-            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toMap() as HashMap)
+            putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, arg.toList())
         }
 
         ContextCompat.startForegroundService(context, intent)
@@ -107,7 +107,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_PAUSE_NOTIFICATION
-            putExtra(NotificationReceiver.KEY_PAUSE_NOTIFICATION, arg.toMap() as HashMap)
+            putExtra(NotificationReceiver.KEY_PAUSE_NOTIFICATION, arg.toList())
         }
         context.sendBroadcast(intent)
 
@@ -128,7 +128,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         stopForegroundService()
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = NotificationReceiver.ACTION_ELAPSED_NOTIFICATION
-            putExtra(NotificationReceiver.KEY_ELAPSED_NOTIFICATION, arg.toMap() as HashMap)
+            putExtra(NotificationReceiver.KEY_ELAPSED_NOTIFICATION, arg.toList())
         }
         context.sendBroadcast(intent)
 

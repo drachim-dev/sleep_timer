@@ -46,7 +46,8 @@ const String kThemeKeyBlackBlue = 'black_blue_theme';
 const String kPrefKeyTheme = 'pref_key_theme';
 const String kPrefKeyGlow = 'pref_key_glow';
 const String kPrefKeyBridgeAccess = 'pref_key_bridge_access';
-const String kKeyVolumeLevel = 'pref_key_volume_level';
+const String kKeyVolumeStartLevel = 'pref_key_volume_level';
+const String kKeyVolumeEndLevel = 'pref_key_volume_end_level';
 const String kPrefKeyInitialTime = 'pref_key_initial_time';
 
 const String kPrefKeyExtendByShake = 'pref_key_extend_by_shake';
@@ -56,6 +57,8 @@ const String kPrefKeyShowTapHintForStartActions =
     'key_show_tap_hint_for_start_actions';
 const String kPrefKeyShowLongPressHintForStartActions =
     'key_show_long_press_hint_for_start_actions';
+    const String kPrefKeyShowBluetoothNotSupportedHint =
+    'key_show_bluetooth_not_supported_hint';
 
 const String kHueBridgeUsername = String.fromEnvironment('APP_NAME');
 const String kPrefKeyHueBridges = 'pref_key_hue_bridges';

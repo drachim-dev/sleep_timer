@@ -16,15 +16,14 @@ import io.flutter.embedding.engine.dart.DartExecutor.DartEntrypoint
 import io.flutter.view.FlutterCallbackInformation
 
 class TimerWidget : AppWidgetProvider() {
-    private var context: Context? = null
+
     private var flutterTimerApi: FlutterTimerApi? = null
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        this.context = context
-        initializeFlutter()
+        initializeFlutter(context)
         for (appWidgetId in appWidgetIds) {
             updateWidget("onUpdate \${Math.random()}", appWidgetId, context)
             // Pass over the id so we can update it later...
-            flutterTimerApi!!.onWidgetUpdate { reply: WidgetUpdateResponse -> updateWidget(reply.title + appWidgetId, appWidgetId, context) }
+            flutterTimerApi?.onWidgetUpdate { reply: WidgetUpdateResponse -> updateWidget(reply.title + appWidgetId, appWidgetId, context) }
             val startTimerIntent = Intent(context, WidgetReceiver::class.java)
             startTimerIntent.action = ACTION_CODE_WIDGET_START_TIMER
             val startTimerPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_START_WIDGET, startTimerIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -43,11 +42,11 @@ class TimerWidget : AppWidgetProvider() {
         }
     }
 
-    private fun initializeFlutter() {
+    private fun initializeFlutter(context: Context) {
         var flutterEngine = FlutterEngineCache.getInstance()[MainActivity.ENGINE_ID]
         val flutterLoader = FlutterInjector.instance().flutterLoader()
-        flutterLoader.startInitialization(context!!)
-        flutterLoader.ensureInitializationComplete(context!!, null)
+        flutterLoader.startInitialization(context)
+        flutterLoader.ensureInitializationComplete(context, null)
         val handle = CallbackHelper.getRawHandle(context)
         if (handle == CallbackHelper.NO_HANDLE) {
             Log.e(TAG, "Couldn't update widget because there is no handle stored!")
@@ -58,7 +57,7 @@ class TimerWidget : AppWidgetProvider() {
         // the hassle with SharedPreferences, but alas when running your
         // app in release mode this would fail.
         if (flutterEngine == null) {
-            flutterEngine = FlutterEngine(context!!.applicationContext)
+            flutterEngine = FlutterEngine(context.applicationContext)
             val entryPointFunctionName = callbackInfo.callbackName
             val entryPoint = DartEntrypoint(flutterLoader.findAppBundlePath(), entryPointFunctionName)
             flutterEngine.dartExecutor.executeDartEntrypoint(entryPoint)

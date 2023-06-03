@@ -105,8 +105,9 @@
   "rateAppPrice": "Gratis",
   "notificationsRequired": "Se requieren notificaciones",
   "timerNoBluetooth": "No opción de Bluetooth",
-  "timerNoBluetoothDescription": "A partir de Android 13 ya no es posible desactivar el bluetooth.",
+  "timerNoBluetoothDescription": "Desde Android 13 ya no es posible desactivar el bluetooth.",
   "actionNotSupported": "Acción no compatible",
-  "bluetoothNotSupportedExplanation": "Desde Android 13 ya no es posible activar el Bluetooth desde una aplicación. Esta acción se eliminará en el futuro.",
-  "commonDialogOk": "OK"
+  "bluetoothNotSupportedExplanation": "Desde Android 13 ya no es posible desactivar el bluetooth.",
+  "commonDialogOk": "OK",
+  "bluetoothToggleNotSupportedTitle": "Acción bluetooth eliminado"
 }

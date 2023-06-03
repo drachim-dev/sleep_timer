@@ -30,19 +30,21 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       required final int duration,
       required final int remainingTime,
       required final bool shakeToExtend}) async {
-    final response =
-        await _hostApi.showRunningNotification(RunningNotificationRequest()
-          ..timerId = timerId
-          ..title = title
-          ..description = description
-          ..accentColor = accentColor
-          ..restartAction = restartAction
-          ..pauseAction = pauseAction
-          ..cancelAction = cancelAction
-          ..extendActions = extendActions
-          ..duration = duration
-          ..remainingTime = remainingTime
-          ..shakeToExtend = shakeToExtend);
+    final response = await _hostApi.showRunningNotification(
+      RunningNotificationRequest(
+        timerId: timerId,
+        title: title,
+        description: description,
+        accentColor: accentColor,
+        restartAction: restartAction,
+        pauseAction: pauseAction,
+        cancelAction: cancelAction,
+        extendActions: extendActions,
+        duration: duration,
+        remainingTime: remainingTime,
+        shakeToExtend: shakeToExtend,
+      ),
+    );
     return response.success ?? false;
   }
 
@@ -57,17 +59,19 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       final String? cancelAction,
       final List<int>? extendActions,
       required final int remainingTime}) async {
-    final response =
-        await _hostApi.showPausingNotification(TimeNotificationRequest()
-          ..timerId = timerId
-          ..title = title
-          ..description = description
-          ..accentColor = accentColor
-          ..restartAction = restartAction
-          ..continueAction = continueAction
-          ..cancelAction = cancelAction
-          ..extendActions = extendActions
-          ..remainingTime = remainingTime);
+    final response = await _hostApi.showPausingNotification(
+      TimeNotificationRequest(
+        timerId: timerId,
+        title: title,
+        description: description,
+        accentColor: accentColor,
+        restartAction: restartAction,
+        continueAction: continueAction,
+        cancelAction: cancelAction,
+        extendActions: extendActions,
+        remainingTime: remainingTime,
+      ),
+    );
     return response.success ?? false;
   }
 
@@ -79,26 +83,28 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
     required final int accentColor,
     final String? restartAction,
   }) async {
-    final response =
-        await _hostApi.showElapsedNotification(NotificationRequest()
-          ..timerId = timerId
-          ..title = title
-          ..description = description
-          ..accentColor = accentColor
-          ..restartAction = restartAction!);
+    final response = await _hostApi.showElapsedNotification(
+      NotificationRequest(
+        timerId: timerId,
+        title: title,
+        description: description,
+        accentColor: accentColor,
+        restartAction: restartAction,
+      ),
+    );
     return response.success ?? false;
   }
 
   @override
   Future<bool> cancelTimer(final String timerId) async {
     final response =
-        await _hostApi.cancelTimer(CancelRequest()..timerId = timerId);
+        await _hostApi.cancelTimer(CancelRequest(timerId: timerId));
     return response.success ?? false;
   }
 
   @override
   Future<void> toggleExtendByShake(final bool enable) async {
-    await _hostApi.toggleExtendByShake(ToggleRequest()..enable = enable);
+    await _hostApi.toggleExtendByShake(ToggleRequest(enable: enable));
   }
 
   @override
@@ -129,7 +135,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
 
   @override
   Future<void> launchApp(final String? packageName) async {
-    await _hostApi.launchApp(LaunchAppRequest()..packageName = packageName!);
+    await _hostApi.launchApp(LaunchAppRequest(packageName: packageName));
   }
 }
 
@@ -185,12 +191,10 @@ class FlutterApiHandler extends FlutterTimerApi {
         // Navigate to timer detail view
         StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
             Routes.homeView, (route) => false,
-            arguments:
-                HomeViewArguments(timerId: timerService.timerModel!.id));
+            arguments: HomeViewArguments(timerId: timerService.timerModel!.id));
 
         StackedService.navigatorKey!.currentState!.pushNamed(Routes.timerView,
-            arguments:
-                TimerViewArguments(timerModel: timerService.timerModel));
+            arguments: TimerViewArguments(timerModel: timerService.timerModel));
       }
     });
   }

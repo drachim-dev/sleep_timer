@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
@@ -105,19 +106,20 @@ class TimerService with ListenableServiceMixin {
 
   void _resetTime() => setRemainingTime(timerModel!.initialTimeInSeconds);
 
-  void _handleStartActions() {
+  Future<void> _handleStartActions() async {
     for (var element in timerModel!.startActions) {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.volume:
-            handleVolumeAction((element as ValueActionModel).value!.round());
+            await handleSetVolumeAction(
+                (element as ValueActionModel).value!.round());
             break;
           case ActionType.light:
-            handleLightAction();
+            await handleLightAction();
             break;
           case ActionType.dnd:
             if (_deviceService.notificationSettingsAccess) {
-              handleDoNotDisturbAction();
+              await handleDoNotDisturbAction();
             }
             break;
           default:
@@ -126,16 +128,16 @@ class TimerService with ListenableServiceMixin {
     }
   }
 
-  void handleVolumeAction(int value) {
-    _deviceService.setVolume(value);
+  Future<void> handleSetVolumeAction(int value) async {
+    await _deviceService.setVolume(value);
   }
 
-  void handleLightAction() {
-    _lightService.toggleLights(false);
+  Future<void> handleLightAction() async {
+    await _lightService.toggleLights(false);
   }
 
-  void handleDoNotDisturbAction() {
-    _deviceService.toggleDoNotDisturb(true);
+  Future<void> handleDoNotDisturbAction() async {
+    await _deviceService.toggleDoNotDisturb(true);
   }
 
   Future<void> handleEndedActions() async {
@@ -150,7 +152,22 @@ class TimerService with ListenableServiceMixin {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.media:
-            await _deviceService.toggleMedia(false);
+            final volumeAction = timerModel!.endActions.singleWhereOrNull(
+                (element) =>
+                    element.id == ActionType.volume && element.enabled);
+
+            final endLevel = (volumeAction as ValueActionModel?)?.value?.round();
+
+            await _deviceService.toggleMedia(false, endLevel);
+            break;
+          case ActionType.volume:
+            final hasMediaAction = timerModel!.endActions.any(
+                (element) => element.id == ActionType.media && element.enabled);
+            if (!hasMediaAction) {
+              await handleSetVolumeAction(
+                  (element as ValueActionModel).value!.round());
+            }
+
             break;
           case ActionType.wifi:
             await _deviceService.toggleWifi(false);

@@ -22,7 +22,7 @@ class ShakeDetector : SensorEventListener {
     private var mShakeTimestamp: Long = 0
     private var mShakeCount = 0
 
-    fun setOnShakeListener(listener: OnShakeListener?) {
+    fun setOnShakeListener(listener: OnShakeListener) {
         mListener = listener
     }
 
@@ -35,7 +35,7 @@ class ShakeDetector : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if (mListener != null) {
+        mListener?.let { listener ->
             val x = event.values[0]
             val y = event.values[1]
             val z = event.values[2]
@@ -59,8 +59,9 @@ class ShakeDetector : SensorEventListener {
                 }
                 mShakeTimestamp = now
                 mShakeCount++
+
                 if (mShakeCount >= 2) {
-                    mListener!!.onShake(mShakeCount)
+                    listener.onShake(mShakeCount)
                 }
             }
         }

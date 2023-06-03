@@ -1134,10 +1134,10 @@ class S {
     );
   }
 
-  /// `Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.`
+  /// `Since Android 13, toggling bluetooth is not possible anymore.`
   String get bluetoothNotSupportedExplanation {
     return Intl.message(
-      'Unfortunately, it is no longer possible to toggle Bluetooth from within an app since Android 13. The action will be removed in the future.',
+      'Since Android 13, toggling bluetooth is not possible anymore.',
       name: 'bluetoothNotSupportedExplanation',
       desc: '',
       args: [],
@@ -1149,6 +1149,16 @@ class S {
     return Intl.message(
       'OK',
       name: 'commonDialogOk',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bluetooth action removed`
+  String get bluetoothToggleNotSupportedTitle {
+    return Intl.message(
+      'Bluetooth action removed',
+      name: 'bluetoothToggleNotSupportedTitle',
       desc: '',
       args: [],
     );

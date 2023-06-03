@@ -75,7 +75,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "appearanceSectionTitle":
             MessageLookupByLibrary.simpleMessage("Erscheinungsbild"),
         "bluetoothNotSupportedExplanation": MessageLookupByLibrary.simpleMessage(
-            "Leider ist es seit Android 13 nicht mehr möglich, Bluetooth aus einer App heraus auszuschalten. Die Aktion wird in Zukunft entfernt."),
+            "Seit Android 13 ist das Deaktivieren von Bluetooth nicht mehr möglich."),
+        "bluetoothToggleNotSupportedTitle":
+            MessageLookupByLibrary.simpleMessage("Bluetooth-Aktion entfernt"),
         "buttonOpenSavedTimer": MessageLookupByLibrary.simpleMessage(
             "Hier tippen, um deinen Timer zu sehen"),
         "buttonSearchAgain":

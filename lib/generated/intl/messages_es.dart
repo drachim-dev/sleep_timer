@@ -71,8 +71,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "alreadyPurchased": MessageLookupByLibrary.simpleMessage("Ya comprado"),
         "appearanceSectionTitle":
             MessageLookupByLibrary.simpleMessage("Apariencia"),
-        "bluetoothNotSupportedExplanation": MessageLookupByLibrary.simpleMessage(
-            "Desde Android 13 ya no es posible activar el Bluetooth desde una aplicación. Esta acción se eliminará en el futuro."),
+        "bluetoothNotSupportedExplanation":
+            MessageLookupByLibrary.simpleMessage(
+                "Desde Android 13 ya no es posible desactivar el bluetooth."),
+        "bluetoothToggleNotSupportedTitle":
+            MessageLookupByLibrary.simpleMessage("Acción bluetooth eliminado"),
         "buttonOpenSavedTimer": MessageLookupByLibrary.simpleMessage(
             "Pulse aquí para ver su temporizador"),
         "buttonSearchAgain":
@@ -212,7 +215,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "timerNoBluetooth":
             MessageLookupByLibrary.simpleMessage("No opción de Bluetooth"),
         "timerNoBluetoothDescription": MessageLookupByLibrary.simpleMessage(
-            "A partir de Android 13 ya no es posible desactivar el bluetooth."),
+            "Desde Android 13 ya no es posible desactivar el bluetooth."),
         "timerNoWifi":
             MessageLookupByLibrary.simpleMessage("No opción de Wifi"),
         "timerNoWifiDescription": MessageLookupByLibrary.simpleMessage(
