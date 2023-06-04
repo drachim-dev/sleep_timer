@@ -34,9 +34,13 @@ class ValueActionModel extends ActionModel {
   final String? unit;
   final String? key;
 
+  String get label {
+    return value == null ? title : '${value!.round()} $unit';
+  }
+
   @override
   String get description {
-    return value == null ? title : '${value!.toInt()}$unit';
+    return value == null ? title : S.current.setToValue(title, '${value!.round()}$unit');
   }
 
   ValueActionModel(
@@ -54,7 +58,7 @@ List<ActionModel> startActionList = [
   ValueActionModel(
     id: ActionType.volume,
     title: S.current.actionVolumeTitle,
-    unit: ' %',
+    unit: '%',
     key: kKeyVolumeStartLevel,
   ),
   ActionModel(

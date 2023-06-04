@@ -32,7 +32,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m4(minutes) => "${minutes} min";
 
-  static String m5(bridge) => "Unlink ${bridge}";
+  static String m5(action, value) => "Set ${action} to \$${value}";
+
+  static String m6(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -191,6 +193,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Agradezco cualquier valoración"),
         "rateAppTitle":
             MessageLookupByLibrary.simpleMessage("¿Te gusta la app?"),
+        "setToValue": m5,
         "setVolumeTitle":
             MessageLookupByLibrary.simpleMessage("Ajustar el volumen"),
         "settings": MessageLookupByLibrary.simpleMessage("Ajustes"),
@@ -226,6 +229,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Cuando se inicia"),
         "titleLightGroups":
             MessageLookupByLibrary.simpleMessage("Apagar la luz"),
-        "unlinkBridgeName": m5
+        "unlinkBridgeName": m6
       };
 }

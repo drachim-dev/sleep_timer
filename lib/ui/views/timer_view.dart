@@ -461,7 +461,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       required void Function(bool value) onToggle,
       void Function(double)? onChangeSliderLevel}) {
     return ToggleButton(
-      label: actionModel.description,
+      label: actionModel.label,
       activeIcon: Icons.volume_down_outlined,
       disabledIcon: Icons.volume_mute_outlined,
       onChanged: (value) async {

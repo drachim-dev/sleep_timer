@@ -1163,6 +1163,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Set {action} to {value}`
+  String setToValue(Object action, Object value) {
+    return Intl.message(
+      'Set $action to $value',
+      name: 'setToValue',
+      desc: '',
+      args: [action, value],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

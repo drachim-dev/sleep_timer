@@ -109,5 +109,6 @@
   "actionNotSupported": "Action not supported",
   "bluetoothNotSupportedExplanation": "Since Android 13, toggling bluetooth is not possible anymore.",
   "commonDialogOk": "OK",
-  "bluetoothToggleNotSupportedTitle": "Bluetooth action removed"
+  "bluetoothToggleNotSupportedTitle": "Bluetooth action removed",
+  "setToValue": "Set {action} to {value}"
 }

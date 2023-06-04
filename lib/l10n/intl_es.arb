@@ -109,5 +109,6 @@
   "actionNotSupported": "Acción no compatible",
   "bluetoothNotSupportedExplanation": "Desde Android 13 ya no es posible desactivar el bluetooth.",
   "commonDialogOk": "OK",
-  "bluetoothToggleNotSupportedTitle": "Acción bluetooth eliminado"
+  "bluetoothToggleNotSupportedTitle": "Acción bluetooth eliminado",
+  "setToValue": "Ajuste {acción} al {valor}"
 }
