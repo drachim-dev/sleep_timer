@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// StackedRouterGenerator
+// StackedNavigatorGenerator
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -86,7 +86,7 @@ class StackedRouter extends _i1.RouterBase {
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.IntroView: (data) {
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i2.IntroView(),
         settings: data,
       );
@@ -95,14 +95,14 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<HomeViewArguments>(
         orElse: () => const HomeViewArguments(),
       );
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i3.HomeView(timerId: args.timerId),
         settings: data,
       );
     },
     _i4.TimerView: (data) {
       final args = data.getArgs<TimerViewArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) =>
             _i4.TimerView(key: args.key, timerModel: args.timerModel),
         settings: data,
@@ -112,7 +112,7 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<SettingsViewArguments>(
         orElse: () => const SettingsViewArguments(),
       );
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i5.SettingsView(
             deviceAdminFocused: args.deviceAdminFocused,
             notificationSettingsAccessFocused:
@@ -121,25 +121,25 @@ class StackedRouter extends _i1.RouterBase {
       );
     },
     _i6.FAQView: (data) {
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i6.FAQView(),
         settings: data,
       );
     },
     _i7.CreditsView: (data) {
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i7.CreditsView(),
         settings: data,
       );
     },
     _i8.BridgeLinkView: (data) {
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i8.BridgeLinkView(),
         settings: data,
       );
     },
     _i9.LightGroupView: (data) {
-      return MaterialPageRoute<dynamic>(
+      return _i10.MaterialPageRoute<dynamic>(
         builder: (context) => _i9.LightGroupView(),
         settings: data,
       );
@@ -148,6 +148,7 @@ class StackedRouter extends _i1.RouterBase {
 
   @override
   List<_i1.RouteDef> get routes => _routes;
+
   @override
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
@@ -156,6 +157,22 @@ class HomeViewArguments {
   const HomeViewArguments({this.timerId});
 
   final String? timerId;
+
+  @override
+  String toString() {
+    return '{"timerId": "$timerId"}';
+  }
+
+  @override
+  bool operator ==(covariant HomeViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.timerId == timerId;
+  }
+
+  @override
+  int get hashCode {
+    return timerId.hashCode;
+  }
 }
 
 class TimerViewArguments {
@@ -167,6 +184,22 @@ class TimerViewArguments {
   final _i10.Key? key;
 
   final _i11.TimerModel? timerModel;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "timerModel": "$timerModel"}';
+  }
+
+  @override
+  bool operator ==(covariant TimerViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.timerModel == timerModel;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ timerModel.hashCode;
+  }
 }
 
 class SettingsViewArguments {
@@ -178,6 +211,25 @@ class SettingsViewArguments {
   final dynamic deviceAdminFocused;
 
   final dynamic notificationSettingsAccessFocused;
+
+  @override
+  String toString() {
+    return '{"deviceAdminFocused": "$deviceAdminFocused", "notificationSettingsAccessFocused": "$notificationSettingsAccessFocused"}';
+  }
+
+  @override
+  bool operator ==(covariant SettingsViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.deviceAdminFocused == deviceAdminFocused &&
+        other.notificationSettingsAccessFocused ==
+            notificationSettingsAccessFocused;
+  }
+
+  @override
+  int get hashCode {
+    return deviceAdminFocused.hashCode ^
+        notificationSettingsAccessFocused.hashCode;
+  }
 }
 
 extension NavigatorStateExtension on _i12.NavigationService {
@@ -298,6 +350,129 @@ extension NavigatorStateExtension on _i12.NavigationService {
         transition,
   ]) async {
     return navigateTo<dynamic>(Routes.lightGroupView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithIntroView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.introView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithHomeView({
+    String? timerId,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.homeView,
+        arguments: HomeViewArguments(timerId: timerId),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithTimerView({
+    _i10.Key? key,
+    required _i11.TimerModel? timerModel,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.timerView,
+        arguments: TimerViewArguments(key: key, timerModel: timerModel),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithSettingsView({
+    dynamic deviceAdminFocused = false,
+    dynamic notificationSettingsAccessFocused = false,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  }) async {
+    return replaceWith<dynamic>(Routes.settingsView,
+        arguments: SettingsViewArguments(
+            deviceAdminFocused: deviceAdminFocused,
+            notificationSettingsAccessFocused:
+                notificationSettingsAccessFocused),
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithFAQView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.fAQView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithCreditsView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.creditsView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithBridgeLinkView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.bridgeLinkView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithLightGroupView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.lightGroupView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
