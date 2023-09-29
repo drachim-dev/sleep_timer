@@ -130,21 +130,24 @@ class AlarmService : Service() {
     private fun startAlarm(request: RunningNotificationRequest) {
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
         alarmIntent.putExtra(NotificationReceiver.KEY_TIMER_ID, request.timerId)
-        pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || manager.canScheduleExactAlarms()) {
-            manager.setExactAndAllowWhileIdle(
+
+        pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        pendingAlarmIntent?.let { intent ->
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || manager.canScheduleExactAlarms()) {
+                manager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
-                    pendingAlarmIntent,
-            )
-        } else {
-            manager.setAndAllowWhileIdle(
+                    intent,
+                )
+            } else {
+                manager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
-                    pendingAlarmIntent,
-            )
+                    intent,
+                )
+            }
         }
 
         timerId = request.timerId
@@ -186,9 +189,9 @@ class AlarmService : Service() {
 
     private fun stopAlarm() {
         Log.d(TAG, "stopAlarm")
-        if (pendingAlarmIntent != null) {
+        pendingAlarmIntent?.let {
             val manager = getSystemService(ALARM_SERVICE) as AlarmManager
-            manager.cancel(pendingAlarmIntent)
+            manager.cancel(it)
         }
         timer.cancel()
         timerId = null

@@ -52,7 +52,7 @@ if (project.hasProperty('dart-defines')) {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -65,11 +65,18 @@ android {
     defaultConfig {
         applicationId "dr.achim.sleep_timer"
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders.ADMOB_APP_ID = dartEnvironmentVariables.ADMOB_APP_ID
         manifestPlaceholders.APP_NAME = dartEnvironmentVariables.APP_NAME
+
+        ndk {
+            debugSymbolLevel 'symbol_table'
+            // Issue: https://github.com/liyuanhust/flutter_simple_pdf_viewer/issues/6
+            //noinspection ChromeOsAbiSupport
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        }
     }
 
     signingConfigs {
@@ -98,10 +105,6 @@ android {
                     'proguard-rules.pro'
 
             signingConfig signingConfigs.release
-            ndk {
-                debugSymbolLevel 'symbol_table'
-                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
-            }
         }
     }
 

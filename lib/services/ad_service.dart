@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,8 +13,6 @@ class AdService {
   int _counter = 0;
 
   InterstitialAd? _interstitialAd;
-  int _numInterstitialLoadAttempts = 0;
-  static const int maxFailedLoadAttempts = 3;
 
   final log = getLogger();
 
@@ -41,29 +38,6 @@ class AdService {
     _interstitialAd?.dispose();
   }
 
-  void _createInterstitialAd(VoidCallback onAdLoaded) {
-    InterstitialAd.load(
-        adUnitId: AdManager.interstitialAdUnitId,
-        request: AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) {
-            log.d('$ad loaded');
-            _interstitialAd = ad;
-            _numInterstitialLoadAttempts = 0;
-
-            onAdLoaded();
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            log.d('InterstitialAd failed to load: $error.');
-            _numInterstitialLoadAttempts += 1;
-            _interstitialAd = null;
-            if (_numInterstitialLoadAttempts <= maxFailedLoadAttempts) {
-              _createInterstitialAd(_showInterstitialAd);
-            }
-          },
-        ));
-  }
-
   /// Shows an ad (if user was not asked for review)
   /// every [_interval] times according to [_counter]
   /// or [force] to show an ad.
@@ -78,7 +52,7 @@ class AdService {
 
       if (force || _counter % _interval == 0) {
         _counter = 0;
-        _createInterstitialAd(_showInterstitialAd);
+        _loadAd();
 
         return true;
       }
@@ -86,24 +60,31 @@ class AdService {
     return false;
   }
 
-  void _showInterstitialAd() {
-    if (_interstitialAd == null) {
-      log.d('Warning: attempt to show interstitial before loaded.');
-      return;
-    }
-    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) =>
-          log.d('ad onAdShowedFullScreenContent.'),
-      onAdDismissedFullScreenContent: (InterstitialAd ad) {
-        log.d('$ad onAdDismissedFullScreenContent.');
-        ad.dispose();
-      },
-      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-        log.d('$ad onAdFailedToShowFullScreenContent: $error');
-        ad.dispose();
-      },
-    );
-    _interstitialAd!.show();
-    _interstitialAd = null;
+  void _loadAd() {
+    InterstitialAd.load(
+        adUnitId: AdManager.interstitialAdUnitId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          // Called when an ad is successfully received.
+          onAdLoaded: (InterstitialAd ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+                onAdFailedToShowFullScreenContent: (ad, err) {
+                  log.d('$ad onAdFailedToShowFullScreenContent: $err');
+                  ad.dispose();
+                },
+                onAdDismissedFullScreenContent: (ad) {
+                  log.d('$ad onAdDismissedFullScreenContent.');
+                  ad.dispose();
+                },
+                onAdClicked: (ad) {});
+
+            // Keep a reference to the ad so we can dispose it later.
+            _interstitialAd = ad;
+            ad.show();
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            log.d('InterstitialAd failed to load: $error');
+          },
+        ));
   }
 }
