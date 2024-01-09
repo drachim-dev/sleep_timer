@@ -33,7 +33,7 @@ class CircularSlider extends StatefulWidget {
   }
 
   CircularSlider({
-    Key? key,
+    super.key,
     double initial = 50,
     this.min = 0,
     this.max = 100,
@@ -43,8 +43,7 @@ class CircularSlider extends StatefulWidget {
   })  : currentLapValue = initial % (max + 1),
         lapIndex = (initial / (max + 1)).floor(),
         assert(min <= max),
-        assert(initial >= min),
-        super(key: key);
+        assert(initial >= min);
   @override
   CircularSliderState createState() => CircularSliderState();
 }

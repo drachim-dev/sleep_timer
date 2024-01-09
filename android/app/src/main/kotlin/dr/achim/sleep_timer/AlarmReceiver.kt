@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import dr.achim.sleep_timer.Messages.FlutterTimerApi
 import dr.achim.sleep_timer.Messages.TimerRequest
+import dr.achim.sleep_timer.Messages.VoidResult
 import io.flutter.embedding.engine.FlutterEngineCache
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -21,7 +22,10 @@ class AlarmReceiver : BroadcastReceiver() {
         val request = TimerRequest().apply {
             timerId = intent.getStringExtra(NotificationReceiver.KEY_TIMER_ID)
         }
-        flutterTimerApi.onAlarm(request) { }
+        flutterTimerApi.onAlarm(request, object : VoidResult {
+            override fun success() {}
+            override fun error(error: Throwable) {}
+        })
     }
 
     private fun initializeFlutter() {

@@ -180,10 +180,10 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
 
 class LinkDialog extends StatelessWidget {
   const LinkDialog({
-    Key? key,
+    super.key,
     required this.model,
     required this.bridge,
-  }) : super(key: key);
+  });
 
   final BridgeLinkViewModel? model;
   final BridgeModel bridge;

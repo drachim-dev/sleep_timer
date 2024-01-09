@@ -23,39 +23,57 @@ class NotificationActionReceiver : BroadcastReceiver() {
             NotificationReceiver.ACTION_CONTINUE_REQUEST -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_CONTINUE_REQUEST) as ArrayList<Any>?
                 if (map != null) {
-                    flutterTimerApi.onContinueRequest(TimerRequest.fromList(map)) { }
+                    flutterTimerApi.onContinueRequest(TimerRequest.fromList(map), object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             NotificationReceiver.ACTION_PAUSE_REQUEST -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_PAUSE_REQUEST) as ArrayList<Any>?
                 if (map != null) {
-                    flutterTimerApi.onPauseRequest(TimerRequest.fromList(map)) { }
+                    flutterTimerApi.onPauseRequest(TimerRequest.fromList(map), object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             NotificationReceiver.ACTION_CANCEL_REQUEST -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_CANCEL_REQUEST) as ArrayList<Any>?
                 if (map != null) {
-                    flutterTimerApi.onCancelRequest(TimerRequest.fromList(map)) { }
+                    flutterTimerApi.onCancelRequest(TimerRequest.fromList(map), object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             NotificationReceiver.ACTION_EXTEND -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_EXTEND_RESPONSE) as ArrayList<Any>?
                 if (map != null) {
                     val extendTimeResponse: ExtendTimeRequest = ExtendTimeRequest.fromList(map)
-                    flutterTimerApi.onExtendTime(extendTimeResponse) { }
+                    flutterTimerApi.onExtendTime(extendTimeResponse, object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             NotificationReceiver.ACTION_COUNTDOWN -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST) as ArrayList<Any>?
                 if (map != null) {
                     val countDownRequest: CountDownRequest = CountDownRequest.fromList(map)
-                    flutterTimerApi.onCountDown(countDownRequest) { }
+                    flutterTimerApi.onCountDown(countDownRequest, object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             NotificationReceiver.ACTION_RESTART_REQUEST -> {
                 map = intent.getSerializableExtra(NotificationReceiver.KEY_RESTART_REQUEST) as ArrayList<Any>?
                 if (map != null) {
-                    flutterTimerApi.onRestartRequest(TimerRequest.fromList(map)) { }
+                    flutterTimerApi.onRestartRequest(TimerRequest.fromList(map), object : VoidResult {
+                        override fun success() {}
+                        override fun error(error: Throwable) {}
+                    })
                 }
             }
             else -> { }

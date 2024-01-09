@@ -44,14 +44,13 @@ class ValueActionModel extends ActionModel {
   }
 
   ValueActionModel(
-      {required id,
-      required title,
-      description,
-      enabled = false,
+      {required super.id,
+      required super.title,
+      super.description,
+      super.enabled = false,
       this.value,
       this.unit,
-      this.key})
-      : super(id: id, title: title, description: description, enabled: enabled);
+      this.key});
 }
 
 List<ActionModel> startActionList = [

@@ -28,7 +28,7 @@ class MainActivity : FlutterActivity() {
 
         Log.d(TAG, "configureFlutterEngine")
 
-        HostTimerApi.setup(flutterEngine.dartExecutor, MethodChannelImpl(applicationContext))
+        HostTimerApi.setUp(flutterEngine.dartExecutor, MethodChannelImpl(applicationContext))
         flutterTimerApi = FlutterTimerApi(flutterEngine.dartExecutor.binaryMessenger)
 
         // val factory = ListTileNativeAdFactory(layoutInflater)
@@ -56,7 +56,10 @@ class MainActivity : FlutterActivity() {
         val map = intent.getSerializableExtra(NotificationReceiver.KEY_OPEN_REQUEST) as ArrayList<Any>?
         if (map != null) {
             val request: OpenRequest = OpenRequest.fromList(map)
-            flutterTimerApi?.onOpen(request) { }
+            flutterTimerApi?.onOpen(request, object : Messages.VoidResult {
+                override fun success() {}
+                override fun error(error: Throwable) {}
+            })
         }
     }
 }

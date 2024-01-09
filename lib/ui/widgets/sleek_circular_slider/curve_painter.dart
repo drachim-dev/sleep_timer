@@ -1,4 +1,4 @@
-part of circular_slider;
+part of 'circular_slider.dart';
 
 class _CurvePainter extends CustomPainter {
   final double angle;
