@@ -28,7 +28,7 @@ Additional features
 * Choose between different different themes
 * Sleek animations
 
-Everything is designed to be easy and pleasent to use.
+Everything is designed to be easy and pleasant to use.
 
 ## Screenshots
 

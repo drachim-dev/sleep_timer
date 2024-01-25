@@ -123,7 +123,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     await runBusyFuture(_timerService.cancelTimer());
   }
 
-  Future<void> navigateBack() async {
+  void navigateBack() {
     _navigationService.back(result: timerModel.id);
   }
 
