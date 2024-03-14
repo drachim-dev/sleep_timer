@@ -54,7 +54,7 @@ extension GetItInjectableX on _i1.GetIt {
     );
     gh.lazySingleton<_i5.SnackbarService>(
         () => thirdPartyServicesModule.snackBarService);
-    gh.singleton<_i9.ThemeService>(_i9.ThemeService());
+    gh.singleton<_i9.ThemeService>(() => _i9.ThemeService());
     gh.factoryParam<_i10.TimerService, _i11.TimerModel?, dynamic>((
       timerModel,
       _,
