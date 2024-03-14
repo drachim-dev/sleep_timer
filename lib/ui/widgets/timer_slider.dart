@@ -66,8 +66,8 @@ class _TimerSliderState extends State<TimerSlider> {
 
     return CircularSlider(
       min: widget.minValue.toDouble(),
-      max: widget.maxValue.toDouble(),
-      initial: widget.initialValue.toDouble(),
+      lapMaxValue: widget.maxValue.toDouble(),
+      value: widget.initialValue.toDouble(),
       appearance: CircularSliderAppearance(
         animationEnabled: widget.animationEnabled,
         size: widget.size,

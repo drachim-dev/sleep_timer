@@ -1,7 +1,7 @@
 library circular_slider;
 
-import 'dart:math';
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
@@ -19,31 +19,34 @@ typedef OnChange = void Function(int lapIndex, int currentLapValue);
 enum SlidingState { none, endIsBiggerThanStart, endIsSmallerThanStart }
 
 class CircularSlider extends StatefulWidget {
-  final double currentLapValue;
+  final double lapValue;
   final int lapIndex;
   final double min;
-  final double max;
+  final double lapMaxValue;
   final CircularSliderAppearance appearance;
   final OnChange? onChange;
   final Widget Function(int lapIndex, int currentLapValue)? child;
   static const defaultAppearance = CircularSliderAppearance();
 
   double get angle {
-    return valueToAngle(currentLapValue, min, max, appearance.angleRange);
+    return valueToAngle(lapValue, min, lapMaxValue, appearance.angleRange);
   }
 
   CircularSlider({
     super.key,
-    double initial = 50,
+    double value = 30,
     this.min = 0,
-    this.max = 100,
+    this.lapMaxValue = 60,
     this.appearance = defaultAppearance,
     this.onChange,
     this.child,
-  })  : currentLapValue = initial % (max + 1),
-        lapIndex = (initial / (max + 1)).floor(),
-        assert(min <= max),
-        assert(initial >= min);
+  })  : lapValue = value % lapMaxValue == 0 ? lapMaxValue : value % lapMaxValue,
+        lapIndex = value % lapMaxValue == 0
+            ? (value / lapMaxValue).floor() - 1
+            : (value / lapMaxValue).floor(),
+        assert(min <= lapMaxValue),
+        assert(value >= min);
+
   @override
   CircularSliderState createState() => CircularSliderState();
 }
@@ -71,7 +74,7 @@ class CircularSliderState extends State<CircularSlider>
   @override
   void initState() {
     super.initState();
-    _value = widget.currentLapValue;
+    _value = widget.lapValue;
     _lapIndex = widget.lapIndex;
     _startAngle = widget.appearance.startAngle;
     _angleRange = widget.appearance.angleRange;
@@ -103,12 +106,12 @@ class CircularSliderState extends State<CircularSlider>
     _animationManager ??= ValueChangedAnimationManager(
       tickerProvider: this,
       minValue: widget.min,
-      maxValue: widget.max,
+      maxValue: widget.lapMaxValue,
       durationMultiplier: widget.appearance.animDurationMultiplier,
     );
 
-    _animationManager!.animate(
-        initialValue: widget.currentLapValue,
+    _animationManager?.animate(
+        initialValue: widget.lapValue,
         angle: widget.angle,
         oldAngle: _oldWidgetAngle,
         oldValue: _oldWidgetValue,
@@ -126,7 +129,8 @@ class CircularSliderState extends State<CircularSlider>
 
   // we just want to see if a value changed drastically its value
   bool radiansWasModuloed(double current, double previous) {
-    return (previous - current).abs() / widget.max * 100 > 50;
+    double delta = (previous - current).abs();
+    return delta <= widget.lapMaxValue && delta >= widget.lapMaxValue - 5;
   }
 
   @override
@@ -182,13 +186,14 @@ class CircularSliderState extends State<CircularSlider>
         angle: _currentAngle! < 0.5 ? 0.5 : _currentAngle!,
         appearance: widget.appearance);
     _oldWidgetAngle = widget.angle;
-    _oldWidgetValue = widget.currentLapValue;
+    _oldWidgetValue = widget.lapValue;
   }
 
   void _updateOnChange() {
     final prevValue = _value;
 
-    _value = angleToValue(_currentAngle!, widget.min, widget.max, _angleRange);
+    _value = _currentAngle == 0 ? _value : angleToValue(
+        _currentAngle!, widget.min, widget.lapMaxValue, _angleRange);
 
     if (radiansWasModuloed(prevValue, _value)) {
       prevValue > _value ? _lapIndex++ : _lapIndex = max(_lapIndex - 1, 0);
@@ -244,7 +249,7 @@ class CircularSliderState extends State<CircularSlider>
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var position = renderBox.globalToLocal(details);
     final double touchWidth = max(widget.appearance.progressBarWidth, 50);
-    
+
     if (isPointAlongCircle(
         position, _painter!.center!, _painter!.radius, touchWidth)) {
       _selectedAngle = coordinatesToRadians(_painter!.center!, position);

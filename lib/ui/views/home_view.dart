@@ -164,6 +164,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                   minValue: 1,
                   maxValue: 60,
                   initialValue: viewModel.initialTime,
+                  animationEnabled: false,
                   showGlow: viewModel.showGlow,
                   onChange: (hours, minutes) {
                     final minutesTotal = hours * 60 + minutes;
