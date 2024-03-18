@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -15,20 +14,9 @@ class LightGroupViewModel extends FutureViewModel {
 
   @override
   Future futureToRun() async {
-    final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
-    var savedBridges = <BridgeModel>[];
-    if (savedBridgesJson != null) {
-      savedBridges = BridgeModel.decode(savedBridgesJson);
-    }
+    final savedBridges = await _lightService.getSavedBridges();
 
     await Future.forEach(savedBridges, (BridgeModel bridge) async {
-      final savedEntry =
-          savedBridges.firstWhereOrNull((element) => element.id == element.id);
-
-      if (savedEntry != null) {
-        bridge = savedEntry
-          ..state = await _lightService.getConnectionState(bridge);
-
         if (bridge.state == Connection.connected) {
           var allGroups = await _lightService.getRooms(bridge);
 
@@ -41,7 +29,7 @@ class LightGroupViewModel extends FutureViewModel {
             }
           }
         }
-      }
+      
     });
 
     return savedBridges

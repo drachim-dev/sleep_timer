@@ -1,5 +1,5 @@
-import 'package:http/http.dart';
-import 'package:hue_dart/hue_dart.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter_hue/flutter_hue.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/locator.dart';
@@ -11,76 +11,75 @@ import 'package:sleep_timer/model/light_group.dart';
 class LightService {
   final SharedPreferences _prefsService = locator<SharedPreferences>();
 
-  final Client _client = Client();
+  Future<List<BridgeModel>> discoverBridges() async {
+    await FlutterHueMaintenanceRepo.maintainBridges();
 
-  Future<List<BridgeModel>> findBridges() async {
-    final discovery = BridgeDiscovery(_client);
+    final result = await BridgeDiscoveryRepo.discoverBridges();
+    return result.map((ip) {
+      return BridgeModel(id: ip, ip: ip);
+    }).toList();
+  }
 
-    try {
-      final results = await discovery.automatic();
-      return results.map((e) {
-        return BridgeModel(id: e.id, ip: e.ipAddress, mac: e.mac, name: e.name);
-      }).toList();
-    } on BridgeException {
-      rethrow;
-    }
+  Future<List<BridgeModel>> getSavedBridges() async {
+    final result = await BridgeDiscoveryRepo.fetchSavedBridges();
+    return result.map((bridge) {
+      final authKey = bridge.applicationKey;
+      final state = authKey != null ? Connection.connected : Connection.failed;
+
+      return BridgeModel(
+          id: bridge.bridgeId,
+          ip: bridge.ipAddress,
+          auth: authKey,
+          state: state);
+    }).toList();
   }
 
   Future<bool> linkBridge(BridgeModel bridgeModel) async {
-    final bridge = Bridge(_client, bridgeModel.ip!);
+    final bridge = await BridgeDiscoveryRepo.firstContact(
+      bridgeIpAddr: bridgeModel.ip,
+    );
 
-    final auth = await _createUser(bridge);
+    final authKey = bridge?.applicationKey;
+    final state = authKey != null ? Connection.connected : Connection.failed;
+
     bridgeModel
-      ..auth = auth
-      ..state = Connection.connected;
-    final bridges = <BridgeModel>[bridgeModel];
-    final json = BridgeModel.encode(bridges);
-    await _prefsService.setString(kPrefKeyHueBridges, json);
+      ..auth = authKey
+      ..state = state;
 
-    return false;
-  }
-
-  Future<Connection> getConnectionState(BridgeModel bridgeModel) async {
-    if (bridgeModel.auth == null) {
-      return Connection.unsaved;
-    }
-
-    final bridge = Bridge(_client, bridgeModel.ip!, bridgeModel.auth!);
-    final config = await bridge.configuration();
-
-    if (config.whitelist == null) {
-      return Connection.failed;
-    }
-
-    return Connection.connected;
-  }
-
-  Future<String?> _createUser(Bridge bridge) async {
-    try {
-      final String userNameId = await bridge.brideLoopToAwaitPushlinkForUserId();
-      return userNameId;
-    } on BridgeException {
-      rethrow;
-    }
+    return state == Connection.connected;
   }
 
   Future<List<LightGroup>> getRooms(BridgeModel bridgeModel) async {
-    final bridge = Bridge(_client, bridgeModel.ip!, bridgeModel.auth!);
-    final groups = await bridge.groups();
-    return groups
-        .where((e) => e.type?.toLowerCase() != 'entertainment')
-        .map((e) => LightGroup(
-            id: e.id.toString(),
-            className: e.className,
-            name: e.name,
-            numberOfLights: e.lightIds?.length))
-        .toList();
+    final result = await BridgeDiscoveryRepo.fetchSavedBridges();
+    final bridge =
+        result.firstWhereOrNull((bridge) => bridge.bridgeId == bridgeModel.id);
+
+    if (bridge == null) {
+      return List.empty();
+    }
+
+    final hueNetwork = HueNetwork(bridges: [bridge]);
+    await hueNetwork.fetchAll();
+
+    return hueNetwork.rooms
+        .where((room) => room.type == ResourceType.room)
+        .map((room) {
+      final lights = room.childrenAsResources
+          .where((child) => child.type == ResourceType.light)
+          .toList();
+
+      return LightGroup(
+          id: room.id,
+          className: room.type.name,
+          name: room.metadata.name,
+          numberOfLights: lights.length);
+    }).toList();
   }
 
   Future<void> toggleLights(final bool enabled) async {
     final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
 
-    if (savedBridgesJson != null) {
+    /* if (savedBridgesJson != null) {
       final savedBridges = BridgeModel.decode(savedBridgesJson);
 
       for (var bridgeModel in savedBridges) {
@@ -109,11 +108,11 @@ class LightService {
           }
         }
       }
-    }
+    } */
   }
 }
 
-LightState lightStateForColorOnly(Light light) {
+/* LightState lightStateForColorOnly(Light light) {
   LightState state;
   if (light.state?.colorMode == 'xy') {
     state = LightState((b) => b..xy = light.state?.xy?.toBuilder());
@@ -126,4 +125,4 @@ LightState lightStateForColorOnly(Light light) {
       ..brightness = light.state?.brightness);
   }
   return state;
-}
+} */

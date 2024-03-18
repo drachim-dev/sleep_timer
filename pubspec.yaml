@@ -24,10 +24,10 @@ dependencies:
   collection: ^1.17.0
   firebase_core: ^2.0.0
   firebase_crashlytics: ^3.0.0
+  flutter_hue: ^1.2.4
   get_it: ^7.0.0
   google_mobile_ads: ^4.0.0
   http: ^1.1.2
-  hue_dart: ^0.3.0
   intl: ^0.18.0
   in_app_purchase: ^3.0.0
   in_app_purchase_android: ^0.3.0
@@ -55,13 +55,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-
-dependency_overrides:
-  hue_dart:
-    git:
-      url: https://github.com/guyluz11/hue_dart.git
-      path: .
-      ref: master
 
 dev_dependencies:
   build_runner: null
