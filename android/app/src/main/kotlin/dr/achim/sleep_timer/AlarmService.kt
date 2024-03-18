@@ -117,7 +117,6 @@ class AlarmService : Service() {
                     }
                 }
             }
-
             else -> {
                 isRunning = false
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -128,6 +127,7 @@ class AlarmService : Service() {
     }
 
     private fun startAlarm(request: RunningNotificationRequest) {
+        Log.d(TAG, "startAlarm")
         val alarmIntent = Intent(this, AlarmReceiver::class.java)
         alarmIntent.putExtra(NotificationReceiver.KEY_TIMER_ID, request.timerId)
 
@@ -135,16 +135,17 @@ class AlarmService : Service() {
 
         pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         pendingAlarmIntent?.let { intent ->
+            val triggerInMillis = Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || manager.canScheduleExactAlarms()) {
                 manager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
-                    Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
+                    triggerInMillis,
                     intent,
                 )
             } else {
                 manager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
-                    Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000,
+                    triggerInMillis,
                     intent,
                 )
             }

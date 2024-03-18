@@ -99,12 +99,21 @@ class NotificationReceiver : BroadcastReceiver() {
                     }
                 }
 
-        val actions =
-                buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+        val actions = buildNotificationActions(
+            timerId = timerId,
+            restartAction = request.restartAction,
+            pauseAction = request.pauseAction,
+            continueAction = request.continueAction,
+            cancelAction = request.cancelAction,
+            extendActions = request.extendActions
+        )
+
         for (action in actions) {
             builder.addAction(action)
         }
+
         val notification = builder.build()
+
         showNotification(notification)
     }
 
@@ -165,11 +174,19 @@ class NotificationReceiver : BroadcastReceiver() {
                     }
                 }
 
-        val actions =
-                buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+        val actions = buildNotificationActions(
+                    timerId = timerId,
+                    restartAction = request.restartAction,
+                    pauseAction = request.pauseAction,
+                    continueAction = request.continueAction,
+                    cancelAction = request.cancelAction,
+                    extendActions = request.extendActions
+                )
+
         for (action in actions) {
             builder.addAction(action)
         }
+
         val notification = builder.build()
         showNotification(notification)
     }
@@ -191,11 +208,19 @@ class NotificationReceiver : BroadcastReceiver() {
                     }
                 }
 
-        val actions =
-                buildNotificationActions(timerId, request.restartAction, request.pauseAction, request.continueAction, request.cancelAction, request.extendActions)
+        val actions = buildNotificationActions(
+            timerId = timerId,
+            restartAction = request.restartAction,
+            pauseAction = request.pauseAction,
+            continueAction = request.continueAction,
+            cancelAction = request.cancelAction,
+            extendActions = request.extendActions
+        )
+
         for (action in actions) {
             builder.addAction(action)
         }
+
         val notification = builder.build()
         showNotification(notification)
     }
