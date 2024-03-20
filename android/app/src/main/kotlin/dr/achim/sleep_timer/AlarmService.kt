@@ -4,6 +4,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.*
@@ -42,9 +43,22 @@ class AlarmService : Service() {
 
         if (notification == null) {
             initNotificationChannel()
-            notification = NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID).build()
+            notification =
+                NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID)
+                    .build()
         }
-        startForeground(NotificationReceiver.NOTIFICATION_ID, notification)
+
+        notification?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(
+                    NotificationReceiver.NOTIFICATION_ID,
+                    it,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                )
+            } else {
+                startForeground(NotificationReceiver.NOTIFICATION_ID, it)
+            }
+        }
 
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
             initShakeDetector()
@@ -56,7 +70,11 @@ class AlarmService : Service() {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_LOW
-            val notificationChannel = NotificationChannel(NotificationReceiver.NOTIFICATION_CHANNEL_ID, "Active timer", importance)
+            val notificationChannel = NotificationChannel(
+                NotificationReceiver.NOTIFICATION_CHANNEL_ID,
+                "Active timer",
+                importance
+            )
             notificationChannel.description = "Notify about running or pausing timers"
             NotificationManagerCompat.from(this).createNotificationChannel(notificationChannel)
         }
@@ -75,10 +93,12 @@ class AlarmService : Service() {
         Log.d(TAG, "intent action: ${intent?.action}")
         when (intent?.action) {
             ACTION_START -> {
-                val map = intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as ArrayList<Any>?
+                val map =
+                    intent.getSerializableExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION) as ArrayList<Any>?
 
                 if (map != null) {
-                    val request: RunningNotificationRequest = RunningNotificationRequest.fromList(map)
+                    val request: RunningNotificationRequest =
+                        RunningNotificationRequest.fromList(map)
                     startAlarm(request)
 
                     timer.scheduleAtFixedRate(object : TimerTask() {
@@ -90,16 +110,26 @@ class AlarmService : Service() {
                                 newTime = max(request.remainingTime!!, 0L)
                             }
 
-                            val countDownIntent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                            val countDownIntent = Intent(
+                                applicationContext,
+                                NotificationActionReceiver::class.java
+                            ).apply {
                                 action = NotificationReceiver.ACTION_COUNTDOWN
-                                putExtra(NotificationReceiver.KEY_COUNTDOWN_REQUEST, response.toList())
+                                putExtra(
+                                    NotificationReceiver.KEY_COUNTDOWN_REQUEST,
+                                    response.toList()
+                                )
                             }
                             sendBroadcast(countDownIntent)
 
-                            val showRunningIntent = Intent(applicationContext, NotificationReceiver::class.java).apply {
-                                action = NotificationReceiver.ACTION_SHOW_RUNNING
-                                putExtra(NotificationReceiver.KEY_SHOW_NOTIFICATION, request.toList())
-                            }
+                            val showRunningIntent =
+                                Intent(applicationContext, NotificationReceiver::class.java).apply {
+                                    action = NotificationReceiver.ACTION_SHOW_RUNNING
+                                    putExtra(
+                                        NotificationReceiver.KEY_SHOW_NOTIFICATION,
+                                        request.toList()
+                                    )
+                                }
                             sendBroadcast(showRunningIntent)
                         }
                     }, 0, 1000)
@@ -117,6 +147,7 @@ class AlarmService : Service() {
                     }
                 }
             }
+
             else -> {
                 isRunning = false
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -133,9 +164,15 @@ class AlarmService : Service() {
 
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        pendingAlarmIntent = PendingIntent.getBroadcast(this, REQUEST_CODE_ALARM, alarmIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        pendingAlarmIntent = PendingIntent.getBroadcast(
+            this,
+            REQUEST_CODE_ALARM,
+            alarmIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
         pendingAlarmIntent?.let { intent ->
-            val triggerInMillis = Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000
+            val triggerInMillis =
+                Calendar.getInstance().timeInMillis + request.remainingTime!! * 1000
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || manager.canScheduleExactAlarms()) {
                 manager.setExactAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
@@ -163,14 +200,16 @@ class AlarmService : Service() {
                 val response = ExtendTimeRequest()
                 response.timerId = timerId ?: this@AlarmService.timerId
 
-                val intent = Intent(applicationContext, NotificationActionReceiver::class.java).apply {
-                    action = NotificationReceiver.ACTION_EXTEND
-                    putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toList())
-                }
+                val intent =
+                    Intent(applicationContext, NotificationActionReceiver::class.java).apply {
+                        action = NotificationReceiver.ACTION_EXTEND
+                        putExtra(NotificationReceiver.KEY_EXTEND_RESPONSE, response.toList())
+                    }
                 sendBroadcast(intent)
 
                 val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                    val vibratorManager =
+                        getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
                     vibratorManager.defaultVibrator
                 } else {
                     @Suppress("DEPRECATION")
@@ -178,7 +217,12 @@ class AlarmService : Service() {
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+                    vibrator.vibrate(
+                        VibrationEffect.createOneShot(
+                            500,
+                            VibrationEffect.DEFAULT_AMPLITUDE
+                        )
+                    )
                 } else {
                     @Suppress("DEPRECATION")
                     vibrator.vibrate(500)

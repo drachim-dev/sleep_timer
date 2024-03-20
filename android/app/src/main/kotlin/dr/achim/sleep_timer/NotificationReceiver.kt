@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.text.format.DateUtils
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -94,6 +95,11 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .apply {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+                    }
+
                     request.accentColor?.let {
                         color = it.toInt()
                     }
