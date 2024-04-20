@@ -18,29 +18,19 @@ class BridgeLinkViewModel extends FutureViewModel {
 
   @override
   Future<List<BridgeModel>> futureToRun() async {
-
     try {
+      final newDevices = await _lightService.discoverBridges();
+      final savedBridges = await _lightService.getSavedBridges();
 
-      await _lightService.discoverBridges();
-      final bridges = await _lightService.getSavedBridges();
+      final allIps =
+          savedBridges.map((e) => e.ip).whereType<String>().toList() +
+              newDevices;
 
-      final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
-
-      if (savedBridgesJson == null) return bridges;
-
-      final savedBridges = BridgeModel.decode(savedBridgesJson);
-      await Future.forEach(bridges, (BridgeModel element) async {
-        final savedEntry = savedBridges.firstWhereOrNull(
-            (element) => element.id == element.id);
-
-        if (savedEntry != null) {
-          element
-            ..auth = savedEntry.auth
-            ..state = await _lightService.getConnectionState(element);
-        }
-      });
-
-      return bridges;
+      return allIps.map((e) {
+        final savedBridge =
+            savedBridges.firstWhereOrNull((element) => element.ip == e);
+        return savedBridge ?? BridgeModel(id: e, ip: e);
+      }).toList();
     } catch (error) {
       setError(error);
       rethrow;

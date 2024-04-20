@@ -170,9 +170,14 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
                   connectionHint,
                   textAlign: TextAlign.center,
                 ),
-                onTap: () => item.state == Connection.connected
-                    ? _buildDisconnectDialog(theme, item)
-                    : _buildConnectDialog(theme, item));
+                onTap: () {
+                  if (item.state != Connection.connected) {
+                    _buildConnectDialog(theme, item);
+                  }
+
+                  // No unlinking possible for now
+                  // _buildDisconnectDialog(theme, item)
+                });
           },
           itemCount: viewModel.data.length,
           separatorBuilder: (_, int index) => Divider(),
