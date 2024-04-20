@@ -37,31 +37,38 @@ class AlarmService : Service() {
     private var accelerometer: Sensor? = null
     private var pendingAlarmIntent: PendingIntent? = null
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.d(TAG, "onCreate")
-
-        if (notification == null) {
-            initNotificationChannel()
-            notification =
-                NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID)
-                    .build()
-        }
-
-        notification?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NotificationReceiver.NOTIFICATION_ID,
-                    it,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                )
-            } else {
-                startForeground(NotificationReceiver.NOTIFICATION_ID, it)
+    private fun startForeground() {
+        try {
+            if (notification == null) {
+                initNotificationChannel()
+                notification =
+                    NotificationCompat.Builder(this, NotificationReceiver.NOTIFICATION_CHANNEL_ID)
+                        .build()
             }
-        }
 
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
-            initShakeDetector()
+            notification?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    startForeground(
+                        NotificationReceiver.NOTIFICATION_ID,
+                        it,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                    )
+                } else {
+                    startForeground(NotificationReceiver.NOTIFICATION_ID, it)
+                }
+            }
+
+            if (packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
+                initShakeDetector()
+            }
+
+        } catch (e: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && e is ForegroundServiceStartNotAllowedException
+            ) {
+                Log.d(TAG, "App not in a valid state to start foreground service")
+            }
+            Log.d(TAG, e.localizedMessage ?: e.message ?: e.toString())
         }
     }
 
@@ -89,8 +96,10 @@ class AlarmService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground()
         isRunning = true
         Log.d(TAG, "intent action: ${intent?.action}")
+
         when (intent?.action) {
             ACTION_START -> {
                 val map =
@@ -101,7 +110,7 @@ class AlarmService : Service() {
                         RunningNotificationRequest.fromList(map)
                     startAlarm(request)
 
-                    timer.scheduleAtFixedRate(object : TimerTask() {
+                    timer.schedule(object : TimerTask() {
                         override fun run() {
                             val response = Messages.CountDownRequest().apply {
                                 timerId = request.timerId
@@ -149,6 +158,7 @@ class AlarmService : Service() {
             }
 
             else -> {
+                Log.d(TAG, "Stopping service due to ${intent?.action}")
                 isRunning = false
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
