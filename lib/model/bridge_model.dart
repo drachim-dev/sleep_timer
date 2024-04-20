@@ -9,7 +9,8 @@ enum Connection { unsaved, connected, failed }
 
 @JsonSerializable()
 class BridgeModel {
-  final String? id, ip, mac, name;
+  final String? id, mac, name;
+  final String ip;
   String? auth;
   Connection? state;
   List<LightGroup> groups;

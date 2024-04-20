@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
@@ -160,8 +162,8 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
 
             return ListTile(
                 leading: Icon(Icons.device_hub_outlined),
-                title: Text('${item.name} '),
-                subtitle: Text('${item.ip}'),
+                title: Text('${item.name}'),
+                subtitle: Text(item.ip),
                 trailing: Text(
                   connectionHint,
                   textAlign: TextAlign.center,
@@ -223,7 +225,7 @@ class LinkDialog extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await model!.linkBridge(bridge);
+                await model?.linkBridge(bridge);
                 setState(() {});
               },
               child: Text(S.of(context).dialogConnect),
