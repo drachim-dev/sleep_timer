@@ -4,7 +4,7 @@
   "introNoInterruptionsTitle": "Sin interrupciones",
   "introNoInterruptionsSubtitle": "No se distraiga con los mensajes o notificaciones entrantes.",
   "introMediaTitle": "Escucha tu música favorita",
-  "IntroMediaSubtitle": "¿Te gusta escuchar música o ver una película mientras te quedas dormido?",
+  "introMediaSubtitle": "¿Te gusta escuchar música o ver una película mientras te quedas dormido?",
   "introGoodNightTitle": "Que tengas una buena noche",
   "introGoodNightSubtitle": "Sólo ajusta el temporizador y listo. Relájate y deja que tus sueños se hagan realidad...",
   "introButtonSkip": "SALTAR",
@@ -110,5 +110,9 @@
   "bluetoothNotSupportedExplanation": "Desde Android 13 ya no es posible desactivar el bluetooth.",
   "commonDialogOk": "OK",
   "bluetoothToggleNotSupportedTitle": "Acción bluetooth eliminado",
-  "setToValue": "Ajuste {acción} al {valor}"
+  "setToValue": "Ajuste {action} al {value}",
+  "linkingFailed": "Error de conexión",
+  "linkingPending": "Conectando",
+  "linkingUnknownError": "Error desconocido",
+  "linkingState": "Status: {status}"
 }

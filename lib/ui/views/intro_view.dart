@@ -41,7 +41,7 @@ class _IntroViewState extends State<IntroView> {
               ),
               PageViewModel(
                 title: S.of(context).introMediaTitle,
-                body: S.of(context).IntroMediaSubtitle,
+                body: S.of(context).introMediaSubtitle,
                 image: _buildImage('img_music.webp'),
                 decoration: pageDecoration,
               ),

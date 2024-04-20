@@ -17,19 +17,18 @@ class LightGroupViewModel extends FutureViewModel {
     final savedBridges = await _lightService.getSavedBridges();
 
     await Future.forEach(savedBridges, (BridgeModel bridge) async {
-        if (bridge.state == Connection.connected) {
-          var allGroups = await _lightService.getRooms(bridge);
+      if (bridge.state == Connection.connected) {
+        final allGroups = await _lightService.getRooms(bridge);
 
-          // check for possible new groups
-          for (var group in allGroups) {
-            var exists =
-                bridge.groups.any((savedGroup) => savedGroup.id == group.id);
-            if (!exists) {
-              bridge.groups.add(group);
-            }
+        // check for possible new groups
+        for (final group in allGroups) {
+          final exists =
+              bridge.groups.any((savedGroup) => savedGroup.id == group.id);
+          if (!exists) {
+            bridge.groups.add(group);
           }
         }
-      
+      }
     });
 
     return savedBridges

@@ -101,10 +101,10 @@ class S {
   }
 
   /// `Do you like to hear music or watch a movie while falling asleep?`
-  String get IntroMediaSubtitle {
+  String get introMediaSubtitle {
     return Intl.message(
       'Do you like to hear music or watch a movie while falling asleep?',
-      name: 'IntroMediaSubtitle',
+      name: 'introMediaSubtitle',
       desc: '',
       args: [],
     );
@@ -1171,6 +1171,46 @@ class S {
       name: 'setToValue',
       desc: '',
       args: [action, value],
+    );
+  }
+
+  /// `Connection failed`
+  String get linkingFailed {
+    return Intl.message(
+      'Connection failed',
+      name: 'linkingFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connecting`
+  String get linkingPending {
+    return Intl.message(
+      'Connecting',
+      name: 'linkingPending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unknown`
+  String get linkingUnknownError {
+    return Intl.message(
+      'Unknown',
+      name: 'linkingUnknownError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Status: {status}`
+  String linkingState(Object status) {
+    return Intl.message(
+      'Status: $status',
+      name: 'linkingState',
+      desc: '',
+      args: [status],
     );
   }
 }

@@ -28,18 +28,18 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m2(count) =>
       "${Intl.plural(count, one: '1 Licht', other: '${count} Lichter')}";
 
-  static String m3(minutes) => "${minutes} Minuten";
+  static String m3(status) => "Status: ${status}";
 
-  static String m4(minutes) => "${minutes} Min";
+  static String m4(minutes) => "${minutes} Minuten";
 
-  static String m5(action, value) => "Stelle ${action} auf ${value}";
+  static String m5(minutes) => "${minutes} Min";
 
-  static String m6(bridge) => "Unlink ${bridge}";
+  static String m6(action, value) => "Stelle ${action} auf ${value}";
+
+  static String m7(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "IntroMediaSubtitle": MessageLookupByLibrary.simpleMessage(
-            "Hörst du zum Einschlafen gerne Musik oder schaust dir einen Film an?"),
         "actionDoNotDisturbDescription":
             MessageLookupByLibrary.simpleMessage("Aktiviert \"Nicht stören\""),
         "actionDoNotDisturbTitle":
@@ -134,6 +134,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Stell einfach den Timer und fertig.\nEntspann dich und träum schön :)"),
         "introGoodNightTitle":
             MessageLookupByLibrary.simpleMessage("Gute Nacht"),
+        "introMediaSubtitle": MessageLookupByLibrary.simpleMessage(
+            "Hörst du zum Einschlafen gerne Musik oder schaust dir einen Film an?"),
         "introMediaTitle":
             MessageLookupByLibrary.simpleMessage("Hör deine Lieblingsmusik"),
         "introNoInterruptionsSubtitle": MessageLookupByLibrary.simpleMessage(
@@ -143,6 +145,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "linkBridge": MessageLookupByLibrary.simpleMessage("Verbinde Bridge"),
         "linkBridgeInstruction": MessageLookupByLibrary.simpleMessage(
             "1. Drücke den Knopf auf der Bridge\n2. Tippe auf verbinden"),
+        "linkingFailed":
+            MessageLookupByLibrary.simpleMessage("Connection failed"),
+        "linkingPending": MessageLookupByLibrary.simpleMessage("Connecting"),
+        "linkingState": m3,
+        "linkingUnknownError": MessageLookupByLibrary.simpleMessage("Unknown"),
         "longPressToAdjustDesc": MessageLookupByLibrary.simpleMessage(
             "Einige Aktionen können konfiguriert werden. Halte die Aktion dazu gedrückt."),
         "longPressToAdjustTitle":
@@ -171,8 +178,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Verbleibende Zeit: %s"),
         "notificationsRequired": MessageLookupByLibrary.simpleMessage(
             "Timer-Benachrichtigungen erforderlich"),
-        "numberOfMinutesLong": m3,
-        "numberOfMinutesShort": m4,
+        "numberOfMinutesLong": m4,
+        "numberOfMinutesShort": m5,
         "otherSectionTitle": MessageLookupByLibrary.simpleMessage("Sonstige"),
         "prefsDeviceAdmin":
             MessageLookupByLibrary.simpleMessage("Erweiterte Gerätefunktionen"),
@@ -199,7 +206,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Ich bin für jede Bewertung dankbar"),
         "rateAppTitle":
             MessageLookupByLibrary.simpleMessage("Gefällt dir die App?"),
-        "setToValue": m5,
+        "setToValue": m6,
         "setVolumeTitle":
             MessageLookupByLibrary.simpleMessage("Lautstärke ändern"),
         "settings": MessageLookupByLibrary.simpleMessage("Einstellungen"),
@@ -235,6 +242,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Beim Starten des Timers"),
         "titleLightGroups":
             MessageLookupByLibrary.simpleMessage("Lampen ausschalten"),
-        "unlinkBridgeName": m6
+        "unlinkBridgeName": m7
       };
 }

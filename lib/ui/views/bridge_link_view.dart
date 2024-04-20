@@ -65,7 +65,9 @@ class _BridgeLinkViewState extends State<BridgeLinkView> {
       final ThemeData theme, final BridgeModel bridge) {
     return showDialog<double>(
         context: context,
-        builder: (_) => LinkDialog(model: viewModel, bridge: bridge));
+        builder: (_) {
+          return LinkDialog(model: viewModel, bridge: bridge);
+        });
   }
 
   Future<void> _buildDisconnectDialog(
@@ -194,6 +196,8 @@ class LinkDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    Connection? connection;
+
     return StatefulBuilder(builder: (_, setState) {
       return AlertDialog(
           title: Text('${bridge.name}'),
@@ -202,35 +206,68 @@ class LinkDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(S.of(context).linkBridgeInstruction),
-                if (model!.connectionError.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: kVerticalPadding),
-                    child: Text(model!.connectionError,
-                        style: theme.textTheme.titleMedium!
-                            .copyWith(color: theme.colorScheme.error)),
-                  ),
                 SizedBox(height: kVerticalPadding),
                 Image.asset('assets/img_pushlink_bridge.webp',
                     width: 88, color: theme.iconTheme.color),
+                if (connection != null)
+                  _buildConnectionState(context, theme, connection!),
               ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                model!.cancelDialog();
+                model?.cancelDialog();
                 setState(() {});
               },
               child: Text(S.of(context).dialogCancel),
             ),
             TextButton(
               onPressed: () async {
-                await model?.linkBridge(bridge);
-                setState(() {});
+                setState(() {
+                  connection = Connection.pending;
+                });
+
+                final result = await model?.linkBridge(bridge);
+                setState(() {
+                  connection = result;
+                });
               },
               child: Text(S.of(context).dialogConnect),
             )
           ]);
     });
   }
+}
+
+Widget _buildConnectionState(
+    BuildContext context, ThemeData theme, Connection connection) {
+  final status = switch (connection) {
+    Connection.failed => S.of(context).linkingFailed,
+    Connection.pending => S.of(context).linkingPending,
+    Connection.connected => S.of(context).connectionStateConnected,
+    _ => S.of(context).linkingUnknownError,
+  };
+
+  return Padding(
+    padding: const EdgeInsets.only(top: kVerticalPadding),
+    child: Row(
+      children: [
+        Text(S.of(context).linkingState(status),
+            style: theme.textTheme.titleMedium!),
+        if (connection == Connection.pending)
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: SizedBox(
+              height: 16,
+              width: 16,
+              child: Center(
+                  child: CircularProgressIndicator(
+                strokeWidth: 2,
+              )),
+            ),
+          ),
+      ],
+    ),
+  );
 }

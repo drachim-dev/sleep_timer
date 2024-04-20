@@ -28,18 +28,18 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m2(count) =>
       "${Intl.plural(count, one: '1 luz', other: '${count} luces')}";
 
-  static String m3(minutes) => "${minutes} minutos";
+  static String m3(status) => "Status: ${status}";
 
-  static String m4(minutes) => "${minutes} min";
+  static String m4(minutes) => "${minutes} minutos";
 
-  static String m5(action, value) => "Set ${action} to \$${value}";
+  static String m5(minutes) => "${minutes} min";
 
-  static String m6(bridge) => "Unlink ${bridge}";
+  static String m6(action, value) => "Ajuste ${action} al ${value}";
+
+  static String m7(bridge) => "Unlink ${bridge}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-        "IntroMediaSubtitle": MessageLookupByLibrary.simpleMessage(
-            "¿Te gusta escuchar música o ver una película mientras te quedas dormido?"),
         "actionDoNotDisturbDescription":
             MessageLookupByLibrary.simpleMessage("Activar No molestar"),
         "actionDoNotDisturbTitle":
@@ -128,6 +128,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Sólo ajusta el temporizador y listo. Relájate y deja que tus sueños se hagan realidad..."),
         "introGoodNightTitle":
             MessageLookupByLibrary.simpleMessage("Que tengas una buena noche"),
+        "introMediaSubtitle": MessageLookupByLibrary.simpleMessage(
+            "¿Te gusta escuchar música o ver una película mientras te quedas dormido?"),
         "introMediaTitle":
             MessageLookupByLibrary.simpleMessage("Escucha tu música favorita"),
         "introNoInterruptionsSubtitle": MessageLookupByLibrary.simpleMessage(
@@ -137,6 +139,12 @@ class MessageLookup extends MessageLookupByLibrary {
         "linkBridge": MessageLookupByLibrary.simpleMessage("Link el puente"),
         "linkBridgeInstruction": MessageLookupByLibrary.simpleMessage(
             "1. Presiona el botón del puente\n2. Pulse en conectar"),
+        "linkingFailed":
+            MessageLookupByLibrary.simpleMessage("Error de conexión"),
+        "linkingPending": MessageLookupByLibrary.simpleMessage("Conectando"),
+        "linkingState": m3,
+        "linkingUnknownError":
+            MessageLookupByLibrary.simpleMessage("Error desconocido"),
         "longPressToAdjustDesc": MessageLookupByLibrary.simpleMessage(
             "Algunas acciones se pueden configurar. Mantenga pulsada la acción para ajustarla."),
         "longPressToAdjustTitle":
@@ -165,8 +173,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Tiempo restante: %s"),
         "notificationsRequired":
             MessageLookupByLibrary.simpleMessage("Se requieren notificaciones"),
-        "numberOfMinutesLong": m3,
-        "numberOfMinutesShort": m4,
+        "numberOfMinutesLong": m4,
+        "numberOfMinutesShort": m5,
         "otherSectionTitle": MessageLookupByLibrary.simpleMessage("Otro"),
         "prefsDeviceAdmin": MessageLookupByLibrary.simpleMessage(
             "Administrador del dispositivo"),
@@ -193,7 +201,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Agradezco cualquier valoración"),
         "rateAppTitle":
             MessageLookupByLibrary.simpleMessage("¿Te gusta la app?"),
-        "setToValue": m5,
+        "setToValue": m6,
         "setVolumeTitle":
             MessageLookupByLibrary.simpleMessage("Ajustar el volumen"),
         "settings": MessageLookupByLibrary.simpleMessage("Ajustes"),
@@ -229,6 +237,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Cuando se inicia"),
         "titleLightGroups":
             MessageLookupByLibrary.simpleMessage("Apagar la luz"),
-        "unlinkBridgeName": m6
+        "unlinkBridgeName": m7
       };
 }

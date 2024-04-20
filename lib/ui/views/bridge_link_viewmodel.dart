@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleep_timer/app/app.router.dart';
@@ -15,29 +16,48 @@ class BridgeLinkViewModel extends FutureViewModel {
   final SharedPreferences _prefsService = locator<SharedPreferences>();
   final LightService _lightService = locator<LightService>();
 
-  String connectionError = '';
-
   @override
-  Future futureToRun() async {
-    final savedBridges = await _lightService.getSavedBridges();
-    return savedBridges;
+  Future<List<BridgeModel>> futureToRun() async {
+
+    try {
+
+      await _lightService.discoverBridges();
+      final bridges = await _lightService.getSavedBridges();
+
+      final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
+
+      if (savedBridgesJson == null) return bridges;
+
+      final savedBridges = BridgeModel.decode(savedBridgesJson);
+      await Future.forEach(bridges, (BridgeModel element) async {
+        final savedEntry = savedBridges.firstWhereOrNull(
+            (element) => element.id == element.id);
+
+        if (savedEntry != null) {
+          element
+            ..auth = savedEntry.auth
+            ..state = await _lightService.getConnectionState(element);
+        }
+      });
+
+      return bridges;
+    } catch (error) {
+      setError(error);
+      rethrow;
+    }
   }
 
-  void _resetError() {
-    connectionError = '';
-  }
+  Future<Connection> linkBridge(final BridgeModel bridgeModel) async {
+    final result = await _lightService.linkBridge(bridgeModel);
 
-  Future<void> linkBridge(final BridgeModel bridgeModel) async {
-    await _lightService.linkBridge(bridgeModel);
-    _resetError();
+    if (result == Connection.connected) {
+      navigateBackToLights();
+    }
 
-    navigateBackToLights();
-
-    notifyListeners();
+    return result;
   }
 
   Future<void> remove(final BridgeModel bridgeModel) async {
-    // TODO: Remove bridge
     await _prefsService.remove(kPrefKeyHueBridges);
     _navigationService.back();
     await initialise();
@@ -50,6 +70,5 @@ class BridgeLinkViewModel extends FutureViewModel {
 
   void cancelDialog() {
     _navigationService.back();
-    _resetError();
   }
 }

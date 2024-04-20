@@ -5,7 +5,7 @@ import 'package:sleep_timer/model/light_group.dart';
 
 part 'bridge_model.g.dart';
 
-enum Connection { unsaved, connected, failed }
+enum Connection { unsaved, pending, connected, failed }
 
 @JsonSerializable()
 class BridgeModel {

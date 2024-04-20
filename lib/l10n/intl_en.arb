@@ -4,7 +4,7 @@
   "introNoInterruptionsTitle": "No interruptions",
   "introNoInterruptionsSubtitle": "Don't get distracted by incoming messages or notifications.",
   "introMediaTitle": "Listen to your favorite music",
-  "IntroMediaSubtitle": "Do you like to hear music or watch a movie while falling asleep?",
+  "introMediaSubtitle": "Do you like to hear music or watch a movie while falling asleep?",
   "introGoodNightTitle": "Have a good night",
   "introGoodNightSubtitle": "Just set the timer and you're done.\nRelax and let your dreams come true ...",
   "introButtonSkip": "SKIP",
@@ -110,5 +110,9 @@
   "bluetoothNotSupportedExplanation": "Since Android 13, toggling bluetooth is not possible anymore.",
   "commonDialogOk": "OK",
   "bluetoothToggleNotSupportedTitle": "Bluetooth action removed",
-  "setToValue": "Set {action} to {value}"
+  "setToValue": "Set {action} to {value}",
+  "linkingFailed": "Connection failed",
+  "linkingPending": "Connecting",
+  "linkingUnknownError": "Unknown",
+  "linkingState": "Status: {status}"
 }
