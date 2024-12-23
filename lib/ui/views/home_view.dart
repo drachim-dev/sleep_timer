@@ -175,15 +175,19 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.only(
                       bottom: kFloatingActionButtonHeight),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [10, 20, 30, 60].map((value) {
-                        return Expanded(
-                          child: RoundedRectButton(
+                  child: Container(
+                    height: 86,
+                    width: double.maxFinite,
+                    alignment: Alignment.center,
+                    child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        children: [15, 30, 45, 60, 90].map((value) {
+                          return RoundedRectButton(
                               title: '$value',
-                              onPressed: () => viewModel.setTime(value)),
-                        );
-                      }).toList()),
+                              onPressed: () => viewModel.setTime(value));
+                        }).toList()),
+                  ),
                 ),
               ],
             ),
