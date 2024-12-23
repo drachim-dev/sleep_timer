@@ -26,37 +26,37 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         private val TAG = MethodChannelImpl::class.java.toString()
 
         private val audioPlayerPackages = listOf(
-                "com.spotify.music",
-                "com.google.android.youtube",
-                "deezer.android.app",
-                "com.apple.android.music",
-                "com.amazon.mp3",
-                "com.pandora.android",
-                "com.rhapsody",
-                "com.aspiro.tidal",
-                "com.soundcloud.android",
-                "com.google.android.apps.podcasts",
-                "com.sec.android.app.music",
-                "com.google.android.apps.youtube.music",
+            "com.spotify.music",
+            "com.google.android.youtube",
+            "deezer.android.app",
+            "com.apple.android.music",
+            "com.amazon.mp3",
+            "com.pandora.android",
+            "com.rhapsody",
+            "com.aspiro.tidal",
+            "com.soundcloud.android",
+            "com.google.android.apps.podcasts",
+            "com.sec.android.app.music",
+            "com.google.android.apps.youtube.music",
         )
 
         private val videoPlayerPackages = listOf(
-                "com.netflix.mediaclient",
-                "com.disney.disneyplus",
-                "com.amazon.avod.thirdpartyclient",
-                "com.disney.disneyplus",
-                "de.prosiebensat1digital.seventv",
-                "de.sky.bw",
-                "de.sky.online",
-                "com.dazn",
-                "com.plexapp.android",
-                "org.xbmc.kodi",
-                "com.vanced.android.youtube",
+            "com.netflix.mediaclient",
+            "com.disney.disneyplus",
+            "com.amazon.avod.thirdpartyclient",
+            "com.disney.disneyplus",
+            "de.prosiebensat1digital.seventv",
+            "de.sky.bw",
+            "de.sky.online",
+            "com.dazn",
+            "com.plexapp.android",
+            "org.xbmc.kodi",
+            "com.vanced.android.youtube",
         )
 
         private val excludePackages = listOf(
-                "com.google.android.apps.docs",
-                "com.google.android.apps.photos",
+            "com.google.android.apps.docs",
+            "com.google.android.apps.photos",
         )
     }
 
@@ -70,10 +70,8 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
     }
 
     private fun stopForegroundService() {
-        if (AlarmService.isRunning) {
-            val intent = Intent(context, AlarmService::class.java)
-            context.stopService(intent)
-        }
+        val intent = Intent(context, AlarmService::class.java)
+        context.stopService(intent)
     }
 
     override fun showRunningNotification(arg: RunningNotificationRequest): NotificationResponse {
@@ -159,7 +157,7 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
                 putExtra(AlarmService.KEY_ENABLE_EXTEND_BY_SHAKE, arg.enable)
             }
 
-            context.startService(intent)
+            ContextCompat.startForegroundService(context, intent)
         }
     }
 
@@ -182,10 +180,10 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
         val mediaList = manager.queryBroadcastReceivers(intentMedia, 0)
 
         val apps: MutableSet<Package> = getAppsFromResolveInfo(audioList)
-                .union(getAppsFromResolveInfo(videoList))
-                .union(getAppsFromResolveInfo(mediaList))
-                .filterNot { excludePackages.contains(it.packageName) }
-                .toMutableSet()
+            .union(getAppsFromResolveInfo(videoList))
+            .union(getAppsFromResolveInfo(mediaList))
+            .filterNot { excludePackages.contains(it.packageName) }
+            .toMutableSet()
 
         // Query by packageName
         val packageNames = audioPlayerPackages + videoPlayerPackages
@@ -248,7 +246,11 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
 
     // https://stackoverflow.com/questions/44447056/convert-adaptiveicondrawable-to-bitmap-in-android-o-preview
     private fun getBitmapFromDrawable(drawable: Drawable): Bitmap {
-        val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)

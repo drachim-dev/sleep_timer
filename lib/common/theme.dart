@@ -133,7 +133,7 @@ ColorScheme _lightOrangeColorScheme = ColorScheme(
   onBackground: Colors.grey[900]!,
   surface: Color(0xFFFFFBFF),
   onSurface: Color(0xFF2D1600),
-  surfaceVariant: Color(0xFFF2DFD1),
+  surfaceContainerHighest: Color(0xFFF2DFD1),
   onSurfaceVariant: Color(0xFF51443A),
   outline: Color(0xFF837469),
   surfaceTint: Color(0xFF8C5000),
@@ -157,7 +157,7 @@ ColorScheme _lightGreenColorScheme = ColorScheme(
   onBackground: Colors.grey[900]!,
   surface: Color(0xFFFFFBFF),
   onSurface: Color(0xFF2D1600),
-  surfaceVariant: Color(0xFFE3E4D3),
+  surfaceContainerHighest: Color(0xFFE3E4D3),
   onSurfaceVariant: Color(0xFF46483C),
   outline: Color(0xFF76786B),
   shadow: Color(0xFF000000),
@@ -180,7 +180,7 @@ ColorScheme _darkOrangeColorScheme = ColorScheme(
   onSecondary: _darkFillColor,
   onSurface: _darkFillColor,
   brightness: Brightness.dark,
-  surfaceVariant: Color(0xFF504353),
+  surfaceContainerHighest: Color(0xFF504353),
 );
 
 ColorScheme _darkYellowColorScheme = ColorScheme(
@@ -197,7 +197,7 @@ ColorScheme _darkYellowColorScheme = ColorScheme(
   onSecondary: _darkFillColor,
   onSurface: _darkFillColor,
   brightness: Brightness.dark,
-  surfaceVariant: Color(0xFF505047),
+  surfaceContainerHighest: Color(0xFF505047),
 );
 
 ColorScheme _blackColorScheme = ColorScheme(

@@ -15,7 +15,7 @@ import java.util.*
 
 class NotificationReceiver : BroadcastReceiver() {
     companion object {
-        private val TAG = AlarmService::class.java.toString()
+        private val TAG = NotificationReceiver::class.java.toString()
         const val NOTIFICATION_CHANNEL_ID = "1"
         const val NOTIFICATION_ID = 1
         const val ACTION_SHOW_RUNNING = "ACTION_SHOW_RUNNING"

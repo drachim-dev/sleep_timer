@@ -49,19 +49,19 @@ if (project.hasProperty('dart-defines')) {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 android {
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     namespace = "dr.achim.sleep_timer"
 
-    compileSdk 34
+    compileSdk 35
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -74,7 +74,7 @@ android {
     defaultConfig {
         applicationId "dr.achim.sleep_timer"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders.ADMOB_APP_ID = dartEnvironmentVariables.ADMOB_APP_ID
