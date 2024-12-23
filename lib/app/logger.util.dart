@@ -8,7 +8,7 @@ Logger getLogger() {
       methodCount: 1,
       errorMethodCount: 5,
       printEmojis: false,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
     output: null,
   );

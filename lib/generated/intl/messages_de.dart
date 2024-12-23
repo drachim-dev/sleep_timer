@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "actionDoNotDisturbDescription":
-            MessageLookupByLibrary.simpleMessage("Aktiviert \"Nicht stören\""),
+            MessageLookupByLibrary.simpleMessage("\"Nicht stören\" aktiviert"),
         "actionDoNotDisturbTitle":
             MessageLookupByLibrary.simpleMessage("Nicht stören"),
         "actionNotSupported":
@@ -57,7 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "actionToggleLightTitle":
             MessageLookupByLibrary.simpleMessage("Lampen"),
         "actionToggleMediaDescription":
-            MessageLookupByLibrary.simpleMessage("Medienwiedergabe gestoppt"),
+            MessageLookupByLibrary.simpleMessage("Medienwiedergabe angehalten"),
         "actionToggleMediaTitle":
             MessageLookupByLibrary.simpleMessage("Medien"),
         "actionToggleScreenDescription":

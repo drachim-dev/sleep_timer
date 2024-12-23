@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "actionDoNotDisturbDescription":
-            MessageLookupByLibrary.simpleMessage("Activar No molestar"),
+            MessageLookupByLibrary.simpleMessage("No molestar activado"),
         "actionDoNotDisturbTitle":
             MessageLookupByLibrary.simpleMessage("No molestar"),
         "actionNotSupported":

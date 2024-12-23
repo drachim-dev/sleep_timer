@@ -111,7 +111,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         builder: (context, viewModel, _) {
           return PopScope(
             canPop: false,
-            onPopInvoked: (bool didPop) {
+            onPopInvokedWithResult: (bool didPop, _) {
               if (didPop) return;
               viewModel.navigateBack();
             },

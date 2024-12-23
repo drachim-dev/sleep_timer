@@ -144,7 +144,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       case MenuOption.settings:
         viewModel.navigateToSettings();
         break;
-      default:
     }
   }
 
