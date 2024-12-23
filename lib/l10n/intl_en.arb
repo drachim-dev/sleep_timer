@@ -71,7 +71,7 @@
   "notificationTimeLeft": "Time left: %s",
   "timerSettingsSectionTitle": "Timer settings",
   "prefsExtendTimeOnShake": "Extend on phone shake",
-  "extendTimeByShakeMenuToolTip": "Tap to change time",
+  "extendTimeByShakeMenuToolTip": "Select the time to be extended by on phone shake",
   "notSupported": "Not supported by device",
   "actionToggleLightDescription": "Turns your hue lights off",
   "actionToggleLightTitle": "Hue lights",
@@ -114,5 +114,6 @@
   "linkingFailed": "Connection failed",
   "linkingPending": "Connecting",
   "linkingUnknownError": "Unknown",
-  "linkingState": "Status: {status}"
+  "linkingState": "Status: {status}",
+  "tapToChangeTime": "Tap to change time"
 }

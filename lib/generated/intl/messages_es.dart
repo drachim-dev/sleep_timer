@@ -34,7 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(minutes) => "${minutes} min";
 
-  static String m6(action, value) => "Ajuste ${action} al ${value}";
+  static String m6(action, value) => "${action} al ${value}";
 
   static String m7(bridge) => "Unlink ${bridge}";
 
@@ -49,21 +49,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "actionPlayMusicTitle":
             MessageLookupByLibrary.simpleMessage("Toca música"),
         "actionToggleBluetoothDescription":
-            MessageLookupByLibrary.simpleMessage("Desactivar el bluetooth"),
+            MessageLookupByLibrary.simpleMessage("Bluetooth apagado"),
         "actionToggleBluetoothTitle":
             MessageLookupByLibrary.simpleMessage("Bluetooth"),
         "actionToggleLightDescription":
-            MessageLookupByLibrary.simpleMessage("Apaga la luz de Philips Hue"),
+            MessageLookupByLibrary.simpleMessage("Luz apagada"),
         "actionToggleLightTitle": MessageLookupByLibrary.simpleMessage("Luces"),
         "actionToggleMediaDescription": MessageLookupByLibrary.simpleMessage(
-            "Detener la reproducción de medios"),
+            "Reproducción en pausa"),
         "actionToggleMediaTitle": MessageLookupByLibrary.simpleMessage("Media"),
         "actionToggleScreenDescription":
-            MessageLookupByLibrary.simpleMessage("Apagar la pantalla"),
+            MessageLookupByLibrary.simpleMessage("Pantalla apagada"),
         "actionToggleScreenTitle":
             MessageLookupByLibrary.simpleMessage("Pantalla"),
         "actionToggleWifiDescription":
-            MessageLookupByLibrary.simpleMessage("Desactivar wifi"),
+            MessageLookupByLibrary.simpleMessage("Wifi apagado"),
         "actionToggleWifiTitle": MessageLookupByLibrary.simpleMessage("Wifi"),
         "actionVolumeTitle": MessageLookupByLibrary.simpleMessage("Volumen"),
         "adLoadFailure":
@@ -110,8 +110,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Compruebe su conexión"),
         "errorNoDevices": MessageLookupByLibrary.simpleMessage(
             "No se encontraron dispositivos"),
-        "extendTimeByShakeMenuToolTip":
-            MessageLookupByLibrary.simpleMessage("Pulse para cambiar la hora"),
+        "extendTimeByShakeMenuToolTip": MessageLookupByLibrary.simpleMessage(
+            "Seleccione el tiempo que debe prolongarse por agitación telefónica"),
         "faqShort": MessageLookupByLibrary.simpleMessage("FAQ"),
         "faqTitle":
             MessageLookupByLibrary.simpleMessage("Preguntas frecuentes"),
@@ -211,6 +211,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Muestra un efecto de brillo alrededor de la barra de progreso"),
         "sleepTimer": MessageLookupByLibrary.simpleMessage("Sleep Timer"),
         "stateSearching": MessageLookupByLibrary.simpleMessage("Buscando ..."),
+        "tapToChangeTime":
+            MessageLookupByLibrary.simpleMessage("Tap to change time"),
         "tapToConnect":
             MessageLookupByLibrary.simpleMessage("Pulse para\nconectarse"),
         "tapToToggleDesc": MessageLookupByLibrary.simpleMessage(

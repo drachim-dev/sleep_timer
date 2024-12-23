@@ -770,10 +770,10 @@ class S {
     );
   }
 
-  /// `Tap to change time`
+  /// `Select the time to be extended by on phone shake`
   String get extendTimeByShakeMenuToolTip {
     return Intl.message(
-      'Tap to change time',
+      'Select the time to be extended by on phone shake',
       name: 'extendTimeByShakeMenuToolTip',
       desc: '',
       args: [],
@@ -1211,6 +1211,16 @@ class S {
       name: 'linkingState',
       desc: '',
       args: [status],
+    );
+  }
+
+  /// `Tap to change time`
+  String get tapToChangeTime {
+    return Intl.message(
+      'Tap to change time',
+      name: 'tapToChangeTime',
+      desc: '',
+      args: [],
     );
   }
 }

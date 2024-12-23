@@ -250,7 +250,7 @@ class _SettingsViewState extends State<SettingsView>
                   title: Text(S
                       .of(context)
                       .byNumberOfMinutesLong(viewModel.extendTimeByShake)),
-                  subtitle: Text(S.of(context).extendTimeByShakeMenuToolTip),
+                  subtitle: Text(S.of(context).tapToChangeTime),
                 ),
               ),
             ],

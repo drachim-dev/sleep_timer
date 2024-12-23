@@ -71,7 +71,7 @@
   "notificationTimeLeft": "Tiempo restante: %s",
   "timerSettingsSectionTitle": "Temporizador",
   "prefsExtendTimeOnShake": "Agitar para añadir tiempo",
-  "extendTimeByShakeMenuToolTip": "Pulse para cambiar la hora",
+  "extendTimeByShakeMenuToolTip": "Seleccione el tiempo que debe prolongarse por agitación telefónica",
   "notSupported": "No es compatible con el dispositivo",
   "actionToggleLightDescription": "Apaga la luz de Philips Hue",
   "actionToggleLightTitle": "Luces",
@@ -114,5 +114,6 @@
   "linkingFailed": "Error de conexión",
   "linkingPending": "Conectando",
   "linkingUnknownError": "Error desconocido",
-  "linkingState": "Status: {status}"
+  "linkingState": "Status: {status}",
+  "tapToChangeTime": "Tap to change time"
 }

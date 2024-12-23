@@ -34,7 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(minutes) => "${minutes} min";
 
-  static String m6(action, value) => "Set ${action} to ${value}";
+  static String m6(action, value) => "${action} to ${value}";
 
   static String m7(bridge) => "Unlink ${bridge}";
 
@@ -49,22 +49,22 @@ class MessageLookup extends MessageLookupByLibrary {
         "actionPlayMusicTitle":
             MessageLookupByLibrary.simpleMessage("Play music"),
         "actionToggleBluetoothDescription":
-            MessageLookupByLibrary.simpleMessage("Disable bluetooth"),
+            MessageLookupByLibrary.simpleMessage("Bluetooth disabled"),
         "actionToggleBluetoothTitle":
             MessageLookupByLibrary.simpleMessage("Bluetooth"),
         "actionToggleLightDescription":
-            MessageLookupByLibrary.simpleMessage("Turns your hue lights off"),
+            MessageLookupByLibrary.simpleMessage("Lights turned off"),
         "actionToggleLightTitle":
             MessageLookupByLibrary.simpleMessage("Hue lights"),
         "actionToggleMediaDescription":
-            MessageLookupByLibrary.simpleMessage("Stop media playback"),
+            MessageLookupByLibrary.simpleMessage("Media paused"),
         "actionToggleMediaTitle": MessageLookupByLibrary.simpleMessage("Media"),
         "actionToggleScreenDescription":
-            MessageLookupByLibrary.simpleMessage("Turn screen off"),
+            MessageLookupByLibrary.simpleMessage("Screen off"),
         "actionToggleScreenTitle":
             MessageLookupByLibrary.simpleMessage("Screen"),
         "actionToggleWifiDescription":
-            MessageLookupByLibrary.simpleMessage("Disable wifi"),
+            MessageLookupByLibrary.simpleMessage("Wifi disabled"),
         "actionToggleWifiTitle": MessageLookupByLibrary.simpleMessage("Wifi"),
         "actionVolumeTitle": MessageLookupByLibrary.simpleMessage("Volume"),
         "adLoadFailure":
@@ -110,8 +110,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Check your connection"),
         "errorNoDevices":
             MessageLookupByLibrary.simpleMessage("No devices found"),
-        "extendTimeByShakeMenuToolTip":
-            MessageLookupByLibrary.simpleMessage("Tap to change time"),
+        "extendTimeByShakeMenuToolTip": MessageLookupByLibrary.simpleMessage(
+            "Select the time to be extended by on phone shake"),
         "faqShort": MessageLookupByLibrary.simpleMessage("FAQ"),
         "faqTitle":
             MessageLookupByLibrary.simpleMessage("Frequently asked questions"),
@@ -208,6 +208,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Shows a glow effect around the timers progress bar"),
         "sleepTimer": MessageLookupByLibrary.simpleMessage("Sleep Timer"),
         "stateSearching": MessageLookupByLibrary.simpleMessage("Searching ..."),
+        "tapToChangeTime":
+            MessageLookupByLibrary.simpleMessage("Tap to change time"),
         "tapToConnect": MessageLookupByLibrary.simpleMessage("Tap to\nconnect"),
         "tapToToggleDesc": MessageLookupByLibrary.simpleMessage(
             "Start actions will be executed next time you start the timer."),

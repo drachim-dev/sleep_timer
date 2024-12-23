@@ -28,7 +28,7 @@ dependencies:
   get_it: ^7.0.0
   google_mobile_ads: ^5.0.0
   http: ^1.1.2
-  intl: ^0.18.1
+  intl: ^0.19.0
   in_app_purchase: ^3.0.0
   in_app_purchase_android: ^0.3.0
   in_app_review: ^2.0.0

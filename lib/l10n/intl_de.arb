@@ -71,7 +71,7 @@
   "notificationTimeLeft": "Verbleibende Zeit: %s",
   "timerSettingsSectionTitle": "Timer",
   "prefsExtendTimeOnShake": "Schütteln zum Verlängern",
-  "extendTimeByShakeMenuToolTip": "Tippen, um die Zeit zu ändern",
+  "extendTimeByShakeMenuToolTip": "Wähle aus, um wieviel die Zeit beim Schütteln verlängert werden soll",
   "notSupported": "Nicht vom Gerät unterstützt",
   "actionToggleLightDescription": "Schaltet deine Philips Hue Lampen aus",
   "actionToggleLightTitle": "Lampen",
@@ -114,5 +114,6 @@
   "linkingFailed": "Connection failed",
   "linkingPending": "Connecting",
   "linkingUnknownError": "Unknown",
-  "linkingState": "Status: {status}"
+  "linkingState": "Status: {status}",
+  "tapToChangeTime": "Tap to change time"
 }
