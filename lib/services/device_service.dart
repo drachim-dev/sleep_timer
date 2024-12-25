@@ -1,6 +1,7 @@
 import 'package:device_functions/messages_generated.dart';
 import 'package:device_functions/platform_interface.dart';
 import 'package:injectable/injectable.dart';
+import 'package:sleep_timer/common/color_ext.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
 import 'package:sleep_timer/model/timer_model.dart';
@@ -96,7 +97,7 @@ class DeviceService with ListenableServiceMixin {
         timerId: timerId,
         title: S.current.notificationTimeLeft,
         description: S.current.notificationStatusActive,
-        accentColor: kNotificationActionColor.value,
+        accentColor: kNotificationActionColor.toARGB32,
         pauseAction: S.current.notificationActionPause,
         extendActions: [5, 20],
         duration: duration,
@@ -110,7 +111,7 @@ class DeviceService with ListenableServiceMixin {
         timerId: timerId,
         title: S.current.notificationTimeLeft,
         description: S.current.notificationStatusPausing,
-        accentColor: kNotificationActionColor.value,
+        accentColor: kNotificationActionColor.toARGB32,
         cancelAction: S.current.notificationActionCancel,
         continueAction: S.current.notificationActionContinue,
         remainingTime: remainingTime);
@@ -134,7 +135,7 @@ class DeviceService with ListenableServiceMixin {
         timerId: timerModel.id,
         title: S.current.notificationStatusElapsed,
         description: description,
-        accentColor: kNotificationActionColor.value,
+        accentColor: kNotificationActionColor.toARGB32,
         restartAction: S.current.notificationActionRestart);
   }
 
