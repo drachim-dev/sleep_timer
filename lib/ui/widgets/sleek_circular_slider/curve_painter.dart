@@ -126,7 +126,7 @@ class _CurvePainter extends CustomPainter {
     for (int i = 1; i <= repetitions; i++) {
       shadowPaint.strokeWidth = appearance.progressBarWidth + i * shadowStep;
       shadowPaint.color = appearance.shadowColor
-          .withOpacity(maxOpacity - (opacityStep * (i - 1)));
+          .withValues(alpha: maxOpacity - (opacityStep * (i - 1)));
       drawCircularArc(canvas: canvas, size: size, paint: shadowPaint);
     }
   }

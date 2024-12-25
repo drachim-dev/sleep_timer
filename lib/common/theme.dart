@@ -13,8 +13,8 @@ class MyTheme {
 const _lightFillColor = Colors.black;
 const _darkFillColor = Colors.white;
 
-final Color _lightFocusColor = Colors.black.withOpacity(0.12);
-final Color _darkFocusColor = Colors.white.withOpacity(0.12);
+final Color _lightFocusColor = Colors.black.withValues(alpha: 0.12);
+final Color _darkFocusColor = Colors.white.withValues(alpha: 0.12);
 
 const TextTheme _textTheme = TextTheme(
   displayMedium: TextStyle(fontWeight: FontWeight.w300),
@@ -98,7 +98,7 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: Color.alphaBlend(
-        _lightFillColor.withOpacity(0.80),
+        _lightFillColor.withValues(alpha: 0.8),
         _darkFillColor,
       ),
       contentTextStyle: _textTheme.titleMedium!.apply(color: _darkFillColor),
@@ -111,8 +111,8 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
     toggleButtonsTheme: ToggleButtonsThemeData(
       constraints: BoxConstraints(minWidth: 80),
       selectedColor: colorScheme.primary,
-      disabledColor: colorScheme.onSurface.withOpacity(0.38),
-      fillColor: colorScheme.primary.withOpacity(0.18),
+      disabledColor: colorScheme.onSurface.withValues(alpha: 0.38),
+      fillColor: colorScheme.primary.withValues(alpha: 0.18),
     ),
   );
 }
