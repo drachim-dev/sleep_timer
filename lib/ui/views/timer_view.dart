@@ -251,6 +251,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       required String subtitle,
       required void Function() onPressed}) {
     return Card(
+      color: Theme.of(context).cardColor,
       margin: EdgeInsets.symmetric(
         horizontal: kHorizontalPadding,
         vertical: kVerticalPaddingSmall,
@@ -275,8 +276,6 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
   }
 
   SizedBox _buildQuickLaunch(final ThemeData theme) {
-    final isLight = theme.brightness == Brightness.light;
-
     return SizedBox(
       height: 56,
       child: ListView(
@@ -286,18 +285,12 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
         scrollDirection: Axis.horizontal,
         children: [
           OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: isLight ? Colors.black87 : Colors.white,
-            ),
             icon: Icon(Icons.play_arrow_outlined),
             label: Text(S.of(context).buttonShowPlayerApps),
             onPressed: () => _showAppSheet(theme, viewModel.playerApps),
           ),
           SizedBox(width: 12),
           OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: isLight ? Colors.black87 : Colors.white,
-            ),
             icon: Icon(Icons.alarm),
             label: Text(S.of(context).buttonShowAlarmApps),
             onPressed: () => _showAppSheet(theme, viewModel.alarmApps),

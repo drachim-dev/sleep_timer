@@ -120,7 +120,7 @@ class _SettingsViewState extends State<SettingsView>
           _buildTimerSettings(theme),
           SectionHeader(S.of(context).purchasesSectionTitle,
               dense: true, leftPadding: kHorizontalPaddingSmall),
-          Card(
+          Card.filled(
             clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
@@ -141,7 +141,7 @@ class _SettingsViewState extends State<SettingsView>
           _buildAdvanced(theme),
           SectionHeader(S.of(context).otherSectionTitle,
               dense: true, leftPadding: kHorizontalPaddingSmall),
-          Card(
+          Card.filled(
             clipBehavior: Clip.antiAlias,
             child: Column(children: [
               ListTile(
@@ -162,7 +162,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   Widget _buildAppearance(final ThemeData theme) {
-    return Card(
+    return Card.filled(
       clipBehavior: Clip.antiAlias,
       child: Column(children: [
         ListTile(
@@ -206,7 +206,7 @@ class _SettingsViewState extends State<SettingsView>
   Widget _buildTimerSettings(final ThemeData theme) {
     final selectedColor = theme.textTheme.titleMedium!.color;
 
-    return Card(
+    return Card.filled(
       clipBehavior: Clip.antiAlias,
       child: Theme(
         data: theme.copyWith(
@@ -293,7 +293,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   Widget _buildAdvanced(final ThemeData theme) {
-    return Card(
+    return Card.filled(
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [

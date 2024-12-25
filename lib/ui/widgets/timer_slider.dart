@@ -44,7 +44,7 @@ class _TimerSliderState extends State<TimerSlider> {
 
     final trackColor = theme.brightness == Brightness.light
         ? Colors.grey[100]
-        : theme.colorScheme.surface;
+        : theme.colorScheme.surfaceContainer;
 
     final shadowColor = theme.brightness == Brightness.light
         ? theme.colorScheme.secondary
