@@ -12,8 +12,6 @@ import 'package:stacked_services/stacked_services.dart';
 import 'app/app.router.dart';
 import 'common/timer_service_manager.dart';
 
-import 'package:collection/collection.dart';
-
 class SleepTimerPlatformImpl implements SleepTimerPlatform {
   final HostTimerApi _hostApi = HostTimerApi();
 
@@ -115,7 +113,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       return [];
     }
 
-    final apps = response.apps!.whereNotNull().toList()
+    final apps = response.apps!.nonNulls.toList()
       ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
@@ -128,7 +126,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
       return [];
     }
 
-    final apps = response.apps!.whereNotNull().toList()
+    final apps = response.apps!.nonNulls.toList()
       ..sort((a, b) => a.title!.compareTo(b.title!));
     return apps;
   }
