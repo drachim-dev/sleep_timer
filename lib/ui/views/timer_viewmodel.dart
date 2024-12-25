@@ -220,7 +220,7 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   void onChangeVolumeEndAction(bool enabled) {
-    if (_timerModel.volumeAction.value != null) {
+    if (_timerModel.volumeAction.value != null || !enabled) {
       _timerModel.volumeAction.enabled = enabled;
       _prefsService.setBool('${ActionType.volume.toString()}_end', enabled);
       notifyListeners();
