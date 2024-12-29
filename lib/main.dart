@@ -133,7 +133,7 @@ class Application {
         .setCrashlyticsCollectionEnabled(kReleaseMode);
 
     // setup callback even when activity is destroyed
-    FlutterTimerApi.setup(FlutterApiHandler(alarmCallback: onAlarmCallback));
+    FlutterTimerApi.setUp(FlutterApiHandler(alarmCallback: onAlarmCallback));
 
     FlutterDeviceFunctionsApi.setup(DeviceFunctionsApiHandler(
         onDeviceAdminCallback: onDeviceAdminCallback,

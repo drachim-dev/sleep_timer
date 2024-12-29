@@ -1,4 +1,4 @@
-library circular_slider;
+library;
 
 import 'dart:math' as math;
 import 'dart:math';
