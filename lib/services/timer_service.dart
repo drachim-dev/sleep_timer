@@ -24,13 +24,13 @@ class TimerService with ListenableServiceMixin {
   final DeviceService _deviceService = locator<DeviceService>();
   final LightService _lightService = locator<LightService>();
   final SharedPreferences _prefsService = locator<SharedPreferences>();
-  final TimerModel? timerModel;
+  final TimerModel timerModel;
 
   TimerStatus _status = TimerStatus.initial;
   TimerStatus get status => _status;
 
   TimerService(@factoryParam this.timerModel)
-      : _remainingTime = timerModel!.initialTimeInSeconds,
+      : _remainingTime = timerModel.initialTimeInSeconds,
         _maxTime = timerModel.initialTimeInSeconds {
     listenToReactiveValues([_remainingTime, _status]);
   }
@@ -51,7 +51,7 @@ class TimerService with ListenableServiceMixin {
     setTimerStatus(TimerStatus.running);
 
     _deviceService.showRunningNotification(
-        timerId: timerModel!.id,
+        timerId: timerModel.id,
         duration: maxTime,
         remainingTime: remainingTime,
         shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
@@ -79,7 +79,7 @@ class TimerService with ListenableServiceMixin {
 
     if (status == TimerStatus.running) {
       _deviceService.showRunningNotification(
-          timerId: timerModel!.id,
+          timerId: timerModel.id,
           duration: maxTime,
           remainingTime: remainingTime,
           shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
@@ -93,21 +93,21 @@ class TimerService with ListenableServiceMixin {
     setTimerStatus(TimerStatus.pausing);
 
     _deviceService.showPauseNotification(
-        timerId: timerModel!.id, remainingTime: remainingTime);
+        timerId: timerModel.id, remainingTime: remainingTime);
   }
 
   Future<void> cancelTimer() async {
     setTimerStatus(TimerStatus.elapsed);
 
     // ignore: unawaited_futures
-    _deviceService.cancelNotification(timerId: timerModel!.id);
+    _deviceService.cancelNotification(timerId: timerModel.id);
     _resetTime();
   }
 
-  void _resetTime() => setRemainingTime(timerModel!.initialTimeInSeconds);
+  void _resetTime() => setRemainingTime(timerModel.initialTimeInSeconds);
 
   Future<void> _handleStartActions() async {
-    for (var element in timerModel!.startActions) {
+    for (var element in timerModel.startActions) {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.volume:
@@ -148,11 +148,11 @@ class TimerService with ListenableServiceMixin {
     var numElapsed = _prefsService.getInt(kPrefKeyNumTimerElapsed) ?? 0;
     await _prefsService.setInt(kPrefKeyNumTimerElapsed, ++numElapsed);
 
-    for (var element in timerModel!.endActions) {
+    for (var element in timerModel.endActions) {
       if (element.enabled) {
         switch (element.id) {
           case ActionType.media:
-            final volumeAction = timerModel!.endActions.singleWhereOrNull(
+            final volumeAction = timerModel.endActions.singleWhereOrNull(
                 (element) =>
                     element.id == ActionType.volume && element.enabled);
 
@@ -161,7 +161,7 @@ class TimerService with ListenableServiceMixin {
             await _deviceService.toggleMedia(false, endLevel);
             break;
           case ActionType.volume:
-            final hasMediaAction = timerModel!.endActions.any(
+            final hasMediaAction = timerModel.endActions.any(
                 (element) => element.id == ActionType.media && element.enabled);
             if (!hasMediaAction) {
               await handleSetVolumeAction(
@@ -185,11 +185,11 @@ class TimerService with ListenableServiceMixin {
       }
     }
 
-    await _deviceService.showElapsedNotification(timerModel: timerModel!);
+    await _deviceService.showElapsedNotification(timerModel: timerModel);
   }
 
   void setMaxTime() =>
-      _maxTime = max(timerModel!.initialTimeInSeconds, remainingTime);
+      _maxTime = max(timerModel.initialTimeInSeconds, remainingTime);
 }
 
 void onDeviceAdminCallback(final bool granted) async {

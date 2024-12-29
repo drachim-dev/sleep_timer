@@ -22,9 +22,9 @@ BridgeModel _$BridgeModelFromJson(Map<String, dynamic> json) => BridgeModel(
 Map<String, dynamic> _$BridgeModelToJson(BridgeModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'ip': instance.ip,
       'mac': instance.mac,
       'name': instance.name,
+      'ip': instance.ip,
       'auth': instance.auth,
       'state': _$ConnectionEnumMap[instance.state],
       'groups': instance.groups,
@@ -32,6 +32,7 @@ Map<String, dynamic> _$BridgeModelToJson(BridgeModel instance) =>
 
 const _$ConnectionEnumMap = {
   Connection.unsaved: 'unsaved',
+  Connection.pending: 'pending',
   Connection.connected: 'connected',
   Connection.failed: 'failed',
 };

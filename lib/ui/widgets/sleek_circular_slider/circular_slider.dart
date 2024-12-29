@@ -192,8 +192,10 @@ class CircularSliderState extends State<CircularSlider>
   void _updateOnChange() {
     final prevValue = _value;
 
-    _value = _currentAngle == 0 ? _value : angleToValue(
-        _currentAngle!, widget.min, widget.lapMaxValue, _angleRange);
+    _value = _currentAngle == 0
+        ? _value
+        : angleToValue(
+            _currentAngle!, widget.min, widget.lapMaxValue, _angleRange);
 
     if (radiansWasModuloed(prevValue, _value)) {
       prevValue > _value ? _lapIndex++ : _lapIndex = max(_lapIndex - 1, 0);
@@ -261,7 +263,10 @@ class CircularSliderState extends State<CircularSlider>
   }
 
   bool _onPanDown(Offset details) {
-    if (_painter == null || _interactionEnabled == false) {
+    final painter = _painter;
+    final center = _painter?.center;
+
+    if (painter == null || center == null || _interactionEnabled == false) {
       return false;
     }
     RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -270,7 +275,7 @@ class CircularSliderState extends State<CircularSlider>
     final angleWithinRange = isAngleWithinRange(
         startAngle: _startAngle,
         angleRange: _angleRange,
-        touchAngle: coordinatesToRadians(_painter!.center!, position),
+        touchAngle: coordinatesToRadians(center, position),
         previousAngle: _currentAngle);
     if (!angleWithinRange) {
       return false;
@@ -281,7 +286,7 @@ class CircularSliderState extends State<CircularSlider>
         : 25.0;
 
     if (isPointAlongCircle(
-        position, _painter!.center!, _painter!.radius, touchWidth)) {
+        position, center, painter.radius, touchWidth)) {
       _isHandlerSelected = true;
 
       _onPanUpdate(details);

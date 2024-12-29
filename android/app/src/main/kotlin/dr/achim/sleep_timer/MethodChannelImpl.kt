@@ -239,9 +239,11 @@ class MethodChannelImpl(private val context: Context) : HostTimerApi {
     }
 
     override fun launchApp(request: LaunchAppRequest) {
-        val manager = context.packageManager
-        val intent = manager.getLaunchIntentForPackage(request.packageName!!)
-        context.startActivity(intent)
+        request.packageName?.let {
+            val manager = context.packageManager
+            val intent = manager.getLaunchIntentForPackage(it)
+            context.startActivity(intent)
+        }
     }
 
     // https://stackoverflow.com/questions/44447056/convert-adaptiveicondrawable-to-bitmap-in-android-o-preview

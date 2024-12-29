@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/generated/l10n.dart';
@@ -37,17 +36,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _animationController.forward();
 
     // Request notification permission
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      Permission.notification.request().then((permissionStatus) => {
-            if (permissionStatus.isPermanentlyDenied)
-              {
-                Future.delayed(Duration(seconds: 1, milliseconds: 500)).then(
-                    (_) => {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(_buildSnackBar(context))
-                        })
-              }
-          });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final permissionStatus = await Permission.notification.request();
+      if (permissionStatus.isPermanentlyDenied) {
+        await Future.delayed(Duration(seconds: 1, milliseconds: 500));
+        ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(context));
+      }
     });
   }
 

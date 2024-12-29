@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:logger/logger.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -46,7 +45,7 @@ class _SettingsViewState extends State<SettingsView>
     );
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(Duration(milliseconds: 750)).then((value) => {
               _scrollController.animateTo(
                   _scrollController.position.maxScrollExtent,
@@ -105,11 +104,16 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   Widget _buildBody(final ThemeData theme) {
+    final bottomInsets = MediaQuery.of(context).viewPadding.bottom;
     return Scrollbar(
       controller: _scrollController,
       thumbVisibility: true,
       child: ListView(
-        padding: const EdgeInsets.all(kHorizontalPaddingSmall),
+        padding: EdgeInsets.only(
+            top: kHorizontalPaddingSmall,
+            left: kHorizontalPaddingSmall,
+            right: kHorizontalPaddingSmall,
+            bottom: bottomInsets),
         controller: _scrollController,
         children: [
           SectionHeader(S.of(context).appearanceSectionTitle,
@@ -143,7 +147,8 @@ class _SettingsViewState extends State<SettingsView>
               dense: true, leftPadding: kHorizontalPaddingSmall),
           Card.filled(
             clipBehavior: Clip.antiAlias,
-            child: Column(children: [
+            child: Column(
+                children: [
               ListTile(
                 leading: Icon(Icons.question_answer_outlined),
                 title: Text(S.of(context).faqShort),
@@ -164,7 +169,8 @@ class _SettingsViewState extends State<SettingsView>
   Widget _buildAppearance(final ThemeData theme) {
     return Card.filled(
       clipBehavior: Clip.antiAlias,
-      child: Column(children: [
+      child: Column(
+          children: [
         ListTile(
           title: Text(S.of(context).chooseThemeTitle),
           subtitle: Text(viewModel.currentTheme.title),

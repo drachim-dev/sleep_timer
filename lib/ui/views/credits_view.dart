@@ -88,12 +88,17 @@ class CreditsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInsets = MediaQuery.of(context).viewPadding.bottom;
     return Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).creditsAppTitle),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(kHorizontalPaddingSmall),
+          padding: EdgeInsets.only(
+              top: kHorizontalPaddingSmall,
+              left: kHorizontalPaddingSmall,
+              right: kHorizontalPaddingSmall,
+              bottom: bottomInsets),
           children: [
             ..._buildListItems(
                 'Icons from the Noun Project', _imagesFromNounProject),

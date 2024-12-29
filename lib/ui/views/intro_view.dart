@@ -32,6 +32,7 @@ class _IntroViewState extends State<IntroView> {
         builder: (context, viewModel, _) {
           return IntroductionScreen(
             key: introKey,
+            resizeToAvoidBottomInset: false,
             pages: [
               PageViewModel(
                 title: S.of(context).introAutomateSleepRoutineTitle,
@@ -60,6 +61,7 @@ class _IntroViewState extends State<IntroView> {
             ],
             showSkipButton: true,
             showNextButton: true,
+            controlsMargin: EdgeInsets.only(bottom: MediaQuery.of(context).viewPadding.bottom),
             skip: Text(
               S.of(context).introButtonSkip,
               textAlign: TextAlign.center,

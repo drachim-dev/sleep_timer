@@ -1,4 +1,4 @@
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
@@ -132,7 +132,7 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   }
 
   @override
-  Future<void> launchApp(final String? packageName) async {
+  Future<void> launchApp(final String packageName) async {
     await _hostApi.launchApp(LaunchAppRequest(packageName: packageName));
   }
 }
@@ -180,7 +180,7 @@ class FlutterApiHandler extends FlutterTimerApi {
     }
 
     // Wait for Flutter engine to be attached and runApp to be active
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // _timerService was terminated by system
       if (timerService == null) {
         StackedService.navigatorKey!.currentState!
@@ -189,7 +189,7 @@ class FlutterApiHandler extends FlutterTimerApi {
         // Navigate to timer detail view
         StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
             Routes.homeView, (route) => false,
-            arguments: HomeViewArguments(timerId: timerService.timerModel!.id));
+            arguments: HomeViewArguments(timerId: timerService.timerModel.id));
 
         StackedService.navigatorKey!.currentState!.pushNamed(Routes.timerView,
             arguments: TimerViewArguments(timerModel: timerService.timerModel));

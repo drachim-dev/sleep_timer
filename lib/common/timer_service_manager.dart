@@ -11,6 +11,6 @@ class TimerServiceManager {
   }
 
   void setTimerService(final TimerService timerService) {
-    _timerServices[timerService.timerModel!.id] = timerService;
+    _timerServices[timerService.timerModel.id] = timerService;
   }
 }

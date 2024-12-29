@@ -8,68 +8,68 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:get_it/get_it.dart' as _i1;
-import 'package:injectable/injectable.dart' as _i2;
-import 'package:shared_preferences/shared_preferences.dart' as _i8;
-import 'package:sleep_timer/model/timer_model.dart' as _i11;
-import 'package:sleep_timer/services/ad_service.dart' as _i12;
-import 'package:sleep_timer/services/device_service.dart' as _i3;
-import 'package:sleep_timer/services/light_service.dart' as _i4;
-import 'package:sleep_timer/services/purchase_service.dart' as _i6;
-import 'package:sleep_timer/services/review_service.dart' as _i7;
-import 'package:sleep_timer/services/theme_service.dart' as _i9;
-import 'package:sleep_timer/services/third_party_services_module.dart' as _i13;
-import 'package:sleep_timer/services/timer_service.dart' as _i10;
-import 'package:stacked_services/stacked_services.dart' as _i5;
+import 'package:get_it/get_it.dart' as _i174;
+import 'package:injectable/injectable.dart' as _i526;
+import 'package:shared_preferences/shared_preferences.dart' as _i460;
+import 'package:sleep_timer/model/timer_model.dart' as _i190;
+import 'package:sleep_timer/services/ad_service.dart' as _i861;
+import 'package:sleep_timer/services/device_service.dart' as _i270;
+import 'package:sleep_timer/services/light_service.dart' as _i338;
+import 'package:sleep_timer/services/purchase_service.dart' as _i997;
+import 'package:sleep_timer/services/review_service.dart' as _i445;
+import 'package:sleep_timer/services/theme_service.dart' as _i548;
+import 'package:sleep_timer/services/third_party_services_module.dart' as _i719;
+import 'package:sleep_timer/services/timer_service.dart' as _i477;
+import 'package:stacked_services/stacked_services.dart' as _i1055;
 
 const String _prod = 'prod';
 
-extension GetItInjectableX on _i1.GetIt {
+extension GetItInjectableX on _i174.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
-  Future<_i1.GetIt> init({
+  Future<_i174.GetIt> init({
     String? environment,
-    _i2.EnvironmentFilter? environmentFilter,
+    _i526.EnvironmentFilter? environmentFilter,
   }) async {
-    final gh = _i2.GetItHelper(
+    final gh = _i526.GetItHelper(
       this,
       environment,
       environmentFilter,
     );
     final thirdPartyServicesModule = _$ThirdPartyServicesModule();
-    gh.singletonAsync<_i3.DeviceService>(
-      () => _i3.DeviceService.create(),
-      registerFor: {_prod},
-    );
-    gh.lazySingleton<_i4.LightService>(() => _i4.LightService());
-    gh.lazySingleton<_i5.NavigationService>(
-        () => thirdPartyServicesModule.navigationService);
-    gh.lazySingletonAsync<_i6.PurchaseService>(
-      () => _i6.PurchaseService.create(),
-      registerFor: {_prod},
-    );
-    gh.lazySingleton<_i7.ReviewService>(() => _i7.ReviewService());
-    await gh.factoryAsync<_i8.SharedPreferences>(
+    await gh.factoryAsync<_i460.SharedPreferences>(
       () => thirdPartyServicesModule.prefsService,
       preResolve: true,
     );
-    gh.lazySingleton<_i5.SnackbarService>(
+    gh.singleton<_i548.ThemeService>(() => _i548.ThemeService());
+    gh.lazySingleton<_i338.LightService>(() => _i338.LightService());
+    gh.lazySingleton<_i1055.NavigationService>(
+        () => thirdPartyServicesModule.navigationService);
+    gh.lazySingleton<_i1055.SnackbarService>(
         () => thirdPartyServicesModule.snackBarService);
-    gh.singleton<_i9.ThemeService>(() => _i9.ThemeService());
-    gh.factoryParam<_i10.TimerService, _i11.TimerModel?, dynamic>((
+    gh.lazySingleton<_i445.ReviewService>(() => _i445.ReviewService());
+    gh.lazySingletonAsync<_i861.AdService>(
+        () => _i861.AdService.create(gh<_i460.SharedPreferences>()));
+    gh.singletonAsync<_i270.DeviceService>(
+      () => _i270.DeviceService.create(),
+      registerFor: {_prod},
+    );
+    gh.lazySingletonAsync<_i997.PurchaseService>(
+      () => _i997.PurchaseService.create(),
+      registerFor: {_prod},
+    );
+    gh.factoryParam<_i477.TimerService, _i190.TimerModel, dynamic>((
       timerModel,
       _,
     ) =>
-        _i10.TimerService(timerModel));
-    gh.lazySingletonAsync<_i12.AdService>(
-        () => _i12.AdService.create(gh<_i8.SharedPreferences>()));
+        _i477.TimerService(timerModel));
     return this;
   }
 }
 
-class _$ThirdPartyServicesModule extends _i13.ThirdPartyServicesModule {
+class _$ThirdPartyServicesModule extends _i719.ThirdPartyServicesModule {
   @override
-  _i5.NavigationService get navigationService => _i5.NavigationService();
+  _i1055.NavigationService get navigationService => _i1055.NavigationService();
 
   @override
-  _i5.SnackbarService get snackBarService => _i5.SnackbarService();
+  _i1055.SnackbarService get snackBarService => _i1055.SnackbarService();
 }
