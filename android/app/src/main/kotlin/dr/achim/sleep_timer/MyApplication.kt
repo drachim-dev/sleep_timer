@@ -1,17 +1,17 @@
 package dr.achim.sleep_timer
 
+import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import dr.achim.sleep_timer.MainActivity.Companion.ENGINE_ID
-import io.flutter.app.FlutterApplication
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
 
-class MyApplication : FlutterApplication() {
-    private lateinit var flutterEngine : FlutterEngine
+internal class MyApplication : Application() {
+    private lateinit var flutterEngine: FlutterEngine
 
     override fun onCreate() {
         super.onCreate()
@@ -21,7 +21,7 @@ class MyApplication : FlutterApplication() {
 
         // Start executing Dart code to pre-warm the FlutterEngine.
         flutterEngine.dartExecutor.executeDartEntrypoint(
-                DartExecutor.DartEntrypoint.createDefault()
+            DartExecutor.DartEntrypoint.createDefault()
         )
 
         // Cache the FlutterEngine to be used by FlutterActivity.
@@ -42,7 +42,8 @@ class MyApplication : FlutterApplication() {
             )
             channel.description = "Notify about running or pausing timers"
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/ad_manager.dart';
-import 'package:sleep_timer/common/color_ext.dart';
 import 'package:sleep_timer/common/constants.dart';
 
 class NativeAdWidget extends StatefulWidget {
@@ -44,8 +43,8 @@ class NativeAdState extends State<NativeAdWidget> {
       ),
     )
       ..customOptions = {
-        'titleTextColor': '#${titleTextColor.toARGB32.toRadixString(16)}',
-        'subtitleTextColor': '#${subtitleTextColor.toARGB32.toRadixString(16)}',
+        'titleTextColor': '#${titleTextColor.toARGB32().toRadixString(16)}',
+        'subtitleTextColor': '#${subtitleTextColor.toARGB32().toRadixString(16)}',
       }
       ..load();
   }
