@@ -45,7 +45,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     });
   }
 
-  SnackBar _buildSnackBar(context) {
+  SnackBar _buildSnackBar(BuildContext context) {
     final theme = Theme.of(context);
 
     return SnackBar(

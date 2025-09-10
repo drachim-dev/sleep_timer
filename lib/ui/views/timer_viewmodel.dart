@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:device_functions/messages_generated.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/messages_generated.dart';
@@ -38,8 +38,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
     if (savedBridgesJson != null) {
       final savedBridges = BridgeModel.decode(savedBridgesJson);
-      return savedBridges
-          .any((bridge) => bridge.groups.any((group) => group.actionEnabled!));
+      return savedBridges.any(
+        (bridge) => bridge.groups.any((group) => group.actionEnabled!),
+      );
     } else {
       return false;
     }
@@ -63,9 +64,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   bool get bluetoothSupported => _platformVersion < 33;
 
   TimerViewModel(this._timerModel)
-      : _timerService =
-            TimerServiceManager.instance.getTimerService(_timerModel.id) ??
-                locator<TimerService>(param1: _timerModel) {
+    : _timerService =
+          TimerServiceManager.instance.getTimerService(_timerModel.id) ??
+          locator<TimerService>(param1: _timerModel) {
     _newInstance =
         TimerServiceManager.instance.getTimerService(timerModel.id) == null;
     if (_newInstance) {
@@ -110,11 +111,14 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     });
   }
 
-  Future<void> startTimer(
-      {final Duration delay = const Duration(seconds: 0)}) async {
-    await runBusyFuture(Future.delayed(delay, () {
-      _timerService.start();
-    }));
+  Future<void> startTimer({
+    final Duration delay = const Duration(seconds: 0),
+  }) async {
+    await runBusyFuture(
+      Future.delayed(delay, () {
+        _timerService.start();
+      }),
+    );
   }
 
   void pauseTimer() => _timerService.pauseTimer();
@@ -127,14 +131,18 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
     _navigationService.back(result: timerModel.id);
   }
 
-  Future<void> navigateToSettings(
-      {final bool? deviceAdminFocused,
-      final bool? notificationSettingsAccessFocused}) async {
-    await _navigationService.navigateTo(Routes.settingsView,
-        arguments: SettingsViewArguments(
-            deviceAdminFocused: deviceAdminFocused,
-            notificationSettingsAccessFocused:
-                notificationSettingsAccessFocused));
+  Future<void> navigateToSettings({
+    final bool? deviceAdminFocused,
+    final bool? notificationSettingsAccessFocused,
+  }) async {
+    await _navigationService.navigateTo(
+      Routes.settingsView,
+      arguments: SettingsViewArguments(
+        deviceAdminFocused: deviceAdminFocused ?? false,
+        notificationSettingsAccessFocused:
+            notificationSettingsAccessFocused ?? false,
+      ),
+    );
   }
 
   Future<void> navigateToLightsGroups() async {
@@ -149,7 +157,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
 
   void dismissLongPressHint() async {
     await _prefsService.setBool(
-        kPrefKeyShowLongPressHintForStartActions, false);
+      kPrefKeyShowLongPressHintForStartActions,
+      false,
+    );
     notifyListeners();
   }
 
@@ -173,7 +183,9 @@ class TimerViewModel extends ReactiveViewModel implements Initialisable {
   }
 
   Future<void> onChangeVolumeLevel(
-      ValueActionModel actionModel, double value) async {
+    ValueActionModel actionModel,
+    double value,
+  ) async {
     actionModel.value = value;
     await _prefsService.setDouble(actionModel.key!, value);
     notifyListeners();

@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
@@ -24,11 +24,12 @@ class BridgeLinkViewModel extends FutureViewModel {
 
       final allIps =
           savedBridges.map((e) => e.ip).whereType<String>().toList() +
-              newDevices;
+          newDevices;
 
       return allIps.map((e) {
-        final savedBridge =
-            savedBridges.firstWhereOrNull((element) => element.ip == e);
+        final savedBridge = savedBridges.firstWhereOrNull(
+          (element) => element.ip == e,
+        );
         return savedBridge ?? BridgeModel(id: e, ip: e);
       }).toList();
     } catch (error) {
@@ -54,8 +55,9 @@ class BridgeLinkViewModel extends FutureViewModel {
   }
 
   void navigateBackToLights() {
-    _navigationService
-        .popUntil((route) => route.settings.name == Routes.lightGroupView);
+    _navigationService.popUntil(
+      (route) => route.settings.name == Routes.lightGroupView,
+    );
   }
 
   void cancelDialog() {

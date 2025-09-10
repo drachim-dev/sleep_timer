@@ -55,15 +55,20 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   void initAnimations() {
     _hideFabAnimController = AnimationController(
-        vsync: this, duration: kThemeAnimationDuration, value: 1);
+      vsync: this,
+      duration: kThemeAnimationDuration,
+      value: 1,
+    );
     _fabAnimController = AnimationController(
-        vsync: this, duration: kThemeAnimationDuration, value: 1);
+      vsync: this,
+      duration: kThemeAnimationDuration,
+      value: 1,
+    );
 
     _colorAnimation = ColorTween(
       begin: Colors.redAccent,
       end: Colors.orangeAccent,
-    ).animate(_fabAnimController)
-      ..addListener(() => setState(() {}));
+    ).animate(_fabAnimController)..addListener(() => setState(() {}));
   }
 
   @override
@@ -80,57 +85,60 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final theme = Theme.of(context);
 
     return ViewModelBuilder<TimerViewModel>.reactive(
-        viewModelBuilder: () => TimerViewModel(widget.timerModel!),
-        onViewModelReady: (viewModel) {
-          this.viewModel = viewModel;
+      viewModelBuilder: () => TimerViewModel(widget.timerModel!),
+      onViewModelReady: (viewModel) {
+        this.viewModel = viewModel;
 
-          alarmAppsFuture = viewModel.alarmApps;
-          playerAppsFuture = viewModel.playerApps;
+        alarmAppsFuture = viewModel.alarmApps;
+        playerAppsFuture = viewModel.playerApps;
 
-          alarmAppsFuture.then((apps) {
-            cachedAppIcons.addAll({
-              for (var e in apps)
-                e.packageName!: Image.memory(
-                  base64Decode(e.icon!),
-                  width: kAppImageSize,
-                  height: kAppImageSize,
-                )
-            });
-          });
-          playerAppsFuture.then((apps) {
-            cachedAppIcons.addAll({
-              for (var e in apps)
-                e.packageName!: Image.memory(
-                  base64Decode(e.icon!),
-                  width: kAppImageSize,
-                  height: kAppImageSize,
-                )
-            });
-          });
-        },
-        builder: (context, viewModel, _) {
-          return PopScope(
-            canPop: false,
-            onPopInvokedWithResult: (bool didPop, _) {
-              if (didPop) return;
-              viewModel.navigateBack();
-            },
-            child: NotificationListener(
-              onNotification: _onScrollNotification,
-              child: Scaffold(
-                body: _buildBody(theme),
-                floatingActionButton: _buildFAB(theme),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerFloat,
+        alarmAppsFuture.then((apps) {
+          cachedAppIcons.addAll({
+            for (var e in apps)
+              e.packageName!: Image.memory(
+                base64Decode(e.icon!),
+                width: kAppImageSize,
+                height: kAppImageSize,
               ),
-            ),
-          );
+          });
         });
+        playerAppsFuture.then((apps) {
+          cachedAppIcons.addAll({
+            for (var e in apps)
+              e.packageName!: Image.memory(
+                base64Decode(e.icon!),
+                width: kAppImageSize,
+                height: kAppImageSize,
+              ),
+          });
+        });
+      },
+      builder: (context, viewModel, _) {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, _) {
+            if (didPop) return;
+            viewModel.navigateBack();
+          },
+          child: NotificationListener(
+            onNotification: _onScrollNotification,
+            child: Scaffold(
+              body: _buildBody(theme),
+              floatingActionButton: _buildFAB(theme),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   SliverAppBar _buildAppBar(final ThemeData theme) {
     final titleStyle = theme.textTheme.displayMedium!.copyWith(
-        fontSize: 46, shadows: [Shadow(blurRadius: 5.0, color: Colors.white)]);
+      fontSize: 46,
+      shadows: [Shadow(blurRadius: 5.0, color: Colors.white)],
+    );
 
     return SliverAppBar(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -144,14 +152,20 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       automaticallyImplyLeading: false,
       actions: [
         IconButton(
-            icon: Icon(Icons.clear), onPressed: () => viewModel.cancelTimer()),
+          icon: Icon(Icons.clear),
+          onPressed: () => viewModel.cancelTimer(),
+        ),
       ],
       centerTitle: true,
       title: SABT(
-          child: Text(
-              Utils.secondsToString(viewModel.remainingTime, spacing: true),
-              style: theme.textTheme.displayMedium!
-                  .copyWith(fontSize: 40, color: Colors.white))),
+        child: Text(
+          Utils.secondsToString(viewModel.remainingTime, spacing: true),
+          style: theme.textTheme.displayMedium!.copyWith(
+            fontSize: 40,
+            color: Colors.white,
+          ),
+        ),
+      ),
       elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
@@ -164,7 +178,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
               showGlow: viewModel.showGlow,
               labelStyle: titleStyle,
               size: 180,
-              child: (_, __) => _buildTimeLabel(),
+              child: (_, _) => _buildTimeLabel(),
             ),
           ),
         ),
@@ -180,14 +194,13 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
-    final formattedSeconds =
-        Utils.secondsToString(viewModel.remainingTime, spacing: true);
+    final formattedSeconds = Utils.secondsToString(
+      viewModel.remainingTime,
+      spacing: true,
+    );
 
     return Center(
-      child: Text(
-        formattedSeconds,
-        style: textTheme.headlineLarge,
-      ),
+      child: Text(formattedSeconds, style: textTheme.headlineLarge),
     );
   }
 
@@ -200,11 +213,15 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
           sliver: SliverList(
             delegate: SliverChildListDelegate.fixed([
               Divider(height: 1),
-              SectionHeader(S.of(context).quickLaunchTitle,
-                  leftPadding: kHorizontalPadding),
+              SectionHeader(
+                S.of(context).quickLaunchTitle,
+                leftPadding: kHorizontalPadding,
+              ),
               _buildQuickLaunch(theme),
-              SectionHeader(S.of(context).timerStartsActionsTitle,
-                  leftPadding: kHorizontalPadding),
+              SectionHeader(
+                S.of(context).timerStartsActionsTitle,
+                leftPadding: kHorizontalPadding,
+              ),
               if (viewModel.showStartActionHints)
                 Stack(
                   children: [
@@ -224,16 +241,19 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
                 ),
               _buildStartActions(theme),
               // if (!viewModel.isAdFree) NativeAdWidget(),
-              SectionHeader(S.of(context).timerEndsActionsTitle,
-                  leftPadding: kHorizontalPadding),
+              SectionHeader(
+                S.of(context).timerEndsActionsTitle,
+                leftPadding: kHorizontalPadding,
+              ),
               if (viewModel.showEndActionHints)
                 Stack(
                   children: [
                     if (viewModel.showBluetoothNotSupportedHint)
                       _buildHint(
                         title: S.of(context).bluetoothToggleNotSupportedTitle,
-                        subtitle:
-                            S.of(context).bluetoothNotSupportedExplanation,
+                        subtitle: S
+                            .of(context)
+                            .bluetoothNotSupportedExplanation,
                         onPressed: viewModel.dismissBluetoothHint,
                       ),
                   ],
@@ -246,10 +266,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  Card _buildHint(
-      {required String title,
-      required String subtitle,
-      required void Function() onPressed}) {
+  Card _buildHint({
+    required String title,
+    required String subtitle,
+    required void Function() onPressed,
+  }) {
     return Card(
       color: Theme.of(context).cardColor,
       margin: EdgeInsets.symmetric(
@@ -259,11 +280,7 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       child: ListTile(
         leading: Icon(Icons.info),
         title: Text(title, maxLines: 1),
-        subtitle: Text(
-          subtitle,
-          maxLines: 4,
-          overflow: TextOverflow.ellipsis,
-        ),
+        subtitle: Text(subtitle, maxLines: 4, overflow: TextOverflow.ellipsis),
         isThreeLine: true,
         trailing: IconButton(
           alignment: Alignment.topRight,
@@ -280,7 +297,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
       height: 56,
       child: ListView(
         padding: const EdgeInsets.symmetric(
-            horizontal: kHorizontalPadding, vertical: kVerticalPaddingSmall),
+          horizontal: kHorizontalPadding,
+          vertical: kVerticalPaddingSmall,
+        ),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         children: [
@@ -307,76 +326,79 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     final labelStyle = theme.textTheme.bodyMedium;
 
     showModalBottomSheet(
-        context: context,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(16),
-          ),
-        ),
-        isScrollControlled: true,
-        builder: (context) => DraggableScrollableSheet(
-            expand: false,
-            builder: (context, scrollController) {
-              return FutureBuilder<List<Package>>(
-                  future: apps,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final apps = snapshot.data!;
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        builder: (context, scrollController) {
+          return FutureBuilder<List<Package>>(
+            future: apps,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final apps = snapshot.data!;
 
-                      return Column(
-                        children: [
-                          Container(
-                            height: 5,
-                            width: 38,
-                            margin: const EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: Colors.grey),
-                          ),
-                          Expanded(
-                            child: GridView.builder(
-                                padding:
-                                    const EdgeInsets.all(kBottomSheetPadding),
-                                controller: scrollController,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: gridSize),
-                                itemBuilder: (_, index) {
-                                  final app = snapshot.data![index];
+                return Column(
+                  children: [
+                    Container(
+                      height: 5,
+                      width: 38,
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(kBottomSheetPadding),
+                        controller: scrollController,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridSize,
+                        ),
+                        itemBuilder: (_, index) {
+                          final app = snapshot.data![index];
 
-                                  return TextButton(
-                                    onPressed: () =>
-                                        viewModel.openPackage(app.packageName!),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        cachedAppIcons[app.packageName] ??
-                                            Image.memory(
-                                              base64Decode(app.icon!),
-                                              width: kAppImageSize,
-                                              height: kAppImageSize,
-                                            ),
-                                        SizedBox(height: labelMargin),
-                                        Text(app.title!,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.center,
-                                            style: labelStyle,
-                                            maxLines: 1),
-                                      ],
+                          return TextButton(
+                            onPressed: () =>
+                                viewModel.openPackage(app.packageName!),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                cachedAppIcons[app.packageName] ??
+                                    Image.memory(
+                                      base64Decode(app.icon!),
+                                      width: kAppImageSize,
+                                      height: kAppImageSize,
                                     ),
-                                  );
-                                },
-                                itemCount: apps.length),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  });
-            }));
+                                SizedBox(height: labelMargin),
+                                Text(
+                                  app.title!,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: labelStyle,
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        itemCount: apps.length,
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          );
+        },
+      ),
+    );
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
@@ -404,12 +426,14 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   Row _buildExtendTimeRow() {
     return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [1, 5, 20].map((minutes) {
-          return RoundedRectButton(
-              title: '+ $minutes',
-              onPressed: () => viewModel.onExtendTime(minutes));
-        }).toList());
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [1, 5, 20].map((minutes) {
+        return RoundedRectButton(
+          title: '+ $minutes',
+          onPressed: () => viewModel.onExtendTime(minutes),
+        );
+      }).toList(),
+    );
   }
 
   Widget _buildStartActions(final ThemeData theme) {
@@ -441,8 +465,10 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
             disabledIcon: MdiIcons.minusCircleOffOutline,
             onChanged: viewModel.onChangeDoNotDisturb,
             onLongPress: () => viewModel.navigateToSettings(
-                notificationSettingsAccessFocused: true),
-            value: viewModel.timerModel.doNotDisturbStartAction.enabled &&
+              notificationSettingsAccessFocused: true,
+            ),
+            value:
+                viewModel.timerModel.doNotDisturbStartAction.enabled &&
                 viewModel.hasNotificationSettingsAccess,
           ),
         ],
@@ -450,10 +476,11 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     );
   }
 
-  ToggleButton _buildVolumeToggle(
-      {required ValueActionModel actionModel,
-      required void Function(bool value) onToggle,
-      void Function(double)? onChangeSliderLevel}) {
+  ToggleButton _buildVolumeToggle({
+    required ValueActionModel actionModel,
+    required void Function(bool value) onToggle,
+    void Function(double)? onChangeSliderLevel,
+  }) {
     return ToggleButton(
       label: actionModel.label,
       activeIcon: Icons.volume_down_outlined,
@@ -495,61 +522,70 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kVerticalPaddingSmall),
       child: FutureBuilder<Map<Permission, PermissionStatus>>(
-          future: getPermissionStatus(),
-          builder: (context, snapshot) {
-            final permissionStatus = snapshot.data;
+        future: getPermissionStatus(),
+        builder: (context, snapshot) {
+          final permissionStatus = snapshot.data;
 
-            if (snapshot.hasData && permissionStatus != null) {
-              final bluetoothPermission =
-                  viewModel.timerModel.bluetoothAction.permission;
-              final bluetoothPermissionStatus =
-                  permissionStatus[bluetoothPermission];
+          if (snapshot.hasData && permissionStatus != null) {
+            final bluetoothPermission =
+                viewModel.timerModel.bluetoothAction.permission;
+            final bluetoothPermissionStatus =
+                permissionStatus[bluetoothPermission];
 
-              return Wrap(
-                alignment: WrapAlignment.spaceEvenly,
-                runSpacing: kVerticalPadding,
-                direction: Axis.horizontal,
-                children: [
+            return Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              runSpacing: kVerticalPadding,
+              direction: Axis.horizontal,
+              children: [
+                ToggleButton(
+                  label: viewModel.timerModel.mediaAction.title,
+                  activeIcon: Icons.music_off_outlined,
+                  disabledIcon: Icons.music_note_outlined,
+                  onChanged: viewModel.onChangeMedia,
+                  value: viewModel.timerModel.mediaAction.enabled,
+                ),
+                _buildVolumeToggle(
+                  actionModel: viewModel.timerModel.volumeAction,
+                  onToggle: viewModel.onChangeVolumeEndAction,
+                ),
+                if (viewModel.wifiSupported)
                   ToggleButton(
-                      label: viewModel.timerModel.mediaAction.title,
-                      activeIcon: Icons.music_off_outlined,
-                      disabledIcon: Icons.music_note_outlined,
-                      onChanged: viewModel.onChangeMedia,
-                      value: viewModel.timerModel.mediaAction.enabled),
-                  _buildVolumeToggle(
-                      actionModel: viewModel.timerModel.volumeAction,
-                      onToggle: viewModel.onChangeVolumeEndAction),
-                  if (viewModel.wifiSupported)
-                    ToggleButton(
-                        label: viewModel.timerModel.wifiAction.title,
-                        activeIcon: Icons.wifi_off_outlined,
-                        disabledIcon: Icons.wifi_outlined,
-                        onChanged: viewModel.onChangeWifi,
-                        value: viewModel.timerModel.wifiAction.enabled),
-                  if (viewModel.bluetoothSupported)
-                    _buildBluetoothToggleButton(
-                        bluetoothPermission, bluetoothPermissionStatus),
-                  ToggleButton(
-                      label: viewModel.timerModel.screenAction.title,
-                      activeIcon: Icons.tv_off_outlined,
-                      disabledIcon: Icons.tv_outlined,
-                      onChanged: viewModel.onChangeScreen,
-                      value: viewModel.timerModel.screenAction.enabled &&
-                          viewModel.isDeviceAdmin),
-                ],
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          }),
+                    label: viewModel.timerModel.wifiAction.title,
+                    activeIcon: Icons.wifi_off_outlined,
+                    disabledIcon: Icons.wifi_outlined,
+                    onChanged: viewModel.onChangeWifi,
+                    value: viewModel.timerModel.wifiAction.enabled,
+                  ),
+                if (viewModel.bluetoothSupported)
+                  _buildBluetoothToggleButton(
+                    bluetoothPermission,
+                    bluetoothPermissionStatus,
+                  ),
+                ToggleButton(
+                  label: viewModel.timerModel.screenAction.title,
+                  activeIcon: Icons.tv_off_outlined,
+                  disabledIcon: Icons.tv_outlined,
+                  onChanged: viewModel.onChangeScreen,
+                  value:
+                      viewModel.timerModel.screenAction.enabled &&
+                      viewModel.isDeviceAdmin,
+                ),
+              ],
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 
   ToggleButton _buildBluetoothToggleButton(
-      Permission? permission, PermissionStatus? permissionStatus) {
-    final needsAttention = permissionStatus?.isGranted == false ||
+    Permission? permission,
+    PermissionStatus? permissionStatus,
+  ) {
+    final needsAttention =
+        permissionStatus?.isGranted == false ||
         permissionStatus?.isPermanentlyDenied == true;
 
     // Disable action in prefs if it needs attention
@@ -558,49 +594,51 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     }
 
     return ToggleButton(
-        label: viewModel.timerModel.bluetoothAction.title,
-        activeIcon: needsAttention
-            ? Icons.warning_amber_rounded
-            : Icons.bluetooth_disabled_outlined,
-        disabledIcon: needsAttention
-            ? Icons.warning_amber_rounded
-            : Icons.bluetooth_outlined,
-        onChanged: (enable) async {
-          final permissionStatus = await permission?.request();
+      label: viewModel.timerModel.bluetoothAction.title,
+      activeIcon: needsAttention
+          ? Icons.warning_amber_rounded
+          : Icons.bluetooth_disabled_outlined,
+      disabledIcon: needsAttention
+          ? Icons.warning_amber_rounded
+          : Icons.bluetooth_outlined,
+      onChanged: (enable) async {
+        final permissionStatus = await permission?.request();
 
-          if (permissionStatus == null || permissionStatus.isGranted) {
-            viewModel.onChangeBluetooth(enable);
-          } else if (permissionStatus.isPermanentlyDenied == true) {
-            await openAppSettings();
-          }
-        },
-        value: viewModel.timerModel.bluetoothAction.enabled);
+        if (permissionStatus == null || permissionStatus.isGranted) {
+          viewModel.onChangeBluetooth(enable);
+        } else if (permissionStatus.isPermanentlyDenied == true) {
+          await openAppSettings();
+        }
+      },
+      value: viewModel.timerModel.bluetoothAction.enabled,
+    );
   }
 
-  Future<void> _showVolumeLevelPicker(
-      {required ValueActionModel actionModel,
-      void Function(double)? onChangeEnd}) async {
+  Future<void> _showVolumeLevelPicker({
+    required ValueActionModel actionModel,
+    void Function(double)? onChangeEnd,
+  }) async {
     final volumeLevel = await showDialog<double>(
-        context: context,
-        builder: (context) => FutureBuilder<VolumeResponse>(
-            future: viewModel.volume,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final currentLevel =
-                    snapshot.data?.currentLevel?.toDouble() ?? 3;
-                final maxVolume =
-                    snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
+      context: context,
+      builder: (context) => FutureBuilder<VolumeResponse>(
+        future: viewModel.volume,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final currentLevel = snapshot.data?.currentLevel?.toDouble() ?? 3;
+            final maxVolume = snapshot.data?.maxSystemIndex?.toDouble() ?? 10;
 
-                return SliderDialog(
-                  title: S.of(context).setVolumeTitle,
-                  initialValue: actionModel.value ?? currentLevel,
-                  maxValue: maxVolume,
-                  onChangeEnd: onChangeEnd,
-                );
-              } else {
-                return CircularProgressIndicator();
-              }
-            }));
+            return SliderDialog(
+              title: S.of(context).setVolumeTitle,
+              initialValue: actionModel.value ?? currentLevel,
+              maxValue: maxVolume,
+              onChangeEnd: onChangeEnd,
+            );
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
+    );
 
     if (volumeLevel != null) {
       await viewModel.onChangeVolumeLevel(actionModel, volumeLevel);
@@ -609,8 +647,9 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
 
   Widget _buildFAB(ThemeData theme) {
     final foregroundColor = Colors.white;
-    final textStyle =
-        theme.textTheme.titleLarge!.copyWith(color: foregroundColor);
+    final textStyle = theme.textTheme.titleLarge!.copyWith(
+      color: foregroundColor,
+    );
 
     if (viewModel.timerStatus == TimerStatus.running) {
       _fabAnimController.reverse();
@@ -621,28 +660,29 @@ class _TimerViewState extends State<TimerView> with TickerProviderStateMixin {
     return ScaleTransition(
       scale: _hideFabAnimController,
       child: FloatingActionButton.extended(
-          backgroundColor: _colorAnimation.value,
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.pause_play,
-            progress: _fabAnimController,
-            color: foregroundColor,
-          ),
-          label: Text(
-            viewModel.timerStatus == TimerStatus.running ||
-                    viewModel.timerStatus == TimerStatus.initial
-                ? S.of(context).buttonTimerPause
-                : viewModel.timerStatus == TimerStatus.elapsed
-                    ? S.of(context).buttonTimerStart
-                    : S.of(context).buttonTimerContinue,
-            style: textStyle,
-          ),
-          onPressed: () {
-            if (viewModel.timerStatus == TimerStatus.running) {
-              viewModel.pauseTimer();
-            } else {
-              viewModel.startTimer();
-            }
-          }),
+        backgroundColor: _colorAnimation.value,
+        icon: AnimatedIcon(
+          icon: AnimatedIcons.pause_play,
+          progress: _fabAnimController,
+          color: foregroundColor,
+        ),
+        label: Text(
+          viewModel.timerStatus == TimerStatus.running ||
+                  viewModel.timerStatus == TimerStatus.initial
+              ? S.of(context).buttonTimerPause
+              : viewModel.timerStatus == TimerStatus.elapsed
+              ? S.of(context).buttonTimerStart
+              : S.of(context).buttonTimerContinue,
+          style: textStyle,
+        ),
+        onPressed: () {
+          if (viewModel.timerStatus == TimerStatus.running) {
+            viewModel.pauseTimer();
+          } else {
+            viewModel.startTimer();
+          }
+        },
+      ),
     );
   }
 }

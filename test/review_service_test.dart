@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:injectable/injectable.dart' show Environment;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/services/review_service.dart';
 import 'package:test/test.dart';
@@ -11,7 +11,7 @@ void main() {
     setUpAll(() {
       WidgetsFlutterBinding.ensureInitialized();
       SharedPreferences.setMockInitialValues({});
-      configureInjection(Environment.test);
+      setupLocator(Environment.test);
     });
 
     test('Dont ask user for review at first launch', () {
@@ -33,14 +33,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date = DateTime.now()
-          .subtract(Duration(days: reviewService.dayInterval - 1));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval - 1),
+      );
       final minElapsed = reviewService.minElapsed;
       final alreadyAsked = 0;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -56,14 +59,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval),
+      );
       final minElapsed = reviewService.minElapsed;
       final alreadyAsked = 0;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -79,14 +85,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval),
+      );
       final minElapsed = reviewService.minElapsed - 1;
       final alreadyAsked = 0;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -102,14 +111,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval),
+      );
       final minElapsed = reviewService.minElapsed;
       final alreadyAsked = 0;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -125,14 +137,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval),
+      );
       final minElapsed = reviewService.minElapsed;
       final alreadyAsked = kMaxAskForReview;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -148,14 +163,17 @@ void main() {
       final reviewService = locator<ReviewService>();
 
       // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
+      final date = DateTime.now().subtract(
+        Duration(days: reviewService.dayInterval),
+      );
       final minElapsed = reviewService.minElapsed;
       final alreadyAsked = kMaxAskForReview - 2;
 
       // mocking
       prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
+        kPrefKeyReviewCalledDate,
+        date.millisecondsSinceEpoch,
+      );
       prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
       prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
@@ -166,27 +184,33 @@ void main() {
       expect(shouldAsk, true);
     });
 
-    test('Ask user second time after dayInterval days if all conditions are met', () {
-      final prefsService = locator<SharedPreferences>();
-      final reviewService = locator<ReviewService>();
+    test(
+      'Ask user second time after dayInterval days if all conditions are met',
+      () {
+        final prefsService = locator<SharedPreferences>();
+        final reviewService = locator<ReviewService>();
 
-      // test data
-      final date =
-          DateTime.now().subtract(Duration(days: reviewService.dayInterval));
-      final minElapsed = 10;
-      final alreadyAsked = 1;
+        // test data
+        final date = DateTime.now().subtract(
+          Duration(days: reviewService.dayInterval),
+        );
+        final minElapsed = 10;
+        final alreadyAsked = 1;
 
-      // mocking
-      prefsService.setInt(
-          kPrefKeyReviewCalledDate, date.millisecondsSinceEpoch);
-      prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
-      prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
+        // mocking
+        prefsService.setInt(
+          kPrefKeyReviewCalledDate,
+          date.millisecondsSinceEpoch,
+        );
+        prefsService.setInt(kPrefKeyNumTimerElapsed, minElapsed);
+        prefsService.setInt(kPrefKeyReviewCount, alreadyAsked);
 
-      // action
-      final shouldAsk = reviewService.shouldAskForReview();
+        // action
+        final shouldAsk = reviewService.shouldAskForReview();
 
-      // assertion
-      expect(shouldAsk, true);
-    });
+        // assertion
+        expect(shouldAsk, true);
+      },
+    );
   });
 }

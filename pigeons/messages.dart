@@ -19,32 +19,15 @@ class NotificationRequest {
   List<int?>? extendActions;
 }
 
-class TimeNotificationRequest implements NotificationRequest {
-  @override
-  String? description;
-
-  @override
+class TimeNotificationRequest {
   String? timerId;
-
-  @override
   String? title;
-
-  @override
+  String? description;
   int? accentColor;
-
-  @override
   String? restartAction;
-
-  @override
   String? continueAction;
-
-  @override
   String? pauseAction;
-
-  @override
   String? cancelAction;
-
-  @override
   List<int?>? extendActions;
 
   /// The initial number of minutes the timer was set to.
@@ -54,38 +37,21 @@ class TimeNotificationRequest implements NotificationRequest {
   int? remainingTime;
 }
 
-class RunningNotificationRequest implements TimeNotificationRequest {
-  @override
-  String? description;
-
-  @override
+class RunningNotificationRequest {
   String? timerId;
-
-  @override
   String? title;
-
-  @override
+  String? description;
   int? accentColor;
-
-  @override
   String? restartAction;
-
-  @override
   String? continueAction;
-
-  @override
   String? pauseAction;
-
-  @override
   String? cancelAction;
-
-  @override
   List<int?>? extendActions;
 
-  @override
+  /// The initial number of minutes the timer was set to.
   int? duration;
 
-  @override
+  /// The number of seconds left for the timer.
   int? remainingTime;
 
   /// Enable shake to extend functionality.

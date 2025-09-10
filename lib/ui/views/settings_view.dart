@@ -12,13 +12,14 @@ import 'package:stacked/stacked.dart';
 import 'settings_viewmodel.dart';
 
 class SettingsView extends StatefulWidget {
-  final bool deviceAdminFocused, notificationSettingsAccessFocused;
+  final bool deviceAdminFocused;
+  final bool notificationSettingsAccessFocused;
 
-  const SettingsView(
-      {deviceAdminFocused = false, notificationSettingsAccessFocused = false})
-      : deviceAdminFocused = deviceAdminFocused ?? false,
-        notificationSettingsAccessFocused =
-            notificationSettingsAccessFocused ?? false;
+  const SettingsView({
+    super.key,
+    this.deviceAdminFocused = false,
+    this.notificationSettingsAccessFocused = false,
+  });
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -46,12 +47,15 @@ class _SettingsViewState extends State<SettingsView>
 
     if (widget.deviceAdminFocused || widget.notificationSettingsAccessFocused) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(milliseconds: 750)).then((value) => {
-              _scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: kThemeAnimationDuration,
-                  curve: Curves.easeOut)
-            });
+        Future.delayed(Duration(milliseconds: 750)).then(
+          (value) => {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: kThemeAnimationDuration,
+              curve: Curves.easeOut,
+            ),
+          },
+        );
       });
     }
   }
@@ -81,26 +85,22 @@ class _SettingsViewState extends State<SettingsView>
     final theme = Theme.of(context);
 
     return ViewModelBuilder<SettingsViewModel>.reactive(
-        viewModelBuilder: () => SettingsViewModel(),
-        onViewModelReady: (viewModel) {
-          this.viewModel = viewModel;
-          if (widget.deviceAdminFocused ||
-              widget.notificationSettingsAccessFocused) {
-            initAnimations(theme);
-          }
-        },
-        builder: (context, viewModel, _) {
-          return Scaffold(
-            appBar: _buildAppBar(theme),
-            body: _buildBody(theme),
-          );
-        });
+      viewModelBuilder: () => SettingsViewModel(),
+      onViewModelReady: (viewModel) {
+        this.viewModel = viewModel;
+        if (widget.deviceAdminFocused ||
+            widget.notificationSettingsAccessFocused) {
+          initAnimations(theme);
+        }
+      },
+      builder: (context, viewModel, _) {
+        return Scaffold(appBar: _buildAppBar(theme), body: _buildBody(theme));
+      },
+    );
   }
 
   AppBar _buildAppBar(final ThemeData theme) {
-    return AppBar(
-      title: Text(S.of(context).settings),
-    );
+    return AppBar(title: Text(S.of(context).settings));
   }
 
   Widget _buildBody(final ThemeData theme) {
@@ -110,20 +110,30 @@ class _SettingsViewState extends State<SettingsView>
       thumbVisibility: true,
       child: ListView(
         padding: EdgeInsets.only(
-            top: kHorizontalPaddingSmall,
-            left: kHorizontalPaddingSmall,
-            right: kHorizontalPaddingSmall,
-            bottom: bottomInsets),
+          top: kHorizontalPaddingSmall,
+          left: kHorizontalPaddingSmall,
+          right: kHorizontalPaddingSmall,
+          bottom: bottomInsets,
+        ),
         controller: _scrollController,
         children: [
-          SectionHeader(S.of(context).appearanceSectionTitle,
-              dense: true, leftPadding: kHorizontalPaddingSmall),
+          SectionHeader(
+            S.of(context).appearanceSectionTitle,
+            dense: true,
+            leftPadding: kHorizontalPaddingSmall,
+          ),
           _buildAppearance(theme),
-          SectionHeader(S.of(context).timerSettingsSectionTitle,
-              dense: true, leftPadding: kHorizontalPaddingSmall),
+          SectionHeader(
+            S.of(context).timerSettingsSectionTitle,
+            dense: true,
+            leftPadding: kHorizontalPaddingSmall,
+          ),
           _buildTimerSettings(theme),
-          SectionHeader(S.of(context).purchasesSectionTitle,
-              dense: true, leftPadding: kHorizontalPaddingSmall),
+          SectionHeader(
+            S.of(context).purchasesSectionTitle,
+            dense: true,
+            leftPadding: kHorizontalPaddingSmall,
+          ),
           Card.filled(
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -136,31 +146,38 @@ class _SettingsViewState extends State<SettingsView>
                   onTap: viewModel.openStoreListing,
                 ),
                 for (var product in viewModel.products)
-                  _buildProduct(theme, product)
+                  _buildProduct(theme, product),
               ]..withSeparator(),
             ),
           ),
-          SectionHeader(S.of(context).advancedSectionTitle,
-              dense: true, leftPadding: kHorizontalPaddingSmall),
+          SectionHeader(
+            S.of(context).advancedSectionTitle,
+            dense: true,
+            leftPadding: kHorizontalPaddingSmall,
+          ),
           _buildAdvanced(theme),
-          SectionHeader(S.of(context).otherSectionTitle,
-              dense: true, leftPadding: kHorizontalPaddingSmall),
+          SectionHeader(
+            S.of(context).otherSectionTitle,
+            dense: true,
+            leftPadding: kHorizontalPaddingSmall,
+          ),
           Card.filled(
             clipBehavior: Clip.antiAlias,
             child: Column(
-                children: [
-              ListTile(
-                leading: Icon(Icons.question_answer_outlined),
-                title: Text(S.of(context).faqShort),
-                onTap: viewModel.navigateToFAQ,
-              ),
-              ListTile(
-                leading: Icon(Icons.description_outlined),
-                title: Text(S.of(context).creditsAppTitle),
-                onTap: viewModel.navigateToCredits,
-              ),
-            ]..withSeparator()),
-          )
+              children: [
+                ListTile(
+                  leading: Icon(Icons.question_answer_outlined),
+                  title: Text(S.of(context).faqShort),
+                  onTap: viewModel.navigateToFAQ,
+                ),
+                ListTile(
+                  leading: Icon(Icons.description_outlined),
+                  title: Text(S.of(context).creditsAppTitle),
+                  onTap: viewModel.navigateToCredits,
+                ),
+              ]..withSeparator(),
+            ),
+          ),
         ],
       ),
     );
@@ -170,22 +187,23 @@ class _SettingsViewState extends State<SettingsView>
     return Card.filled(
       clipBehavior: Clip.antiAlias,
       child: Column(
-          children: [
-        ListTile(
-          title: Text(S.of(context).chooseThemeTitle),
-          subtitle: Text(viewModel.currentTheme.title),
-          leading: Icon(Icons.color_lens_outlined),
-          onTap: _showThemeDialog,
-        ),
-        SwitchListTile(
-          title: Text(S.of(context).showTimerGlow),
-          subtitle: Text(S.of(context).showTimerGlowDescription),
-          isThreeLine: true,
-          secondary: Icon(Icons.blur_on_outlined),
-          value: viewModel.glow,
-          onChanged: viewModel.onChangeGlow,
-        ),
-      ]..withSeparator()),
+        children: [
+          ListTile(
+            title: Text(S.of(context).chooseThemeTitle),
+            subtitle: Text(viewModel.currentTheme.title),
+            leading: Icon(Icons.color_lens_outlined),
+            onTap: _showThemeDialog,
+          ),
+          SwitchListTile(
+            title: Text(S.of(context).showTimerGlow),
+            subtitle: Text(S.of(context).showTimerGlowDescription),
+            isThreeLine: true,
+            secondary: Icon(Icons.blur_on_outlined),
+            value: viewModel.glow,
+            onChanged: viewModel.onChangeGlow,
+          ),
+        ]..withSeparator(),
+      ),
     );
   }
 
@@ -195,15 +213,19 @@ class _SettingsViewState extends State<SettingsView>
       builder: (_) {
         return AlertDialog(
           title: Text(S.of(context).chooseThemeTitle),
-          content: Column(
+          content: RadioGroup(
+            groupValue: viewModel.currentTheme.id,
+            onChanged: viewModel.setTheme,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: themeList.map((myTheme) {
                 return RadioListTile(
-                    title: Text(myTheme.title),
-                    groupValue: viewModel.currentTheme.id,
-                    value: myTheme.id,
-                    onChanged: viewModel.setTheme);
-              }).toList()),
+                  title: Text(myTheme.title),
+                  value: myTheme.id,
+                );
+              }).toList(),
+            ),
+          ),
         );
       },
     );
@@ -215,9 +237,7 @@ class _SettingsViewState extends State<SettingsView>
     return Card.filled(
       clipBehavior: Clip.antiAlias,
       child: Theme(
-        data: theme.copyWith(
-          dividerColor: Colors.transparent,
-        ),
+        data: theme.copyWith(dividerColor: Colors.transparent),
         child: IgnorePointer(
           ignoring: !viewModel.hasAccelerometer,
           child: ExpansionTile(
@@ -243,8 +263,9 @@ class _SettingsViewState extends State<SettingsView>
                 offset: Offset(1, 0),
                 initialValue: viewModel.extendTimeByShake,
                 onSelected: viewModel.onChangeExtendTimeByShake,
-                itemBuilder: (context) =>
-                    kExtendTimeByShakeOptions.map((minutes) {
+                itemBuilder: (context) => kExtendTimeByShakeOptions.map((
+                  minutes,
+                ) {
                   return PopupMenuItem(
                     value: minutes,
                     child: Text(S.of(context).numberOfMinutesShort(minutes)),
@@ -253,9 +274,11 @@ class _SettingsViewState extends State<SettingsView>
                 child: ListTile(
                   leading: SizedBox(),
                   enabled: viewModel.hasAccelerometer,
-                  title: Text(S
-                      .of(context)
-                      .byNumberOfMinutesLong(viewModel.extendTimeByShake)),
+                  title: Text(
+                    S
+                        .of(context)
+                        .byNumberOfMinutesLong(viewModel.extendTimeByShake),
+                  ),
                   subtitle: Text(S.of(context).tapToChangeTime),
                 ),
               ),
@@ -304,42 +327,47 @@ class _SettingsViewState extends State<SettingsView>
       child: Column(
         children: [
           AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Container(
-                  color: widget.deviceAdminFocused
-                      ? blinkingFocus
-                          .evaluate(AlwaysStoppedAnimation(_controller.value))
-                      : Colors.transparent,
-                  child: SwitchListTile(
-                      secondary: Icon(Icons.security_outlined),
-                      title: Text(S.of(context).prefsDeviceAdmin),
-                      subtitle: Text(S.of(context).prefsDeviceAdminDescription),
-                      isThreeLine: true,
-                      value: viewModel.deviceAdmin,
-                      onChanged: viewModel.onChangeDeviceAdmin),
-                );
-              }),
+            animation: _controller,
+            builder: (context, child) {
+              return Container(
+                color: widget.deviceAdminFocused
+                    ? blinkingFocus.evaluate(
+                        AlwaysStoppedAnimation(_controller.value),
+                      )
+                    : Colors.transparent,
+                child: SwitchListTile(
+                  secondary: Icon(Icons.security_outlined),
+                  title: Text(S.of(context).prefsDeviceAdmin),
+                  subtitle: Text(S.of(context).prefsDeviceAdminDescription),
+                  isThreeLine: true,
+                  value: viewModel.deviceAdmin,
+                  onChanged: viewModel.onChangeDeviceAdmin,
+                ),
+              );
+            },
+          ),
           AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Container(
-                  color: widget.notificationSettingsAccessFocused
-                      ? blinkingFocus
-                          .evaluate(AlwaysStoppedAnimation(_controller.value))
-                      : Colors.transparent,
-                  child: SwitchListTile(
-                      secondary: Icon(Icons.do_not_disturb_on),
-                      title:
-                          Text(S.of(context).prefsNotificationSettingsAccess),
-                      subtitle: Text(S
-                          .of(context)
-                          .prefsNotificationSettingsAccessDescription),
-                      isThreeLine: true,
-                      value: viewModel.notificationSettingsAccess,
-                      onChanged: viewModel.onChangeNotificationSettingsAccess),
-                );
-              }),
+            animation: _controller,
+            builder: (context, child) {
+              return Container(
+                color: widget.notificationSettingsAccessFocused
+                    ? blinkingFocus.evaluate(
+                        AlwaysStoppedAnimation(_controller.value),
+                      )
+                    : Colors.transparent,
+                child: SwitchListTile(
+                  secondary: Icon(Icons.do_not_disturb_on),
+                  title: Text(S.of(context).prefsNotificationSettingsAccess),
+                  subtitle: Text(
+                    S.of(context).prefsNotificationSettingsAccessDescription,
+                  ),
+                  isThreeLine: true,
+                  value: viewModel.notificationSettingsAccess,
+                  onChanged: viewModel.onChangeNotificationSettingsAccess,
+                ),
+              );
+            },
+          ),
         ]..withSeparator(),
       ),
     );

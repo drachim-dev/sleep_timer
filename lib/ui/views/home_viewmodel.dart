@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/timer_service_manager.dart';
 import 'package:sleep_timer/model/action_model.dart';
@@ -18,8 +18,8 @@ class HomeViewModel extends BaseViewModel {
   final ReviewService _reviewService = locator<ReviewService>();
   final ThemeService _themeService = locator<ThemeService>();
   final Future<AdService> _adService = locator.getAsync<AdService>();
-  final Future<PurchaseService> _purchaseService =
-      locator.getAsync<PurchaseService>();
+  final Future<PurchaseService> _purchaseService = locator
+      .getAsync<PurchaseService>();
 
   bool get showGlow => _themeService.showGlow;
 
@@ -57,11 +57,16 @@ class HomeViewModel extends BaseViewModel {
       }
     });
 
-    final timerModel =
-        TimerModel(_initialTime * 60, startActionList, endActionList);
+    final timerModel = TimerModel(
+      _initialTime * 60,
+      startActionList,
+      endActionList,
+    );
 
-    final resultFuture = _navigationService.navigateTo(Routes.timerView,
-        arguments: TimerViewArguments(timerModel: timerModel));
+    final resultFuture = _navigationService.navigateTo(
+      Routes.timerView,
+      arguments: TimerViewArguments(timerModel: timerModel),
+    );
 
     resultFuture?.then((value) {
       activeTimerId = value;
@@ -75,8 +80,10 @@ class HomeViewModel extends BaseViewModel {
           .getTimerService(activeTimerId!)!
           .timerModel;
 
-      final result = await (_navigationService.navigateTo(Routes.timerView,
-          arguments: TimerViewArguments(timerModel: timerModel)));
+      final result = await (_navigationService.navigateTo(
+        Routes.timerView,
+        arguments: TimerViewArguments(timerModel: timerModel),
+      ));
 
       activeTimerId = result;
       notifyListeners();

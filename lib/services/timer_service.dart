@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/action_model.dart';
@@ -30,8 +30,8 @@ class TimerService with ListenableServiceMixin {
   TimerStatus get status => _status;
 
   TimerService(@factoryParam this.timerModel)
-      : _remainingTime = timerModel.initialTimeInSeconds,
-        _maxTime = timerModel.initialTimeInSeconds {
+    : _remainingTime = timerModel.initialTimeInSeconds,
+      _maxTime = timerModel.initialTimeInSeconds {
     listenToReactiveValues([_remainingTime, _status]);
   }
 
@@ -51,11 +51,12 @@ class TimerService with ListenableServiceMixin {
     setTimerStatus(TimerStatus.running);
 
     _deviceService.showRunningNotification(
-        timerId: timerModel.id,
-        duration: maxTime,
-        remainingTime: remainingTime,
-        shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
-            kDefaultExtendByShake);
+      timerId: timerModel.id,
+      duration: maxTime,
+      remainingTime: remainingTime,
+      shakeToExtend:
+          _prefsService.getBool(kPrefKeyExtendByShake) ?? kDefaultExtendByShake,
+    );
   }
 
   void setTimerStatus(TimerStatus status) {
@@ -71,7 +72,7 @@ class TimerService with ListenableServiceMixin {
   void extendTime(final int? seconds) {
     final defaultExtendTime =
         _prefsService.getInt(kPrefKeyDefaultExtendTimeByShake) ??
-            kDefaultExtendTimeByShake;
+        kDefaultExtendTimeByShake;
 
     final newTime = _remainingTime += seconds ?? defaultExtendTime * 60;
     setRemainingTime(newTime);
@@ -79,11 +80,13 @@ class TimerService with ListenableServiceMixin {
 
     if (status == TimerStatus.running) {
       _deviceService.showRunningNotification(
-          timerId: timerModel.id,
-          duration: maxTime,
-          remainingTime: remainingTime,
-          shakeToExtend: _prefsService.getBool(kPrefKeyExtendByShake) ??
-              kDefaultExtendByShake);
+        timerId: timerModel.id,
+        duration: maxTime,
+        remainingTime: remainingTime,
+        shakeToExtend:
+            _prefsService.getBool(kPrefKeyExtendByShake) ??
+            kDefaultExtendByShake,
+      );
     } else if (status == TimerStatus.pausing) {
       pauseTimer();
     }
@@ -93,7 +96,9 @@ class TimerService with ListenableServiceMixin {
     setTimerStatus(TimerStatus.pausing);
 
     _deviceService.showPauseNotification(
-        timerId: timerModel.id, remainingTime: remainingTime);
+      timerId: timerModel.id,
+      remainingTime: remainingTime,
+    );
   }
 
   Future<void> cancelTimer() async {
@@ -112,7 +117,8 @@ class TimerService with ListenableServiceMixin {
         switch (element.id) {
           case ActionType.volume:
             await handleSetVolumeAction(
-                (element as ValueActionModel).value!.round());
+              (element as ValueActionModel).value!.round(),
+            );
             break;
           case ActionType.light:
             await handleLightAction();
@@ -153,19 +159,22 @@ class TimerService with ListenableServiceMixin {
         switch (element.id) {
           case ActionType.media:
             final volumeAction = timerModel.endActions.singleWhereOrNull(
-                (element) =>
-                    element.id == ActionType.volume && element.enabled);
+              (element) => element.id == ActionType.volume && element.enabled,
+            );
 
-            final endLevel = (volumeAction as ValueActionModel?)?.value?.round();
+            final endLevel = (volumeAction as ValueActionModel?)?.value
+                ?.round();
 
             await _deviceService.toggleMedia(false, endLevel);
             break;
           case ActionType.volume:
             final hasMediaAction = timerModel.endActions.any(
-                (element) => element.id == ActionType.media && element.enabled);
+              (element) => element.id == ActionType.media && element.enabled,
+            );
             if (!hasMediaAction) {
               await handleSetVolumeAction(
-                  (element as ValueActionModel).value!.round());
+                (element as ValueActionModel).value!.round(),
+              );
             }
 
             break;

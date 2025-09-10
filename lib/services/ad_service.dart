@@ -29,7 +29,8 @@ class AdService {
   Future<void> _init() async {
     await MobileAds.instance.initialize();
     await MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(testDeviceIds: AdManager.testDeviceId));
+      RequestConfiguration(testDeviceIds: AdManager.testDeviceId),
+    );
 
     _counter = _prefsService.getInt(kPrefKeyAdIntervalCounter) ?? _counter;
   }
@@ -62,29 +63,31 @@ class AdService {
 
   void _loadAd() {
     InterstitialAd.load(
-        adUnitId: AdManager.interstitialAdUnitId,
-        request: const AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          // Called when an ad is successfully received.
-          onAdLoaded: (InterstitialAd ad) {
-            ad.fullScreenContentCallback = FullScreenContentCallback(
-                onAdFailedToShowFullScreenContent: (ad, err) {
-                  log.d('$ad onAdFailedToShowFullScreenContent: $err');
-                  ad.dispose();
-                },
-                onAdDismissedFullScreenContent: (ad) {
-                  log.d('$ad onAdDismissedFullScreenContent.');
-                  ad.dispose();
-                },
-                onAdClicked: (ad) {});
+      adUnitId: AdManager.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        // Called when an ad is successfully received.
+        onAdLoaded: (InterstitialAd ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdFailedToShowFullScreenContent: (ad, err) {
+              log.d('$ad onAdFailedToShowFullScreenContent: $err');
+              ad.dispose();
+            },
+            onAdDismissedFullScreenContent: (ad) {
+              log.d('$ad onAdDismissedFullScreenContent.');
+              ad.dispose();
+            },
+            onAdClicked: (ad) {},
+          );
 
-            // Keep a reference to the ad so we can dispose it later.
-            _interstitialAd = ad;
-            ad.show();
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            log.d('InterstitialAd failed to load: $error');
-          },
-        ));
+          // Keep a reference to the ad so we can dispose it later.
+          _interstitialAd = ad;
+          ad.show();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          log.d('InterstitialAd failed to load: $error');
+        },
+      ),
+    );
   }
 }

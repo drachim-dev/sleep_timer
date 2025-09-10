@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
-import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/messages_generated.dart';
 import 'package:sleep_timer/model/action_model.dart';
@@ -16,18 +16,19 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   final HostTimerApi _hostApi = HostTimerApi();
 
   @override
-  Future<bool> showRunningNotification(
-      {required final String timerId,
-      required final String title,
-      required final String description,
-      required final int accentColor,
-      final String? restartAction,
-      final String? pauseAction,
-      final String? cancelAction,
-      final List<int>? extendActions,
-      required final int duration,
-      required final int remainingTime,
-      required final bool shakeToExtend}) async {
+  Future<bool> showRunningNotification({
+    required final String timerId,
+    required final String title,
+    required final String description,
+    required final int accentColor,
+    final String? restartAction,
+    final String? pauseAction,
+    final String? cancelAction,
+    final List<int>? extendActions,
+    required final int duration,
+    required final int remainingTime,
+    required final bool shakeToExtend,
+  }) async {
     final response = await _hostApi.showRunningNotification(
       RunningNotificationRequest(
         timerId: timerId,
@@ -47,16 +48,17 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
   }
 
   @override
-  Future<bool> showPausingNotification(
-      {required final String timerId,
-      required final String title,
-      required final String description,
-      required final int accentColor,
-      final String? restartAction,
-      final String? continueAction,
-      final String? cancelAction,
-      final List<int>? extendActions,
-      required final int remainingTime}) async {
+  Future<bool> showPausingNotification({
+    required final String timerId,
+    required final String title,
+    required final String description,
+    required final int accentColor,
+    final String? restartAction,
+    final String? continueAction,
+    final String? cancelAction,
+    final List<int>? extendActions,
+    required final int remainingTime,
+  }) async {
     final response = await _hostApi.showPausingNotification(
       TimeNotificationRequest(
         timerId: timerId,
@@ -95,8 +97,9 @@ class SleepTimerPlatformImpl implements SleepTimerPlatform {
 
   @override
   Future<bool> cancelTimer(final String timerId) async {
-    final response =
-        await _hostApi.cancelTimer(CancelRequest(timerId: timerId));
+    final response = await _hostApi.cancelTimer(
+      CancelRequest(timerId: timerId),
+    );
     return response.success ?? false;
   }
 
@@ -147,7 +150,8 @@ class FlutterApiHandler extends FlutterTimerApi {
   void onExtendTime(ExtendTimeRequest request) {
     final timerId = request.timerId;
     log.d(
-        'extend time by: ${request.additionalTime} for timer with id $timerId');
+      'extend time by: ${request.additionalTime} for timer with id $timerId',
+    );
 
     if (timerId != null) {
       TimerServiceManager.instance
@@ -160,7 +164,8 @@ class FlutterApiHandler extends FlutterTimerApi {
   void onCountDown(CountDownRequest request) {
     final timerId = request.timerId;
     log.d(
-        'new time after countdown: ${request.newTime} for timer with id $timerId');
+      'new time after countdown: ${request.newTime} for timer with id $timerId',
+    );
 
     if (timerId != null) {
       TimerServiceManager.instance
@@ -183,16 +188,22 @@ class FlutterApiHandler extends FlutterTimerApi {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // _timerService was terminated by system
       if (timerService == null) {
-        StackedService.navigatorKey!.currentState!
-            .pushNamedAndRemoveUntil(Routes.homeView, (route) => false);
+        StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
+          Routes.homeView,
+          (route) => false,
+        );
       } else {
         // Navigate to timer detail view
         StackedService.navigatorKey!.currentState!.pushNamedAndRemoveUntil(
-            Routes.homeView, (route) => false,
-            arguments: HomeViewArguments(timerId: timerService.timerModel.id));
+          Routes.homeView,
+          (route) => false,
+          arguments: HomeViewArguments(timerId: timerService.timerModel.id),
+        );
 
-        StackedService.navigatorKey!.currentState!.pushNamed(Routes.timerView,
-            arguments: TimerViewArguments(timerModel: timerService.timerModel));
+        StackedService.navigatorKey!.currentState!.pushNamed(
+          Routes.timerView,
+          arguments: TimerViewArguments(timerModel: timerService.timerModel),
+        );
       }
     });
   }
@@ -216,8 +227,9 @@ class FlutterApiHandler extends FlutterTimerApi {
       TimerServiceManager.instance.getTimerService(timerId)?.cancelTimer();
     }
 
-    StackedService.navigatorKey!.currentState!
-        .popUntil((route) => route.settings.name != Routes.timerView);
+    StackedService.navigatorKey!.currentState!.popUntil(
+      (route) => route.settings.name != Routes.timerView,
+    );
   }
 
   @override

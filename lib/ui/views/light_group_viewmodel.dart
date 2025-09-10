@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/services/light_service.dart';
@@ -22,8 +22,9 @@ class LightGroupViewModel extends FutureViewModel {
 
         // check for possible new groups
         for (final group in allGroups) {
-          final exists =
-              bridge.groups.any((savedGroup) => savedGroup.id == group.id);
+          final exists = bridge.groups.any(
+            (savedGroup) => savedGroup.id == group.id,
+          );
           if (!exists) {
             bridge.groups.add(group);
           }

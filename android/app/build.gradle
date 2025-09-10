@@ -55,15 +55,12 @@ kotlin {
 android {
     namespace = "dr.achim.sleep_timer"
 
-    compileSdk 35
+    compileSdk 36
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         applicationId "dr.achim.sleep_timer"
@@ -109,6 +106,9 @@ android {
 
             signingConfig signingConfigs.release
         }
+    }
+    lint {
+        disable 'InvalidPackage'
     }
 
 }

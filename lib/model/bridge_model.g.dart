@@ -7,17 +7,18 @@ part of 'bridge_model.dart';
 // **************************************************************************
 
 BridgeModel _$BridgeModelFromJson(Map<String, dynamic> json) => BridgeModel(
-      id: json['id'] as String?,
-      ip: json['ip'] as String?,
-      mac: json['mac'] as String?,
-      name: json['name'] as String?,
-      auth: json['auth'] as String?,
-      state: $enumDecodeNullable(_$ConnectionEnumMap, json['state']) ??
-          Connection.unsaved,
-      groups: (json['groups'] as List<dynamic>?)
-          ?.map((e) => LightGroup.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  id: json['id'] as String?,
+  ip: json['ip'] as String?,
+  mac: json['mac'] as String?,
+  name: json['name'] as String?,
+  auth: json['auth'] as String?,
+  state:
+      $enumDecodeNullable(_$ConnectionEnumMap, json['state']) ??
+      Connection.unsaved,
+  groups: (json['groups'] as List<dynamic>?)
+      ?.map((e) => LightGroup.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$BridgeModelToJson(BridgeModel instance) =>
     <String, dynamic>{

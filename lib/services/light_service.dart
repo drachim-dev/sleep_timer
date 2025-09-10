@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_hue/flutter_hue.dart';
+import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/model/bridge_model.dart';
 import 'package:sleep_timer/model/light_group.dart';
@@ -16,11 +16,15 @@ extension BridgeModelMapping on BridgeModel {
 
 @lazySingleton
 class LightService {
-  final SharedPreferences _prefsService = locator<SharedPreferences>();
+  final SharedPreferences _prefsService = GetIt.instance<SharedPreferences>();
 
   Future<List<String>> discoverBridges() async {
     await FlutterHueMaintenanceRepo.maintainBridges();
-    return await BridgeDiscoveryRepo.discoverBridges();
+
+    List<DiscoveredBridge> devices =
+        await BridgeDiscoveryRepo.discoverBridges();
+
+    return devices.map((device) => device.ipAddress).toList();
   }
 
   Future<List<BridgeModel>> getSavedBridges() async {
@@ -33,18 +37,20 @@ class LightService {
       final savedBridgesJson = _prefsService.getString(kPrefKeyHueBridges);
       if (savedBridgesJson != null) {
         final savedBridges = BridgeModel.decode(savedBridgesJson);
-        final savedBridge =
-            savedBridges.firstWhereOrNull((b) => b.id == bridge.bridgeId);
+        final savedBridge = savedBridges.firstWhereOrNull(
+          (b) => b.id == bridge.bridgeId,
+        );
 
         groups = savedBridge?.groups;
       }
 
       return BridgeModel(
-          id: bridge.bridgeId,
-          ip: bridge.ipAddress,
-          auth: authKey,
-          state: state,
-          groups: groups);
+        id: bridge.bridgeId,
+        ip: bridge.ipAddress,
+        auth: authKey,
+        state: state,
+        groups: groups,
+      );
     }).toList();
   }
 
@@ -83,22 +89,26 @@ class LightService {
     final hueNetwork = HueNetwork(bridges: [bridge]);
     await hueNetwork.fetchAll();
 
-    return hueNetwork.rooms
-        .where((room) => room.type == ResourceType.room)
-        .map((room) {
-      final lights = room.childrenAsResources
-          .where((child) =>
-              child is Device &&
-              child.services
-                  .any((service) => service.type == ResourceType.light))
-          .toList();
+    return hueNetwork.rooms.where((room) => room.type == ResourceType.room).map(
+      (room) {
+        final lights = room.childrenAsResources
+            .where(
+              (child) =>
+                  child is Device &&
+                  child.services.any(
+                    (service) => service.type == ResourceType.light,
+                  ),
+            )
+            .toList();
 
-      return LightGroup(
+        return LightGroup(
           id: room.id,
           className: room.type.name,
           name: room.metadata.name,
-          numberOfLights: lights.length);
-    }).toList();
+          numberOfLights: lights.length,
+        );
+      },
+    ).toList();
   }
 
   Future<void> toggleLights(final bool enabled) async {
@@ -119,14 +129,17 @@ class LightService {
             final owner = remoteGroup.ownerAsResource;
             return owner is Room &&
                 remoteGroup.on.isOn &&
-                bridgeModel.groups.any((localGroup) =>
-                    localGroup.actionEnabled == true &&
-                    localGroup.id == owner.id);
+                bridgeModel.groups.any(
+                  (localGroup) =>
+                      localGroup.actionEnabled == true &&
+                      localGroup.id == owner.id,
+                );
           }).toList();
 
           for (final foundGroup in groupsToTurnOff) {
-            final updatedLightGroup =
-                foundGroup.copyWith(on: LightOn(isOn: false));
+            final updatedLightGroup = foundGroup.copyWith(
+              on: LightOn(isOn: false),
+            );
             await bridge.put(updatedLightGroup);
           }
         }

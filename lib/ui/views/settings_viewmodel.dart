@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
-import 'package:sleep_timer/app/locator.dart';
 import 'package:sleep_timer/common/constants.dart';
 import 'package:sleep_timer/common/theme.dart';
 import 'package:sleep_timer/model/product.dart';
@@ -44,8 +44,10 @@ class SettingsViewModel extends ReactiveViewModel implements Initialisable {
   List<Product> get products => _purchaseService.products;
 
   @override
-  List<ListenableServiceMixin> get listenableServices =>
-      [_themeService, _deviceService];
+  List<ListenableServiceMixin> get listenableServices => [
+    _themeService,
+    _deviceService,
+  ];
 
   @override
   Future initialise() async {

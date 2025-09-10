@@ -11,6 +11,7 @@ import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/app.router.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
@@ -19,53 +20,58 @@ import 'package:sleep_timer/platform_impl.dart';
 import 'package:sleep_timer/services/device_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-
-import 'app/locator.dart';
 import 'common/timer_service_manager.dart';
 import 'generated/l10n.dart';
 import 'services/theme_service.dart';
 
 Future<void> main() async {
-  await runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
+  await runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp();
 
-    ErrorWidget.builder = _buildErrorWidget;
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      ErrorWidget.builder = _buildErrorWidget;
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-    await Application.init();
+      await Application.init();
 
-    await configureInjection(Environment.prod);
-    runApp(MyApp());
-  }, (error, stackTrace) {
-    FirebaseCrashlytics.instance.recordError(error, stackTrace);
-  });
+      // Setup locator
+      await setupLocator(Environment.prod);
+
+      runApp(MyApp());
+    },
+    (error, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    },
+  );
 }
 
 Builder _buildErrorWidget(FlutterErrorDetails details) {
   var message = 'Error occured!\n\n${details.exception}\n\n';
   var stackTrace = details.stack.toString().split('\n');
 
-  return Builder(builder: (context) {
-    final theme = Theme.of(context);
-    return kDebugMode
-        ? SingleChildScrollView(child: ErrorWidget('$message $stackTrace'))
-        : Center(
-            child: Container(
-              color: Colors.transparent,
-              child: Column(
-                children: [
-                  Icon(MdiIcons.googleDownasaur, size: 64),
-                  Text(
-                    "Oops, this shouldn't have happened.\nPlease try again!",
-                    style: theme.textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+  return Builder(
+    builder: (context) {
+      final theme = Theme.of(context);
+      return kDebugMode
+          ? SingleChildScrollView(child: ErrorWidget('$message $stackTrace'))
+          : Center(
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    Icon(MdiIcons.googleDownasaur, size: 64),
+                    Text(
+                      "Oops, this shouldn't have happened.\nPlease try again!",
+                      style: theme.textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-  });
+            );
+    },
+  );
 }
 
 final mainScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -74,30 +80,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<MyAppViewModel>.reactive(
-        viewModelBuilder: () => MyAppViewModel(),
-        builder: (context, model, child) {
-          return MaterialApp(
-            theme: model.theme,
-            title: kAppTitle,
-            scaffoldMessengerKey: mainScaffoldMessengerKey,
-            navigatorKey: StackedService.navigatorKey,
-            onGenerateRoute: StackedRouter().onGenerateRoute,
-            initialRoute:
-                model.firstLaunch ? Routes.introView : Routes.homeView,
-            localizationsDelegates: [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: [
-              const Locale.fromSubtags(languageCode: 'en'),
-              const Locale.fromSubtags(languageCode: 'de'),
-              const Locale.fromSubtags(languageCode: 'es'),
-            ],
-            debugShowCheckedModeBanner: false,
-          );
-        });
+      viewModelBuilder: () => MyAppViewModel(),
+      builder: (context, model, child) {
+        return MaterialApp(
+          theme: model.theme,
+          title: kAppTitle,
+          scaffoldMessengerKey: mainScaffoldMessengerKey,
+          navigatorKey: StackedService.navigatorKey,
+          onGenerateRoute: StackedRouter().onGenerateRoute,
+          initialRoute: model.firstLaunch ? Routes.introView : Routes.homeView,
+          localizationsDelegates: [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale.fromSubtags(languageCode: 'en'),
+            const Locale.fromSubtags(languageCode: 'de'),
+            const Locale.fromSubtags(languageCode: 'es'),
+          ],
+          debugShowCheckedModeBanner: false,
+        );
+      },
+    );
   }
 }
 
@@ -129,15 +135,19 @@ class Application {
     Logger.level = Level.debug;
 
     // Enable crashlytics only in release mode
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(kReleaseMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      kReleaseMode,
+    );
 
     // setup callback even when activity is destroyed
     FlutterTimerApi.setUp(FlutterApiHandler(alarmCallback: onAlarmCallback));
 
-    FlutterDeviceFunctionsApi.setup(DeviceFunctionsApiHandler(
+    FlutterDeviceFunctionsApi.setup(
+      DeviceFunctionsApiHandler(
         onDeviceAdminCallback: onDeviceAdminCallback,
-        onNotificationAccessCallback: onNotificationAccessCallback));
+        onNotificationAccessCallback: onNotificationAccessCallback,
+      ),
+    );
   }
 }
 

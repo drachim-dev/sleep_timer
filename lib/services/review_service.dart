@@ -2,7 +2,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sleep_timer/app/locator.dart';
+import 'package:sleep_timer/app/app.locator.dart';
 import 'package:sleep_timer/app/logger.util.dart';
 import 'package:sleep_timer/common/constants.dart';
 
@@ -26,8 +26,9 @@ class ReviewService {
       return false;
     }
 
-    final calledDateInMillisSinceEpoch =
-        _prefsService.getInt(kPrefKeyReviewCalledDate);
+    final calledDateInMillisSinceEpoch = _prefsService.getInt(
+      kPrefKeyReviewCalledDate,
+    );
 
     if (calledDateInMillisSinceEpoch == null) {
       _prefsService.setInt(kPrefKeyReviewCalledDate, _calledDate);

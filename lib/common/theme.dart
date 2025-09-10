@@ -46,13 +46,18 @@ List<MyTheme> themeList = [
     id: kThemeKeyBlackBlue,
     title: 'Black',
     theme: _themeData(_blackColorScheme, _darkFocusColor),
-  )
+  ),
 ];
 
 ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
   final isLight = colorScheme.brightness == Brightness.light;
 
   return ThemeData(
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+      },
+    ),
     colorScheme: colorScheme,
     textTheme: _textTheme,
     useMaterial3: true,
@@ -62,10 +67,12 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       elevation: 0,
       iconTheme: IconThemeData(color: colorScheme.primary),
       systemOverlayStyle: isLight
-          ? SystemUiOverlayStyle.dark
-              .copyWith(statusBarColor: Colors.transparent)
-          : SystemUiOverlayStyle.light
-              .copyWith(statusBarColor: Colors.transparent),
+          ? SystemUiOverlayStyle.dark.copyWith(
+              statusBarColor: Colors.transparent,
+            )
+          : SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+            ),
     ),
     iconTheme: IconThemeData(color: colorScheme.onPrimary),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -78,10 +85,11 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       backgroundColor: colorScheme.secondary,
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-      foregroundColor: colorScheme.onSurface,
-      side: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.6)),
-    )),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: colorScheme.onSurface,
+        side: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.6)),
+      ),
+    ),
     canvasColor: colorScheme.surface,
     scaffoldBackgroundColor: colorScheme.surface,
     highlightColor: Colors.transparent,
@@ -90,18 +98,13 @@ ThemeData _themeData(ColorScheme colorScheme, Color focusColor) {
       selectionHandleColor: colorScheme.primary,
       cursorColor: colorScheme.primary,
     ),
-    dialogBackgroundColor: colorScheme.surfaceContainer,
     dividerTheme: DividerThemeData(
       color: colorScheme.onSurface.withValues(alpha: 0.4),
     ),
-    dialogTheme: DialogThemeData(
-      backgroundColor: colorScheme.surfaceContainer
-    ),
+    dialogTheme: DialogThemeData(backgroundColor: colorScheme.surfaceContainer),
     cardColor: colorScheme.surfaceContainer,
     cardTheme: CardThemeData(color: colorScheme.surfaceContainer),
-    popupMenuTheme: PopupMenuThemeData(
-      color: colorScheme.surfaceContainer,
-    ),
+    popupMenuTheme: PopupMenuThemeData(color: colorScheme.surfaceContainer),
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: colorScheme.surfaceContainer,
       modalBackgroundColor: colorScheme.surfaceContainer,
