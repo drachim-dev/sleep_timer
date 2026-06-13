@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ComfySleepTimer">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ComfySleepTimer">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.TimerService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Sleep timer that performs actions like stopping music and locking screen when time is up." />
+        </service>
+
+        <receiver
+            android:name=".receiver.TimerReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="dr.achim.sleep_timer.ACTION_TIMER_EXPIRED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.SleepTimerAdminReceiver"
+            android:description="@string/settings_device_admin_description"
+            android:exported="true"
+            android:label="@string/settings_device_admin_title"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_receiver" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+    <queries>
+        <!-- Alarm clocks -->
+        <package android:name="com.htc.android.worldclock" />
+        <package android:name="com.android.deskclock" />
+        <package android:name="com.google.android.deskclock" />
+        <package android:name="com.motorola.blur.alarmclock" />
+        <package android:name="com.sec.android.app.clockpackage" />
+        <package android:name="com.sonyericsson.organizer" />
+        <package android:name="com.asus.deskclock" />
+        <package android:name="com.lge.clock" />
+        <package android:name="com.lge.alarm.alarmclocknew" />
+        <package android:name="zte.com.cn.alarmclock" />
+        <package android:name="com.mobitobi.android.gentlealarm" />
+        <package android:name="com.urbandroid.sleep.alarmclock" />
+        <package android:name="com.splunchy.android.alarmclock" />
+
+        <!-- Audio player -->
+        <package android:name="com.spotify.music" />
+        <package android:name="com.spotify.kids" />
+        <package android:name="deezer.android.app" />
+        <package android:name="com.apple.android.music" />
+        <package android:name="com.amazon.mp3" />
+        <package android:name="com.audible.application" />
+        <package android:name="com.pandora.android" />
+        <package android:name="com.rhapsody" />
+        <package android:name="com.aspiro.tidal" />
+        <package android:name="com.soundcloud.android" />
+        <package android:name="com.google.android.apps.podcasts" />
+        <package android:name="com.sec.android.app.music" />
+        <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="tunein.player" />
+        <package android:name="radiotime.player" />
+        <package android:name="com.streema.simpleradio" />
+        <package android:name="musicplayer.musicapps.music.mp3player" />
+        <package android:name="com.shaiban.audioplayer.mplayer" />
+        <package android:name="media.music.musicplayer" />
+        <package android:name="com.musicplayer.player.mp3player.white" />
+        <package android:name="com.media.music.mp3.musicplayer" />
+        <package android:name="code.name.monkey.retromusic" />
+        <package android:name="media.audioplayer.musicplayer" />
+        <package android:name="com.clearchannel.iheartradio.controller" />
+        <package android:name="com.piyush.music" />
+        <package android:name="media.music.mp3player.musicplayer" />
+        <package android:name="com.bambuna.podcastaddict" />
+        <package android:name="de.danoeh.antennapod" />
+        <package android:name="fm.castbox.audiobook.radio.podcast" />
+
+        <!-- Sleep audio apps -->
+        <package android:name="com.aumio.app" />
+
+        <!-- Video player -->
+        <package android:name="com.netflix.mediaclient" />
+        <package android:name="com.disney.disneyplus" />
+        <package android:name="com.amazon.avod.thirdpartyclient" />
+        <package android:name="de.prosiebensat1digital.seventv" />
+        <package android:name="de.sky.bw" />
+        <package android:name="de.sky.online" />
+        <package android:name="com.dazn" />
+        <package android:name="com.plexapp.android" />
+        <package android:name="org.xbmc.kodi" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.apps.youtube.kids" />
+        <package android:name="com.vanced.android.youtube" />
+        <package android:name="org.videolan.vlc" />
+        <package android:name="video.player.videoplayer" />
+        <package android:name="com.mxtech.videoplayer.ad" />
+        <package android:name="com.mxtech.videoplayer.pro" />
+        <package android:name="com.real.RealPlayerMobile" />
+        <package android:name="com.kmplayer.d" />
+        <package android:name="com.kmplayer" />
+
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="audio/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="video/*" />
+        </intent>
+    </queries>
+
+</manifest>
