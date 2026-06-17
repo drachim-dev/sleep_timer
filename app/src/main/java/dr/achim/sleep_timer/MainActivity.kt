@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.ThemeMode
 import dr.achim.sleep_timer.navigation.HomeKey
+import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 import dr.achim.sleep_timer.navigation.Navigation
 import dr.achim.sleep_timer.navigation.TimerKey
 import dr.achim.sleep_timer.service.TimerService
@@ -31,7 +34,14 @@ class MainActivity : ComponentActivity() {
             }
 
             AppTheme(themeMode = themeMode) {
-                Navigation(initialBackStack = initialBackStack)
+                SharedTransitionLayout {
+                    CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                        Navigation(
+                            initialBackStack = initialBackStack,
+                            sharedTransitionScope = this
+                        )
+                    }
+                }
             }
         }
     }

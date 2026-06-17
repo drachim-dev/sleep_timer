@@ -1,10 +1,14 @@
 package dr.achim.sleep_timer.presentation.timer
 
+import dr.achim.sleep_timer.model.HueActionSource
+
 sealed interface TimerUiAction {
     data class ToggleStartVolume(val enabled: Boolean) : TimerUiAction
     data class SetStartVolumeLevel(val level: Int?) : TimerUiAction
     data class ToggleDnd(val enabled: Boolean) : TimerUiAction
     data class ToggleHueLights(val enabled: Boolean) : TimerUiAction
+    data class ToggleEndHueLights(val enabled: Boolean) : TimerUiAction
+    data class OpenHueSettings(val source: HueActionSource) : TimerUiAction
     data class ToggleStopMedia(val enabled: Boolean) : TimerUiAction
     data class ToggleEndVolume(val enabled: Boolean) : TimerUiAction
     data class SetEndVolumeLevel(val level: Int?) : TimerUiAction

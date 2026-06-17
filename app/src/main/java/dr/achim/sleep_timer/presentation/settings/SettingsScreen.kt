@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,13 +33,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,19 +55,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.BuildConfig
 import dr.achim.sleep_timer.R
+import dr.achim.sleep_timer.common.findActivity
+import dr.achim.sleep_timer.model.Product
+import dr.achim.sleep_timer.model.PurchaseEvent
 import dr.achim.sleep_timer.model.ThemeMode
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
 import dr.achim.sleep_timer.ui.components.SectionTitle
+import dr.achim.sleep_timer.ui.components.SwitchListItem
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
+import io.github.vinceglb.confettikit.compose.ConfettiKit
+import io.github.vinceglb.confettikit.core.Party
+import io.github.vinceglb.confettikit.core.Position
+import io.github.vinceglb.confettikit.core.emitter.Emitter
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SettingsScreen(
@@ -83,6 +94,7 @@ fun SettingsScreen(
     val extendOnShake by viewModel.extendOnShake.collectAsStateWithLifecycle()
     val isDeviceAdminEnabled by viewModel.isDeviceAdminEnabled.collectAsStateWithLifecycle()
     val hasNotificationAccess by viewModel.hasNotificationAccess.collectAsStateWithLifecycle()
+    val productUiModels by viewModel.productUiModels.collectAsStateWithLifecycle()
 
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(SettingsUiAction.RefreshDeviceAdminStatus)
@@ -100,7 +112,9 @@ fun SettingsScreen(
         isDeviceAdminEnabled = isDeviceAdminEnabled,
         hasNotificationAccess = hasNotificationAccess,
         onAction = viewModel::onAction,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        purchaseEvents = viewModel.events,
+        productUiModels = productUiModels,
     )
 }
 
@@ -117,9 +131,12 @@ fun SettingsScreenContent(
     isDeviceAdminEnabled: Boolean,
     hasNotificationAccess: Boolean,
     onAction: (SettingsUiAction) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    purchaseEvents: Flow<PurchaseEvent>,
+    productUiModels: List<StoreProductUiModel>
 ) {
     val context = LocalContext.current
+    val activity = remember(context) { context.findActivity() }
 
     val deviceAdminLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -148,168 +165,227 @@ fun SettingsScreenContent(
         )
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            painterResource(R.drawable.ic_arrow_back),
-                            contentDescription = stringResource(R.string.settings_back_description)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .consumeWindowInsets(innerPadding)
-                .padding(innerPadding)
-                .padding(AppTheme.dimens.spacingMedium),
-            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingLarge)
-        ) {
-            SettingsSection(
-                title = { SectionTitle(stringResource(R.string.settings_section_appearance)) }
-            ) {
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_palette),
-                    title = stringResource(R.string.settings_theme_title),
-                    subtitle = when (themeMode) {
-                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
-                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
-                        ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
-                        ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
-                    },
-                    onClick = { showThemeDialog = true }
-                )
-                SettingsSwitchItem(
-                    painter = painterResource(R.drawable.ic_blur),
-                    title = stringResource(R.string.settings_glow_effect_title),
-                    subtitle = stringResource(R.string.settings_glow_effect_subtitle),
-                    checked = glowEnabled,
-                    onCheckedChange = { onAction(SettingsUiAction.SetGlowEffectEnabled(it)) }
-                )
-                if (glowEnabled) {
-                    SettingsSliderItem(
-                        title = stringResource(R.string.settings_glow_intensity_title),
-                        value = glowIntensity,
-                        onValueChange = { onAction(SettingsUiAction.SetGlowIntensity(it)) },
-                        valueRange = 20f..60f
-                    )
+    var showConfetti by remember { mutableStateOf(false) }
+    val purchaseErrorMessage = stringResource(R.string.error_purchase_failure)
+    LaunchedEffect(Unit) {
+        purchaseEvents.collectLatest {
+            when (it) {
+                PurchaseEvent.PurchaseComplete -> {
+                    showConfetti = true
+                    // TODO
+                    // show in app review
                 }
-            }
 
-            SettingsSection(
-                title = { SectionTitle(stringResource(R.string.settings_section_timer_settings)) }
-            ) {
-                SettingsSwitchItem(
-                    painter = painterResource(R.drawable.ic_vibrate),
-                    title = stringResource(R.string.settings_extend_on_shake_title),
-                    checked = extendOnShake,
-                    onCheckedChange = { onAction(SettingsUiAction.SetExtendOnShake(it)) }
-                )
-            }
-
-            SettingsSection(
-                title = { SectionTitle(stringResource(R.string.settings_section_support_me)) }
-            ) {
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_rate_review),
-                    title = stringResource(R.string.settings_like_app_title),
-                    subtitle = stringResource(R.string.settings_like_app_subtitle),
-                    trailingText = stringResource(R.string.settings_like_app_trailing),
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data =
-                                "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri()
-                            setPackage("com.android.vending")
-                        }
-                        context.startActivity(intent)
-                    }
-                )
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_ad_off),
-                    title = stringResource(R.string.settings_remove_ads_title),
-                    subtitle = stringResource(R.string.settings_remove_ads_subtitle),
-                    trailingText = stringResource(R.string.settings_remove_ads_trailing),
-                    trailingColor = Color(0xFF81C784),
-                    onClick = {}
-                )
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_coffee),
-                    title = stringResource(R.string.settings_donation_title),
-                    subtitle = stringResource(R.string.settings_donation_subtitle),
-                    trailingText = stringResource(R.string.settings_donation_trailing),
-                    onClick = {}
-                )
-            }
-
-            SettingsSection(
-                title = { SectionTitle(stringResource(R.string.settings_section_advanced)) }
-            ) {
-                SettingsSwitchItem(
-                    painter = painterResource(R.drawable.ic_device_admin),
-                    title = stringResource(R.string.settings_device_admin_title),
-                    subtitle = stringResource(R.string.settings_device_admin_subtitle),
-                    checked = isDeviceAdminEnabled,
-                    onCheckedChange = { enabled ->
-                        if (enabled) {
-                            val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                                putExtra(
-                                    DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                    ComponentName(context, SleepTimerAdminReceiver::class.java)
-                                )
-                                putExtra(
-                                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                                    context.getString(R.string.settings_device_admin_description)
-                                )
-                            }
-                            deviceAdminLauncher.launch(intent)
-                        } else {
-                            onAction(SettingsUiAction.DisableDeviceAdmin)
-                        }
-                    }
-                )
-
-                SettingsSwitchItem(
-                    painter = painterResource(R.drawable.ic_notification_settings),
-                    title = stringResource(R.string.settings_notification_access_title),
-                    subtitle = stringResource(R.string.settings_notification_access_subtitle),
-                    checked = hasNotificationAccess,
-                    onCheckedChange = { enabled ->
-                        if (enabled) {
-                            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                            notificationAccessLauncher.launch(intent)
-                        } else {
-                            onAction(SettingsUiAction.DisableNotificationAccess)
-                        }
-                    }
-                )
-            }
-
-            SettingsSection(
-                title = { SectionTitle(stringResource(R.string.settings_section_other)) }
-            ) {
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_help),
-                    title = stringResource(R.string.faq_title),
-                    onClick = onNavigateToFaq
-                )
-                SettingsItem(
-                    painter = painterResource(R.drawable.ic_license),
-                    title = stringResource(R.string.settings_credits_title),
-                    onClick = onNavigateToCredits
-                )
+                PurchaseEvent.PurchaseAborted -> {
+                    snackbarHostState.showSnackbar(purchaseErrorMessage)
+                }
             }
         }
     }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.settings_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                painterResource(R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(R.string.settings_back_description)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                )
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .consumeWindowInsets(innerPadding)
+                    .padding(innerPadding)
+                    .padding(AppTheme.dimens.spacingMedium),
+                verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingLarge)
+            ) {
+                SettingsSection(
+                    title = { SectionTitle(stringResource(R.string.settings_section_appearance)) }
+                ) {
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_palette),
+                        title = stringResource(R.string.settings_theme_title),
+                        subtitle = when (themeMode) {
+                            ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
+                            ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
+                            ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
+                            ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
+                        },
+                        onClick = { showThemeDialog = true }
+                    )
+                    SettingsSwitchItem(
+                        painter = painterResource(R.drawable.ic_blur),
+                        title = stringResource(R.string.settings_glow_effect_title),
+                        subtitle = stringResource(R.string.settings_glow_effect_subtitle),
+                        checked = glowEnabled,
+                        onCheckedChange = { onAction(SettingsUiAction.SetGlowEffectEnabled(it)) }
+                    )
+                    if (glowEnabled) {
+                        SettingsSliderItem(
+                            title = stringResource(R.string.settings_glow_intensity_title),
+                            value = glowIntensity,
+                            onValueChange = { onAction(SettingsUiAction.SetGlowIntensity(it)) },
+                            valueRange = 20f..60f
+                        )
+                    }
+                }
+
+                SettingsSection(
+                    title = { SectionTitle(stringResource(R.string.settings_section_timer_settings)) }
+                ) {
+                    SettingsSwitchItem(
+                        painter = painterResource(R.drawable.ic_vibrate),
+                        title = stringResource(R.string.settings_extend_on_shake_title),
+                        checked = extendOnShake,
+                        onCheckedChange = { onAction(SettingsUiAction.SetExtendOnShake(it)) }
+                    )
+                }
+
+                SettingsSection(
+                    title = { SectionTitle(stringResource(R.string.settings_section_support_me)) }
+                ) {
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_rate_review),
+                        title = stringResource(R.string.settings_like_app_title),
+                        subtitle = stringResource(R.string.settings_like_app_subtitle),
+                        trailingText = stringResource(R.string.settings_like_app_trailing),
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data =
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri()
+                                setPackage("com.android.vending")
+                            }
+                            context.startActivity(intent)
+                        }
+                    )
+
+                    productUiModels.forEach { uiModel ->
+                        val product = uiModel.product
+                        val icon = when (product.id) {
+                            Product.Donation.id -> R.drawable.ic_coffee
+                            Product.RemoveAds.id -> R.drawable.ic_ad_off
+                            else -> null
+                        }
+
+                        icon?.let {
+                            SettingsItem(
+                                painter = painterResource(icon),
+                                title = uiModel.product.title,
+                                subtitle = uiModel.product.description,
+                                trailingText = if (uiModel.isPurchased) stringResource(R.string.settings_remove_ads_trailing) else product.price.formatted,
+                                trailingColor = Color(0xFF81C784),
+                                onClick = {
+                                    onAction(SettingsUiAction.PurchaseProduct(activity, product))
+                                }
+                            )
+                        }
+                    }
+                }
+
+                SettingsSection(
+                    title = { SectionTitle(stringResource(R.string.settings_section_advanced)) }
+                ) {
+                    val adminDescription = stringResource(R.string.settings_device_admin_description)
+                    SettingsSwitchItem(
+                        painter = painterResource(R.drawable.ic_device_admin),
+                        title = stringResource(R.string.settings_device_admin_title),
+                        subtitle = stringResource(R.string.settings_device_admin_subtitle),
+                        checked = isDeviceAdminEnabled,
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                val intent =
+                                    Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                                        putExtra(
+                                            DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                                            ComponentName(
+                                                context,
+                                                SleepTimerAdminReceiver::class.java
+                                            )
+                                        )
+                                        putExtra(
+                                            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                                            adminDescription
+                                        )
+                                    }
+                                deviceAdminLauncher.launch(intent)
+                            } else {
+                                onAction(SettingsUiAction.DisableDeviceAdmin)
+                            }
+                        }
+                    )
+
+                    SettingsSwitchItem(
+                        painter = painterResource(R.drawable.ic_notification_settings),
+                        title = stringResource(R.string.settings_notification_access_title),
+                        subtitle = stringResource(R.string.settings_notification_access_subtitle),
+                        checked = hasNotificationAccess,
+                        onCheckedChange = { enabled ->
+                            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                            notificationAccessLauncher.launch(intent)
+                            if (!enabled) {
+                                onAction(SettingsUiAction.DisableNotificationAccess)
+                            }
+                        }
+                    )
+                }
+
+                SettingsSection(
+                    title = { SectionTitle(stringResource(R.string.settings_section_other)) }
+                ) {
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_help),
+                        title = stringResource(R.string.settings_faq_title),
+                        onClick = onNavigateToFaq
+                    )
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_license),
+                        title = stringResource(R.string.settings_credits_title),
+                        onClick = onNavigateToCredits
+                    )
+                }
+            }
+        }
+
+        if (showConfetti) {
+            Confetti(modifier = Modifier.fillMaxSize()) { showConfetti = false }
+        }
+    }
+}
+
+@Composable
+fun Confetti(modifier: Modifier, onAnimationCompleted: () -> Unit) {
+    val baseParty = Party(
+        spread = 45,
+        speed = 30f,
+        maxSpeed = 50f,
+        damping = 0.9f,
+        emitter = Emitter(duration = 100.milliseconds).max(100)
+    )
+
+    ConfettiKit(
+        modifier = modifier,
+        parties = listOf(
+            baseParty.copy(angle = 315, position = Position.Relative(0.0, 1.0)),
+            baseParty.copy(angle = 225, position = Position.Relative(1.0, 1.0))
+        ),
+        onParticleSystemEnded = { _, activeSystems ->
+            if (activeSystems == 0) {
+                onAnimationCompleted()
+            }
+        }
+    )
 }
 
 @Composable
@@ -318,7 +394,7 @@ fun SettingsSection(title: @Composable () -> Unit, content: @Composable ColumnSc
         title()
         Column(
             modifier = Modifier.clip(MaterialTheme.shapes.large),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingExtraExtraSmall),
             content = content
         )
     }
@@ -416,7 +492,7 @@ fun SettingsItem(
                 )
             }
         },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
         Text(text = title)
     }
@@ -424,23 +500,16 @@ fun SettingsItem(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SettingsSwitchItem(
+private fun SettingsSwitchItem(
     painter: Painter,
     title: String,
     subtitle: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    ListItem(
-        onClick = { onCheckedChange(!checked) },
-        modifier = Modifier.toggleable(
-            value = checked,
-            onValueChange = onCheckedChange,
-            role = Role.Switch,
-            interactionSource = interactionSource,
-            indication = ripple()
-        ),
+    SwitchListItem(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
         supportingContent = subtitle?.let { { Text(text = it) } },
         leadingContent = {
             Icon(
@@ -448,14 +517,6 @@ fun SettingsSwitchItem(
                 contentDescription = null,
             )
         },
-        trailingContent = {
-            Switch(
-                checked = checked,
-                onCheckedChange = null,
-                interactionSource = interactionSource
-            )
-        },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)
     ) {
         Text(text = title)
     }
@@ -477,13 +538,13 @@ fun SettingsSliderItem(
                 valueRange = valueRange,
             )
         },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF0F0D13)
 @Composable
-fun SettingsScreenPreview() {
+private fun Preview() {
     AppTheme {
         SettingsScreenContent(
             onBack = {},
@@ -496,7 +557,9 @@ fun SettingsScreenPreview() {
             isDeviceAdminEnabled = false,
             hasNotificationAccess = false,
             onAction = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            purchaseEvents = emptyFlow(),
+            productUiModels = emptyList()
         )
     }
 }

@@ -6,6 +6,7 @@ import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.model.TimerActions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 
 enum class VolumeType { START, END }
 
@@ -26,19 +27,21 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
             )
         }
 
-        val endActionsFlow = combine(
+        val endActionsFlow = combine<Any?, EndActions>(
             settingsRepository.endStopMedia,
             settingsRepository.endAdjustVolume,
             settingsRepository.endVolumeLevel,
             settingsRepository.endTurnOffScreen,
-            settingsRepository.endTurnOffBluetooth
-        ) { stop, adjust, level, screen, bluetooth ->
+            settingsRepository.endTurnOffBluetooth,
+            settingsRepository.endHueLights
+        ) { flows ->
             EndActions(
-                stopMedia = stop,
-                adjustVolume = adjust,
-                volumeLevel = level,
-                turnOffScreen = screen,
-                turnOffBluetooth = bluetooth
+                stopMedia = flows[0] as Boolean,
+                adjustVolume = flows[1] as Boolean,
+                volumeLevel = flows[2] as Int?,
+                turnOffScreen = flows[3] as Boolean,
+                turnOffBluetooth = flows[4] as Boolean,
+                hueLights = flows[5] as Boolean
             )
         }
 
@@ -80,5 +83,9 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
 
     suspend fun setEndTurnOffBluetooth(enabled: Boolean) {
         settingsRepository.setEndTurnOffBluetooth(enabled)
+    }
+
+    suspend fun setEndHueLights(enabled: Boolean) {
+        settingsRepository.setEndHueLights(enabled)
     }
 }

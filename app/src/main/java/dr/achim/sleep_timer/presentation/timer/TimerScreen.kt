@@ -64,6 +64,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -93,9 +94,11 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.domain.model.AppCategory
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
+import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
+import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
 import dr.achim.sleep_timer.ui.components.QuickLaunchAppItem
 import dr.achim.sleep_timer.ui.components.QuickLaunchItem
@@ -103,7 +106,7 @@ import dr.achim.sleep_timer.ui.components.QuickLaunchPlaceholder
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.TimeButton
 import dr.achim.sleep_timer.ui.components.rememberDrawablePainter
-import dr.achim.sleep_timer.ui.sharedElementTransition
+import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
 import dr.achim.sleep_timer.ui.theme.RedAccent
@@ -113,10 +116,19 @@ import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 @Composable
 fun TimerScreen(
     onBack: () -> Unit,
+    onNavigateToRoomSelection: (HueActionSource) -> Unit,
     viewModel: TimerViewModel,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.navEvents.collect { event ->
+            when (event) {
+                is TimerNavEvent.NavigateToRoomSelection -> onNavigateToRoomSelection(event.source)
+            }
+        }
+    }
 
     TimerScreenContent(
         onBack = onBack,
@@ -238,7 +250,7 @@ private fun TimerScreenContent(
                         transitionSpec = {
                             spring(
                                 dampingRatio = Spring.DampingRatioHighBouncy,
-                                stiffness = Spring.StiffnessMediumLow
+                                stiffness = Spring.StiffnessMedium
                             )
                         }
                     ) { state ->
@@ -249,7 +261,7 @@ private fun TimerScreenContent(
                             onAction(Action.StopTimer)
                             onBack()
                         },
-                        modifier = Modifier.sharedElementTransition(key = "action-button")
+                        modifier = Modifier.safeSharedElement(SharedElementKey.ActionButtonGearToCross)
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_close),
@@ -286,7 +298,7 @@ private fun TimerScreenContent(
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .onGloballyPositioned { fabHeight = it.size.height }
-                    .sharedElementTransition(key = "fab"),
+                    .safeSharedElement(SharedElementKey.Fab),
                 shape = MaterialTheme.shapes.extraLarge,
                 containerColor = fabColor,
                 contentColor = Color.White
@@ -329,7 +341,7 @@ private fun TimerScreenContent(
                 interactive = false,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .sharedElementTransition(key = "timer")
+                    .safeSharedElement(SharedElementKey.CircularTimer)
                     .let {
                         val expandedSize = AppTheme.dimens.timerSizeExpanded
                         val collapsedSize = AppTheme.dimens.timerSizeCollapsed
@@ -391,6 +403,7 @@ private fun TimerScreenContent(
             TimerSection(
                 title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) }
             ) {
+                val explanation = stringResource(R.string.settings_device_admin_description)
                 EndActionsRow(
                     timerActions = uiState.timerActions,
                     isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
@@ -405,10 +418,7 @@ private fun TimerScreenContent(
                                     SleepTimerAdminReceiver::class.java
                                 )
                             )
-                            putExtra(
-                                DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                                context.getString(R.string.settings_device_admin_description)
-                            )
+                            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, explanation)
                         }
                         deviceAdminLauncher.launch(intent)
                     }
@@ -444,7 +454,8 @@ private fun StartActionsRow(
         painter = painterResource(if (timerActions.startActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.startActions.hueLights,
-        onClick = { onAction(Action.ToggleHueLights(!timerActions.startActions.hueLights)) }
+        onClick = { onAction(Action.ToggleHueLights(!timerActions.startActions.hueLights)) },
+        onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.START)) }
     )
     ActionToggle(
         painter = painterResource(if (timerActions.startActions.enableDnd) R.drawable.ic_dnd_on else R.drawable.ic_dnd_off),
@@ -499,6 +510,13 @@ private fun EndActionsRow(
                 onAdminRequestPermission()
             }
         }
+    )
+    ActionToggle(
+        painter = painterResource(if (timerActions.endActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
+        label = stringResource(R.string.timer_action_hue_lights),
+        active = timerActions.endActions.hueLights,
+        onClick = { onAction(Action.ToggleEndHueLights(!timerActions.endActions.hueLights)) },
+        onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.END)) }
     )
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         ActionToggle(
@@ -759,7 +777,8 @@ fun ActionToggle(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
         }
     }

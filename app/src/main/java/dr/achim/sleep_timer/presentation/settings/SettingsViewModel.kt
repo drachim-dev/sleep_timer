@@ -1,21 +1,44 @@
 package dr.achim.sleep_timer.presentation.settings
 
+import android.app.Activity
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.ProductType
+import com.revenuecat.purchases.PurchaseParams
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.getCustomerInfoWith
+import com.revenuecat.purchases.getProductsWith
+import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
+import com.revenuecat.purchases.models.StoreProduct
+import com.revenuecat.purchases.purchaseWith
+import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateSettingsUseCase
 import dr.achim.sleep_timer.model.AppSettings
+import dr.achim.sleep_timer.model.Entitlement
+import dr.achim.sleep_timer.model.Product
+import dr.achim.sleep_timer.model.PurchaseEvent
 import dr.achim.sleep_timer.model.ThemeMode
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+data class StoreProductUiModel(
+    val product: StoreProduct,
+    val isPurchased: Boolean
+)
 
 class SettingsViewModel(
     private val timerController: TimerController,
@@ -24,6 +47,9 @@ class SettingsViewModel(
     private val manageTimerActionsUseCase: ManageTimerActionsUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
 ) : ViewModel() {
+
+    private val eventChannel = Channel<PurchaseEvent>(Channel.BUFFERED)
+    val events = eventChannel.receiveAsFlow()
 
     private val settings = getSettingsUseCase()
         .stateIn(
@@ -70,6 +96,58 @@ class SettingsViewModel(
     private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase.hasNotificationAccess())
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
 
+    private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
+    private val _customerInfo = MutableStateFlow<CustomerInfo?>(null)
+
+    val productUiModels: StateFlow<List<StoreProductUiModel>> = combine(_products, _customerInfo) { products, info ->
+        products.map { product ->
+            val productType = Product.entries.find { it.id == product.id }
+            val isConsumable = productType?.isConsumable ?: false
+
+            val isPurchased = when (product.id) {
+                Product.RemoveAds.id -> info?.entitlements?.get(Entitlement.Pro.id)?.isActive == true
+                else -> info?.allPurchasedProductIds?.contains(product.id) == true && !isConsumable
+            }
+
+            StoreProductUiModel(product, isPurchased)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
+    init {
+        loadProducts()
+        loadCustomerInfo()
+        Purchases.sharedInstance.updatedCustomerInfoListener = UpdatedCustomerInfoListener { info ->
+            _customerInfo.value = info
+        }
+    }
+
+    private fun loadCustomerInfo() {
+        Purchases.sharedInstance.getCustomerInfoWith(
+            onError = { error ->
+                Log.e(TAG, "Code ${error.code}: ${error.message}")
+            }
+        ) { info ->
+            _customerInfo.value = info
+        }
+    }
+
+    private fun loadProducts() {
+        val productIdentifiers = Product.entries.map { it.id }
+        Purchases.sharedInstance.getProductsWith(
+            productIds = productIdentifiers,
+            type = ProductType.INAPP,
+            onError = { error ->
+                Log.e(TAG, "Code ${error.code}: ${error.message}")
+            }
+        ) { storeProducts ->
+            _products.value = storeProducts
+        }
+    }
+
     fun onAction(action: SettingsUiAction) {
         when (action) {
             is SettingsUiAction.RefreshDeviceAdminStatus -> refreshDeviceAdminStatus()
@@ -80,7 +158,21 @@ class SettingsViewModel(
             is SettingsUiAction.SetGlowEffectEnabled -> setGlowEffectEnabled(action.enabled)
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
+            is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.product)
         }
+    }
+
+    private fun purchaseProduct(activity: Activity, product: StoreProduct) {
+        Purchases.sharedInstance.purchaseWith(
+            PurchaseParams.Builder(activity, product).build(),
+            onError = { error, _ ->
+                Log.e(TAG, "Code ${error.code}: ${error.message}")
+                sendEvent(PurchaseEvent.PurchaseAborted)
+            },
+            onSuccess = { _, _ ->
+                sendEvent(PurchaseEvent.PurchaseComplete)
+            }
+        )
     }
 
     private fun refreshDeviceAdminStatus(): Boolean {
@@ -104,10 +196,9 @@ class SettingsViewModel(
     }
 
     private fun disableNotificationAccess() {
-        timerController.removeActiveAdmin()
-        _isDeviceAdminEnabled.value = false
+        _hasNotificationAccess.value = false
         viewModelScope.launch {
-            manageTimerActionsUseCase.setEndTurnOffScreen(false)
+            manageTimerActionsUseCase.setStartEnableDnd(false)
         }
     }
 
@@ -133,5 +224,16 @@ class SettingsViewModel(
         viewModelScope.launch {
             updateSettingsUseCase.setExtendOnShake(enabled)
         }
+    }
+
+    private fun sendEvent(event: PurchaseEvent) {
+        viewModelScope.launch {
+            eventChannel.send(event)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Purchases.sharedInstance.updatedCustomerInfoListener = null
     }
 }

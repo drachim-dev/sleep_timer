@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 data class Dimens(
+    val spacingExtraExtraSmall: Dp = 2.dp,
     val spacingExtraSmall: Dp = 4.dp,
     val spacingSmall: Dp = 8.dp,
     val spacingNormal: Dp = 12.dp,
@@ -13,6 +14,7 @@ data class Dimens(
     val spacingExtraLarge: Dp = 32.dp,
     val spacingHuge: Dp = 56.dp,
 
+    val largeButtonSize: Dp = 48.dp,
     val timeButtonSize: Dp = 64.dp,
     val quickTimeAddIconSize: Dp = 32.dp,
     val actionToggleIconSize: Dp = 32.dp,

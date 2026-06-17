@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -34,6 +37,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val revenueCatKey = if (System.getenv("REVENUECAT_KEY") != null) {
+            System.getenv("REVENUECAT_KEY")
+        } else {
+            val localProperties = Properties().apply {
+                val localPropertiesFile = rootProject.file("local.properties")
+                if (localPropertiesFile.exists()) {
+                    load(FileInputStream(localPropertiesFile))
+                } else {
+                    println("Warning: local.properties file not found")
+                }
+            }
+            localProperties.getProperty("REVENUECAT_KEY", "")
+        }
+        buildConfigField("String", "REVENUECAT_KEY", "\"${revenueCatKey}\"")
     }
 
     buildTypes {
@@ -69,6 +87,14 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.annotations)
     implementation(libs.aboutlibraries.compose.m3)
+    implementation(libs.revenuecat.purchases)
+    implementation(libs.confettikit)
+
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

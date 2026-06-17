@@ -11,16 +11,13 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 
 @Composable
-fun Modifier.sharedElementTransition(
-    key: Any,
-): Modifier {
+fun Modifier.safeSharedElement(key: Any): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
-    val isPreview = LocalInspectionMode.current
-    val animatedVisibilityScope = if (isPreview) null else LocalNavAnimatedContentScope.current
+    val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
 
     return if (sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
-            this@sharedElementTransition.sharedElement(
+            sharedElement(
                 sharedContentState = rememberSharedContentState(key = key),
                 animatedVisibilityScope = animatedVisibilityScope
             )
@@ -29,23 +26,28 @@ fun Modifier.sharedElementTransition(
 }
 
 @Composable
-fun Modifier.sharedBoundsIfAvailable(
-    key: Any,
+fun Modifier.safeSharedBounds(key: Any,
     enter: EnterTransition = fadeIn(),
     exit: ExitTransition = fadeOut(),
 ): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
-    val isPreview = LocalInspectionMode.current
-    val animatedVisibilityScope = if (isPreview) null else LocalNavAnimatedContentScope.current
+    val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
 
     return if (sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
-            this@sharedBoundsIfAvailable.sharedBounds(
-                rememberSharedContentState(key = key),
+            sharedBounds(
+                sharedContentState = rememberSharedContentState(key = key),
                 animatedVisibilityScope = animatedVisibilityScope,
                 enter = enter,
                 exit = exit
             )
         }
     } else this
+}
+
+enum class SharedElementKey {
+    Fab,
+    FabTrailing,
+    CircularTimer,
+    ActionButtonGearToCross
 }

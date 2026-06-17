@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dr.achim.sleep_timer.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -34,9 +35,16 @@ class SettingsRepository(private val context: Context) {
         private val END_STOP_MEDIA_KEY = booleanPreferencesKey("end_stop_media")
         private val END_TURN_OFF_SCREEN_KEY = booleanPreferencesKey("end_turn_off_screen")
         private val END_TURN_OFF_BLUETOOTH_KEY = booleanPreferencesKey("end_turn_off_bluetooth")
+        private val END_HUE_LIGHTS_KEY = booleanPreferencesKey("end_hue_lights")
+
+        private val HUE_BRIDGE_IP_KEY = stringPreferencesKey("hue_bridge_ip")
+        private val HUE_API_USER_KEY = stringPreferencesKey("hue_api_user")
+        private val HUE_SELECTED_GROUPS_KEY = stringSetPreferencesKey("hue_selected_groups")
+        private val HUE_START_GROUPS_KEY = stringSetPreferencesKey("hue_start_groups")
+        private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("hue_end_groups")
 
         private const val DEFAULT_GLOW_EFFECT_ENABLED = true
-        private const val DEFAULT_GLOW_INTENSITY = 20f
+        private const val DEFAULT_GLOW_INTENSITY = 40f
         private const val DEFAULT_EXTEND_ON_SHAKE = false
     }
 
@@ -74,7 +82,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     val startAdjustVolume: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
-        preferences[START_ADJUST_VOLUME_KEY] ?: true
+        preferences[START_ADJUST_VOLUME_KEY] ?: false
     }
 
     val startEnableDnd: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
@@ -103,6 +111,30 @@ class SettingsRepository(private val context: Context) {
 
     val endTurnOffBluetooth: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
         preferences[END_TURN_OFF_BLUETOOTH_KEY] ?: false
+    }
+
+    val endHueLights: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
+        preferences[END_HUE_LIGHTS_KEY] ?: false
+    }
+
+    val hueBridgeIp: Flow<String?> = context.settingsDataStore.data.map { preferences ->
+        preferences[HUE_BRIDGE_IP_KEY]
+    }
+
+    val hueApiUser: Flow<String?> = context.settingsDataStore.data.map { preferences ->
+        preferences[HUE_API_USER_KEY]
+    }
+
+    val hueSelectedGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
+        preferences[HUE_SELECTED_GROUPS_KEY] ?: emptySet()
+    }
+
+    val hueStartGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
+        preferences[HUE_START_GROUPS_KEY] ?: emptySet()
+    }
+
+    val hueEndGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
+        preferences[HUE_END_GROUPS_KEY] ?: emptySet()
     }
 
     suspend fun setThemeMode(themeMode: ThemeMode) {
@@ -208,6 +240,37 @@ class SettingsRepository(private val context: Context) {
     suspend fun setEndTurnOffBluetooth(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[END_TURN_OFF_BLUETOOTH_KEY] = enabled
+        }
+    }
+
+    suspend fun setEndHueLights(enabled: Boolean) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[END_HUE_LIGHTS_KEY] = enabled
+        }
+    }
+
+    suspend fun setHueBridgeSettings(ip: String, user: String) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[HUE_BRIDGE_IP_KEY] = ip
+            preferences[HUE_API_USER_KEY] = user
+        }
+    }
+
+    suspend fun setHueSelectedGroups(groups: Set<String>) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[HUE_SELECTED_GROUPS_KEY] = groups
+        }
+    }
+
+    suspend fun setHueStartGroups(groups: Set<String>) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[HUE_START_GROUPS_KEY] = groups
+        }
+    }
+
+    suspend fun setHueEndGroups(groups: Set<String>) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[HUE_END_GROUPS_KEY] = groups
         }
     }
 }

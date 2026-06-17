@@ -5,23 +5,32 @@ import androidx.lifecycle.viewModelScope
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
 import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
+import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.VolumeType
+import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.model.TimerState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 
+sealed class TimerNavEvent {
+    data class NavigateToRoomSelection(val source: HueActionSource) : TimerNavEvent()
+}
+
 class TimerViewModel(
     getTimerStatusUseCase: GetTimerStatusUseCase,
     private val controlTimerUseCase: ControlTimerUseCase,
     private val manageTimerActionsUseCase: ManageTimerActionsUseCase,
+    private val manageHueUseCase: ManageHueUseCase,
     private val manageQuickLaunchUseCase: ManageQuickLaunchUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
     @InjectedParam minutes: Int?
@@ -29,6 +38,12 @@ class TimerViewModel(
 
     private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase.isDeviceAdminEnabled())
     private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase.hasNotificationAccess())
+
+    private var isPendingStartHueActivation = false
+    private var isPendingEndHueActivation = false
+
+    private val _navEvents = Channel<TimerNavEvent>()
+    val navEvents = _navEvents.receiveAsFlow()
 
     val uiState: StateFlow<TimerUiState> = combine(
         getTimerStatusUseCase.timerState,
@@ -55,6 +70,23 @@ class TimerViewModel(
         if (minutes != null) {
             startTimer(minutes * 60 * 1000L)
         }
+
+        viewModelScope.launch {
+            manageHueUseCase.getStartGroups().collect { groups ->
+                if (isPendingStartHueActivation && groups.isNotEmpty()) {
+                    manageTimerActionsUseCase.setStartHueLights(true)
+                    isPendingStartHueActivation = false
+                }
+            }
+        }
+        viewModelScope.launch {
+            manageHueUseCase.getEndGroups().collect { groups ->
+                if (isPendingEndHueActivation && groups.isNotEmpty()) {
+                    manageTimerActionsUseCase.setEndHueLights(true)
+                    isPendingEndHueActivation = false
+                }
+            }
+        }
     }
 
     fun onAction(action: Action) {
@@ -63,6 +95,10 @@ class TimerViewModel(
             is Action.SetStartVolumeLevel -> setStartVolumeLevel(action.level)
             is Action.ToggleDnd -> toggleDnd(action.enabled)
             is Action.ToggleHueLights -> toggleHueLights(action.enabled)
+            is Action.ToggleEndHueLights -> toggleEndHueLights(action.enabled)
+            is Action.OpenHueSettings -> viewModelScope.launch { 
+                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(action.source)) 
+            }
             is Action.ToggleStopMedia -> toggleStopMedia(action.enabled)
             is Action.ToggleEndVolume -> toggleEndVolume(action.enabled)
             is Action.SetEndVolumeLevel -> setEndVolumeLevel(action.level)
@@ -117,7 +153,25 @@ class TimerViewModel(
 
     private fun toggleHueLights(enabled: Boolean) {
         viewModelScope.launch {
-            manageTimerActionsUseCase.setStartHueLights(enabled)
+            if (enabled && !manageHueUseCase.isConfigured(HueActionSource.START)) {
+                isPendingStartHueActivation = true
+                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(HueActionSource.START))
+            } else {
+                if (!enabled) isPendingStartHueActivation = false
+                manageTimerActionsUseCase.setStartHueLights(enabled)
+            }
+        }
+    }
+
+    private fun toggleEndHueLights(enabled: Boolean) {
+        viewModelScope.launch {
+            if (enabled && !manageHueUseCase.isConfigured(HueActionSource.END)) {
+                isPendingEndHueActivation = true
+                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(HueActionSource.END))
+            } else {
+                if (!enabled) isPendingEndHueActivation = false
+                manageTimerActionsUseCase.setEndHueLights(enabled)
+            }
         }
     }
 

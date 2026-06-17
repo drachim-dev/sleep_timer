@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -28,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,10 +78,13 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.model.TimerState
+import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
+import dr.achim.sleep_timer.ui.components.InitialAnimation
+import dr.achim.sleep_timer.ui.components.LargeButton
 import dr.achim.sleep_timer.ui.components.TimeButton
 import dr.achim.sleep_timer.ui.dashedBorder
-import dr.achim.sleep_timer.ui.sharedElementTransition
+import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
 import dr.achim.sleep_timer.ui.theme.RedAccent
@@ -162,25 +165,27 @@ fun HomeScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            HomeFab(
-                timerState = uiState.timerState,
-                onNavigateToTimer = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val permissionCheck = ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        )
-                        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                            onNavigateToTimer()
+            InitialAnimation {
+                HomeFab(
+                    timerState = uiState.timerState,
+                    onNavigateToTimer = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val permissionCheck = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            )
+                            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                                onNavigateToTimer()
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
                         } else {
-                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            onNavigateToTimer()
                         }
-                    } else {
-                        onNavigateToTimer()
-                    }
-                },
-                onStopTimer = { onAction(HomeUiAction.StopTimer) }
-            )
+                    },
+                    onStopTimer = { onAction(HomeUiAction.StopTimer) }
+                )
+            }
         },
     ) { innerPadding ->
         Column(
@@ -191,27 +196,30 @@ fun HomeScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CircularTimer(
-                progress = if (uiState.timerState is TimerState.Idle) selectedMinutes.value else uiState.timerState.progress,
-                timeText = if (uiState.timerState is TimerState.Idle) {
-                    val totalMinutes = (selectedMinutes.value * 60).toInt()
-                    formatMinutes(totalMinutes)
-                } else {
-                    uiState.timerState.formattedTime
-                },
-                glowEnabled = uiState.glowEnabled,
-                glowIntensity = uiState.glowIntensity,
-                interactive = uiState.timerState is TimerState.Idle,
-                onProgressChange = { newProgress ->
-                    if (uiState.timerState !is TimerState.Idle) return@CircularTimer
-                    coroutineScope.launch {
-                        val snappedProgress = newProgress.coerceAtLeast(0.01f)
-                        selectedMinutes.snapTo(snappedProgress)
-                        onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
-                    }
-                },
-                modifier = Modifier.sharedElementTransition(key = "timer")
-            )
+            val isIdle = uiState.timerState is TimerState.Idle
+            AnimatedContent(isIdle) { isIdle ->
+                CircularTimer(
+                    progress = if (isIdle) selectedMinutes.value else uiState.timerState.progress,
+                    timeText = if (isIdle) {
+                        val totalMinutes = (selectedMinutes.value * 60).toInt()
+                        formatMinutes(totalMinutes)
+                    } else {
+                        uiState.timerState.formattedTime
+                    },
+                    glowEnabled = uiState.glowEnabled,
+                    glowIntensity = uiState.glowIntensity,
+                    interactive = isIdle,
+                    onProgressChange = { newProgress ->
+                        if (uiState.timerState !is TimerState.Idle) return@CircularTimer
+                        coroutineScope.launch {
+                            val snappedProgress = newProgress.coerceAtLeast(0.01f)
+                            selectedMinutes.snapTo(snappedProgress)
+                            onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
+                        }
+                    },
+                    modifier = Modifier.safeSharedElement(SharedElementKey.CircularTimer)
+                )
+            }
 
             Spacer(Modifier.heightIn(min = AppTheme.dimens.spacingHuge))
 
@@ -267,7 +275,7 @@ private fun HomeTopBar(onNavigateToSettings: () -> Unit) {
         actions = {
             IconButton(
                 onClick = onNavigateToSettings,
-                modifier = Modifier.sharedElementTransition(key = "action-button")
+                modifier = Modifier.safeSharedElement(SharedElementKey.ActionButtonGearToCross)
             ) {
                 Icon(
                     painter = rememberAnimatedVectorPainter(
@@ -293,7 +301,7 @@ private fun HomeFab(
         ExtendedFloatingActionButton(
             onClick = onNavigateToTimer,
             shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier.sharedElementTransition(key = "fab")
+            modifier = Modifier.safeSharedElement(SharedElementKey.Fab)
         ) {
             Icon(painterResource(R.drawable.ic_moon_stars), contentDescription = null)
             Spacer(Modifier.width(AppTheme.dimens.spacingNormal))
@@ -326,7 +334,7 @@ private fun HomeFab(
                     ),
                     modifier = Modifier
                         .fillMaxHeight()
-                        .sharedElementTransition(key = "fab")
+                        .safeSharedElement(SharedElementKey.Fab)
                 ) {
                     Icon(painterResource(R.drawable.ic_alarm), contentDescription = null)
                     Spacer(Modifier.width(AppTheme.dimens.spacingNormal))
@@ -349,7 +357,7 @@ private fun HomeFab(
                     ),
                     modifier = Modifier
                         .fillMaxHeight()
-                        .sharedElementTransition(key = "fab-trailing")
+                        .safeSharedElement(SharedElementKey.FabTrailing)
                 ) {
                     Icon(painterResource(R.drawable.ic_close), contentDescription = null)
                 }
@@ -421,67 +429,109 @@ private fun QuickTimeEditSheet(
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Expanded)
     val focusRequester = remember { FocusRequester() }
     val initialText = if (initialValue == -1) "" else initialValue.toString()
-    var editValue by remember { mutableStateOf(TextFieldValue(initialText, TextRange(initialText.length))) }
+    var editValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                initialText,
+                TextRange(initialText.length)
+            )
+        )
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
+        QuickTimeEditContent(
+            editValue = editValue,
+            onValueChange = { editValue = it },
+            onSave = onSave,
+            focusRequester = focusRequester
+        )
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+    }
+}
+
+@Composable
+private fun QuickTimeEditContent(
+    editValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    onSave: (Int) -> Unit,
+    focusRequester: FocusRequester
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = AppTheme.dimens.spacingExtraLarge)
+            .padding(bottom = AppTheme.dimens.spacingExtraLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingLarge)
+    ) {
         Text(
             text = stringResource(R.string.home_quick_time_dialog_title),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = AppTheme.dimens.spacingMedium),
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
 
-        Column(
+        OutlinedTextField(
+            value = editValue,
+            onValueChange = { if (it.text.isDigitsOnly()) onValueChange(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(AppTheme.dimens.spacingMedium),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingMedium)
-        ) {
-
-            OutlinedTextField(
-                value = editValue,
-                onValueChange = { if (it.text.isDigitsOnly()) editValue = it },
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.5f)
-                    .focusRequester(focusRequester),
-                suffix = { Text(stringResource(R.string.home_quick_time_unit_min)) },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        val mins = editValue.text.toIntOrNull() ?: 0
-                        if (mins in 1..120) {
-                            onSave(mins)
-                        }
-                    }
-                ),
-                singleLine = true
-            )
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
+                .focusRequester(focusRequester),
+            textStyle = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center),
+            suffix = {
+                Text(
+                    text = stringResource(R.string.home_quick_time_unit_min),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
                     val mins = editValue.text.toIntOrNull() ?: 0
                     if (mins in 1..120) {
                         onSave(mins)
                     }
                 }
-            ) {
-                Text(stringResource(R.string.home_quick_time_save))
-            }
-        }
+            ),
+            singleLine = true,
+            shape = MaterialTheme.shapes.large
+        )
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+        LargeButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                val mins = editValue.text.toIntOrNull() ?: 0
+                if (mins in 1..120) {
+                    onSave(mins)
+                }
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.home_quick_time_save),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun QuickTimeEditSheetPreview() {
+    AppTheme {
+        QuickTimeEditContent(
+            editValue = TextFieldValue("30", TextRange(2)),
+            onValueChange = {},
+            onSave = {},
+            focusRequester = remember { FocusRequester() }
+        )
     }
 }
 

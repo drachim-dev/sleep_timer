@@ -12,17 +12,20 @@ import android.os.Build
 import dr.achim.sleep_timer.model.EndActions
 import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
+import kotlinx.coroutines.flow.firstOrNull
 
 class TimerActionExecutor(
     private val context: Context,
     private val notificationManager: NotificationManager,
     private val devicePolicyManager: DevicePolicyManager,
-    private val audioManager: AudioManager
+    private val audioManager: AudioManager,
+    private val hueRepository: HueRepository,
+    private val settingsRepository: SettingsRepository
 ) {
     private val adminComponent = ComponentName(context, SleepTimerAdminReceiver::class.java)
     private var originalVolume: Int = -1
 
-    fun applyStartActions(actions: StartActions) {
+    suspend fun applyStartActions(actions: StartActions) {
         if (actions.adjustVolume) {
             actions.volumeLevel?.let { level ->
                 originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -35,9 +38,18 @@ class TimerActionExecutor(
         if (actions.enableDnd && notificationManager.isNotificationPolicyAccessGranted) {
             notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
         }
+
+        if (actions.hueLights) {
+            val ip = settingsRepository.hueBridgeIp.firstOrNull()
+            val user = settingsRepository.hueApiUser.firstOrNull()
+            val groups = settingsRepository.hueStartGroups.firstOrNull() ?: emptySet()
+            if (ip != null && user != null) {
+                turnOffHueLights(ip, user, groups)
+            }
+        }
     }
 
-    fun applyEndActions(actions: EndActions, startActions: StartActions) {
+    suspend fun applyEndActions(actions: EndActions, startActions: StartActions) {
         if (actions.stopMedia) {
             stopMedia()
         }
@@ -62,9 +74,28 @@ class TimerActionExecutor(
             turnOffBluetooth()
         }
 
+        if (actions.hueLights) {
+            val ip = settingsRepository.hueBridgeIp.firstOrNull()
+            val user = settingsRepository.hueApiUser.firstOrNull()
+            val groups = settingsRepository.hueEndGroups.firstOrNull() ?: emptySet()
+            if (ip != null && user != null) {
+                turnOffHueLights(ip, user, groups)
+            }
+        }
+
         // Restore DND if it was enabled and we have permission
         if (startActions.enableDnd && notificationManager.isNotificationPolicyAccessGranted) {
             notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+        }
+    }
+
+    private suspend fun turnOffHueLights(ip: String, user: String, groups: Set<String>) {
+        if (groups.isNotEmpty()) {
+            groups.forEach { groupId ->
+                hueRepository.turnOffGroup(ip, user, groupId)
+            }
+        } else {
+            hueRepository.turnOffLights(ip, user)
         }
     }
 

@@ -14,6 +14,9 @@ koinCompiler = "1.0.1"
 datastorePreferences = "1.2.1"
 animation-graphics = "1.11.2"
 aboutLibraries = "14.2.1"
+ktor = "3.5.0"
+revenuecat = "10.10.0"
+confettikit = "0.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +39,12 @@ koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = 
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 koin-annotations = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koin" }
 aboutlibraries-compose-m3 = { group = "com.mikepenz", name = "aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+revenuecat-purchases = { group = "com.revenuecat.purchases", name = "purchases", version.ref = "revenuecat" }
+confettikit = { group = "io.github.vinceglb", name = "confettikit", version.ref = "confettikit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

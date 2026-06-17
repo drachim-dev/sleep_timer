@@ -175,8 +175,10 @@ class TimerService : Service() {
 
     private fun onTimerFinished() {
         stopTimer()
-        timerActionExecutor.applyEndActions(currentActions.endActions, currentActions.startActions)
-        stopSelf()
+        serviceScope.launch {
+            timerActionExecutor.applyEndActions(currentActions.endActions, currentActions.startActions)
+            stopSelf()
+        }
     }
 
     private fun scheduleAlarm(remainingMillis: Long) {

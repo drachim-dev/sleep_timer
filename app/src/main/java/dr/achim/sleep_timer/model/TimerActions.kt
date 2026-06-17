@@ -9,6 +9,11 @@ data class TimerActions(
 )
 
 @Serializable
+enum class HueActionSource {
+    START, END
+}
+
+@Serializable
 data class StartActions(
     val adjustVolume: Boolean = false,
     val volumeLevel: Int? = null,
@@ -22,5 +27,6 @@ data class EndActions(
     val adjustVolume: Boolean = false,
     val volumeLevel: Int? = null,
     val turnOffScreen: Boolean = false,
-    val turnOffBluetooth: Boolean = false
+    val turnOffBluetooth: Boolean = false,
+    val hueLights: Boolean = false
 )
