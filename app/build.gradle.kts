@@ -9,9 +9,7 @@ plugins {
     alias(libs.plugins.aboutLibraries)
 }
 
-aboutLibraries {
-
-}
+aboutLibraries {}
 
 koinCompiler {
     compileSafety = true
@@ -38,20 +36,28 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val revenueCatKey = if (System.getenv("REVENUECAT_KEY") != null) {
-            System.getenv("REVENUECAT_KEY")
-        } else {
-            val localProperties = Properties().apply {
-                val localPropertiesFile = rootProject.file("local.properties")
-                if (localPropertiesFile.exists()) {
-                    load(FileInputStream(localPropertiesFile))
-                } else {
-                    println("Warning: local.properties file not found")
+        fun getProperty(name: String, default: String): String {
+            return if (System.getenv(name) != null) {
+                System.getenv(name)
+            } else {
+                val localProperties = Properties().apply {
+                    val localPropertiesFile = rootProject.file("local.properties")
+                    if (localPropertiesFile.exists()) {
+                        load(FileInputStream(localPropertiesFile))
+                    }
                 }
+                localProperties.getProperty(name, default)
             }
-            localProperties.getProperty("REVENUECAT_KEY", "")
         }
+
+        val revenueCatKey = getProperty("REVENUECAT_KEY", "")
         buildConfigField("String", "REVENUECAT_KEY", "\"${revenueCatKey}\"")
+
+        val admobAppId = getProperty("ADMOB_APP_ID", "")
+        val admobInterstitialUnitId = getProperty("ADMOB_INTERSTITIAL_UNIT_ID", "")
+
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"${admobInterstitialUnitId}\"")
     }
 
     buildTypes {
@@ -89,6 +95,7 @@ dependencies {
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.revenuecat.purchases)
     implementation(libs.confettikit)
+    implementation(libs.play.services.ads)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

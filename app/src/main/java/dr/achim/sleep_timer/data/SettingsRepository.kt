@@ -43,6 +43,8 @@ class SettingsRepository(private val context: Context) {
         private val HUE_START_GROUPS_KEY = stringSetPreferencesKey("hue_start_groups")
         private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("hue_end_groups")
 
+        private val TIMER_START_COUNT_KEY = intPreferencesKey("timer_start_count")
+
         private const val DEFAULT_GLOW_EFFECT_ENABLED = true
         private const val DEFAULT_GLOW_INTENSITY = 40f
         private const val DEFAULT_EXTEND_ON_SHAKE = false
@@ -135,6 +137,10 @@ class SettingsRepository(private val context: Context) {
 
     val hueEndGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
         preferences[HUE_END_GROUPS_KEY] ?: emptySet()
+    }
+
+    val timerStartCount: Flow<Int> = context.settingsDataStore.data.map { preferences ->
+        preferences[TIMER_START_COUNT_KEY] ?: 0
     }
 
     suspend fun setThemeMode(themeMode: ThemeMode) {
@@ -272,5 +278,13 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { preferences ->
             preferences[HUE_END_GROUPS_KEY] = groups
         }
+    }
+
+    suspend fun incrementAndGetTimerStartCount(): Int {
+        return context.settingsDataStore.edit { preferences ->
+            val current = preferences[TIMER_START_COUNT_KEY] ?: 0
+            val next = current + 1
+            preferences[TIMER_START_COUNT_KEY] = next
+        }[TIMER_START_COUNT_KEY] ?: 0
     }
 }

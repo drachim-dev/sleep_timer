@@ -1,6 +1,7 @@
 package dr.achim.sleep_timer
 
 import android.app.Application
+import com.google.android.gms.ads.MobileAds
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import dr.achim.sleep_timer.di.appModule
@@ -17,6 +18,8 @@ class MainApplication : Application() {
         Purchases.configure(
             PurchasesConfiguration.Builder(this, BuildConfig.REVENUECAT_KEY).build()
         )
+
+        MobileAds.initialize(this) {}
 
         startKoin {
             androidLogger()

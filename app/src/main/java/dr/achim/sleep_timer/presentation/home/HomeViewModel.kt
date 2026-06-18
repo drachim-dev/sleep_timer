@@ -2,6 +2,7 @@ package dr.achim.sleep_timer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
 import dr.achim.sleep_timer.domain.usecase.GetLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.GetQuickTimesUseCase
@@ -22,21 +23,24 @@ class HomeViewModel(
     private val updateLastSelectedMinutesUseCase: UpdateLastSelectedMinutesUseCase,
     getSettingsUseCase: GetSettingsUseCase,
     getTimerStatusUseCase: GetTimerStatusUseCase,
-    private val controlTimerUseCase: ControlTimerUseCase
+    private val controlTimerUseCase: ControlTimerUseCase,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = combine(
         getSettingsUseCase(),
         getQuickTimesUseCase(),
         getLastSelectedMinutesUseCase(),
-        getTimerStatusUseCase.timerState
-    ) { settings, quickTimes, lastMinutes, timerState ->
+        getTimerStatusUseCase.timerState,
+        settingsRepository.timerStartCount
+    ) { settings, quickTimes, lastMinutes, timerState, startCount ->
         HomeUiState(
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
             quickTimes = quickTimes,
             lastSelectedMinutes = lastMinutes,
-            timerState = timerState
+            timerState = timerState,
+            timerStartCount = startCount
         )
     }.stateIn(
         scope = viewModelScope,
@@ -48,7 +52,7 @@ class HomeViewModel(
         when (action) {
             is HomeUiAction.UpdateQuickTime -> updateQuickTime(action.index, action.minutes)
             is HomeUiAction.UpdateLastSelectedMinutes -> updateLastSelectedMinutes(action.minutes)
-            HomeUiAction.StopTimer -> stopTimer()
+            is HomeUiAction.StopTimer -> stopTimer()
         }
     }
 

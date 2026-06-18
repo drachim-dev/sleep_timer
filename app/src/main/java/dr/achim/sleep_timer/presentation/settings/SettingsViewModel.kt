@@ -4,16 +4,14 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.ProductType
 import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.getCustomerInfoWith
 import com.revenuecat.purchases.getProductsWith
-import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.purchases.purchaseWith
 import dr.achim.sleep_timer.common.TAG
+import dr.achim.sleep_timer.data.BillingRepository
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
@@ -42,6 +40,7 @@ data class StoreProductUiModel(
 
 class SettingsViewModel(
     private val timerController: TimerController,
+    billingRepository: BillingRepository,
     getSettingsUseCase: GetSettingsUseCase,
     private val updateSettingsUseCase: UpdateSettingsUseCase,
     private val manageTimerActionsUseCase: ManageTimerActionsUseCase,
@@ -97,9 +96,8 @@ class SettingsViewModel(
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
 
     private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
-    private val _customerInfo = MutableStateFlow<CustomerInfo?>(null)
 
-    val productUiModels: StateFlow<List<StoreProductUiModel>> = combine(_products, _customerInfo) { products, info ->
+    val productUiModels: StateFlow<List<StoreProductUiModel>> = combine(_products, billingRepository.customerInfo) { products, info ->
         products.map { product ->
             val productType = Product.entries.find { it.id == product.id }
             val isConsumable = productType?.isConsumable ?: false
@@ -119,20 +117,6 @@ class SettingsViewModel(
 
     init {
         loadProducts()
-        loadCustomerInfo()
-        Purchases.sharedInstance.updatedCustomerInfoListener = UpdatedCustomerInfoListener { info ->
-            _customerInfo.value = info
-        }
-    }
-
-    private fun loadCustomerInfo() {
-        Purchases.sharedInstance.getCustomerInfoWith(
-            onError = { error ->
-                Log.e(TAG, "Code ${error.code}: ${error.message}")
-            }
-        ) { info ->
-            _customerInfo.value = info
-        }
     }
 
     private fun loadProducts() {
@@ -234,6 +218,5 @@ class SettingsViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        Purchases.sharedInstance.updatedCustomerInfoListener = null
     }
 }

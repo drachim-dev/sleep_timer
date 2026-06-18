@@ -8,5 +8,6 @@ data class HomeUiState(
     val glowIntensity: Float = 0f,
     val quickTimes: List<Int> = emptyList(),
     val lastSelectedMinutes: Int = DEFAULT_SELECTED_MINUTES,
-    val timerState: TimerState = TimerState.Idle()
+    val timerState: TimerState = TimerState.Idle(),
+    val timerStartCount: Int = 0
 )

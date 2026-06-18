@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.metadata
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.presentation.home.HomeScreen
 import dr.achim.sleep_timer.presentation.hue.HueDiscoveryScreen
@@ -33,7 +34,6 @@ import dr.achim.sleep_timer.presentation.settings.CreditsScreen
 import dr.achim.sleep_timer.presentation.settings.FaqScreen
 import dr.achim.sleep_timer.presentation.settings.SettingsScreen
 import dr.achim.sleep_timer.presentation.timer.TimerScreen
-import dr.achim.sleep_timer.common.UiMessageManager
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -86,7 +86,7 @@ fun Navigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         sharedTransitionScope = sharedTransitionScope,
-        predictivePopTransitionSpec =     {
+        predictivePopTransitionSpec = {
             ContentTransform(
                 fadeIn(
                     spring(

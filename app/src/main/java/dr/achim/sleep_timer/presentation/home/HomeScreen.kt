@@ -76,7 +76,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
+import dr.achim.sleep_timer.common.findActivity
+import dr.achim.sleep_timer.data.AdManager
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
@@ -91,23 +94,39 @@ import dr.achim.sleep_timer.ui.theme.RedAccent
 import dr.achim.sleep_timer.ui.theme.dimens
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun HomeScreen(
     onNavigateToTimer: (Int?) -> Unit,
     onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
+    adManager: AdManager = koinInject(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val activity = LocalContext.current.findActivity()
+    val isProUser = LocalIsPro.current
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(isProUser, uiState.timerStartCount) {
+        if (!isProUser) {
+            adManager.mayPreload()
+        }
+    }
 
     HomeScreenContent(
         uiState = uiState,
         onNavigateToTimer = {
-            if (uiState.timerState is TimerState.Idle) {
-                onNavigateToTimer(uiState.lastSelectedMinutes)
-            } else {
-                onNavigateToTimer(null)
+            coroutineScope.launch {
+                val selectedMinutes = if (uiState.timerState is TimerState.Idle) uiState.lastSelectedMinutes else null
+                if (adManager.shouldShowAd(isProUser)) {
+                    adManager.showAd(activity) {
+                        onNavigateToTimer(selectedMinutes)
+                    }
+                } else {
+                    onNavigateToTimer(selectedMinutes)
+                }
             }
         },
         onNavigateToSettings = onNavigateToSettings,
