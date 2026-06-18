@@ -95,7 +95,6 @@
 
     <!-- Hue Discovery -->
     <string name="hue_discovery_title">Link Bridge</string>
-    <string name="hue_discovery_paired_bridges_subtitle">Paired bridges</string>
     <plurals name="hue_discovery_devices_count_title">
         <item quantity="one">%d device found</item>
         <item quantity="other">%d devices found</item>
@@ -118,9 +117,6 @@
     <!-- Hue Pairing -->
     <string name="hue_pairing_title">Pairing</string>
     <string name="hue_pairing_message">Press the link button on your Hue Bridge to connect.</string>
-    <string name="hue_pairing_timeout">Pairing timed out. Please try again.</string>
-    <string name="hue_pairing_error">An error occurred during pairing.</string>
-    <string name="hue_pairing_success">Successfully connected to your Hue Bridge!</string>
     <string name="hue_pairing_confirm">Connect</string>
     <string name="hue_pairing_cancel">Cancel</string>
 
