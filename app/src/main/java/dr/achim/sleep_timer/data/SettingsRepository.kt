@@ -1,6 +1,7 @@
 package dr.achim.sleep_timer.data
 
 import android.content.Context
+import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -61,10 +62,20 @@ class SettingsRepository(private val context: Context) {
 
     val themeMode: Flow<ThemeMode> = context.settingsDataStore.data.map { preferences ->
         val savedTheme = preferences[THEME_MODE_KEY]
-        try {
-            if (savedTheme != null) ThemeMode.valueOf(savedTheme) else ThemeMode.SYSTEM
-        } catch (_: IllegalArgumentException) {
+        val defaultTheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ThemeMode.DYNAMIC
+        } else {
             ThemeMode.SYSTEM
+        }
+        try {
+            val theme = if (savedTheme != null) ThemeMode.valueOf(savedTheme) else defaultTheme
+            if (theme == ThemeMode.DYNAMIC && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                ThemeMode.SYSTEM
+            } else {
+                theme
+            }
+        } catch (_: IllegalArgumentException) {
+            defaultTheme
         }
     }
 

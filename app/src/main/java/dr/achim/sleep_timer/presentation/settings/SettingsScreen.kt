@@ -3,6 +3,7 @@ package dr.achim.sleep_timer.presentation.settings
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -445,7 +446,9 @@ fun ThemeSelectionDialog(
                     modifier = Modifier.padding(bottom = AppTheme.dimens.spacingMedium)
                 )
 
-                ThemeMode.entries.forEach { mode ->
+                ThemeMode.entries
+                    .filter { it != ThemeMode.DYNAMIC || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S }
+                    .forEach { mode ->
                     val label = when (mode) {
                         ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
                         ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
