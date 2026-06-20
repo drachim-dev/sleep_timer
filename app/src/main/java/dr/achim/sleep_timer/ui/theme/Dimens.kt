@@ -15,6 +15,7 @@ data class Dimens(
     val spacingHuge: Dp = 56.dp,
 
     val largeButtonSize: Dp = 48.dp,
+    val pageIndicator: Dp = 8.dp,
     val timeButtonSize: Dp = 64.dp,
     val quickTimeAddIconSize: Dp = 32.dp,
     val actionToggleIconSize: Dp = 32.dp,

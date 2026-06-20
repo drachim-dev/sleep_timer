@@ -126,4 +126,17 @@
     <string name="hue_room_selection_loading">Fetching rooms…</string>
     <string name="hue_room_selection_no_rooms">No rooms found</string>
     <string name="hue_room_selection_no_rooms_sub">Make sure your Hue Bridge is configured correctly and contains rooms or zones.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_music_title">Listen to your music</string>
+    <string name="onboarding_music_desc">Fall asleep to your favorite music, podcasts, or audiobooks without worry.</string>
+    <string name="onboarding_sleep_title">Better sleep</string>
+    <string name="onboarding_sleep_desc">Simply set the timer and relax. The app will take care of the rest.</string>
+    <string name="onboarding_automate_title">Automate your routines</string>
+    <string name="onboarding_automate_desc">Automatically turn off your lights, lower the volume, or enable Do Not Disturb.</string>
+    <string name="onboarding_interruption_title">No interruptions</string>
+    <string name="onboarding_interruption_desc">The timer will stop your media and can even turn off your screen to save battery.</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
 </resources>

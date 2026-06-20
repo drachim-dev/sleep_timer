@@ -83,8 +83,8 @@ import dr.achim.sleep_timer.data.AdManager
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
+import dr.achim.sleep_timer.ui.components.DefaultButton
 import dr.achim.sleep_timer.ui.components.InitialAnimation
-import dr.achim.sleep_timer.ui.components.LargeButton
 import dr.achim.sleep_timer.ui.components.TimeButton
 import dr.achim.sleep_timer.ui.dashedBorder
 import dr.achim.sleep_timer.ui.safeSharedElement
@@ -524,7 +524,7 @@ private fun QuickTimeEditContent(
             shape = MaterialTheme.shapes.large
         )
 
-        LargeButton(
+        DefaultButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 val mins = editValue.text.toIntOrNull() ?: 0

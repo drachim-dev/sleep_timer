@@ -143,6 +143,12 @@ class SettingsRepository(private val context: Context) {
         preferences[TIMER_START_COUNT_KEY] ?: 0
     }
 
+    suspend fun setFirstLaunchCompleted() {
+        context.settingsDataStore.edit { preferences ->
+            preferences[FIRST_LAUNCH_KEY] = false
+        }
+    }
+
     suspend fun setThemeMode(themeMode: ThemeMode) {
         context.settingsDataStore.edit { preferences ->
             preferences[THEME_MODE_KEY] = themeMode.name

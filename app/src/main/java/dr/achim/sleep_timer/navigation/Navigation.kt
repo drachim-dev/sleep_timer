@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
@@ -26,20 +27,26 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dr.achim.sleep_timer.common.UiMessageManager
+import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.presentation.home.HomeScreen
 import dr.achim.sleep_timer.presentation.hue.HueDiscoveryScreen
 import dr.achim.sleep_timer.presentation.hue.RoomSelectionScreen
+import dr.achim.sleep_timer.presentation.onboarding.OnboardingScreen
 import dr.achim.sleep_timer.presentation.settings.CreditsScreen
 import dr.achim.sleep_timer.presentation.settings.FaqScreen
 import dr.achim.sleep_timer.presentation.settings.SettingsScreen
 import dr.achim.sleep_timer.presentation.timer.TimerScreen
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }
+
+@Serializable
+object OnboardingKey : NavKey
 
 @Serializable
 object HomeKey : NavKey
@@ -70,8 +77,11 @@ fun Navigation(
 ) {
     val backStack = rememberNavBackStack(*initialBackStack.toTypedArray())
     val onBack = dropUnlessResumed { backStack.removeLastOrNull() }
+    val settingsRepository = koinInject<SettingsRepository>()
     val uiMessageManager = koinInject<UiMessageManager>()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         uiMessageManager.messages.collect { message ->
@@ -98,6 +108,17 @@ fun Navigation(
             )
         },
         entryProvider = entryProvider {
+            entry<OnboardingKey> {
+                OnboardingScreen(
+                    onComplete = {
+                        scope.launch {
+                            settingsRepository.setFirstLaunchCompleted()
+                            backStack.clear()
+                            backStack.add(HomeKey)
+                        }
+                    }
+                )
+            }
             entry<HomeKey> {
                 HomeScreen(
                     onNavigateToTimer = { minutes ->

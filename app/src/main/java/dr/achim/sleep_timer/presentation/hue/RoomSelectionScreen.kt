@@ -31,9 +31,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
 import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.ui.components.DefaultButton
 import dr.achim.sleep_timer.ui.components.EmptyState
 import dr.achim.sleep_timer.ui.components.FullScreenLoadingState
-import dr.achim.sleep_timer.ui.components.LargeButton
 import dr.achim.sleep_timer.ui.components.SwitchListItem
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
@@ -100,7 +100,7 @@ private fun RoomSelectionContent(
                         Icon(painterResource(R.drawable.ic_search), contentDescription = null)
                     }
                 } else {
-                    LargeButton(
+                    DefaultButton(
                         onClick = onSave,
                         modifier = Modifier
                             .fillMaxWidth()
