@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,14 +44,14 @@ import kotlin.math.sin
 @Composable
 fun CircularTimer(
     progress: Float,
-    timeText: String,
     modifier: Modifier = Modifier,
     interactive: Boolean = false,
     glowEnabled: Boolean = true,
     glowIntensity: Float = 30f,
     glowColor: Color = MaterialTheme.colorScheme.primary,
     showHandle: Boolean = interactive,
-    onProgressChange: (Float) -> Unit = {}
+    onProgressChange: (Float) -> Unit = {},
+    content: @Composable () -> Unit
 ) {
     val currentProgress by rememberUpdatedState(progress)
     val currentOnProgressChange by rememberUpdatedState(onProgressChange)
@@ -151,14 +154,12 @@ fun CircularTimer(
                     .padding(AppTheme.dimens.spacingSmall),
                 contentAlignment = Alignment.Center
             ) {
-                val textStyle = MaterialTheme.typography.displayLarge
-                Text(
-                    text = timeText,
-                    style = textStyle,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    autoSize = TextAutoSize.StepBased(maxFontSize = textStyle.fontSize)
-                )
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+                    LocalTextStyle provides MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),
+                ) {
+                    content()
+                }
             }
         }
     }
@@ -295,8 +296,13 @@ fun CircularTimerPreview() {
     AppTheme {
         CircularTimer(
             progress = 0.83f,
-            timeText = "50",
             interactive = true
-        )
+        ) {
+            Text(
+                text = "50",
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(maxFontSize = MaterialTheme.typography.displayLarge.fontSize)
+            )
+        }
     }
 }

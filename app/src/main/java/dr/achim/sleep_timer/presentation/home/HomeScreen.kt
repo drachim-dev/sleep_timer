@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +37,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -216,15 +218,9 @@ fun HomeScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             val isIdle = uiState.timerState is TimerState.Idle
-            AnimatedContent(isIdle) { isIdle ->
+            AnimatedContent(isIdle, label = "timerContent") { isIdle ->
                 CircularTimer(
                     progress = if (isIdle) selectedMinutes.value else uiState.timerState.progress,
-                    timeText = if (isIdle) {
-                        val totalMinutes = (selectedMinutes.value * 60).toInt()
-                        formatMinutes(totalMinutes)
-                    } else {
-                        uiState.timerState.formattedTime
-                    },
                     glowEnabled = uiState.glowEnabled,
                     glowIntensity = uiState.glowIntensity,
                     interactive = isIdle,
@@ -237,7 +233,35 @@ fun HomeScreenContent(
                         }
                     },
                     modifier = Modifier.safeSharedElement(SharedElementKey.CircularTimer)
-                )
+                ) {
+                    if (isIdle) {
+                        val totalMinutes = (selectedMinutes.value * 60).toInt()
+                        val hours = totalMinutes / 60
+                        val minutes = totalMinutes % 60
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.home_time_minutes_only, minutes),
+                                maxLines = 1,
+                                autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                            )
+                            if (hours > 0) {
+                                Text(
+                                    text = "+ ${hours}h",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.displaySmall,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    } else {
+                        Text(
+                            text = uiState.timerState.formattedTime,
+                            maxLines = 1,
+                            autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.heightIn(min = AppTheme.dimens.spacingHuge))
@@ -266,17 +290,6 @@ fun HomeScreenContent(
                 }
             )
         }
-    }
-}
-
-@Composable
-private fun formatMinutes(totalMinutes: Int): String {
-    val hours = totalMinutes / 60
-    val minutes = totalMinutes % 60
-    return when {
-        hours > 0 && minutes == 0 -> stringResource(R.string.home_time_hours_only, hours)
-        hours > 0 -> stringResource(R.string.home_time_minutes_and_hours, minutes, hours)
-        else -> stringResource(R.string.home_time_minutes_only, minutes)
     }
 }
 

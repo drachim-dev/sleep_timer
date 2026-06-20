@@ -41,6 +41,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -51,6 +52,7 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -343,7 +345,6 @@ private fun TimerScreenContent(
         ) {
             CircularTimer(
                 progress = uiState.timerState.progress,
-                timeText = uiState.timerState.formattedTime,
                 glowEnabled = uiState.glowEnabled,
                 glowIntensity = uiState.glowIntensity,
                 interactive = false,
@@ -369,7 +370,13 @@ private fun TimerScreenContent(
                     val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
                     onAction(Action.SetRemainingTime(totalMillis))
                 }
-            )
+            ) {
+                Text(
+                    text = uiState.timerState.formattedTime,
+                    maxLines = 1,
+                    autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                )
+            }
 
             TimeAdjustmentRow(
                 modifier = Modifier.fillMaxWidth(),
