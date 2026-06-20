@@ -10,5 +10,7 @@ data class TimerUiState(
     val quickLaunchApps: List<QuickLaunchApp> = emptyList(),
     val selectedApps: List<QuickLaunchApp?> = listOf(null, null),
     val isDeviceAdminEnabled: Boolean = false,
-    val hasNotificationAccess: Boolean = false
+    val hasNotificationAccess: Boolean = false,
+    val glowEnabled: Boolean = false,
+    val glowIntensity: Float = 0f
 )

@@ -337,7 +337,8 @@ private fun TimerScreenContent(
             CircularTimer(
                 progress = uiState.timerState.progress,
                 timeText = uiState.timerState.formattedTime,
-                glowEnabled = false,
+                glowEnabled = uiState.glowEnabled,
+                glowIntensity = uiState.glowIntensity,
                 interactive = false,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -633,7 +634,7 @@ fun QuickLaunchBottomSheet(
     onDismiss: () -> Unit
 ) {
     val groupedApps = remember(apps) { apps.groupBy { it.category } }
-    var selectedAppForMenu by remember { mutableStateOf<QuickLaunchApp?>(null) }
+    var selectedAppPackageName by remember { mutableStateOf<String?>(null) }
 
     val sheetState = rememberBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -672,14 +673,14 @@ fun QuickLaunchBottomSheet(
                             onClick = { onAppClick(app.packageName) },
                             onLongClick = {
                                 if (selectingIndex == -1) {
-                                    selectedAppForMenu = app
+                                    selectedAppPackageName = app.packageName
                                 }
                             }
                         )
 
                         DropdownMenu(
-                            expanded = selectedAppForMenu == app,
-                            onDismissRequest = { selectedAppForMenu = null }
+                            expanded = selectedAppPackageName == app.packageName,
+                            onDismissRequest = { selectedAppPackageName = null }
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -715,7 +716,7 @@ fun QuickLaunchBottomSheet(
                                 },
                                 onClick = {
                                     onPinApp(app.packageName, 0)
-                                    selectedAppForMenu = null
+                                    selectedAppPackageName = null
                                 }
                             )
                             DropdownMenuItem(
@@ -728,7 +729,7 @@ fun QuickLaunchBottomSheet(
                                 },
                                 onClick = {
                                     onPinApp(app.packageName, 1)
-                                    selectedAppForMenu = null
+                                    selectedAppPackageName = null
                                 }
                             )
                         }

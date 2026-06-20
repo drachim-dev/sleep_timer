@@ -2,8 +2,11 @@ package dr.achim.sleep_timer.presentation.timer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dr.achim.sleep_timer.common.combine
+import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
+import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
@@ -33,11 +36,12 @@ class TimerViewModel(
     private val manageHueUseCase: ManageHueUseCase,
     private val manageQuickLaunchUseCase: ManageQuickLaunchUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
+    getSettingsUseCase: GetSettingsUseCase,
     @InjectedParam minutes: Int?
 ) : ViewModel() {
 
-    private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase.isDeviceAdminEnabled())
-    private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase.hasNotificationAccess())
+    private val _permissionsFlow = MutableStateFlow(checkTimerPermissionsUseCase())
+    private val _quickLaunchApps = MutableStateFlow<List<QuickLaunchApp>>(emptyList())
 
     private var isPendingStartHueActivation = false
     private var isPendingEndHueActivation = false
@@ -49,16 +53,19 @@ class TimerViewModel(
         getTimerStatusUseCase.timerState,
         getTimerStatusUseCase.observeTimerActions(),
         manageQuickLaunchUseCase.getSelectedApps(),
-        _isDeviceAdminEnabled,
-        _hasNotificationAccess
-    ) { timerState, timerActions, selectedApps, isAdmin, hasDnd ->
+        _permissionsFlow,
+        _quickLaunchApps,
+        getSettingsUseCase()
+    ) { timerState, timerActions, selectedApps, permissions, apps, settings ->
         TimerUiState(
             timerState = timerState,
             timerActions = timerActions,
-            quickLaunchApps = manageQuickLaunchUseCase.getApps(),
+            quickLaunchApps = apps,
             selectedApps = selectedApps,
-            isDeviceAdminEnabled = isAdmin,
-            hasNotificationAccess = hasDnd
+            isDeviceAdminEnabled = permissions.isDeviceAdminEnabled,
+            hasNotificationAccess = permissions.hasNotificationAccess,
+            glowEnabled = settings.glowEffectEnabled,
+            glowIntensity = settings.glowIntensity
         )
     }.stateIn(
         scope = viewModelScope,
@@ -67,6 +74,8 @@ class TimerViewModel(
     )
 
     init {
+        _quickLaunchApps.value = manageQuickLaunchUseCase.getApps()
+
         if (minutes != null) {
             startTimer(minutes * 60 * 1000L)
         }
@@ -109,16 +118,16 @@ class TimerViewModel(
             is Action.StopTimer -> stopTimer()
             is Action.TogglePauseResume -> togglePauseResume()
             is Action.RefreshAdminStatus -> {
-                val enabled = checkTimerPermissionsUseCase.isDeviceAdminEnabled()
-                _isDeviceAdminEnabled.value = enabled
-                if (enabled && action.autoEnable) {
+                val permissions = checkTimerPermissionsUseCase()
+                _permissionsFlow.value = permissions
+                if (permissions.isDeviceAdminEnabled && action.autoEnable) {
                     toggleScreenOff(true)
                 }
             }
             is Action.RefreshDndStatus -> {
-                val enabled = checkTimerPermissionsUseCase.hasNotificationAccess()
-                _hasNotificationAccess.value = enabled
-                if (enabled && action.autoEnable) {
+                val permissions = checkTimerPermissionsUseCase()
+                _permissionsFlow.value = permissions
+                if (permissions.hasNotificationAccess && action.autoEnable) {
                     toggleDnd(true)
                 }
             }

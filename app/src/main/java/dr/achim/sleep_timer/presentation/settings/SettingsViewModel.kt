@@ -97,10 +97,10 @@ class SettingsViewModel(
             initialValue = AppSettings().extendOnShakeMinutes
         )
 
-    private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase.isDeviceAdminEnabled())
+    private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase().isDeviceAdminEnabled)
     val isDeviceAdminEnabled: StateFlow<Boolean> = _isDeviceAdminEnabled.asStateFlow()
 
-    private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase.hasNotificationAccess())
+    private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase().hasNotificationAccess)
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
 
     private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
@@ -169,13 +169,13 @@ class SettingsViewModel(
     }
 
     private fun refreshDeviceAdminStatus(): Boolean {
-        val enabled = checkTimerPermissionsUseCase.isDeviceAdminEnabled()
+        val enabled = checkTimerPermissionsUseCase().isDeviceAdminEnabled
         _isDeviceAdminEnabled.value = enabled
         return enabled
     }
 
     private fun refreshDndStatus(): Boolean {
-        val enabled = checkTimerPermissionsUseCase.hasNotificationAccess()
+        val enabled = checkTimerPermissionsUseCase().hasNotificationAccess
         _hasNotificationAccess.value = enabled
         return enabled
     }
