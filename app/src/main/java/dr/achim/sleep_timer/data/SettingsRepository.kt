@@ -19,35 +19,44 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
 class SettingsRepository(private val context: Context) {
 
     companion object {
-        private val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
-        private val GLOW_EFFECT_ENABLED_KEY = booleanPreferencesKey("glow_effect_enabled")
-        private val GLOW_INTENSITY_KEY = floatPreferencesKey("glow_intensity")
-        private val EXTEND_ON_SHAKE_KEY = booleanPreferencesKey("extend_on_shake")
-        private val QUICK_LAUNCH_APP_1_KEY = stringPreferencesKey("quick_launch_app_1")
-        private val QUICK_LAUNCH_APP_2_KEY = stringPreferencesKey("quick_launch_app_2")
-        private val START_VOLUME_LEVEL_KEY = intPreferencesKey("start_volume_level")
-        private val START_ADJUST_VOLUME_KEY = booleanPreferencesKey("start_adjust_volume")
-        private val START_ENABLE_DND_KEY = booleanPreferencesKey("start_enable_dnd")
-        private val START_HUE_LIGHTS_KEY = booleanPreferencesKey("start_hue_lights")
+        private val FIRST_LAUNCH_KEY = booleanPreferencesKey("pref_key_first_launch")
+        private val THEME_MODE_KEY = stringPreferencesKey("pref_key_theme_mode")
+        private val GLOW_EFFECT_ENABLED_KEY = booleanPreferencesKey("pref_key_glow")
+        private val GLOW_INTENSITY_KEY = floatPreferencesKey("pref_key_glow_intensity")
+        private val EXTEND_ON_SHAKE_KEY = booleanPreferencesKey("pref_key_extend_on_shake")
+        private val EXTEND_ON_SHAKE_MINUTES_KEY = intPreferencesKey("pref_key_default_extend_time_by_shake")
+        private val QUICK_LAUNCH_APP_1_KEY = stringPreferencesKey("pref_key_quick_launch_app_1")
+        private val QUICK_LAUNCH_APP_2_KEY = stringPreferencesKey("pref_key_quick_launch_app_2")
+        private val START_VOLUME_LEVEL_KEY = intPreferencesKey("pref_key_volume_level")
+        private val START_ADJUST_VOLUME_KEY = booleanPreferencesKey("pref_key_start_adjust_volume")
+        private val START_ENABLE_DND_KEY = booleanPreferencesKey("pref_key_start_enable_dnd")
+        private val START_HUE_LIGHTS_KEY = booleanPreferencesKey("pref_key_start_hue_lights")
+        private val END_VOLUME_LEVEL_KEY = intPreferencesKey("pref_key_volume_end_level")
+        private val END_ADJUST_VOLUME_KEY = booleanPreferencesKey("pref_key_end_adjust_volume")
+        private val END_STOP_MEDIA_KEY = booleanPreferencesKey("pref_key_end_stop_media")
+        private val END_TURN_OFF_SCREEN_KEY = booleanPreferencesKey("pref_key_end_turn_off_screen")
+        private val END_TURN_OFF_BLUETOOTH_KEY = booleanPreferencesKey("pref_key_end_turn_off_bluetooth")
+        private val END_HUE_LIGHTS_KEY = booleanPreferencesKey("pref_key_end_hue_lights")
 
-        private val END_VOLUME_LEVEL_KEY = intPreferencesKey("end_volume_level")
-        private val END_ADJUST_VOLUME_KEY = booleanPreferencesKey("end_adjust_volume")
-        private val END_STOP_MEDIA_KEY = booleanPreferencesKey("end_stop_media")
-        private val END_TURN_OFF_SCREEN_KEY = booleanPreferencesKey("end_turn_off_screen")
-        private val END_TURN_OFF_BLUETOOTH_KEY = booleanPreferencesKey("end_turn_off_bluetooth")
-        private val END_HUE_LIGHTS_KEY = booleanPreferencesKey("end_hue_lights")
+        private val HUE_BRIDGE_IP_KEY = stringPreferencesKey("pref_key_hue_bridge_ip")
+        private val HUE_API_USER_KEY = stringPreferencesKey("pref_key_hue_api_user")
+        private val HUE_SELECTED_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_selected_groups")
+        private val HUE_START_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_start_groups")
+        private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_end_groups")
 
-        private val HUE_BRIDGE_IP_KEY = stringPreferencesKey("hue_bridge_ip")
-        private val HUE_API_USER_KEY = stringPreferencesKey("hue_api_user")
-        private val HUE_SELECTED_GROUPS_KEY = stringSetPreferencesKey("hue_selected_groups")
-        private val HUE_START_GROUPS_KEY = stringSetPreferencesKey("hue_start_groups")
-        private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("hue_end_groups")
+        private val TIMER_START_COUNT_KEY = intPreferencesKey("pref_key_timer_start_count")
 
-        private val TIMER_START_COUNT_KEY = intPreferencesKey("timer_start_count")
-
+        /**
+         * Default values
+         */
         private const val DEFAULT_GLOW_EFFECT_ENABLED = true
         private const val DEFAULT_GLOW_INTENSITY = 40f
         private const val DEFAULT_EXTEND_ON_SHAKE = false
+        private const val DEFAULT_EXTEND_ON_SHAKE_MINUTES = 15
+    }
+
+    val isFirstLaunch: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
+        preferences[FIRST_LAUNCH_KEY] ?: true
     }
 
     val themeMode: Flow<ThemeMode> = context.settingsDataStore.data.map { preferences ->
@@ -69,6 +78,10 @@ class SettingsRepository(private val context: Context) {
 
     val extendOnShake: Flow<Boolean> = context.settingsDataStore.data.map { preferences ->
         preferences[EXTEND_ON_SHAKE_KEY] ?: DEFAULT_EXTEND_ON_SHAKE
+    }
+
+    val extendOnShakeMinutes: Flow<Int> = context.settingsDataStore.data.map { preferences ->
+        preferences[EXTEND_ON_SHAKE_MINUTES_KEY] ?: DEFAULT_EXTEND_ON_SHAKE_MINUTES
     }
 
     val quickLaunchApp1: Flow<String?> = context.settingsDataStore.data.map { preferences ->
@@ -170,6 +183,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun setExtendOnShake(enabled: Boolean) {
         context.settingsDataStore.edit { preferences ->
             preferences[EXTEND_ON_SHAKE_KEY] = enabled
+        }
+    }
+
+    suspend fun setExtendOnShakeMinutes(minutes: Int) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[EXTEND_ON_SHAKE_MINUTES_KEY] = minutes
         }
     }
 

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,6 +62,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.BuildConfig
 import dr.achim.sleep_timer.R
+import dr.achim.sleep_timer.common.Constants.extendOnShakeSteps
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.model.Product
 import dr.achim.sleep_timer.model.PurchaseEvent
@@ -92,6 +94,7 @@ fun SettingsScreen(
     val glowEnabled by viewModel.glowEffectEnabled.collectAsStateWithLifecycle()
     val glowIntensity by viewModel.glowIntensity.collectAsStateWithLifecycle()
     val extendOnShake by viewModel.extendOnShake.collectAsStateWithLifecycle()
+    val extendOnShakeMinutes by viewModel.extendOnShakeMinutes.collectAsStateWithLifecycle()
     val isDeviceAdminEnabled by viewModel.isDeviceAdminEnabled.collectAsStateWithLifecycle()
     val hasNotificationAccess by viewModel.hasNotificationAccess.collectAsStateWithLifecycle()
     val productUiModels by viewModel.productUiModels.collectAsStateWithLifecycle()
@@ -109,6 +112,7 @@ fun SettingsScreen(
         glowEnabled = glowEnabled,
         glowIntensity = glowIntensity,
         extendOnShake = extendOnShake,
+        extendOnShakeMinutes = extendOnShakeMinutes,
         isDeviceAdminEnabled = isDeviceAdminEnabled,
         hasNotificationAccess = hasNotificationAccess,
         onAction = viewModel::onAction,
@@ -128,6 +132,7 @@ fun SettingsScreenContent(
     glowEnabled: Boolean,
     glowIntensity: Float,
     extendOnShake: Boolean,
+    extendOnShakeMinutes: Int,
     isDeviceAdminEnabled: Boolean,
     hasNotificationAccess: Boolean,
     onAction: (SettingsUiAction) -> Unit,
@@ -232,7 +237,7 @@ fun SettingsScreenContent(
                         checked = glowEnabled,
                         onCheckedChange = { onAction(SettingsUiAction.SetGlowEffectEnabled(it)) }
                     )
-                    if (glowEnabled) {
+                    AnimatedVisibility(glowEnabled) {
                         SettingsSliderItem(
                             title = stringResource(R.string.settings_glow_intensity_title),
                             value = glowIntensity,
@@ -251,6 +256,22 @@ fun SettingsScreenContent(
                         checked = extendOnShake,
                         onCheckedChange = { onAction(SettingsUiAction.SetExtendOnShake(it)) }
                     )
+                    AnimatedVisibility(extendOnShake) {
+                        val currentIndex = extendOnShakeSteps.indexOf(extendOnShakeMinutes).coerceAtLeast(0)
+                        SettingsSliderItem(
+                            title = stringResource(
+                                R.string.settings_extend_on_shake_minutes_title,
+                                extendOnShakeMinutes
+                            ),
+                            value = currentIndex.toFloat(),
+                            onValueChange = { index ->
+                                val minutes = extendOnShakeSteps[index.toInt()]
+                                onAction(SettingsUiAction.SetExtendOnShakeMinutes(minutes))
+                            },
+                            valueRange = 0f..(extendOnShakeSteps.size - 1).toFloat(),
+                            steps = extendOnShakeSteps.size - 2
+                        )
+                    }
                 }
 
                 SettingsSection(
@@ -297,7 +318,8 @@ fun SettingsScreenContent(
                 SettingsSection(
                     title = { SectionTitle(stringResource(R.string.settings_section_advanced)) }
                 ) {
-                    val adminDescription = stringResource(R.string.settings_device_admin_description)
+                    val adminDescription =
+                        stringResource(R.string.settings_device_admin_description)
                     SettingsSwitchItem(
                         painter = painterResource(R.drawable.ic_device_admin),
                         title = stringResource(R.string.settings_device_admin_title),
@@ -527,7 +549,8 @@ fun SettingsSliderItem(
     title: String,
     value: Float,
     onValueChange: (Float) -> Unit,
-    valueRange: ClosedFloatingPointRange<Float> = 0f..1f
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+    steps: Int = 0
 ) {
     ListItem(
         headlineContent = { Text(text = title) },
@@ -536,6 +559,7 @@ fun SettingsSliderItem(
                 value = value,
                 onValueChange = onValueChange,
                 valueRange = valueRange,
+                steps = steps
             )
         },
         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
@@ -554,6 +578,7 @@ private fun Preview() {
             glowEnabled = false,
             glowIntensity = 0f,
             extendOnShake = false,
+            extendOnShakeMinutes = 15,
             isDeviceAdminEnabled = false,
             hasNotificationAccess = false,
             onAction = {},

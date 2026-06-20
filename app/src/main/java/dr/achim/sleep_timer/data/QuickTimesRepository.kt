@@ -7,8 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dr.achim.sleep_timer.common.Constants.DEFAULT_QUICK_TIMES
-import dr.achim.sleep_timer.common.Constants.DEFAULT_SELECTED_MINUTES
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -18,7 +16,13 @@ class QuickTimesRepository(private val context: Context) {
 
     companion object {
         private val QUICK_TIMES_KEY = stringPreferencesKey("quick_times")
-        private val LAST_SELECTED_MINUTES_KEY = intPreferencesKey("last_selected_minutes")
+        private val LAST_SELECTED_MINUTES_KEY = intPreferencesKey("pref_key_initial_time")
+
+        /**
+         * Default values
+         */
+        private val DEFAULT_QUICK_TIMES = listOf(15, 30, 45, 60, -1) // -1 as placeholder
+        private const val DEFAULT_SELECTED_MINUTES = 15
     }
 
     val quickTimes: Flow<List<Int>> = context.dataStore.data.map { preferences ->

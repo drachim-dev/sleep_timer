@@ -10,13 +10,15 @@ class GetSettingsUseCase(private val repository: SettingsRepository) {
         repository.themeMode,
         repository.glowEffectEnabled,
         repository.glowIntensity,
-        repository.extendOnShake
-    ) { themeMode, glowEnabled, intensity, extendOnShake ->
+        repository.extendOnShake,
+        repository.extendOnShakeMinutes
+    ) { themeMode, glowEnabled, intensity, extendOnShake, extendOnShakeMinutes ->
         AppSettings(
             themeMode = themeMode,
             glowEffectEnabled = glowEnabled,
             glowIntensity = intensity,
-            extendOnShake = extendOnShake
+            extendOnShake = extendOnShake,
+            extendOnShakeMinutes = extendOnShakeMinutes
         )
     }
 }

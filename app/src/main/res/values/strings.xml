@@ -27,6 +27,7 @@
     <string name="settings_glow_intensity_title">Glow intensity</string>
     <string name="settings_section_timer_settings">Timer settings</string>
     <string name="settings_extend_on_shake_title">Extend on phone shake</string>
+    <string name="settings_extend_on_shake_minutes_title">Extend by %d minutes</string>
     <string name="settings_section_support_me">Support me</string>
     <string name="settings_like_app_title">Do you like the app?</string>
     <string name="settings_like_app_subtitle">Please write a review or rate the app</string>

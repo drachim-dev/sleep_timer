@@ -19,4 +19,8 @@ class UpdateSettingsUseCase(private val repository: SettingsRepository) {
     suspend fun setExtendOnShake(enabled: Boolean) {
         repository.setExtendOnShake(enabled)
     }
+
+    suspend fun setExtendOnShakeMinutes(minutes: Int) {
+        repository.setExtendOnShakeMinutes(minutes)
+    }
 }

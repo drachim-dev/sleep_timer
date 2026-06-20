@@ -89,6 +89,14 @@ class SettingsViewModel(
             initialValue = AppSettings().extendOnShake
         )
 
+    val extendOnShakeMinutes: StateFlow<Int> = settings
+        .map { it.extendOnShakeMinutes }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AppSettings().extendOnShakeMinutes
+        )
+
     private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase.isDeviceAdminEnabled())
     val isDeviceAdminEnabled: StateFlow<Boolean> = _isDeviceAdminEnabled.asStateFlow()
 
@@ -142,6 +150,7 @@ class SettingsViewModel(
             is SettingsUiAction.SetGlowEffectEnabled -> setGlowEffectEnabled(action.enabled)
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
+            is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
             is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.product)
         }
     }
@@ -210,13 +219,15 @@ class SettingsViewModel(
         }
     }
 
+    private fun setExtendOnShakeMinutes(minutes: Int) {
+        viewModelScope.launch {
+            updateSettingsUseCase.setExtendOnShakeMinutes(minutes)
+        }
+    }
+
     private fun sendEvent(event: PurchaseEvent) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }
