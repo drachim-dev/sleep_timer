@@ -36,7 +36,7 @@ class TimerActionExecutor(
         }
 
         if (actions.enableDnd && notificationManager.isNotificationPolicyAccessGranted) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS)
         }
 
         if (actions.hueLights) {
@@ -81,11 +81,6 @@ class TimerActionExecutor(
             if (ip != null && user != null) {
                 turnOffHueLights(ip, user, groups)
             }
-        }
-
-        // Restore DND if it was enabled and we have permission
-        if (startActions.enableDnd && notificationManager.isNotificationPolicyAccessGranted) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
         }
     }
 
