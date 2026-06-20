@@ -15,14 +15,10 @@ sealed interface TimerState {
 
     val formattedTime: String
         get() {
-            val seconds = (remainingTimeMillis / 1000) % 60
-            val minutes = (remainingTimeMillis / (1000 * 60)) % 60
-            val hours = (remainingTimeMillis / (1000 * 60 * 60))
-            return if (hours > 0) {
-                String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds)
-            } else {
-                String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-            }
+            val totalSeconds = remainingTimeMillis / 1000
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+            return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
         }
 
     data class Idle(
