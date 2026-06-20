@@ -176,7 +176,7 @@ class TimerService : Service() {
     private fun onTimerFinished() {
         stopTimer()
         serviceScope.launch {
-            timerActionExecutor.applyEndActions(currentActions.endActions, currentActions.startActions)
+            timerActionExecutor.applyEndActions(currentActions.endActions)
             stopSelf()
         }
     }

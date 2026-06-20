@@ -5,10 +5,8 @@ import android.app.admin.DevicePolicyManager
 import android.bluetooth.BluetoothManager
 import android.content.ComponentName
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
-import android.media.AudioManager
 import android.os.Build
+import dr.achim.sleep_timer.domain.repository.AudioRepository
 import dr.achim.sleep_timer.model.EndActions
 import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
@@ -18,20 +16,16 @@ class TimerActionExecutor(
     private val context: Context,
     private val notificationManager: NotificationManager,
     private val devicePolicyManager: DevicePolicyManager,
-    private val audioManager: AudioManager,
+    private val audioRepository: AudioRepository,
     private val hueRepository: HueRepository,
     private val settingsRepository: SettingsRepository
 ) {
     private val adminComponent = ComponentName(context, SleepTimerAdminReceiver::class.java)
-    private var originalVolume: Int = -1
 
     suspend fun applyStartActions(actions: StartActions) {
         if (actions.adjustVolume) {
             actions.volumeLevel?.let { level ->
-                originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-                val targetVolume = (maxVolume * level / 100f).toInt()
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
+                audioRepository.setMediaVolume(level)
             }
         }
 
@@ -49,18 +43,16 @@ class TimerActionExecutor(
         }
     }
 
-    suspend fun applyEndActions(actions: EndActions, startActions: StartActions) {
+    suspend fun applyEndActions(actions: EndActions) {
         if (actions.stopMedia) {
-            stopMedia()
+            audioRepository.stopMedia()
         }
 
         if (actions.adjustVolume) {
             actions.volumeLevel?.let { level ->
-                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-                val targetVolume = (maxVolume * level / 100f).toInt()
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, 0)
+                audioRepository.setMediaVolume(level)
             } ?: run {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0)
+                audioRepository.setMediaVolume(0)
             }
         }
 
@@ -107,20 +99,5 @@ class TimerActionExecutor(
                 // Permission not granted
             }
         }
-    }
-
-    private fun stopMedia() {
-        val focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
-            )
-            .setAcceptsDelayedFocusGain(true)
-            .setOnAudioFocusChangeListener { }
-            .build()
-        audioManager.requestAudioFocus(focusRequest)
-        audioManager.abandonAudioFocusRequest(focusRequest)
     }
 }

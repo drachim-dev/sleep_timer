@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.net.nsd.NsdManager
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.AdManager
+import dr.achim.sleep_timer.data.AudioRepositoryImpl
 import dr.achim.sleep_timer.data.BillingRepository
 import dr.achim.sleep_timer.data.HueRepository
 import dr.achim.sleep_timer.data.QuickLaunchRepositoryImpl
@@ -15,6 +16,7 @@ import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.data.TimerActionExecutor
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.data.TimerRepositoryImpl
+import dr.achim.sleep_timer.domain.repository.AudioRepository
 import dr.achim.sleep_timer.domain.repository.QuickLaunchRepository
 import dr.achim.sleep_timer.domain.repository.TimerRepository
 import io.ktor.client.HttpClient
@@ -59,6 +61,7 @@ val dataModule = module {
     single<QuickTimesRepository>()
     single<SettingsRepository>()
     single<HueRepository>()
+    single { AudioRepositoryImpl(get()) }.bind(AudioRepository::class)
     single { TimerRepositoryImpl() }.bind(TimerRepository::class)
     single<TimerActionExecutor>()
     single<TimerController>()

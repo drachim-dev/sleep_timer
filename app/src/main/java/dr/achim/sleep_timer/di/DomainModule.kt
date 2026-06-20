@@ -9,6 +9,7 @@ import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
+import dr.achim.sleep_timer.domain.usecase.SetMediaVolumeUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateQuickTimeUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateSettingsUseCase
@@ -29,4 +30,5 @@ val domainModule = module {
     factory<ManageHueUseCase>()
     factory<ManageQuickLaunchUseCase>()
     factory<CheckTimerPermissionsUseCase>()
+    factory<SetMediaVolumeUseCase>()
 }

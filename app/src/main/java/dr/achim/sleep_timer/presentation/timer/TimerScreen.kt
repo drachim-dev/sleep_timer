@@ -2,6 +2,7 @@ package dr.achim.sleep_timer.presentation.timer
 
 import android.app.admin.DevicePolicyManager
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -177,6 +178,9 @@ private fun TimerScreenContent(
                 onAction(Action.ToggleStartVolume(true))
                 showStartVolumeDialog = false
             },
+            onValueChange = { level ->
+                onAction(Action.SetMediaVolume(level, AudioManager.FLAG_SHOW_UI))
+            },
             onDismiss = { showStartVolumeDialog = false }
         )
     }
@@ -188,6 +192,9 @@ private fun TimerScreenContent(
                 onAction(Action.SetEndVolumeLevel(level))
                 onAction(Action.ToggleEndVolume(true))
                 showEndVolumeDialog = false
+            },
+            onValueChange = { level ->
+                onAction(Action.SetMediaVolume(level, AudioManager.FLAG_SHOW_UI))
             },
             onDismiss = { showEndVolumeDialog = false }
         )
@@ -789,6 +796,7 @@ fun ActionToggle(
 fun VolumeSliderDialog(
     initialValue: Int?,
     onConfirm: (Int) -> Unit,
+    onValueChange: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     var sliderValue by remember { mutableFloatStateOf((initialValue ?: 50).toFloat()) }
@@ -807,7 +815,10 @@ fun VolumeSliderDialog(
                 Spacer(Modifier.height(AppTheme.dimens.spacingMedium))
                 Slider(
                     value = sliderValue,
-                    onValueChange = { sliderValue = it },
+                    onValueChange = {
+                        sliderValue = it
+                        onValueChange(it.toInt())
+                    },
                     valueRange = 0f..100f
                 )
             }

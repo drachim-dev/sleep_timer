@@ -11,6 +11,7 @@ import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
+import dr.achim.sleep_timer.domain.usecase.SetMediaVolumeUseCase
 import dr.achim.sleep_timer.domain.usecase.VolumeType
 import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.model.TimerState
@@ -18,7 +19,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,6 +36,7 @@ class TimerViewModel(
     private val manageHueUseCase: ManageHueUseCase,
     private val manageQuickLaunchUseCase: ManageQuickLaunchUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
+    private val setMediaVolumeUseCase: SetMediaVolumeUseCase,
     getSettingsUseCase: GetSettingsUseCase,
     @InjectedParam minutes: Int?
 ) : ViewModel() {
@@ -133,7 +134,12 @@ class TimerViewModel(
             }
             is Action.AddMinutes -> addMinutes(action.minutes)
             is Action.SetQuickLaunchApp -> setQuickLaunchApp(action.index, action.packageName)
+            is Action.SetMediaVolume -> setMediaVolume(action.level, action.flags)
         }
+    }
+
+    private fun setMediaVolume(level: Int, flags: Int) {
+        setMediaVolumeUseCase(level, flags)
     }
 
     private fun setQuickLaunchApp(index: Int, packageName: String?) {
