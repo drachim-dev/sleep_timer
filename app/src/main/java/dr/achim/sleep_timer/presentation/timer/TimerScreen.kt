@@ -526,13 +526,14 @@ private fun EndActionsRow(
             }
         }
     )
-    ActionToggle(
+    // Implement when dimming lights is available
+    /* ActionToggle(
         painter = painterResource(if (timerActions.endActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.endActions.hueLights,
         onClick = { onAction(Action.ToggleEndHueLights(!timerActions.endActions.hueLights)) },
         onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.END)) }
-    )
+    ) */
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         ActionToggle(
             painter = painterResource(if (timerActions.endActions.turnOffBluetooth) R.drawable.ic_bluetooth_off else R.drawable.ic_bluetooth_on),
