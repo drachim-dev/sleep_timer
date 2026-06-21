@@ -3,7 +3,11 @@ package dr.achim.sleep_timer.di
 import android.app.NotificationManager
 import android.app.admin.DevicePolicyManager
 import android.content.Context
+import android.hardware.SensorManager
 import android.media.AudioManager
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.os.Build
 import android.net.nsd.NsdManager
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.AdManager
@@ -38,6 +42,20 @@ private fun provideDevicePolicyManager(context: Context) =
 private fun provideAudioManager(context: Context) =
     context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+private fun provideSensorManager(context: Context) =
+    context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+private fun provideVibrator(context: Context): Vibrator {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager =
+            context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+}
+
 private fun provideNsdManager(context: Context) =
     context.getSystemService(Context.NSD_SERVICE) as NsdManager
 
@@ -54,6 +72,8 @@ val dataModule = module {
     single<NotificationManager> { create(::provideNotificationManager) }
     single<DevicePolicyManager> { create(::provideDevicePolicyManager) }
     single<AudioManager> { create(::provideAudioManager) }
+    single<SensorManager> { create(::provideSensorManager) }
+    single<Vibrator> { create(::provideVibrator) }
     single<NsdManager> { create(::provideNsdManager) }
     single<HttpClient> { create(::provideHttpClient) }
 
