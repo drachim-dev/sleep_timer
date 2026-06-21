@@ -18,7 +18,7 @@ class MainApplication : Application() {
         super.onCreate()
 
         Purchases.apply {
-            logLevel = if (BuildConfig.DEBUG) LogLevel.DEBUG else LogLevel.INFO
+            logLevel = if (BuildConfig.DEBUG) LogLevel.DEBUG else LogLevel.ERROR
             configure(
                 PurchasesConfiguration.Builder(
                     this@MainApplication,
@@ -30,7 +30,7 @@ class MainApplication : Application() {
         MobileAds.initialize(this) {}
 
         startKoin {
-            androidLogger(if (BuildConfig.DEBUG) Level.DEBUG else Level.ERROR)
+            androidLogger(if (BuildConfig.DEBUG) Level.DEBUG else Level.NONE)
             androidContext(this@MainApplication)
             modules(
                 dataModule,
