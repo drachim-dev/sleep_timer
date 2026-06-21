@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Comfy Sleep Timer</string>
 
+    <!-- Foreground Service Justification -->
+    <string name="fgs_special_use_justification" translatable="false">The service is required to maintain an accurate sleep timer and manage background audio/system states while the device is idle, ensuring the timer executes reliably even when the app is not in the foreground.</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Timer Status</string>
     <string name="notification_title">Sleep Timer</string>

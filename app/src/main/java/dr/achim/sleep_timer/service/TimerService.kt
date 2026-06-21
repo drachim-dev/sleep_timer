@@ -93,6 +93,9 @@ class TimerService : Service() {
             }
 
             ACTION_FINISH -> {
+                // Ensure service is in foreground if triggered while app/service is killed
+                // and to guarantee completion of end actions without system throttling.
+                ensureForeground()
                 onTimerFinished()
             }
         }
@@ -114,16 +117,7 @@ class TimerService : Service() {
 
         scheduleAlarm(durationMillis)
 
-        val initialContent = getNotificationContent()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(
-                NOTIFICATION_ID,
-                createNotification(initialContent),
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, createNotification(initialContent))
-        }
+        ensureForeground()
 
         timerJob = serviceScope.launch {
             while (timerRepository.timerState.value.remainingTimeMillis > 0) {
@@ -288,6 +282,19 @@ class TimerService : Service() {
 
     private fun updateNotification() {
         notificationManager.notify(NOTIFICATION_ID, createNotification(getNotificationContent()))
+    }
+
+    private fun ensureForeground() {
+        val initialContent = getNotificationContent()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(
+                NOTIFICATION_ID,
+                createNotification(initialContent),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification(initialContent))
+        }
     }
 
     private fun getNotificationContent(): String {

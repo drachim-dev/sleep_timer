@@ -40,7 +40,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Sleep timer that performs actions like stopping music and locking screen when time is up." />
+                android:resource="@string/fgs_special_use_justification" />
         </service>
 
         <receiver
