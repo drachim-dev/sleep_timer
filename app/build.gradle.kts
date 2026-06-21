@@ -96,6 +96,7 @@ dependencies {
     implementation(libs.revenuecat.purchases)
     implementation(libs.confettikit)
     implementation(libs.play.services.ads)
+    implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
