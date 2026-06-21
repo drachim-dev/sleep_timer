@@ -1,0 +1,143 @@
+<resources>
+    <string name="app_name">Sleep Timer</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Timer-Status</string>
+    <string name="notification_title">Sleep Timer</string>
+    <string name="notification_action_pause">Pause</string>
+    <string name="notification_action_resume">Fortsetzen</string>
+    <string name="notification_action_extend_5">+5 Min</string>
+    <string name="notification_action_extend_20">+20 Min</string>
+    <string name="notification_paused_prefix">Pausiert - %s</string>
+
+    <!-- Errors -->
+    <string name="error_purchase_failure">Es gab ein Problem bei der Bearbeitung deiner Bestellung</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_back_description">Zurück</string>
+    <string name="settings_section_appearance">Erscheinungsbild</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_mode_system">System</string>
+    <string name="settings_theme_mode_light">Hell</string>
+    <string name="settings_theme_mode_dark">Dunkel</string>
+    <string name="settings_theme_mode_dynamic">Dynamisch</string>
+    <string name="settings_glow_effect_title">Timer Leuchteffekt</string>
+    <string name="settings_glow_effect_subtitle">Zeigt einen Leuchteffekt rund um den Fortschrittsbalken des Timers</string>
+    <string name="settings_glow_intensity_title">Leuchtintensität</string>
+    <string name="settings_section_timer_settings">Timer</string>
+    <string name="settings_extend_on_shake_title">Schütteln zum Verlängern</string>
+    <plurals name="settings_extend_on_shake_minutes_title">
+        <item quantity="one">um %d Minute</item>
+        <item quantity="other">um %d Minuten</item>
+    </plurals>
+    <string name="settings_section_support_me">Unterstütze mich</string>
+    <string name="settings_like_app_title">Gefällt dir die App?</string>
+    <string name="settings_like_app_subtitle">Jede Bewertung hilft mir weiter</string>
+    <string name="settings_like_app_trailing">Gratis</string>
+    <string name="settings_remove_ads_trailing">Bereits gekauft</string>
+    <string name="settings_section_advanced">Fortgeschrittene Funktionen</string>
+    <string name="settings_device_admin_title">Erweiterte Gerätefunktionen</string>
+    <string name="settings_device_admin_subtitle">Ermöglicht das Ausschalten des Displays. Vorm Deinstallieren deaktivieren.</string>
+    <string name="settings_device_admin_description">Beschreibung</string>
+    <string name="settings_notification_access_title">Zugriff auf Benachrichtigungsmodi</string>
+    <string name="settings_notification_access_subtitle">Wird für die \"Nicht stören\"-Aktion benötigt</string>
+    <string name="settings_section_other">Sonstige</string>
+    <string name="settings_faq_title">FAQ</string>
+    <string name="settings_credits_title">Credits</string>
+
+    <string name="faq_title">Häufig gestellte Fragen</string>
+    <string name="faq_timer_no_alarm_title">Timer löst manchmal nicht aus</string>
+    <string name="faq_timer_no_alarm_description">Stell bitte sicher, dass die Batterieoptimierung für die App deaktiviert ist. Einige Gerätehersteller wie Samsung oder Huawei benötigen zusätzliche Einstellungen, damit die App im Hintergrund ausgeführt werden kann.</string>
+    <string name="faq_timer_no_wifi_title">WLAN Aktion fehlt</string>
+    <string name="faq_timer_no_wifi_description">Seit Android 10 ist es nicht mehr möglich, WLAN über eine App an- oder auszuschalten.</string>
+    <string name="faq_uninstall_title">Deinstallieren</string>
+    <string name="faq_uninstall_description">Um die App deinstallieren zu können, muss \"Erweiterte Gerätefunktionen\" in den Einstellungen deaktiviert werden.</string>
+    <string name="faq_timer_no_bluetooth_title">Bluetooth Aktion fehlt</string>
+    <string name="faq_timer_no_bluetooth_description">Seit Android 13 ist es nicht mehr möglich, Bluetooth über eine App an- oder auszuschalten.</string>
+
+    <string name="credits_noun_project_header">Icons von Noun Project</string>
+    <string name="credits_freepik_header">Bilder von Freepik</string>
+    <string name="credits_libraries_header">Bibliotheken</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Sleep Timer</string>
+    <string name="home_settings_description">Einstellungen</string>
+    <string name="home_start_timer">Timer starten</string>
+    <string name="home_show_timer">Timer anzeigen</string>
+    <string name="home_quick_time_dialog_title">Zeitslot festlegen</string>
+    <string name="home_quick_time_unit_min">min</string>
+    <string name="home_quick_time_save">Speichern</string>
+    <string name="home_time_minutes_only">%d min</string>
+    <string name="home_add_quick_time_description">Hinzufügen</string>
+
+    <!-- Timer Screen -->
+    <string name="timer_quick_launch_title">Schnellstart</string>
+    <string name="timer_pin_app_title">App anpinnen</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_resume">Fortsetzen</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_section_start_actions">Beim Starten des Timers</string>
+    <string name="timer_section_end_actions">Nach Ablauf der Zeit</string>
+    <string name="timer_action_volume">Lautstärke</string>
+    <string name="timer_action_hue_lights">Hue Lampen</string>
+    <string name="timer_action_dnd">Nicht stören</string>
+    <string name="timer_action_media">Medien</string>
+    <string name="timer_action_screen">Display</string>
+    <string name="timer_action_bluetooth">Bluetooth</string>
+    <string name="timer_close_description">Schließen</string>
+    <string name="timer_apps">Apps</string>
+    <string name="timer_category_media">Medien</string>
+    <string name="timer_category_alarm">Wecker</string>
+    <string name="timer_volume_dialog_title">Lautstärke festlegen</string>
+    <string name="timer_volume_confirm">Bestätigen</string>
+    <string name="timer_volume_cancel">Abbrechen</string>
+    <string name="timer_pin_to_slot_1">An Slot 1 pinnen</string>
+    <string name="timer_pin_to_slot_2">An Slot 2 pinnen</string>
+
+    <!-- Hue Discovery -->
+    <string name="hue_discovery_title">Bridge verbinden</string>
+    <plurals name="hue_discovery_devices_count_title">
+        <item quantity="one">%d Gerät gefunden</item>
+        <item quantity="other">%d Geräte gefunden</item>
+    </plurals>
+    <string name="hue_discovery_searching">Suche nach Bridges…</string>
+    <string name="hue_discovery_no_bridges">Keine Bridges gefunden</string>
+    <string name="hue_discovery_no_bridges_sub">Stelle sicher, dass deine Bridge eingeschaltet ist und sich im selben WLAN-Netzwerk befindet.</string>
+    <string name="hue_discovery_refresh">Aktualisieren</string>
+    <string name="hue_discovery_pair">Koppeln</string>
+    <string name="hue_discovery_manual_ip">Manuell verbinden</string>
+    <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
+
+    <!-- Hue Manual IP -->
+    <string name="hue_manual_ip_title">Manuelle Verbindung</string>
+    <string name="hue_manual_ip_label">Bridge IP-Adresse</string>
+    <string name="hue_manual_ip_confirm">Verbinden</string>
+    <string name="hue_manual_ip_cancel">Abbrechen</string>
+
+    <!-- Hue Pairing -->
+    <string name="hue_pairing_title">Kopplung</string>
+    <string name="hue_pairing_message">Drücke den Knopf auf der Bridge zum Verbinden.</string>
+    <string name="hue_pairing_confirm">Verbinden</string>
+    <string name="hue_pairing_cancel">Abbrechen</string>
+
+    <!-- Hue Room Selection -->
+    <string name="hue_room_selection_title">Räume auswählen</string>
+    <string name="hue_room_selection_save">Speichern</string>
+    <string name="hue_room_selection_loading">Lade Räume…</string>
+    <string name="hue_room_selection_no_rooms">Keine Räume gefunden</string>
+    <string name="hue_room_selection_no_rooms_sub">Stelle sicher, dass deine Hue Bridge korrekt konfiguriert ist und Räume oder Zonen enthält.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_music_title">Hör deine Lieblingsmusik</string>
+    <string name="onboarding_music_desc">Schlafe sorgenfrei zu deiner Lieblingsmusik, Podcasts oder Hörbüchern ein.</string>
+    <string name="onboarding_sleep_title">Besser schlafen</string>
+    <string name="onboarding_sleep_desc">Stelle einfach den Timer ein und entspanne dich. Die App kümmert sich um den Rest.</string>
+    <string name="onboarding_automate_title">Automatisiere deine Routinen</string>
+    <string name="onboarding_automate_desc">Schalte automatisch dein Licht aus, senke die Lautstärke oder aktiviere Nicht stören.</string>
+    <string name="onboarding_interruption_title">Keine Unterbrechungen</string>
+    <string name="onboarding_interruption_desc">Der Timer stoppt deine Medien und kann sogar dein Display ausschalten, um Akku zu sparen.</string>
+    <string name="onboarding_get_started">Loslegen</string>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_next">Weiter</string>
+</resources>

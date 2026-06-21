@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -260,8 +261,9 @@ fun SettingsScreenContent(
                     AnimatedVisibility(extendOnShake) {
                         val currentIndex = extendOnShakeSteps.indexOf(extendOnShakeMinutes).coerceAtLeast(0)
                         SettingsSliderItem(
-                            title = stringResource(
-                                R.string.settings_extend_on_shake_minutes_title,
+                            title = pluralStringResource(
+                                R.plurals.settings_extend_on_shake_minutes_title,
+                                extendOnShakeMinutes,
                                 extendOnShakeMinutes
                             ),
                             value = currentIndex.toFloat(),

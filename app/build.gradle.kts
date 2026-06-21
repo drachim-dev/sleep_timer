@@ -27,6 +27,11 @@ android {
         buildConfig = true
     }
 
+    androidResources {
+        generateLocaleConfig = true
+        localeFilters += listOf("en", "de", "es")
+    }
+
     defaultConfig {
         applicationId = "dr.achim.sleep_timer"
         minSdk = 29

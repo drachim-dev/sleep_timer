@@ -4,6 +4,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 
 val Typography = Typography(
@@ -12,14 +14,16 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 57.sp, // Material 3 default, can be adjusted if needed
         lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp
+        letterSpacing = (-0.25).sp,
+        lineBreak = LineBreak.Heading
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 28.sp,
         lineHeight = 36.sp,
-        letterSpacing = 0.sp
+        letterSpacing = 0.sp,
+        lineBreak = LineBreak.Heading
     ),
     titleSmall = TextStyle(
         fontFamily = FontFamily.Default,
@@ -33,7 +37,9 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.5.sp,
+        lineBreak = LineBreak.Paragraph,
+        hyphens = Hyphens.Auto
     ),
     labelMedium = TextStyle(
         fontFamily = FontFamily.Default,

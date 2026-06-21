@@ -30,7 +30,10 @@
     <string name="settings_glow_intensity_title">Glow intensity</string>
     <string name="settings_section_timer_settings">Timer settings</string>
     <string name="settings_extend_on_shake_title">Extend on phone shake</string>
-    <string name="settings_extend_on_shake_minutes_title">Extend by %d minutes</string>
+    <plurals name="settings_extend_on_shake_minutes_title">
+        <item quantity="one">Extend by %d minute</item>
+        <item quantity="other">Extend by %d minutes</item>
+    </plurals>
     <string name="settings_section_support_me">Support me</string>
     <string name="settings_like_app_title">Do you like the app?</string>
     <string name="settings_like_app_subtitle">Please write a review or rate the app</string>
@@ -40,7 +43,7 @@
     <string name="settings_device_admin_title">Device admin</string>
     <string name="settings_device_admin_subtitle">Required to turn screen off. Disable before uninstall</string>
     <string name="settings_device_admin_description">Description</string>
-    <string name="settings_notification_access_title">Notification access</string>
+    <string name="settings_notification_access_title">Access to notification modes</string>
     <string name="settings_notification_access_subtitle">Required to turn on do not disturb</string>
     <string name="settings_section_other">Other</string>
     <string name="settings_faq_title">FAQ</string>
@@ -68,8 +71,6 @@
     <string name="home_quick_time_dialog_title">Set Time Slot</string>
     <string name="home_quick_time_unit_min">min</string>
     <string name="home_quick_time_save">Save</string>
-    <string name="home_time_hours_only">%d h</string>
-    <string name="home_time_minutes_and_hours">%1$d min\n+ %2$dh</string>
     <string name="home_time_minutes_only">%d min</string>
     <string name="home_add_quick_time_description">Add</string>
 
@@ -107,7 +108,6 @@
     <string name="hue_discovery_no_bridges">No bridges found</string>
     <string name="hue_discovery_no_bridges_sub">Make sure your bridge is powered on and connected to the same Wi-Fi network.</string>
     <string name="hue_discovery_refresh">Refresh</string>
-    <string name="hue_discovery_configure">Configure</string>
     <string name="hue_discovery_pair">Pair</string>
     <string name="hue_discovery_manual_ip">Connect manually</string>
     <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
