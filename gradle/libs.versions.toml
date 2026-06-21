@@ -13,7 +13,7 @@ koin = "4.2.2"
 koinCompiler = "1.0.1"
 datastorePreferences = "1.2.1"
 animation-graphics = "1.11.3"
-aboutLibraries = "14.2.1"
+aboutLibraries = "15.0.0"
 ktor = "3.5.0"
 revenuecat = "10.10.0"
 confettikit = "0.8.0"
@@ -56,4 +56,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koinCompiler" }
-aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
+aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutLibraries" }

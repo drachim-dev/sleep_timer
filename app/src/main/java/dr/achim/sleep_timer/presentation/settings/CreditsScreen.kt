@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import dr.achim.sleep_timer.R
@@ -101,11 +100,7 @@ fun CreditsScreen(
         LibrariesContainer(
             libraries = libraries,
             modifier = Modifier.fillMaxSize(),
-            contentPadding = innerPadding + PaddingValues(AppTheme.dimens.spacingMedium),
-            textStyles = LibraryDefaults.libraryTextStyles(
-                nameTextStyle = MaterialTheme.typography.bodyLarge,
-                authorTextStyle = MaterialTheme.typography.bodyMedium
-            ),
+            contentPadding = innerPadding + PaddingValues(vertical = AppTheme.dimens.spacingMedium),
             header = {
                 item {
                     CreditsHeader(
@@ -113,8 +108,6 @@ fun CreditsScreen(
                             uriHandler.openUri(credit.url)
                         }
                     )
-                    Spacer(modifier = Modifier.height(AppTheme.dimens.spacingLarge))
-                    SectionTitle(text = stringResource(R.string.credits_libraries_header))
                 }
             }
         )
@@ -127,7 +120,11 @@ fun CreditsHeader(
     onCreditClick: (Credit) -> Unit
 ) {
     Column(modifier = modifier) {
-        SectionTitle(text = stringResource(R.string.credits_noun_project_header))
+        SectionTitle(
+            text = stringResource(R.string.credits_noun_project_header),
+            contentPadding = PaddingValues(bottom = AppTheme.dimens.spacingSmall) +
+                    PaddingValues(horizontal = AppTheme.dimens.spacingMedium)
+        )
         iconsFromNounProject.forEach { credit ->
             CreditItem(credit = credit) {
                 onCreditClick(credit)
@@ -136,12 +133,24 @@ fun CreditsHeader(
 
         Spacer(modifier = Modifier.height(AppTheme.dimens.spacingLarge))
 
-        SectionTitle(text = stringResource(R.string.credits_freepik_header))
+        SectionTitle(
+            text = stringResource(R.string.credits_freepik_header),
+            contentPadding = PaddingValues(bottom = AppTheme.dimens.spacingSmall) +
+                    PaddingValues(horizontal = AppTheme.dimens.spacingMedium)
+        )
         imagesFromFreepik.forEach { credit ->
             CreditItem(credit = credit) {
                 onCreditClick(credit)
             }
         }
+
+        Spacer(modifier = Modifier.height(AppTheme.dimens.spacingLarge))
+
+        SectionTitle(
+            text = stringResource(R.string.credits_libraries_header),
+            contentPadding = PaddingValues(bottom = AppTheme.dimens.spacingSmall) +
+                    PaddingValues(horizontal = AppTheme.dimens.spacingMedium)
+        )
     }
 }
 
