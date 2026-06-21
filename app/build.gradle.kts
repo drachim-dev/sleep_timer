@@ -65,16 +65,42 @@ android {
         buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"${admobInterstitialUnitId}\"")
     }
 
+    signingConfigs {
+        create("release") {
+            // CI=true is exported by Codemagic
+            if (System.getenv("CI") == "true") {
+                storeFile = file(System.getenv("CM_KEYSTORE_PATH"))
+                storePassword = System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("CM_KEY_ALIAS")
+                keyPassword = System.getenv("CM_KEY_PASSWORD")
+            } else {
+                val keystoreProperties = Properties().apply {
+                    val keystoreFile = rootProject.file("keystore.properties")
+                    if (keystoreFile.exists()) {
+                        load(FileInputStream(keystoreFile))
+                    } else {
+                        println("Warning: keystore.properties file not found")
+                    }
+                }
+
+                keyAlias = keystoreProperties["keyAlias"] as String?
+                keyPassword = keystoreProperties["keyPassword"] as String?
+                storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
+                storePassword = keystoreProperties["storePassword"] as String?
+            }
+        }
+    }
+
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            optimization { enable = true }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
