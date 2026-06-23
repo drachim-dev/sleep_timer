@@ -12,17 +12,13 @@ class ManageHueUseCase(private val hueRepository: HueRepository) {
 
     suspend fun discoverBridgeByIp(ip: String): HueBridge? = hueRepository.discoverBridgeByIp(ip)
 
-    suspend fun pair(ip: String): PairResult = hueRepository.pair(ip)
+    suspend fun pair(bridge: HueBridge): PairResult = hueRepository.pair(bridge)
 
     suspend fun fetchGroups(ip: String, username: String) = hueRepository.fetchGroups(ip, username)
 
     fun getPairedIp() = hueRepository.getPairedIp()
 
     fun getPairedUser() = hueRepository.getPairedUser()
-
-    fun getSelectedGroups() = hueRepository.getSelectedGroups()
-
-    suspend fun setSelectedGroups(groups: Set<String>) = hueRepository.setSelectedGroups(groups)
 
     fun getStartGroups() = hueRepository.getStartGroups()
     suspend fun setStartGroups(groups: Set<String>) = hueRepository.setStartGroups(groups)

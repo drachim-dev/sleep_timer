@@ -114,7 +114,7 @@ fun Navigation(
                         scope.launch {
                             settingsRepository.setFirstLaunchCompleted()
                             backStack.clear()
-                            backStack.add(HomeKey)
+                            backStack += HomeKey
                         }
                     }
                 )

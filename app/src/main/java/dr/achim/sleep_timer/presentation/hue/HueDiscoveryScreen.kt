@@ -1,5 +1,11 @@
 package dr.achim.sleep_timer.presentation.hue
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -42,12 +48,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
@@ -63,7 +72,39 @@ fun HueDiscoveryScreen(
     onBack: () -> Unit,
     viewModel: HueDiscoveryViewModel
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val permissions = buildSet {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            add(Manifest.permission.ACCESS_LOCAL_NETWORK)
+        }
+    }.toTypedArray()
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results.all { it.value }) {
+            viewModel.onAction(HueDiscoveryUiAction.PermissionGranted)
+        }
+    }
+
+    LifecycleResumeEffect(Unit) {
+        if (checkLocalNetworkPermission(context)) {
+            viewModel.onAction(HueDiscoveryUiAction.PermissionGranted)
+        }
+        onPauseOrDispose {}
+    }
+
+    LaunchedEffect(uiState) {
+        if (uiState is HueDiscoveryUiState.PermissionDenied) {
+            launcher.launch(permissions)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.navEvents.collect { event ->
@@ -76,8 +117,27 @@ fun HueDiscoveryScreen(
     HueDiscoveryContent(
         uiState = uiState,
         onBack = onBack,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onRequestPermission = { launcher.launch(permissions) }
     )
+}
+
+private fun checkLocalNetworkPermission(context: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+
+    val nearbyWifi = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.NEARBY_WIFI_DEVICES
+    ) == PackageManager.PERMISSION_GRANTED
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+        nearbyWifi && ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        nearbyWifi
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +146,7 @@ private fun HueDiscoveryContent(
     uiState: HueDiscoveryUiState,
     onBack: () -> Unit,
     onAction: (HueDiscoveryUiAction) -> Unit,
+    onRequestPermission: () -> Unit
 ) {
     var showManualIpDialog by remember { mutableStateOf(false) }
 
@@ -129,6 +190,19 @@ private fun HueDiscoveryContent(
                 when (state) {
                     is HueDiscoveryUiState.Loading -> {
                         FullScreenLoadingState(text = stringResource(R.string.hue_discovery_searching))
+                    }
+
+                    is HueDiscoveryUiState.PermissionDenied -> {
+                        EmptyState(
+                            title = stringResource(R.string.hue_discovery_permission_title),
+                            subtitle = stringResource(R.string.hue_discovery_permission_subtitle),
+                            imageRes = R.drawable.img_no_results,
+                            action = {
+                                TextButton(onClick = onRequestPermission) {
+                                    Text(stringResource(R.string.hue_discovery_permission_grant))
+                                }
+                            }
+                        )
                     }
 
                     is HueDiscoveryUiState.Empty -> {
@@ -206,7 +280,7 @@ private fun SuccessContent(
                     ),
                 )
             }
-            items(data.bridges, key = { it.id }) { bridge ->
+            items(data.bridges, key = { it.ipAddress }) { bridge ->
                 BridgeItem(bridge = bridge, onClick = { onBridgeClick(bridge) })
             }
         }
@@ -324,7 +398,21 @@ private fun HueDiscoveryLoadingPreview() {
         HueDiscoveryContent(
             uiState = HueDiscoveryUiState.Loading,
             onBack = {},
-            onAction = {}
+            onAction = {},
+            onRequestPermission = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HueDiscoveryPermissionPreview() {
+    AppTheme {
+        HueDiscoveryContent(
+            uiState = HueDiscoveryUiState.PermissionDenied,
+            onBack = {},
+            onAction = {},
+            onRequestPermission = {}
         )
     }
 }
@@ -336,7 +424,8 @@ private fun HueDiscoveryEmptyPreview() {
         HueDiscoveryContent(
             uiState = HueDiscoveryUiState.Empty,
             onBack = {},
-            onAction = {}
+            onAction = {},
+            onRequestPermission = {}
         )
     }
 }
@@ -349,15 +438,16 @@ private fun HueDiscoveryDisplayPreview() {
             uiState = HueDiscoveryUiState.Display(
                 data = HueDiscoveryData(
                     bridges = listOf(
-                        HueBridge(name = "Hue Bridge", id = "1", ipAddress = "192.168.1.100",),
-                        HueBridge(name = "Hue Bridge", id = "2", ipAddress = "192.168.1.101",)
+                        HueBridge(name = "Hue Bridge", ipAddress = "192.168.1.100"),
+                        HueBridge(name = "Hue Bridge", ipAddress = "192.168.1.101")
                     ),
                     pairedBridgeIp = "192.168.1.102",
                     isSearching = true
                 )
             ),
             onBack = {},
-            onAction = {}
+            onAction = {},
+            onRequestPermission = {}
         )
     }
 }
@@ -370,13 +460,14 @@ private fun HueDiscoveryPairingPreview() {
             uiState = HueDiscoveryUiState.Pairing(
                 data = HueDiscoveryData(
                     bridges = listOf(
-                        HueBridge(name = "Hue Bridge", id = "1", ipAddress = "192.168.1.100",)
+                        HueBridge(name = "Hue Bridge", ipAddress = "192.168.1.100")
                     )
                 ),
-                bridge = HueBridge(name = "Hue Bridge", id = "1", ipAddress = "192.168.1.100",)
+                bridge = HueBridge(name = "Hue Bridge", ipAddress = "192.168.1.100")
             ),
             onBack = {},
-            onAction = {}
+            onAction = {},
+            onRequestPermission = {}
         )
     }
 }

@@ -108,6 +108,9 @@
     <string name="hue_discovery_pair">Koppeln</string>
     <string name="hue_discovery_manual_ip">Manuell verbinden</string>
     <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
+    <string name="hue_discovery_permission_title">Lokaler Netzwerkzugriff erforderlich</string>
+    <string name="hue_discovery_permission_subtitle">Um die Hue-Lampen zu finden und zu steuern, benötigt diese App die Berechtigung, auf das lokale Netzwerk zuzugreifen.</string>
+    <string name="hue_discovery_permission_grant">Berechtigung erteilen</string>
 
     <!-- Hue Manual IP -->
     <string name="hue_manual_ip_title">Manuelle Verbindung</string>

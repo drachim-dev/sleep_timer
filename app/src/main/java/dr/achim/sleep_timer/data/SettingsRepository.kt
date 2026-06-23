@@ -41,7 +41,6 @@ class SettingsRepository(private val context: Context) {
 
         private val HUE_BRIDGE_IP_KEY = stringPreferencesKey("pref_key_hue_bridge_ip")
         private val HUE_API_USER_KEY = stringPreferencesKey("pref_key_hue_api_user")
-        private val HUE_SELECTED_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_selected_groups")
         private val HUE_START_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_start_groups")
         private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_end_groups")
 
@@ -149,10 +148,6 @@ class SettingsRepository(private val context: Context) {
 
     val hueApiUser: Flow<String?> = context.settingsDataStore.data.map { preferences ->
         preferences[HUE_API_USER_KEY]
-    }
-
-    val hueSelectedGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
-        preferences[HUE_SELECTED_GROUPS_KEY] ?: emptySet()
     }
 
     val hueStartGroups: Flow<Set<String>> = context.settingsDataStore.data.map { preferences ->
@@ -295,12 +290,6 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { preferences ->
             preferences[HUE_BRIDGE_IP_KEY] = ip
             preferences[HUE_API_USER_KEY] = user
-        }
-    }
-
-    suspend fun setHueSelectedGroups(groups: Set<String>) {
-        context.settingsDataStore.edit { preferences ->
-            preferences[HUE_SELECTED_GROUPS_KEY] = groups
         }
     }
 

@@ -110,6 +110,9 @@
     <string name="hue_discovery_pair">Vincular</string>
     <string name="hue_discovery_manual_ip">Conectar manualmente</string>
     <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
+    <string name="hue_discovery_permission_title">Acceso a la red local requerido</string>
+    <string name="hue_discovery_permission_subtitle">Para descubrir y controlar tus luces Hue, esta aplicación necesita permiso para acceder a tu red local.</string>
+    <string name="hue_discovery_permission_grant">Conceder permiso</string>
 
     <!-- Hue Manual IP -->
     <string name="hue_manual_ip_title">Conexión manual</string>

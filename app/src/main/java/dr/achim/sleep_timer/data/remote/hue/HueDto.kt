@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HueBridge(
-    val id: String,
     @SerialName("internalipaddress")
     val ipAddress: String,
     val name: String? = null,
