@@ -16,7 +16,6 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,16 +39,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -108,7 +103,6 @@ import dr.achim.sleep_timer.ui.components.QuickLaunchItem
 import dr.achim.sleep_timer.ui.components.QuickLaunchPlaceholder
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.TimeButton
-import dr.achim.sleep_timer.ui.components.rememberDrawablePainter
 import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
@@ -221,10 +215,6 @@ private fun TimerScreenContent(
                 }
                 showQuickLaunchSheet = false
                 selectingIndex = -1
-            },
-            onPinApp = { packageName, index ->
-                onAction(Action.SetQuickLaunchApp(index, packageName))
-                showQuickLaunchSheet = false
             },
             onDismiss = {
                 showQuickLaunchSheet = false
@@ -645,7 +635,6 @@ fun QuickLaunchBottomSheet(
     apps: List<QuickLaunchApp>,
     selectingIndex: Int,
     onAppClick: (String) -> Unit,
-    onPinApp: (packageName: String, index: Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     val groupedApps = remember(apps) { apps.groupBy { it.category } }
@@ -682,73 +671,15 @@ fun QuickLaunchBottomSheet(
                     )
                 }
                 items(appsInCategory) { app ->
-                    Box {
-                        QuickLaunchAppItem(
-                            app = app,
-                            onClick = { onAppClick(app.packageName) },
-                            onLongClick = {
-                                if (selectingIndex == -1) {
-                                    selectedAppPackageName = app.packageName
-                                }
+                    QuickLaunchAppItem(
+                        app = app,
+                        onClick = { onAppClick(app.packageName) },
+                        onLongClick = {
+                            if (selectingIndex == -1) {
+                                selectedAppPackageName = app.packageName
                             }
-                        )
-
-                        DropdownMenu(
-                            expanded = selectedAppPackageName == app.packageName,
-                            onDismissRequest = { selectedAppPackageName = null }
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingNormal),
-                                modifier = Modifier
-                                    .padding(
-                                        top = AppTheme.dimens.spacingExtraSmall,
-                                        start = AppTheme.dimens.spacingSmall,
-                                        end = AppTheme.dimens.spacingSmall,
-                                        bottom = AppTheme.dimens.spacingSmall,
-                                    )
-                            ) {
-                                Image(
-                                    painter = rememberDrawablePainter(app.icon),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(28.dp)
-                                        .clip(CircleShape)
-                                )
-                                Text(
-                                    text = app.name,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
-                            HorizontalDivider()
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.timer_pin_to_slot_1)) },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_pin),
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    onPinApp(app.packageName, 0)
-                                    selectedAppPackageName = null
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.timer_pin_to_slot_2)) },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_pin),
-                                        contentDescription = null,
-                                    )
-                                },
-                                onClick = {
-                                    onPinApp(app.packageName, 1)
-                                    selectedAppPackageName = null
-                                }
-                            )
                         }
-                    }
+                    )
                 }
             }
         }

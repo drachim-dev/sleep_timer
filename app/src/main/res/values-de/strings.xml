@@ -92,8 +92,6 @@
     <string name="timer_volume_dialog_title">Lautstärke festlegen</string>
     <string name="timer_volume_confirm">Bestätigen</string>
     <string name="timer_volume_cancel">Abbrechen</string>
-    <string name="timer_pin_to_slot_1">An Slot 1 pinnen</string>
-    <string name="timer_pin_to_slot_2">An Slot 2 pinnen</string>
 
     <!-- Hue Discovery -->
     <string name="hue_discovery_title">Bridge verbinden</string>

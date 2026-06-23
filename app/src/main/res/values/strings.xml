@@ -95,8 +95,6 @@
     <string name="timer_volume_dialog_title">Set volume level</string>
     <string name="timer_volume_confirm">Confirm</string>
     <string name="timer_volume_cancel">Cancel</string>
-    <string name="timer_pin_to_slot_1">Pin to slot 1</string>
-    <string name="timer_pin_to_slot_2">Pin to slot 2</string>
 
     <!-- Hue Discovery -->
     <string name="hue_discovery_title">Link Bridge</string>
