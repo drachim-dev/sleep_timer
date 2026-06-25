@@ -30,7 +30,11 @@ class TimerActionExecutor(
         }
 
         if (actions.enableDnd && notificationManager.isNotificationPolicyAccessGranted) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS)
+            try {
+                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS)
+            } catch (_: SecurityException) {
+                // Permission might have been revoked just now
+            }
         }
 
         if (actions.hueLights) {
@@ -58,7 +62,11 @@ class TimerActionExecutor(
 
         if (actions.turnOffScreen) {
             if (devicePolicyManager.isAdminActive(adminComponent)) {
-                devicePolicyManager.lockNow()
+                try {
+                    devicePolicyManager.lockNow()
+                } catch (_: SecurityException) {
+                    // Permission might have been revoked just now
+                }
             }
         }
 

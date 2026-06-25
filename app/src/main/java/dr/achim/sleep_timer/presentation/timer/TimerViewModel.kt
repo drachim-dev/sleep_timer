@@ -132,6 +132,9 @@ class TimerViewModel(
                     toggleDnd(true)
                 }
             }
+            is Action.RefreshPermissions -> {
+                _permissionsFlow.value = checkTimerPermissionsUseCase()
+            }
             is Action.AddMinutes -> addMinutes(action.minutes)
             is Action.SetQuickLaunchApp -> setQuickLaunchApp(action.index, action.packageName)
             is Action.SetMediaVolume -> setMediaVolume(action.level, action.flags)

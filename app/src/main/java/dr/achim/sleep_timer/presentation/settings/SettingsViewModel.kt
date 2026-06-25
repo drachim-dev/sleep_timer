@@ -15,7 +15,6 @@ import dr.achim.sleep_timer.data.BillingRepository
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
-import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateSettingsUseCase
 import dr.achim.sleep_timer.model.AppSettings
 import dr.achim.sleep_timer.model.Entitlement
@@ -43,7 +42,6 @@ class SettingsViewModel(
     billingRepository: BillingRepository,
     getSettingsUseCase: GetSettingsUseCase,
     private val updateSettingsUseCase: UpdateSettingsUseCase,
-    private val manageTimerActionsUseCase: ManageTimerActionsUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
 ) : ViewModel() {
 
@@ -183,16 +181,10 @@ class SettingsViewModel(
     private fun disableDeviceAdmin() {
         timerController.removeActiveAdmin()
         _isDeviceAdminEnabled.value = false
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setEndTurnOffScreen(false)
-        }
     }
 
     private fun disableNotificationAccess() {
         _hasNotificationAccess.value = false
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setStartEnableDnd(false)
-        }
     }
 
     private fun setThemeMode(themeMode: ThemeMode) {

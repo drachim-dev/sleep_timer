@@ -1,12 +1,8 @@
 package dr.achim.sleep_timer.presentation.timer
 
-import android.app.admin.DevicePolicyManager
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -87,6 +83,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.R
@@ -95,7 +92,8 @@ import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
-import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
+import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
+import dr.achim.sleep_timer.presentation.settings.SETTING_DND
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
 import dr.achim.sleep_timer.ui.components.QuickLaunchAppItem
@@ -114,10 +112,16 @@ import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 fun TimerScreen(
     onBack: () -> Unit,
     onNavigateToRoomSelection: (HueActionSource) -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     viewModel: TimerViewModel,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.onAction(Action.RefreshPermissions)
+        onPauseOrDispose { }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.navEvents.collect { event ->
@@ -130,6 +134,7 @@ fun TimerScreen(
     TimerScreenContent(
         onBack = onBack,
         onAction = viewModel::onAction,
+        onNavigateToSettings = onNavigateToSettings,
         uiState = uiState,
         snackbarHostState = snackbarHostState
     )
@@ -140,25 +145,12 @@ fun TimerScreen(
 private fun TimerScreenContent(
     onBack: () -> Unit,
     onAction: (Action) -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     uiState: TimerUiState,
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-
-    val deviceAdminLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = {
-            onAction(Action.RefreshAdminStatus(true))
-        }
-    )
-
-    val notificationAccessLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = {
-            onAction(Action.RefreshDndStatus(true))
-        }
-    )
 
     var showQuickLaunchSheet by remember { mutableStateOf(false) }
     var selectingIndex by remember { mutableIntStateOf(-1) }
@@ -398,35 +390,19 @@ private fun TimerScreenContent(
                     hasDndPermission = uiState.hasNotificationAccess,
                     onAction = onAction,
                     onVolumeLongClick = { showStartVolumeDialog = true },
-                    onDndRequestPermission = {
-                        val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                        notificationAccessLauncher.launch(intent)
-                    }
+                    onNavigateToSettings = onNavigateToSettings
                 )
             }
 
             TimerSection(
                 title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) }
             ) {
-                val explanation = stringResource(R.string.settings_device_admin_description)
                 EndActionsRow(
                     timerActions = uiState.timerActions,
                     isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
                     onAction = onAction,
                     onVolumeLongClick = { showEndVolumeDialog = true },
-                    onAdminRequestPermission = {
-                        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                            putExtra(
-                                DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                android.content.ComponentName(
-                                    context,
-                                    SleepTimerAdminReceiver::class.java
-                                )
-                            )
-                            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, explanation)
-                        }
-                        deviceAdminLauncher.launch(intent)
-                    }
+                    onNavigateToSettings = onNavigateToSettings
                 )
             }
         }
@@ -439,7 +415,7 @@ private fun StartActionsRow(
     hasDndPermission: Boolean,
     onAction: (Action) -> Unit,
     onVolumeLongClick: () -> Unit,
-    onDndRequestPermission: () -> Unit
+    onNavigateToSettings: (String) -> Unit
 ) {
     ActionToggle(
         painter = painterResource(if (timerActions.startActions.volumeLevel == 0) R.drawable.ic_volume_mute else R.drawable.ic_volume_down),
@@ -466,11 +442,12 @@ private fun StartActionsRow(
         painter = painterResource(if (timerActions.startActions.enableDnd) R.drawable.ic_dnd_on else R.drawable.ic_dnd_off),
         label = stringResource(R.string.timer_action_dnd),
         active = timerActions.startActions.enableDnd,
+        warning = timerActions.startActions.enableDnd && !hasDndPermission,
         onClick = {
             if (hasDndPermission) {
                 onAction(Action.ToggleDnd(!timerActions.startActions.enableDnd))
             } else {
-                onDndRequestPermission()
+                onNavigateToSettings(SETTING_DND)
             }
         }
     )
@@ -482,7 +459,7 @@ private fun EndActionsRow(
     isDeviceAdminEnabled: Boolean,
     onAction: (Action) -> Unit,
     onVolumeLongClick: () -> Unit,
-    onAdminRequestPermission: () -> Unit
+    onNavigateToSettings: (String) -> Unit
 ) {
     ActionToggle(
         painter = painterResource(if (timerActions.endActions.stopMedia) R.drawable.ic_media_off else R.drawable.ic_media_on),
@@ -508,11 +485,12 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.turnOffScreen) R.drawable.ic_screen_off else R.drawable.ic_screen_on),
         label = stringResource(R.string.timer_action_screen),
         active = timerActions.endActions.turnOffScreen,
+        warning = timerActions.endActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
             if (isDeviceAdminEnabled) {
                 onAction(Action.ToggleScreenOff(!timerActions.endActions.turnOffScreen))
             } else {
-                onAdminRequestPermission()
+                onNavigateToSettings(SETTING_ADMIN)
             }
         }
     )
@@ -541,6 +519,7 @@ fun TimerScreenPreview() {
         TimerScreenContent(
             onBack = {},
             onAction = {},
+            onNavigateToSettings = {},
             uiState = TimerUiState(),
             snackbarHostState = remember { SnackbarHostState() }
         )
@@ -693,8 +672,25 @@ fun ActionToggle(
     label: String,
     active: Boolean,
     onClick: () -> Unit,
-    onLongClick: (() -> Unit)? = null
+    onLongClick: (() -> Unit)? = null,
+    warning: Boolean = false
 ) {
+    val containerColor by animateColorAsState(
+        when {
+            warning -> OrangeAccent.copy(alpha = 0.2f)
+            active -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            else -> Color.Transparent
+        }
+    )
+
+    val contentColor by animateColorAsState(
+        when {
+            warning -> OrangeAccent
+            active -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
+        }
+    )
+
     Surface(
         modifier = Modifier
             .size(AppTheme.dimens.quickLaunchCardWidth, AppTheme.dimens.quickLaunchItemHeight)
@@ -705,18 +701,16 @@ fun ActionToggle(
                 role = Role.Button
             ),
         shape = MaterialTheme.shapes.medium,
-        color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
+        color = containerColor,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painter,
+                painter = if (warning) painterResource(R.drawable.ic_warning) else painter,
                 contentDescription = null,
-                tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                    0.5f
-                ),
+                tint = contentColor,
                 modifier = Modifier.size(AppTheme.dimens.actionToggleIconSize)
             )
 
@@ -724,7 +718,7 @@ fun ActionToggle(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = contentColor,
                 textAlign = TextAlign.Center
             )
         }

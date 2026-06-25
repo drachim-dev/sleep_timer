@@ -20,6 +20,7 @@ sealed interface TimerUiAction {
     object TogglePauseResume : TimerUiAction
     data class RefreshAdminStatus(val autoEnable: Boolean) : TimerUiAction
     data class RefreshDndStatus(val autoEnable: Boolean) : TimerUiAction
+    object RefreshPermissions : TimerUiAction
     data class AddMinutes(val minutes: Long) : TimerUiAction
     data class SetQuickLaunchApp(val index: Int, val packageName: String?) : TimerUiAction
     data class SetMediaVolume(val level: Int, val flags: Int = 0) : TimerUiAction

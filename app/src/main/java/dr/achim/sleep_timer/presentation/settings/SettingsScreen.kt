@@ -8,6 +8,8 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,6 +80,7 @@ import io.github.vinceglb.confettikit.compose.ConfettiKit
 import io.github.vinceglb.confettikit.core.Party
 import io.github.vinceglb.confettikit.core.Position
 import io.github.vinceglb.confettikit.core.emitter.Emitter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
@@ -89,6 +92,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onNavigateToCredits: () -> Unit,
     onNavigateToFaq: () -> Unit,
+    highlight: String? = null,
     viewModel: SettingsViewModel = koinViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
@@ -118,11 +122,15 @@ fun SettingsScreen(
         isDeviceAdminEnabled = isDeviceAdminEnabled,
         hasNotificationAccess = hasNotificationAccess,
         onAction = viewModel::onAction,
+        highlight = highlight,
         snackbarHostState = snackbarHostState,
         purchaseEvents = viewModel.events,
         productUiModels = productUiModels,
     )
 }
+
+const val SETTING_ADMIN = "admin"
+const val SETTING_DND = "dnd"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,12 +146,21 @@ fun SettingsScreenContent(
     isDeviceAdminEnabled: Boolean,
     hasNotificationAccess: Boolean,
     onAction: (SettingsUiAction) -> Unit,
+    highlight: String?,
     snackbarHostState: SnackbarHostState,
     purchaseEvents: Flow<PurchaseEvent>,
     productUiModels: List<StoreProductUiModel>
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(highlight) {
+        if (highlight != null) {
+            delay(500.milliseconds)
+            scrollState.animateScrollTo(scrollState.maxValue, animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
+        }
+    }
 
     val deviceAdminLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -179,8 +196,6 @@ fun SettingsScreenContent(
             when (it) {
                 PurchaseEvent.PurchaseComplete -> {
                     showConfetti = true
-                    // TODO
-                    // show in app review
                 }
 
                 PurchaseEvent.PurchaseAborted -> {
@@ -212,7 +227,7 @@ fun SettingsScreenContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .consumeWindowInsets(innerPadding)
                     .padding(innerPadding)
                     .padding(AppTheme.dimens.spacingMedium),
@@ -328,6 +343,7 @@ fun SettingsScreenContent(
                         title = stringResource(R.string.settings_device_admin_title),
                         subtitle = stringResource(R.string.settings_device_admin_subtitle),
                         checked = isDeviceAdminEnabled,
+                        highlighted = highlight == SETTING_ADMIN,
                         onCheckedChange = { enabled ->
                             if (enabled) {
                                 val intent =
@@ -356,6 +372,7 @@ fun SettingsScreenContent(
                         title = stringResource(R.string.settings_notification_access_title),
                         subtitle = stringResource(R.string.settings_notification_access_subtitle),
                         checked = hasNotificationAccess,
+                        highlighted = highlight == SETTING_DND,
                         onCheckedChange = { enabled ->
                             val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
                             notificationAccessLauncher.launch(intent)
@@ -532,18 +549,20 @@ private fun SettingsSwitchItem(
     title: String,
     subtitle: String? = null,
     checked: Boolean,
+    highlighted: Boolean = false,
     onCheckedChange: (Boolean) -> Unit
 ) {
     SwitchListItem(
         checked = checked,
         onCheckedChange = onCheckedChange,
+        highlighted = highlighted,
         supportingContent = subtitle?.let { { Text(text = it) } },
         leadingContent = {
             Icon(
                 painter = painter,
                 contentDescription = null,
             )
-        },
+        }
     ) {
         Text(text = title)
     }
@@ -587,6 +606,7 @@ private fun Preview() {
             isDeviceAdminEnabled = false,
             hasNotificationAccess = false,
             onAction = {},
+            highlight = null,
             snackbarHostState = remember { SnackbarHostState() },
             purchaseEvents = emptyFlow(),
             productUiModels = emptyList()

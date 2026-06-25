@@ -55,7 +55,7 @@ object HomeKey : NavKey
 data class TimerKey(val minutes: Int?) : NavKey
 
 @Serializable
-object SettingsKey : NavKey
+data class SettingsKey(val highlight: String? = null) : NavKey
 
 @Serializable
 object CreditsKey : NavKey
@@ -125,7 +125,7 @@ fun Navigation(
                         backStack += TimerKey(minutes)
                     },
                     onNavigateToSettings = dropUnlessResumed {
-                        backStack += SettingsKey
+                        backStack += SettingsKey()
                     },
                     snackbarHostState = snackbarHostState
                 )
@@ -148,6 +148,9 @@ fun Navigation(
                     onNavigateToRoomSelection = { source ->
                         backStack += RoomSelectionKey(source)
                     },
+                    onNavigateToSettings = { highlight ->
+                        backStack += SettingsKey(highlight)
+                    },
                     viewModel = koinViewModel(parameters = { parametersOf(key.minutes) }),
                     snackbarHostState = snackbarHostState
                 )
@@ -167,7 +170,7 @@ fun Navigation(
                             targetOffsetX = { it })
                     }
                 }
-            ) {
+            ) { key ->
                 SettingsScreen(
                     onBack = onBack,
                     onNavigateToCredits = {
@@ -176,6 +179,7 @@ fun Navigation(
                     onNavigateToFaq = {
                         backStack += FaqKey
                     },
+                    highlight = key.highlight,
                     snackbarHostState = snackbarHostState
                 )
             }
