@@ -65,6 +65,7 @@ class TimerViewModel(
             selectedApps = selectedApps,
             isDeviceAdminEnabled = permissions.isDeviceAdminEnabled,
             hasNotificationAccess = permissions.hasNotificationAccess,
+            hasNearbyPermission = permissions.hasNearbyPermission,
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity
         )

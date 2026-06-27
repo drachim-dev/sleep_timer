@@ -1,9 +1,5 @@
 package dr.achim.sleep_timer.presentation.hue
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -48,14 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
@@ -72,19 +66,9 @@ fun HueDiscoveryScreen(
     onBack: () -> Unit,
     viewModel: HueDiscoveryViewModel
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val permissions = buildSet {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            add(Manifest.permission.NEARBY_WIFI_DEVICES)
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
-            add(Manifest.permission.ACCESS_LOCAL_NETWORK)
-        }
-    }.toTypedArray()
-
+    val permissions = viewModel.getNearbyPermissions()
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
@@ -94,7 +78,7 @@ fun HueDiscoveryScreen(
     }
 
     LifecycleResumeEffect(Unit) {
-        if (checkLocalNetworkPermission(context)) {
+        if (viewModel.hasNearbyPermission()) {
             viewModel.onAction(HueDiscoveryUiAction.PermissionGranted)
         }
         onPauseOrDispose {}
@@ -120,24 +104,6 @@ fun HueDiscoveryScreen(
         onAction = viewModel::onAction,
         onRequestPermission = { launcher.launch(permissions) }
     )
-}
-
-private fun checkLocalNetworkPermission(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
-
-    val nearbyWifi = ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.NEARBY_WIFI_DEVICES
-    ) == PackageManager.PERMISSION_GRANTED
-
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
-        nearbyWifi && ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_LOCAL_NETWORK
-        ) == PackageManager.PERMISSION_GRANTED
-    } else {
-        nearbyWifi
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

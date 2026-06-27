@@ -1,6 +1,5 @@
 package dr.achim.sleep_timer.presentation.hue
 
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dr.achim.sleep_timer.common.combine
@@ -46,7 +45,7 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
     private val _isSearching = MutableStateFlow(false)
     private val _pairingBridge = MutableStateFlow<HueBridge?>(null)
     private val _pairingError = MutableStateFlow<String?>(null)
-    private val _hasPermission = MutableStateFlow(false)
+    private val _hasPermission = MutableStateFlow(manageHueUseCase.hasNearbyPermission())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _pairedData = manageHueUseCase.getPairedIp().map { ip -> ip }
@@ -60,7 +59,7 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
         _hasPermission
     ) { bridges, isSearching, pairingBridge, pairingError, pairedIp, hasPermission ->
 
-        if (!hasPermission && Build.VERSION.SDK_INT >= 33) {
+        if (!hasPermission) {
             return@combine HueDiscoveryUiState.PermissionDenied
         }
 
@@ -84,6 +83,10 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
 
     private val _navEvents = Channel<HueNavEvent>()
     val navEvents = _navEvents.receiveAsFlow()
+
+    fun getNearbyPermissions() = manageHueUseCase.getNearbyPermissions()
+
+    fun hasNearbyPermission() = manageHueUseCase.hasNearbyPermission()
 
     fun onAction(action: HueDiscoveryUiAction) {
         when (action) {

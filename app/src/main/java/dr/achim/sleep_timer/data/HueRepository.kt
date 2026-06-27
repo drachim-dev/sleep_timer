@@ -6,6 +6,7 @@ import android.os.Build
 import android.util.Log
 import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
+import dr.achim.sleep_timer.data.remote.hue.HueConfig
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
 import dr.achim.sleep_timer.data.remote.hue.HuePairingRequest
 import dr.achim.sleep_timer.data.remote.hue.HuePairingResponse
@@ -47,18 +48,19 @@ class HueRepository(
     private suspend fun discoverBridgesNupnp(): List<HueBridge> = try {
         client.get(DISCOVERY_URL).body()
     } catch (e: Exception) {
-        println(e)
+        Log.e(TAG, e.message.toString())
         emptyList()
     }
 
     suspend fun discoverBridgeByIp(ip: String): HueBridge? = try {
-        val config: dr.achim.sleep_timer.data.remote.hue.HueConfig =
+        val config: HueConfig =
             client.get("http://$ip/api/config").body()
         HueBridge(
             name = config.name,
             ipAddress = ip
         )
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        Log.e(TAG, e.message.toString())
         null
     }
 

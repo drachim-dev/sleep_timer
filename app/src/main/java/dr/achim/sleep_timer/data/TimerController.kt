@@ -1,10 +1,14 @@
 package dr.achim.sleep_timer.data
 
+import android.Manifest
 import android.app.NotificationManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
 import dr.achim.sleep_timer.service.TimerService
 
@@ -22,6 +26,34 @@ class TimerController(
     }
 
     fun hasDndPermission(): Boolean = notificationManager.isNotificationPolicyAccessGranted
+
+    fun hasNearbyPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
+
+        val nearbyWifi = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.NEARBY_WIFI_DEVICES
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            nearbyWifi && ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_LOCAL_NETWORK
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            nearbyWifi
+        }
+    }
+
+    fun getNearbyPermissions(): Array<String> = buildSet {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+            add(Manifest.permission.ACCESS_LOCAL_NETWORK)
+        }
+    }.toTypedArray()
 
     fun startTimer(millis: Long) {
         val intent = Intent(context, TimerService::class.java).apply {

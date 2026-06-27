@@ -2,11 +2,15 @@ package dr.achim.sleep_timer.domain.usecase
 
 import dr.achim.sleep_timer.data.HueRepository
 import dr.achim.sleep_timer.data.PairResult
+import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.model.HueActionSource
 import kotlinx.coroutines.flow.firstOrNull
 
-class ManageHueUseCase(private val hueRepository: HueRepository) {
+class ManageHueUseCase(
+    private val hueRepository: HueRepository,
+    private val timerController: TimerController
+) {
 
     suspend fun discoverBridges(): List<HueBridge> = hueRepository.discoverBridges()
 
@@ -24,6 +28,10 @@ class ManageHueUseCase(private val hueRepository: HueRepository) {
     suspend fun setStartGroups(groups: Set<String>) = hueRepository.setStartGroups(groups)
     fun getEndGroups() = hueRepository.getEndGroups()
     suspend fun setEndGroups(groups: Set<String>) = hueRepository.setEndGroups(groups)
+
+    fun hasNearbyPermission() = timerController.hasNearbyPermission()
+
+    fun getNearbyPermissions() = timerController.getNearbyPermissions()
 
     suspend fun isConfigured(source: HueActionSource): Boolean {
         val ip = hueRepository.getPairedIp().firstOrNull()

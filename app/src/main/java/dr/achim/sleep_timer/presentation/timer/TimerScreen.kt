@@ -388,6 +388,7 @@ private fun TimerScreenContent(
                 StartActionsRow(
                     timerActions = uiState.timerActions,
                     hasDndPermission = uiState.hasNotificationAccess,
+                    hasNearbyPermission = uiState.hasNearbyPermission,
                     onAction = onAction,
                     onVolumeLongClick = { showStartVolumeDialog = true },
                     onNavigateToSettings = onNavigateToSettings
@@ -413,6 +414,7 @@ private fun TimerScreenContent(
 private fun StartActionsRow(
     timerActions: TimerActions,
     hasDndPermission: Boolean,
+    hasNearbyPermission: Boolean,
     onAction: (Action) -> Unit,
     onVolumeLongClick: () -> Unit,
     onNavigateToSettings: (String) -> Unit
@@ -435,7 +437,14 @@ private fun StartActionsRow(
         painter = painterResource(if (timerActions.startActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.startActions.hueLights,
-        onClick = { onAction(Action.ToggleHueLights(!timerActions.startActions.hueLights)) },
+        warning = timerActions.startActions.hueLights && !hasNearbyPermission,
+        onClick = {
+            if (hasNearbyPermission) {
+                onAction(Action.ToggleHueLights(!timerActions.startActions.hueLights))
+            } else {
+                onAction(Action.OpenHueSettings(HueActionSource.START))
+            }
+        },
         onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.START)) }
     )
     ActionToggle(
