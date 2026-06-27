@@ -74,6 +74,13 @@
     <string name="home_time_minutes_only">%d min</string>
     <string name="home_add_quick_time_description">Add</string>
 
+    <string name="home_notification_permission_title">Notification Permission Required</string>
+    <string name="home_notification_permission_rationale">Notifications are required to control the timer and ensure it runs reliably in the background.</string>
+    <string name="home_notification_permission_settings_prompt">Please enable the notification permission in the system settings to continue.</string>
+    <string name="home_notification_permission_grant">Grant permission</string>
+    <string name="home_notification_permission_open_settings">Open Settings</string>
+    <string name="home_notification_permission_dismiss">Dismiss</string>
+
     <!-- Timer Screen -->
     <string name="timer_quick_launch_title">Quick launch</string>
     <string name="timer_pin_app_title">Pin app</string>

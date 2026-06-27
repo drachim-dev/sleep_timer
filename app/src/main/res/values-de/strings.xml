@@ -71,6 +71,13 @@
     <string name="home_time_minutes_only">%d min</string>
     <string name="home_add_quick_time_description">Hinzufügen</string>
 
+    <string name="home_notification_permission_title">Benachrichtigungsberechtigung erforderlich</string>
+    <string name="home_notification_permission_rationale">Benachrichtigungen sind erforderlich, um den Timer zu steuern und sicherzustellen, dass er zuverlässig im Hintergrund läuft.</string>
+    <string name="home_notification_permission_settings_prompt">Bitte aktiviere die Benachrichtigungsberechtigung in den Systemeinstellungen, um fortzufahren.</string>
+    <string name="home_notification_permission_grant">Berechtigung erteilen</string>
+    <string name="home_notification_permission_open_settings">Einstellungen öffnen</string>
+    <string name="home_notification_permission_dismiss">Verwerfen</string>
+
     <!-- Timer Screen -->
     <string name="timer_quick_launch_title">Schnellstart</string>
     <string name="timer_pin_app_title">App anpinnen</string>

@@ -2,6 +2,7 @@ package dr.achim.sleep_timer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dr.achim.sleep_timer.common.combine
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
 import dr.achim.sleep_timer.domain.usecase.GetLastSelectedMinutesUseCase
@@ -10,9 +11,9 @@ import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateQuickTimeUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -27,20 +28,27 @@ class HomeViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
+    private val _showNotificationRationale = MutableStateFlow(false)
+    private val _showNotificationSettingsPrompt = MutableStateFlow(false)
+
     val uiState: StateFlow<HomeUiState> = combine(
         getSettingsUseCase(),
         getQuickTimesUseCase(),
         getLastSelectedMinutesUseCase(),
         getTimerStatusUseCase.timerState,
-        settingsRepository.timerStartCount
-    ) { settings, quickTimes, lastMinutes, timerState, startCount ->
+        settingsRepository.timerStartCount,
+        _showNotificationRationale,
+        _showNotificationSettingsPrompt
+    ) { settings, quickTimes, lastMinutes, timerState, startCount, showRationale, showSettings ->
         HomeUiState(
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
             quickTimes = quickTimes,
             lastSelectedMinutes = lastMinutes,
             timerState = timerState,
-            timerStartCount = startCount
+            timerStartCount = startCount,
+            showNotificationRationale = showRationale,
+            showNotificationSettingsPrompt = showSettings
         )
     }.stateIn(
         scope = viewModelScope,
@@ -53,6 +61,15 @@ class HomeViewModel(
             is HomeUiAction.UpdateQuickTime -> updateQuickTime(action.index, action.minutes)
             is HomeUiAction.UpdateLastSelectedMinutes -> updateLastSelectedMinutes(action.minutes)
             is HomeUiAction.StopTimer -> stopTimer()
+            is HomeUiAction.NotificationPermissionDenied -> {
+                _showNotificationRationale.value = action.shouldShowRationale
+                _showNotificationSettingsPrompt.value = !action.shouldShowRationale
+            }
+
+            HomeUiAction.DismissPermissionPrompts -> {
+                _showNotificationRationale.value = false
+                _showNotificationSettingsPrompt.value = false
+            }
         }
     }
 
@@ -71,4 +88,6 @@ class HomeViewModel(
     private fun stopTimer() {
         controlTimerUseCase.stop()
     }
+
+    fun hasNotificationPermission() = controlTimerUseCase.hasNotificationPermission()
 }

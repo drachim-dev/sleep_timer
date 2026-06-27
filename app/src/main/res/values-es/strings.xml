@@ -72,6 +72,13 @@
     <string name="home_time_minutes_only">%d min</string>
     <string name="home_add_quick_time_description">Añadir</string>
 
+    <string name="home_notification_permission_title">Permiso de notificación requerido</string>
+    <string name="home_notification_permission_rationale">Se requieren notificaciones para controlar el temporizador y asegurar su funcionamiento en segundo plano.</string>
+    <string name="home_notification_permission_settings_prompt">Por favor, activa el permiso de notificación en los ajustes del sistema para continuar.</string>
+    <string name="home_notification_permission_grant">Conceder permiso</string>
+    <string name="home_notification_permission_open_settings">Abrir ajustes</string>
+    <string name="home_notification_permission_dismiss">Descartar</string>
+
     <!-- Timer Screen -->
     <string name="timer_quick_launch_title">Abrir rápido</string>
     <string name="timer_pin_app_title">Anclar aplicación</string>

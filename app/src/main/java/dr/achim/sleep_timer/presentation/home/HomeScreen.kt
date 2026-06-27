@@ -1,8 +1,10 @@
 package dr.achim.sleep_timer.presentation.home
 
 import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -26,10 +28,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +51,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SplitButtonDefaults
 import androidx.compose.material3.SplitButtonLayout
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -75,7 +79,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.LocalIsPro
@@ -133,6 +137,7 @@ fun HomeScreen(
         },
         onNavigateToSettings = onNavigateToSettings,
         onAction = viewModel::onAction,
+        onHasNotificationPermission = viewModel::hasNotificationPermission,
         snackbarHostState = snackbarHostState
     )
 }
@@ -144,14 +149,26 @@ fun HomeScreenContent(
     onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onAction: (HomeUiAction) -> Unit,
+    onHasNotificationPermission: () -> Boolean,
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
+    val activity = context.findActivity()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
                 onNavigateToTimer()
+            } else {
+                val showRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                } else {
+                    false
+                }
+                onAction(HomeUiAction.NotificationPermissionDenied(showRationale))
             }
         }
     )
@@ -190,18 +207,10 @@ fun HomeScreenContent(
                 HomeFab(
                     timerState = uiState.timerState,
                     onNavigateToTimer = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            val permissionCheck = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.POST_NOTIFICATIONS
-                            )
-                            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                                onNavigateToTimer()
-                            } else {
-                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                        } else {
+                        if (onHasNotificationPermission()) {
                             onNavigateToTimer()
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
                     },
                     onStopTimer = { onAction(HomeUiAction.StopTimer) }
@@ -290,6 +299,66 @@ fun HomeScreenContent(
                 }
             )
         }
+    }
+
+    if (uiState.showNotificationRationale) {
+        AlertDialog(
+            onDismissRequest = { onAction(HomeUiAction.DismissPermissionPrompts) },
+            title = { Text(stringResource(R.string.home_notification_permission_title)) },
+            text = { Text(stringResource(R.string.home_notification_permission_rationale)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onAction(HomeUiAction.DismissPermissionPrompts)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.home_notification_permission_grant))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onAction(HomeUiAction.DismissPermissionPrompts) }) {
+                    Text(stringResource(R.string.home_notification_permission_dismiss))
+                }
+            }
+        )
+    }
+
+    if (uiState.showNotificationSettingsPrompt) {
+        AlertDialog(
+            onDismissRequest = { onAction(HomeUiAction.DismissPermissionPrompts) },
+            title = { Text(stringResource(R.string.home_notification_permission_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingSmall)) {
+                    Text(stringResource(R.string.home_notification_permission_rationale))
+                    Text(
+                        text = stringResource(R.string.home_notification_permission_settings_prompt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onAction(HomeUiAction.DismissPermissionPrompts)
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                ) {
+                    Text(stringResource(R.string.home_notification_permission_open_settings))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onAction(HomeUiAction.DismissPermissionPrompts) }) {
+                    Text(stringResource(R.string.home_notification_permission_dismiss))
+                }
+            }
+        )
     }
 }
 
@@ -580,6 +649,7 @@ fun HomeScreenPreview() {
             onNavigateToTimer = {},
             onNavigateToSettings = {},
             onAction = {},
+            onHasNotificationPermission = { true },
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

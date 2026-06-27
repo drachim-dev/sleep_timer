@@ -12,4 +12,6 @@ class ControlTimerUseCase(
     fun pause() = timerController.pauseTimer()
     fun resume() = timerController.resumeTimer()
     fun setRemainingTime(millis: Long) = timerRepository.setRemainingTime(millis)
+
+    fun hasNotificationPermission() = timerController.hasNotificationPermission()
 }

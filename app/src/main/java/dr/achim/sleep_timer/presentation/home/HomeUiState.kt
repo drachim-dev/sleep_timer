@@ -8,5 +8,7 @@ data class HomeUiState(
     val quickTimes: List<Int> = emptyList(),
     val lastSelectedMinutes: Int = 0,
     val timerState: TimerState = TimerState.Idle(),
-    val timerStartCount: Int = 0
+    val timerStartCount: Int = 0,
+    val showNotificationRationale: Boolean = false,
+    val showNotificationSettingsPrompt: Boolean = false
 )
