@@ -95,7 +95,7 @@
     <string name="timer_volume_cancel">Cancelar</string>
 
     <!-- Hue Discovery -->
-    <string name="hue_discovery_title">Link el puente</string>
+    <string name="hue_discovery_title">Vincular puente</string>
     <plurals name="hue_discovery_devices_count_title">
         <item quantity="one">%d dispositivo encontrado</item>
         <item quantity="many">%d dispositivos encontrados</item>
@@ -105,12 +105,18 @@
     <string name="hue_discovery_no_bridges">No se encontraron puentes</string>
     <string name="hue_discovery_no_bridges_sub">Asegúrate de que tu puente esté encendido y conectado a la misma red Wi-Fi.</string>
     <string name="hue_discovery_refresh">Actualizar</string>
-    <string name="hue_discovery_pair">Vincular</string>
+    <string name="hue_discovery_link">Vincular</string>
+    <string name="hue_discovery_unlink">Desvincular</string>
+    <string name="hue_discovery_unlink_title">Desvincular puente</string>
+    <string name="hue_discovery_unlink_message">¿Estás seguro de que quieres desvincular este puente? Esto también desactivará tus acciones Hue.</string>
+    <string name="hue_discovery_unlink_confirm">Desvincular</string>
+    <string name="hue_discovery_unlink_cancel">Cancelar</string>
     <string name="hue_discovery_manual_ip">Conectar manualmente</string>
     <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
-    <string name="hue_discovery_permission_title">Acceso a la red local requerido</string>
-    <string name="hue_discovery_permission_subtitle">Para descubrir y controlar tus luces Hue, esta aplicación necesita permiso para acceder a tu red local.</string>
+    <string name="hue_discovery_permission_title">Se requiere permiso para dispositivos cercanos</string>
+    <string name="hue_discovery_permission_subtitle">Para descubrir y controlar sus luces Hue, esta aplicación necesita permiso para buscar y conectarse a dispositivos cercanos.</string>
     <string name="hue_discovery_permission_grant">Conceder permiso</string>
+    <string name="hue_discovery_permission_open_settings">Abrir ajustes</string>
 
     <!-- Hue Manual IP -->
     <string name="hue_manual_ip_title">Conexión manual</string>
@@ -118,11 +124,11 @@
     <string name="hue_manual_ip_confirm">Conectar</string>
     <string name="hue_manual_ip_cancel">Cancelar</string>
 
-    <!-- Hue Pairing -->
-    <string name="hue_pairing_title">Vinculación</string>
-    <string name="hue_pairing_message">Presiona el botón del puente para conectar.</string>
-    <string name="hue_pairing_confirm">Conectar</string>
-    <string name="hue_pairing_cancel">Cancelar</string>
+    <!-- Hue Linking -->
+    <string name="hue_linking_title">Vinculación</string>
+    <string name="hue_linking_message">Presiona el botón del puente para conectar.</string>
+    <string name="hue_linking_confirm">Conectar</string>
+    <string name="hue_linking_cancel">Cancelar</string>
 
     <!-- Hue Room Selection -->
     <string name="hue_room_selection_title">Seleccionar habitaciones</string>

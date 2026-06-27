@@ -18,6 +18,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -41,26 +42,42 @@ class HueRepository(
     suspend fun discoverBridges(): List<HueBridge> {
         val nupnpBridges = discoverBridgesNupnp()
         return nupnpBridges.ifEmpty {
-            discoverBridgesMdns()
+            val mdns = discoverBridgesMdns()
+            return mdns
         }
     }
 
     private suspend fun discoverBridgesNupnp(): List<HueBridge> = try {
-        client.get(DISCOVERY_URL).body()
+        val response = client.get(DISCOVERY_URL)
+        if (response.status == HttpStatusCode.OK) {
+            response.body<List<HueBridge>>()
+        } else {
+            if (response.status == HttpStatusCode.TooManyRequests) {
+                Log.w(TAG, "nUPnP discovery rate limited (429)")
+            } else {
+                Log.e(TAG, "nUPnP discovery failed: ${response.status}")
+            }
+            emptyList()
+        }
     } catch (e: Exception) {
-        Log.e(TAG, e.message.toString())
+        Log.e(TAG, "nUPnP discovery error: ${e.message}")
         emptyList()
     }
 
     suspend fun discoverBridgeByIp(ip: String): HueBridge? = try {
-        val config: HueConfig =
-            client.get("http://$ip/api/config").body()
-        HueBridge(
-            name = config.name,
-            ipAddress = ip
-        )
+        val response = client.get("http://$ip/api/config")
+        if (response.status == HttpStatusCode.OK) {
+            val config: HueConfig = response.body()
+            HueBridge(
+                name = config.name,
+                ipAddress = ip
+            )
+        } else {
+            Log.e(TAG, "Bridge discovery by IP failed: ${response.status}")
+            null
+        }
     } catch (e: Exception) {
-        Log.e(TAG, e.message.toString())
+        Log.e(TAG, "Bridge discovery by IP error: ${e.message}")
         null
     }
 
@@ -97,8 +114,7 @@ class HueRepository(
                             override fun onResolveFailed(
                                 serviceInfo: NsdServiceInfo,
                                 errorCode: Int
-                            ) {
-                            }
+                            ) {}
 
                             override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
                                 @Suppress("DEPRECATION")
@@ -137,7 +153,7 @@ class HueRepository(
         }.first()
     } ?: emptyList()
 
-    suspend fun pair(bridge: HueBridge): PairResult = try {
+    suspend fun link(bridge: HueBridge): LinkResult = try {
         val response: List<HuePairingResponse> = client.post("http://${bridge.ipAddress}/api") {
             contentType(ContentType.Application.Json)
             setBody(HuePairingRequest(DEVICE_TYPE))
@@ -147,14 +163,18 @@ class HueRepository(
         when {
             first?.success != null -> {
                 settingsRepository.setHueBridgeSettings(bridge.ipAddress, first.success.username)
-                PairResult.Success
+                LinkResult.Success
             }
 
-            first?.error?.type == ERROR_LINK_BUTTON_NOT_PRESSED -> PairResult.LinkButtonNotPressed
-            else -> PairResult.Error(first?.error?.description ?: "Unknown error")
+            first?.error?.type == ERROR_LINK_BUTTON_NOT_PRESSED -> LinkResult.LinkButtonNotPressed
+            else -> LinkResult.Error(first?.error?.description ?: "Unknown error")
         }
     } catch (e: Exception) {
-        PairResult.Error(e.message ?: "Network error")
+        LinkResult.Error(e.message ?: "Network error")
+    }
+
+    suspend fun unlink() {
+        settingsRepository.clearHueBridgeSettings()
     }
 
     suspend fun turnOffLights(ip: String, username: String) {
@@ -187,8 +207,8 @@ class HueRepository(
     suspend fun setEndGroups(groups: Set<String>) = settingsRepository.setHueEndGroups(groups)
 }
 
-sealed class PairResult {
-    data object Success : PairResult()
-    data object LinkButtonNotPressed : PairResult()
-    data class Error(val message: String) : PairResult()
+sealed class LinkResult {
+    data object Success : LinkResult()
+    data object LinkButtonNotPressed : LinkResult()
+    data class Error(val message: String) : LinkResult()
 }

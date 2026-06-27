@@ -106,12 +106,18 @@
     <string name="hue_discovery_no_bridges">No bridges found</string>
     <string name="hue_discovery_no_bridges_sub">Make sure your bridge is powered on and connected to the same Wi-Fi network.</string>
     <string name="hue_discovery_refresh">Refresh</string>
-    <string name="hue_discovery_pair">Pair</string>
+    <string name="hue_discovery_link">Link</string>
+    <string name="hue_discovery_unlink">Unlink</string>
+    <string name="hue_discovery_unlink_title">Unlink Bridge</string>
+    <string name="hue_discovery_unlink_message">Are you sure you want to unlink this bridge? This will also disable your Hue actions.</string>
+    <string name="hue_discovery_unlink_confirm">Unlink</string>
+    <string name="hue_discovery_unlink_cancel">Cancel</string>
     <string name="hue_discovery_manual_ip">Connect manually</string>
     <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
-    <string name="hue_discovery_permission_title">Local network access required</string>
-    <string name="hue_discovery_permission_subtitle">To discover and control your Hue lights, this app needs permission to access your local network.</string>
+    <string name="hue_discovery_permission_title">Nearby devices permission required</string>
+    <string name="hue_discovery_permission_subtitle">To discover and control your Hue lights, this app needs permission to find and connect to nearby devices.</string>
     <string name="hue_discovery_permission_grant">Grant permission</string>
+    <string name="hue_discovery_permission_open_settings">Open Settings</string>
 
     <!-- Hue Manual IP -->
     <string name="hue_manual_ip_title">Manual Connection</string>
@@ -119,11 +125,11 @@
     <string name="hue_manual_ip_confirm">Connect</string>
     <string name="hue_manual_ip_cancel">Cancel</string>
 
-    <!-- Hue Pairing -->
-    <string name="hue_pairing_title">Pairing</string>
-    <string name="hue_pairing_message">Press the link button on your Hue Bridge to connect.</string>
-    <string name="hue_pairing_confirm">Connect</string>
-    <string name="hue_pairing_cancel">Cancel</string>
+    <!-- Hue Linking -->
+    <string name="hue_linking_title">Linking</string>
+    <string name="hue_linking_message">Press the link button on your Hue Bridge to connect.</string>
+    <string name="hue_linking_confirm">Connect</string>
+    <string name="hue_linking_cancel">Cancel</string>
 
     <!-- Hue Room Selection -->
     <string name="hue_room_selection_title">Select Rooms</string>

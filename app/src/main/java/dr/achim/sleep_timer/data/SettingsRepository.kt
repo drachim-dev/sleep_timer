@@ -305,6 +305,17 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    suspend fun clearHueBridgeSettings() {
+        context.settingsDataStore.edit { preferences ->
+            preferences.remove(HUE_BRIDGE_IP_KEY)
+            preferences.remove(HUE_API_USER_KEY)
+            preferences.remove(HUE_START_GROUPS_KEY)
+            preferences.remove(HUE_END_GROUPS_KEY)
+            preferences[START_HUE_LIGHTS_KEY] = false
+            preferences[END_HUE_LIGHTS_KEY] = false
+        }
+    }
+
     suspend fun incrementAndGetTimerStartCount(): Int {
         return context.settingsDataStore.edit { preferences ->
             val current = preferences[TIMER_START_COUNT_KEY] ?: 0

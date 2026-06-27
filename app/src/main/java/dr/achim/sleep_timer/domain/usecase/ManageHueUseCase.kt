@@ -1,7 +1,7 @@
 package dr.achim.sleep_timer.domain.usecase
 
 import dr.achim.sleep_timer.data.HueRepository
-import dr.achim.sleep_timer.data.PairResult
+import dr.achim.sleep_timer.data.LinkResult
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.model.HueActionSource
@@ -16,7 +16,9 @@ class ManageHueUseCase(
 
     suspend fun discoverBridgeByIp(ip: String): HueBridge? = hueRepository.discoverBridgeByIp(ip)
 
-    suspend fun pair(bridge: HueBridge): PairResult = hueRepository.pair(bridge)
+    suspend fun link(bridge: HueBridge): LinkResult = hueRepository.link(bridge)
+
+    suspend fun unlink() = hueRepository.unlink()
 
     suspend fun fetchGroups(ip: String, username: String) = hueRepository.fetchGroups(ip, username)
 

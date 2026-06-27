@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
@@ -45,6 +46,11 @@ fun RoomSelectionScreen(
     viewModel: RoomSelectionViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.onAction(RoomSelectionUiAction.Refresh)
+        onPauseOrDispose {}
+    }
 
     RoomSelectionContent(
         uiState = uiState,

@@ -1,5 +1,9 @@
 package dr.achim.sleep_timer.presentation.hue
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -10,13 +14,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,15 +46,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
+import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.ui.components.EmptyState
 import dr.achim.sleep_timer.ui.components.FullScreenLoadingState
@@ -67,6 +72,7 @@ fun HueDiscoveryScreen(
     viewModel: HueDiscoveryViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val permissions = viewModel.getNearbyPermissions()
     val launcher = rememberLauncherForActivityResult(
@@ -74,6 +80,12 @@ fun HueDiscoveryScreen(
     ) { results ->
         if (results.all { it.value }) {
             viewModel.onAction(HueDiscoveryUiAction.PermissionGranted)
+        } else {
+            val activity = context.findActivity()
+            val shouldShowRationale = permissions.any { permission ->
+                ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+            }
+            viewModel.onAction(HueDiscoveryUiAction.PermissionDenied(shouldShowRationale))
         }
     }
 
@@ -93,7 +105,7 @@ fun HueDiscoveryScreen(
     LaunchedEffect(Unit) {
         viewModel.navEvents.collect { event ->
             when (event) {
-                is HueNavEvent.PairingSuccess -> onBack()
+                is HueNavEvent.LinkingSuccess -> onBack()
             }
         }
     }
@@ -114,7 +126,9 @@ private fun HueDiscoveryContent(
     onAction: (HueDiscoveryUiAction) -> Unit,
     onRequestPermission: () -> Unit
 ) {
+    val context = LocalContext.current
     var showManualIpDialog by remember { mutableStateOf(false) }
+    var showUnlinkConfirmDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -149,7 +163,8 @@ private fun HueDiscoveryContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding + PaddingValues(AppTheme.dimens.spacingMedium)),
+                .padding(innerPadding)
+                .padding(AppTheme.dimens.spacingMedium),
             contentAlignment = Alignment.Center
         ) {
             Crossfade(targetState = uiState, label = "HueDiscoveryState") { state ->
@@ -159,13 +174,27 @@ private fun HueDiscoveryContent(
                     }
 
                     is HueDiscoveryUiState.PermissionDenied -> {
+                        val textRes = if (state.shouldShowRationale) {
+                            R.string.hue_discovery_permission_grant
+                        } else {
+                            R.string.hue_discovery_permission_open_settings
+                        }
+
                         EmptyState(
                             title = stringResource(R.string.hue_discovery_permission_title),
                             subtitle = stringResource(R.string.hue_discovery_permission_subtitle),
                             imageRes = R.drawable.img_no_results,
                             action = {
-                                TextButton(onClick = onRequestPermission) {
-                                    Text(stringResource(R.string.hue_discovery_permission_grant))
+                                TextButton(
+                                    onClick = {
+                                        if (state.shouldShowRationale) {
+                                            onRequestPermission()
+                                        } else {
+                                            openAppSettings(context)
+                                        }
+                                    }
+                                ) {
+                                    Text(stringResource(textRes))
                                 }
                             }
                         )
@@ -187,20 +216,22 @@ private fun HueDiscoveryContent(
                     is HueDiscoveryUiState.Display -> {
                         SuccessContent(
                             data = state.data,
-                            onBridgeClick = { onAction(HueDiscoveryUiAction.StartPairing(it)) },
+                            onLink = { onAction(HueDiscoveryUiAction.StartLinking(it)) },
+                            onUnlink = { showUnlinkConfirmDialog = true },
                             onManualIpClick = { showManualIpDialog = true }
                         )
                     }
 
-                    is HueDiscoveryUiState.Pairing -> {
+                    is HueDiscoveryUiState.Linking -> {
                         SuccessContent(
                             data = state.data,
-                            onBridgeClick = { onAction(HueDiscoveryUiAction.StartPairing(it)) },
+                            onLink = { onAction(HueDiscoveryUiAction.StartLinking(it)) },
+                            onUnlink = { showUnlinkConfirmDialog = true },
                             onManualIpClick = { showManualIpDialog = true }
                         )
-                        PairingDialog(
-                            onDismiss = { onAction(HueDiscoveryUiAction.CancelPairing) },
-                            onConfirm = { onAction(HueDiscoveryUiAction.PairBridge) },
+                        LinkingDialog(
+                            onDismiss = { onAction(HueDiscoveryUiAction.CancelLinking) },
+                            onConfirm = { onAction(HueDiscoveryUiAction.LinkBridge) },
                             error = state.error
                         )
                     }
@@ -218,13 +249,24 @@ private fun HueDiscoveryContent(
             }
         )
     }
+
+    if (showUnlinkConfirmDialog) {
+        UnlinkConfirmDialog(
+            onDismiss = { showUnlinkConfirmDialog = false },
+            onConfirm = {
+                showUnlinkConfirmDialog = false
+                onAction(HueDiscoveryUiAction.UnlinkBridge)
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SuccessContent(
     data: HueDiscoveryData,
-    onBridgeClick: (HueBridge) -> Unit,
+    onLink: (HueBridge) -> Unit,
+    onUnlink: () -> Unit,
     onManualIpClick: () -> Unit
 ) {
     if (data.bridges.isEmpty() && data.isSearching) {
@@ -247,7 +289,12 @@ private fun SuccessContent(
                 )
             }
             items(data.bridges, key = { it.ipAddress }) { bridge ->
-                BridgeItem(bridge = bridge, onClick = { onBridgeClick(bridge) })
+                BridgeItem(
+                    bridge = bridge,
+                    isPaired = bridge.ipAddress == data.pairedBridgeIp,
+                    onLink = { onLink(bridge) },
+                    onUnlink = onUnlink
+                )
             }
         }
 
@@ -270,9 +317,9 @@ private fun SuccessContent(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BridgeItem(bridge: HueBridge, onClick: () -> Unit) {
+private fun BridgeItem(bridge: HueBridge, isPaired: Boolean, onLink: () -> Unit, onUnlink: () -> Unit) {
     ListItem(
-        onClick = onClick,
+        onClick = if (isPaired) onUnlink else onLink,
         supportingContent = {
             Text(text = bridge.ipAddress)
         },
@@ -283,8 +330,13 @@ private fun BridgeItem(bridge: HueBridge, onClick: () -> Unit) {
             )
         },
         trailingContent = {
-            TextButton(onClick = onClick) {
-                Text(stringResource(R.string.hue_discovery_pair))
+            TextButton(onClick = if (isPaired) onUnlink else onLink) {
+                Text(
+                    text = if (isPaired) stringResource(R.string.hue_discovery_unlink) else stringResource(
+                        R.string.hue_discovery_link
+                    ),
+                    color = if (isPaired) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                )
             }
         },
         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -295,10 +347,10 @@ private fun BridgeItem(bridge: HueBridge, onClick: () -> Unit) {
 }
 
 @Composable
-private fun PairingDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, error: String?) {
+private fun LinkingDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, error: String?) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.hue_pairing_title)) },
+        title = { Text(stringResource(R.string.hue_linking_title)) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
@@ -309,7 +361,7 @@ private fun PairingDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, error: S
                 )
                 Spacer(Modifier.height(AppTheme.dimens.spacingNormal))
                 Text(
-                    text = error ?: stringResource(R.string.hue_pairing_message),
+                    text = error ?: stringResource(R.string.hue_linking_message),
                     textAlign = TextAlign.Center,
                     color = if (error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
                 )
@@ -317,12 +369,12 @@ private fun PairingDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, error: S
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.hue_pairing_confirm))
+                Text(stringResource(R.string.hue_linking_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.hue_pairing_cancel))
+                Text(stringResource(R.string.hue_linking_cancel))
             }
         }
     )
@@ -357,6 +409,36 @@ private fun ManualIpDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     )
 }
 
+@Composable
+private fun UnlinkConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.hue_discovery_unlink_title)) },
+        text = { Text(stringResource(R.string.hue_discovery_unlink_message)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(R.string.hue_discovery_unlink_confirm),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.hue_discovery_unlink_cancel))
+            }
+        }
+    )
+}
+
+private fun openAppSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun HueDiscoveryLoadingPreview() {
@@ -375,7 +457,7 @@ private fun HueDiscoveryLoadingPreview() {
 private fun HueDiscoveryPermissionPreview() {
     AppTheme {
         HueDiscoveryContent(
-            uiState = HueDiscoveryUiState.PermissionDenied,
+            uiState = HueDiscoveryUiState.PermissionDenied(shouldShowRationale = true),
             onBack = {},
             onAction = {},
             onRequestPermission = {}
@@ -420,10 +502,10 @@ private fun HueDiscoveryDisplayPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun HueDiscoveryPairingPreview() {
+private fun HueDiscoveryLinkingPreview() {
     AppTheme {
         HueDiscoveryContent(
-            uiState = HueDiscoveryUiState.Pairing(
+            uiState = HueDiscoveryUiState.Linking(
                 data = HueDiscoveryData(
                     bridges = listOf(
                         HueBridge(name = "Hue Bridge", ipAddress = "192.168.1.100")

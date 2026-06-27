@@ -2,12 +2,15 @@ package dr.achim.sleep_timer.presentation.hue
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dr.achim.sleep_timer.common.launchLoading
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.model.HueActionSource
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,6 +36,8 @@ class RoomSelectionViewModel(
     private val _groups = MutableStateFlow<List<HueGroup>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
 
+    private var loadJob: Job? = null
+
     val uiState = combine(
         _selectedGroups,
         _groups,
@@ -55,27 +60,14 @@ class RoomSelectionViewModel(
 
     init {
         viewModelScope.launch {
-            val initial = when (source) {
-                HueActionSource.START -> manageHueUseCase.getStartGroups().firstOrNull()
-                HueActionSource.END -> manageHueUseCase.getEndGroups().firstOrNull()
-            }
-            _selectedGroups.value = initial.orEmpty()
-        }
-
-        viewModelScope.launch {
             combine(
                 manageHueUseCase.getPairedIp(),
                 manageHueUseCase.getPairedUser()
-            ) { ip, user -> ip to user }.collect { (ip, user) ->
-                if (ip != null && user != null) {
-                    _isLoading.value = true
-                    _groups.value = manageHueUseCase.fetchGroups(ip, user)
-                    _isLoading.value = false
-                } else {
-                    _groups.value = emptyList()
-                    _isLoading.value = false
+            ) { ip, user -> ip to user }
+                .distinctUntilChanged()
+                .collect {
+                    loadData()
                 }
-            }
         }
     }
 
@@ -83,7 +75,36 @@ class RoomSelectionViewModel(
         when (action) {
             is RoomSelectionUiAction.ToggleGroup -> toggleGroup(action.groupId)
             RoomSelectionUiAction.Save -> save()
+            RoomSelectionUiAction.Refresh -> loadData()
         }
+    }
+
+    private fun loadData() {
+        loadJob = launchLoading(
+            loadingState = _isLoading,
+            previousJob = loadJob,
+            block = {
+                val ip = manageHueUseCase.getPairedIp().firstOrNull()
+                val user = manageHueUseCase.getPairedUser().firstOrNull()
+
+                val fetchedGroups = if (ip != null && user != null) {
+                    manageHueUseCase.fetchGroups(ip, user)
+                } else {
+                    emptyList()
+                }
+
+                val initial = when (source) {
+                    HueActionSource.START -> manageHueUseCase.getStartGroups().firstOrNull()
+                    HueActionSource.END -> manageHueUseCase.getEndGroups().firstOrNull()
+                }
+                val initialSelected = initial.orEmpty()
+                fetchedGroups to initialSelected
+            },
+            onSuccess = { (fetchedGroups, initialSelected) ->
+                _groups.value = fetchedGroups
+                _selectedGroups.value = initialSelected
+            }
+        )
     }
 
     private fun toggleGroup(groupId: String) {

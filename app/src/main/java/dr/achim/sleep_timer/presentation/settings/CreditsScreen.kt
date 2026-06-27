@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.variant.LibraryDetailMode
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.theme.AppTheme
@@ -100,6 +101,7 @@ fun CreditsScreen(
         LibrariesContainer(
             libraries = libraries,
             modifier = Modifier.fillMaxSize(),
+            detailMode = LibraryDetailMode.Sheet,
             contentPadding = innerPadding + PaddingValues(vertical = AppTheme.dimens.spacingMedium),
             header = {
                 item {

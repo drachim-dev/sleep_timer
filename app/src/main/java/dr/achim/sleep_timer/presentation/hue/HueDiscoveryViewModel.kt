@@ -3,19 +3,19 @@ package dr.achim.sleep_timer.presentation.hue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dr.achim.sleep_timer.common.combine
-import dr.achim.sleep_timer.data.PairResult
+import dr.achim.sleep_timer.common.launchLoading
+import dr.achim.sleep_timer.data.LinkResult
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 data class HueDiscoveryData(
     val bridges: List<HueBridge> = emptyList(),
@@ -26,9 +26,9 @@ data class HueDiscoveryData(
 sealed interface HueDiscoveryUiState {
     data object Loading : HueDiscoveryUiState
     data object Empty : HueDiscoveryUiState
-    data object PermissionDenied : HueDiscoveryUiState
+    data class PermissionDenied(val shouldShowRationale: Boolean) : HueDiscoveryUiState
     data class Display(val data: HueDiscoveryData) : HueDiscoveryUiState
-    data class Pairing(
+    data class Linking(
         val data: HueDiscoveryData,
         val bridge: HueBridge,
         val error: String? = null
@@ -36,16 +36,19 @@ sealed interface HueDiscoveryUiState {
 }
 
 sealed class HueNavEvent {
-    data object PairingSuccess : HueNavEvent()
+    data object LinkingSuccess : HueNavEvent()
 }
 
 class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : ViewModel() {
 
     private val _discoveredBridges = MutableStateFlow<List<HueBridge>>(emptyList())
-    private val _isSearching = MutableStateFlow(false)
-    private val _pairingBridge = MutableStateFlow<HueBridge?>(null)
-    private val _pairingError = MutableStateFlow<String?>(null)
+    private val _isSearching = MutableStateFlow(true)
+    private val _linkingBridge = MutableStateFlow<HueBridge?>(null)
+    private val _linkingError = MutableStateFlow<String?>(null)
     private val _hasPermission = MutableStateFlow(manageHueUseCase.hasNearbyPermission())
+    private val _shouldShowRationale = MutableStateFlow(true)
+
+    private var searchJob: Job? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _pairedData = manageHueUseCase.getPairedIp().map { ip -> ip }
@@ -53,26 +56,26 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
     val uiState = combine(
         _discoveredBridges,
         _isSearching,
-        _pairingBridge,
-        _pairingError,
+        _linkingBridge,
+        _linkingError,
         _pairedData,
-        _hasPermission
-    ) { bridges, isSearching, pairingBridge, pairingError, pairedIp, hasPermission ->
+        _hasPermission,
+        _shouldShowRationale
+    ) { bridges, isSearching, linkingBridge, linkingError, pairedIp, hasPermission, shouldShowRationale ->
 
         if (!hasPermission) {
-            return@combine HueDiscoveryUiState.PermissionDenied
+            return@combine HueDiscoveryUiState.PermissionDenied(shouldShowRationale)
         }
 
-        val filteredBridges = bridges.filter { it.ipAddress != pairedIp }
         val data = HueDiscoveryData(
-            bridges = filteredBridges,
+            bridges = bridges,
             pairedBridgeIp = pairedIp,
             isSearching = isSearching
         )
 
         when {
-            pairingBridge != null -> HueDiscoveryUiState.Pairing(data, pairingBridge, pairingError)
-            filteredBridges.isEmpty() && !isSearching -> HueDiscoveryUiState.Empty
+            linkingBridge != null -> HueDiscoveryUiState.Linking(data, linkingBridge, linkingError)
+            bridges.isEmpty() && !isSearching -> HueDiscoveryUiState.Empty
             else -> HueDiscoveryUiState.Display(data)
         }
     }.stateIn(
@@ -91,76 +94,89 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
     fun onAction(action: HueDiscoveryUiAction) {
         when (action) {
             HueDiscoveryUiAction.DiscoverBridges -> discoverBridges()
-            is HueDiscoveryUiAction.StartPairing -> startPairing(action.bridge)
+            is HueDiscoveryUiAction.StartLinking -> startLinking(action.bridge)
             is HueDiscoveryUiAction.ManualIpDiscovery -> discoverBridgeByIp(action.ip)
-            HueDiscoveryUiAction.PairBridge -> pairBridge()
-            HueDiscoveryUiAction.CancelPairing -> cancelPairing()
+            HueDiscoveryUiAction.LinkBridge -> linkBridge()
+            HueDiscoveryUiAction.UnlinkBridge -> unlinkBridge()
+            HueDiscoveryUiAction.CancelLinking -> cancelLinking()
             HueDiscoveryUiAction.NavigateToRoomSelection -> navigateToRoomSelection()
             HueDiscoveryUiAction.PermissionGranted -> {
                 _hasPermission.value = true
                 discoverBridges()
             }
+            is HueDiscoveryUiAction.PermissionDenied -> {
+                _hasPermission.value = false
+                _shouldShowRationale.value = action.shouldShowRationale
+            }
         }
     }
 
     private fun discoverBridges() {
-        viewModelScope.launch {
-            _isSearching.value = true
-            val minDurationJob = launch { delay(400.milliseconds) }
-            val bridges = manageHueUseCase.discoverBridges()
-            minDurationJob.join()
-            _discoveredBridges.value = bridges
-            _isSearching.value = false
-        }
+        searchJob = launchLoading(
+            loadingState = _isSearching,
+            previousJob = searchJob,
+            block = { manageHueUseCase.discoverBridges() },
+            onSuccess = { bridges ->
+                _discoveredBridges.value = bridges
+            }
+        )
     }
 
     private fun discoverBridgeByIp(ip: String) {
-        viewModelScope.launch {
-            _isSearching.value = true
-            val bridge = manageHueUseCase.discoverBridgeByIp(ip)
-            if (bridge != null) {
-                _discoveredBridges.value += bridge
-                startPairing(bridge)
+        searchJob = launchLoading(
+            loadingState = _isSearching,
+            previousJob = searchJob,
+            block = { manageHueUseCase.discoverBridgeByIp(ip) },
+            onSuccess = { bridge ->
+                if (bridge != null) {
+                    _discoveredBridges.value += bridge
+                    startLinking(bridge)
+                }
             }
-            _isSearching.value = false
-        }
+        )
     }
 
-    private fun startPairing(bridge: HueBridge) {
-        _pairingBridge.value = bridge
-        _pairingError.value = null
+    private fun startLinking(bridge: HueBridge) {
+        _linkingBridge.value = bridge
+        _linkingError.value = null
     }
 
-    private fun pairBridge() {
-        val bridge = _pairingBridge.value ?: return
+    private fun linkBridge() {
+        val bridge = _linkingBridge.value ?: return
 
         viewModelScope.launch {
-            _pairingError.value = null
-            when (val result = manageHueUseCase.pair(bridge)) {
-                is PairResult.Success -> {
-                    _pairingBridge.value = null
+            _linkingError.value = null
+            when (val result = manageHueUseCase.link(bridge)) {
+                is LinkResult.Success -> {
+                    _linkingBridge.value = null
                     navigateToRoomSelection()
                 }
 
-                is PairResult.LinkButtonNotPressed -> {
-                    _pairingError.value = "Link button not pressed. Please try again."
+                is LinkResult.LinkButtonNotPressed -> {
+                    _linkingError.value = "Link button not pressed. Please try again."
                 }
 
-                is PairResult.Error -> {
-                    _pairingError.value = result.message
+                is LinkResult.Error -> {
+                    _linkingError.value = result.message
                 }
             }
+        }
+    }
+
+    private fun unlinkBridge() {
+        viewModelScope.launch {
+            manageHueUseCase.unlink()
         }
     }
 
     private fun navigateToRoomSelection() {
         viewModelScope.launch {
-            _navEvents.send(HueNavEvent.PairingSuccess)
+            _navEvents.send(HueNavEvent.LinkingSuccess)
         }
     }
 
-    private fun cancelPairing() {
-        _pairingBridge.value = null
-        _pairingError.value = null
+    private fun cancelLinking() {
+        _linkingBridge.value = null
+        _linkingError.value = null
     }
 }
