@@ -1,48 +1,54 @@
-# Miscellaneous
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
 *.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-**/.cxx
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
+# Generated files
+bin/
+gen/
+out/
 
-# VSCode related
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.fvm/flutter_sdk
-.packages
-.pub-cache/
-.pub/
+# Gradle files
+.gradle
+.gradle/
 build/
-coverage/
-lib/generated_plugin_registrant.dart
 
-# Web related
-lib/generated_plugin_registrant.dart
+# Signing files
+.signing/
 
-# Symbolication related
-app.*.symbols
+# Local configuration file (sdk path, etc)
+local.properties
+keystore.properties
 
-# Obfuscation related
-app.*.map.json
+# Log Files
+*.log
 
-# confidential
-google-services.json
-key.properties
-secrets.xml
-.env*
+# Android Studio
+/*/build/
+/*/out
+/*/*/build
+/*/*/production
+captures/
+.navigation/
+*.ipr
+*~
+*.swp
+
+# Keystore files
+*.jks
+*.keystore
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+/out/
+
+# OS generated files
+.DS_Store

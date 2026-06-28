@@ -1,0 +1,164 @@
+<resources>
+    <string name="app_name">Comfy Sleep Timer</string>
+
+    <!-- Foreground Service Justification -->
+    <string name="fgs_special_use_justification" translatable="false">The service is required to maintain an accurate sleep timer and manage background audio/system states while the device is idle, ensuring the timer executes reliably even when the app is not in the foreground.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Timer Status</string>
+    <string name="notification_title">Sleep Timer</string>
+    <string name="notification_action_pause">Pause</string>
+    <string name="notification_action_resume">Resume</string>
+    <string name="notification_action_extend_5">+5 min</string>
+    <string name="notification_action_extend_20">+20 min</string>
+    <string name="notification_paused_prefix">Paused - %s</string>
+
+    <!-- Errors -->
+    <string name="error_purchase_failure">There was an issue processing your order</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_back_description">Back</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_mode_system">System default</string>
+    <string name="settings_theme_mode_light">Light</string>
+    <string name="settings_theme_mode_dark">Dark</string>
+    <string name="settings_theme_mode_dynamic">Dynamic</string>
+    <string name="settings_glow_effect_title">Timer glow effect</string>
+    <string name="settings_glow_effect_subtitle">Shows a glow effect around the timers progress bar</string>
+    <string name="settings_glow_intensity_title">Glow intensity</string>
+    <string name="settings_section_timer_settings">Timer settings</string>
+    <string name="settings_extend_on_shake_title">Extend on phone shake</string>
+    <plurals name="settings_extend_on_shake_minutes_title">
+        <item quantity="one">Extend by %d minute</item>
+        <item quantity="other">Extend by %d minutes</item>
+    </plurals>
+    <string name="settings_section_support_me">Support me</string>
+    <string name="settings_like_app_title">Do you like the app?</string>
+    <string name="settings_like_app_subtitle">Please write a review or rate the app</string>
+    <string name="settings_like_app_trailing">Free</string>
+    <string name="settings_remove_ads_trailing">Already purchased</string>
+    <string name="settings_section_advanced">Advanced</string>
+    <string name="settings_device_admin_title">Device admin</string>
+    <string name="settings_device_admin_subtitle">Required to turn screen off. Disable before uninstall</string>
+    <string name="settings_device_admin_description">Description</string>
+    <string name="settings_notification_access_title">Access to notification modes</string>
+    <string name="settings_notification_access_subtitle">Required to turn on do not disturb</string>
+    <string name="settings_section_other">Other</string>
+    <string name="settings_faq_title">FAQ</string>
+    <string name="settings_credits_title">Credits</string>
+
+    <string name="faq_title">Frequently asked questions</string>
+    <string name="faq_timer_no_alarm_title">Timer doesn’t work sometimes</string>
+    <string name="faq_timer_no_alarm_description">Make sure that battery optimization is disabled for the app. Some device manufacturers such as Samsung or Huawei require additional settings to allow the app to be running in background.</string>
+    <string name="faq_timer_no_wifi_title">No wifi action</string>
+    <string name="faq_timer_no_wifi_description">Starting with Android 10, it is no longer possible to toggle Wifi from within an app.</string>
+    <string name="faq_uninstall_title">Uninstall</string>
+    <string name="faq_uninstall_description">If you can’t uninstall the app, make sure that device admin is disabled in settings.</string>
+    <string name="faq_timer_no_bluetooth_title">No bluetooth action</string>
+    <string name="faq_timer_no_bluetooth_description">Starting with Android 13, it is no longer possible to toggle Bluetooth from within an app.</string>
+
+    <string name="credits_noun_project_header">Icons from Noun Project</string>
+    <string name="credits_freepik_header">Images from Freepik</string>
+    <string name="credits_libraries_header">Libraries</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Sleep Timer</string>
+    <string name="home_settings_description">Settings</string>
+    <string name="home_start_timer">Start timer</string>
+    <string name="home_show_timer">Show timer</string>
+    <string name="home_quick_time_dialog_title">Set Time Slot</string>
+    <string name="home_quick_time_unit_min">min</string>
+    <string name="home_quick_time_save">Save</string>
+    <string name="home_time_minutes_only">%d min</string>
+    <string name="home_add_quick_time_description">Add</string>
+
+    <string name="home_notification_permission_title">Notification Permission Required</string>
+    <string name="home_notification_permission_rationale">Notifications are required to control the timer and ensure it runs reliably in the background.</string>
+    <string name="home_notification_permission_settings_prompt">Please enable the notification permission in the system settings to continue.</string>
+    <string name="home_notification_permission_grant">Grant permission</string>
+    <string name="home_notification_permission_open_settings">Open Settings</string>
+    <string name="home_notification_permission_dismiss">Dismiss</string>
+
+    <!-- Timer Screen -->
+    <string name="timer_quick_launch_title">Quick launch</string>
+    <string name="timer_pin_app_title">Pin app</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_resume">Resume</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_section_start_actions">When timer starts</string>
+    <string name="timer_section_end_actions">When time is up</string>
+    <string name="timer_action_volume">Volume</string>
+    <string name="timer_action_hue_lights">Hue lights</string>
+    <string name="timer_action_dnd">Do not disturb</string>
+    <string name="timer_action_media">Media</string>
+    <string name="timer_action_screen">Screen</string>
+    <string name="timer_action_bluetooth">Bluetooth</string>
+    <string name="timer_close_description">Close</string>
+    <string name="timer_apps">Apps</string>
+    <string name="timer_category_media">Media</string>
+    <string name="timer_category_alarm">Alarm</string>
+    <string name="timer_volume_dialog_title">Set volume level</string>
+    <string name="timer_volume_confirm">Confirm</string>
+    <string name="timer_volume_cancel">Cancel</string>
+
+    <!-- Hue Discovery -->
+    <string name="hue_discovery_title">Link Bridge</string>
+    <plurals name="hue_discovery_devices_count_title">
+        <item quantity="one">%d device found</item>
+        <item quantity="other">%d devices found</item>
+    </plurals>
+    <string name="hue_discovery_searching">Searching for bridges…</string>
+    <string name="hue_discovery_no_bridges">No bridges found</string>
+    <string name="hue_discovery_no_bridges_sub">Make sure your bridge is powered on and connected to the same Wi-Fi network.</string>
+    <string name="hue_discovery_refresh">Refresh</string>
+    <string name="hue_discovery_link">Link</string>
+    <string name="hue_discovery_unlink">Unlink</string>
+    <string name="hue_discovery_unlink_title">Unlink Bridge</string>
+    <string name="hue_discovery_unlink_message">Are you sure you want to unlink this bridge? This will also disable your Hue actions.</string>
+    <string name="hue_discovery_unlink_confirm">Unlink</string>
+    <string name="hue_discovery_unlink_cancel">Cancel</string>
+    <string name="hue_discovery_manual_ip">Connect manually</string>
+    <string name="hue_discovery_bridge_default_name">Hue Bridge</string>
+    <string name="hue_discovery_permission_title">Nearby devices permission required</string>
+    <string name="hue_discovery_permission_subtitle">To discover and control your Hue lights, this app needs permission to find and connect to nearby devices.</string>
+    <string name="hue_discovery_permission_grant">Grant permission</string>
+    <string name="hue_discovery_permission_open_settings">Open Settings</string>
+
+    <!-- Hue Manual IP -->
+    <string name="hue_manual_ip_title">Manual Connection</string>
+    <string name="hue_manual_ip_label">Bridge IP Address</string>
+    <string name="hue_manual_ip_confirm">Connect</string>
+    <string name="hue_manual_ip_cancel">Cancel</string>
+
+    <!-- Hue Linking -->
+    <string name="hue_linking_title">Linking</string>
+    <string name="hue_linking_message">Press the link button on your Hue Bridge to connect.</string>
+    <string name="hue_linking_confirm">Connect</string>
+    <string name="hue_linking_cancel">Cancel</string>
+
+    <!-- Hue Room Selection -->
+    <string name="hue_room_selection_title">Select Rooms</string>
+    <string name="hue_room_selection_save">Save</string>
+    <string name="hue_room_selection_loading">Fetching rooms…</string>
+    <string name="hue_room_selection_no_rooms">No rooms found</string>
+    <string name="hue_room_selection_no_rooms_sub">Make sure your Hue Bridge is configured correctly and contains rooms or zones.</string>
+    <plurals name="hue_room_selection_light_count">
+        <item quantity="one">%d light</item>
+        <item quantity="other">%d lights</item>
+    </plurals>
+
+    <!-- Onboarding -->
+    <string name="onboarding_music_title">Listen to your music</string>
+    <string name="onboarding_music_desc">Fall asleep to your favorite music, podcasts, or audiobooks without worry.</string>
+    <string name="onboarding_sleep_title">Better sleep</string>
+    <string name="onboarding_sleep_desc">Simply set the timer and relax. The app will take care of the rest.</string>
+    <string name="onboarding_automate_title">Automate your routines</string>
+    <string name="onboarding_automate_desc">Automatically turn off your lights, lower the volume, or enable Do Not Disturb.</string>
+    <string name="onboarding_interruption_title">No interruptions</string>
+    <string name="onboarding_interruption_desc">The timer will stop your media and can even turn off your screen to save battery.</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+</resources>
