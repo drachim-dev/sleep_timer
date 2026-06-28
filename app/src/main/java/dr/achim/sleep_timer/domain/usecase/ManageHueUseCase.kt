@@ -26,10 +26,20 @@ class ManageHueUseCase(
 
     fun getPairedUser() = hueRepository.getPairedUser()
 
-    fun getStartGroups() = hueRepository.getStartGroups()
-    suspend fun setStartGroups(groups: Set<String>) = hueRepository.setStartGroups(groups)
-    fun getEndGroups() = hueRepository.getEndGroups()
-    suspend fun setEndGroups(groups: Set<String>) = hueRepository.setEndGroups(groups)
+    fun observeGroups(source: TimerActionSource) = when (source) {
+        TimerActionSource.START -> hueRepository.getStartGroups()
+        TimerActionSource.END -> hueRepository.getEndGroups()
+    }
+
+    fun getGroups(source: TimerActionSource) = when (source) {
+        TimerActionSource.START -> hueRepository.getStartGroups()
+        TimerActionSource.END -> hueRepository.getEndGroups()
+    }
+
+    suspend fun setGroups(source: TimerActionSource, groups: Set<String>) = when (source) {
+        TimerActionSource.START -> hueRepository.setStartGroups(groups)
+        TimerActionSource.END -> hueRepository.setEndGroups(groups)
+    }
 
     fun hasNearbyPermission() = timerController.hasNearbyPermission()
 

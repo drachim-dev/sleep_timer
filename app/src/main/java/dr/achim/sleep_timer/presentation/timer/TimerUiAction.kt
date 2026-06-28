@@ -1,16 +1,12 @@
 package dr.achim.sleep_timer.presentation.timer
 
 import dr.achim.sleep_timer.model.TimerActionSource
+import dr.achim.sleep_timer.model.TimerActionType
 
 sealed interface TimerUiAction {
-    data class ToggleAdjustVolume(val source: TimerActionSource, val enabled: Boolean) : TimerUiAction
+    data class ToggleAction(val type: TimerActionType, val source: TimerActionSource, val enabled: Boolean) : TimerUiAction
     data class SetVolumeLevel(val source: TimerActionSource, val level: Int?) : TimerUiAction
-    data class ToggleDnd(val enabled: Boolean) : TimerUiAction
-    data class ToggleHueLights(val source: TimerActionSource, val enabled: Boolean) : TimerUiAction
     data class OpenHueSettings(val source: TimerActionSource) : TimerUiAction
-    data class ToggleStopMedia(val enabled: Boolean) : TimerUiAction
-    data class ToggleScreenOff(val enabled: Boolean) : TimerUiAction
-    data class ToggleBluetooth(val enabled: Boolean) : TimerUiAction
     data class SetRemainingTime(val millis: Long) : TimerUiAction
     data class StartTimer(val millis: Long) : TimerUiAction
     object StopTimer : TimerUiAction

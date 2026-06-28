@@ -92,6 +92,7 @@ import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.domain.model.AppCategory
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.model.TimerActionSource
+import dr.achim.sleep_timer.model.TimerActionType
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
@@ -170,7 +171,7 @@ private fun TimerScreenContent(
             initialValue = uiState.timerActions.startActions.volumeLevel,
             onConfirm = { level ->
                 onAction(Action.SetVolumeLevel(TimerActionSource.START, level))
-                onAction(Action.ToggleAdjustVolume(TimerActionSource.START, true))
+                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.START, true))
                 showStartVolumeDialog = false
             },
             onValueChange = { level ->
@@ -185,7 +186,7 @@ private fun TimerScreenContent(
             initialValue = uiState.timerActions.endActions.volumeLevel,
             onConfirm = { level ->
                 onAction(Action.SetVolumeLevel(TimerActionSource.END, level))
-                onAction(Action.ToggleAdjustVolume(TimerActionSource.END, true))
+                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.END, true))
                 showEndVolumeDialog = false
             },
             onValueChange = { level ->
@@ -435,7 +436,7 @@ private fun StartActionsRow(
             if (timerActions.startActions.volumeLevel == null && !timerActions.startActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleAdjustVolume(TimerActionSource.START, !timerActions.startActions.adjustVolume))
+                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.START, !timerActions.startActions.adjustVolume))
             }
         },
         onLongClick = onVolumeLongClick
@@ -447,7 +448,7 @@ private fun StartActionsRow(
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
         onClick = {
             if (hasNearbyPermission) {
-                onAction(Action.ToggleHueLights(TimerActionSource.START, !timerActions.startActions.hueLights))
+                onAction(Action.ToggleAction(TimerActionType.HUE_LIGHTS, TimerActionSource.START, !timerActions.startActions.hueLights))
             } else {
                 onAction(Action.OpenHueSettings(TimerActionSource.START))
             }
@@ -461,7 +462,7 @@ private fun StartActionsRow(
         warning = timerActions.startActions.enableDnd && !hasDndPermission,
         onClick = {
             if (hasDndPermission) {
-                onAction(Action.ToggleDnd(!timerActions.startActions.enableDnd))
+                onAction(Action.ToggleAction(TimerActionType.DND, TimerActionSource.START, !timerActions.startActions.enableDnd))
             } else {
                 onNavigateToSettings(SETTING_DND)
             }
@@ -481,7 +482,7 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.stopMedia) R.drawable.ic_media_off else R.drawable.ic_media_on),
         label = stringResource(R.string.timer_action_media),
         active = timerActions.endActions.stopMedia,
-        onClick = { onAction(Action.ToggleStopMedia(!timerActions.endActions.stopMedia)) }
+        onClick = { onAction(Action.ToggleAction(TimerActionType.STOP_MEDIA, TimerActionSource.END, !timerActions.endActions.stopMedia)) }
     )
     ActionToggle(
         painter = painterResource(if (timerActions.endActions.volumeLevel == 0) R.drawable.ic_volume_mute else R.drawable.ic_volume_down),
@@ -492,7 +493,7 @@ private fun EndActionsRow(
             if (timerActions.endActions.volumeLevel == null && !timerActions.endActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleAdjustVolume(TimerActionSource.END, !timerActions.endActions.adjustVolume))
+                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.END, !timerActions.endActions.adjustVolume))
             }
         },
         onLongClick = onVolumeLongClick
@@ -504,7 +505,7 @@ private fun EndActionsRow(
         warning = timerActions.endActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
             if (isDeviceAdminEnabled) {
-                onAction(Action.ToggleScreenOff(!timerActions.endActions.turnOffScreen))
+                onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.END, !timerActions.endActions.turnOffScreen))
             } else {
                 onNavigateToSettings(SETTING_ADMIN)
             }
@@ -515,7 +516,7 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.endActions.hueLights,
-        onClick = { onAction(Action.ToggleHueLights(TimerActionSource.END, !timerActions.endActions.hueLights)) },
+        onClick = { onAction(Action.ToggleAction(TimerActionType.HUE_LIGHTS, TimerActionSource.END, !timerActions.endActions.hueLights)) },
         onLongClick = { onAction(Action.OpenHueSettings(TimerActionSource.END)) }
     ) */
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
@@ -523,7 +524,7 @@ private fun EndActionsRow(
             painter = painterResource(if (timerActions.endActions.turnOffBluetooth) R.drawable.ic_bluetooth_off else R.drawable.ic_bluetooth_on),
             label = stringResource(R.string.timer_action_bluetooth),
             active = timerActions.endActions.turnOffBluetooth,
-            onClick = { onAction(Action.ToggleBluetooth(!timerActions.endActions.turnOffBluetooth)) }
+            onClick = { onAction(Action.ToggleAction(TimerActionType.TURN_OFF_BLUETOOTH, TimerActionSource.END, !timerActions.endActions.turnOffBluetooth)) }
         )
     }
 }

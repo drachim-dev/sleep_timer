@@ -93,10 +93,7 @@ class RoomSelectionViewModel(
                     emptyList()
                 }
 
-                val initial = when (source) {
-                    TimerActionSource.START -> manageHueUseCase.getStartGroups().firstOrNull()
-                    TimerActionSource.END -> manageHueUseCase.getEndGroups().firstOrNull()
-                }
+                val initial = manageHueUseCase.getGroups(source).firstOrNull()
                 val initialSelected = initial.orEmpty()
                 fetchedGroups to initialSelected
             },
@@ -118,10 +115,7 @@ class RoomSelectionViewModel(
 
     private fun save() {
         viewModelScope.launch {
-            when (source) {
-                TimerActionSource.START -> manageHueUseCase.setStartGroups(_selectedGroups.value)
-                TimerActionSource.END -> manageHueUseCase.setEndGroups(_selectedGroups.value)
-            }
+            manageHueUseCase.setGroups(source, _selectedGroups.value)
         }
     }
 }

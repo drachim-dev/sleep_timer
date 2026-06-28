@@ -2,8 +2,9 @@ package dr.achim.sleep_timer.domain.usecase
 
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.EndActions
-import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.StartActions
+import dr.achim.sleep_timer.model.TimerActionSource
+import dr.achim.sleep_timer.model.TimerActionType
 import dr.achim.sleep_timer.model.TimerActions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -48,10 +49,28 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
         }
     }
 
-    suspend fun setAdjustVolume(source: TimerActionSource, enabled: Boolean) {
-        when (source) {
-            TimerActionSource.START -> settingsRepository.setStartAdjustVolume(enabled)
-            TimerActionSource.END -> settingsRepository.setEndAdjustVolume(enabled)
+    suspend fun updateAction(type: TimerActionType, source: TimerActionSource, enabled: Boolean) {
+        when(source) {
+            TimerActionSource.START -> {
+                when (type) {
+                    TimerActionType.ADJUST_VOLUME -> settingsRepository.setStartAdjustVolume(enabled)
+                    TimerActionType.HUE_LIGHTS -> settingsRepository.setStartHueLights(enabled)
+                    TimerActionType.DND -> settingsRepository.setStartEnableDnd(enabled)
+                    TimerActionType.STOP_MEDIA -> {}
+                    TimerActionType.TURN_OFF_SCREEN -> {}
+                    TimerActionType.TURN_OFF_BLUETOOTH -> {}
+                }
+            }
+            TimerActionSource.END -> {
+                when (type) {
+                    TimerActionType.ADJUST_VOLUME -> settingsRepository.setEndAdjustVolume(enabled)
+                    TimerActionType.HUE_LIGHTS -> settingsRepository.setEndHueLights(enabled)
+                    TimerActionType.DND -> {}
+                    TimerActionType.STOP_MEDIA -> settingsRepository.setEndStopMedia(enabled)
+                    TimerActionType.TURN_OFF_SCREEN -> settingsRepository.setEndTurnOffScreen(enabled)
+                    TimerActionType.TURN_OFF_BLUETOOTH -> settingsRepository.setEndTurnOffBluetooth(enabled)
+                }
+            }
         }
     }
 
@@ -60,28 +79,5 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
             TimerActionSource.START -> settingsRepository.setStartVolumeLevel(level)
             TimerActionSource.END -> settingsRepository.setEndVolumeLevel(level)
         }
-    }
-
-    suspend fun setStartEnableDnd(enabled: Boolean) {
-        settingsRepository.setStartEnableDnd(enabled)
-    }
-
-    suspend fun setHueLights(source: TimerActionSource, enabled: Boolean) {
-        when (source) {
-            TimerActionSource.START -> settingsRepository.setStartHueLights(enabled)
-            TimerActionSource.END -> settingsRepository.setEndHueLights(enabled)
-        }
-    }
-
-    suspend fun setEndStopMedia(enabled: Boolean) {
-        settingsRepository.setEndStopMedia(enabled)
-    }
-
-    suspend fun setEndTurnOffScreen(enabled: Boolean) {
-        settingsRepository.setEndTurnOffScreen(enabled)
-    }
-
-    suspend fun setEndTurnOffBluetooth(enabled: Boolean) {
-        settingsRepository.setEndTurnOffBluetooth(enabled)
     }
 }

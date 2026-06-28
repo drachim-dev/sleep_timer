@@ -14,6 +14,16 @@ enum class TimerActionSource {
 }
 
 @Serializable
+enum class TimerActionType {
+    ADJUST_VOLUME,
+    HUE_LIGHTS,
+    DND,
+    STOP_MEDIA,
+    TURN_OFF_SCREEN,
+    TURN_OFF_BLUETOOTH
+}
+
+@Serializable
 data class StartActions(
     val adjustVolume: Boolean = false,
     val volumeLevel: Int? = null,

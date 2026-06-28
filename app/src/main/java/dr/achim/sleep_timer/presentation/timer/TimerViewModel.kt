@@ -12,7 +12,9 @@ import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.SetMediaVolumeUseCase
+import dr.achim.sleep_timer.model.ActionPermissions
 import dr.achim.sleep_timer.model.TimerActionSource
+import dr.achim.sleep_timer.model.TimerActionType
 import dr.achim.sleep_timer.model.TimerState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,25 +86,19 @@ class TimerViewModel(
             startTimer(minutes * 60 * 1000L)
         }
 
+        observeHueGroups(TimerActionSource.START)
+        observeHueGroups(TimerActionSource.END)
+    }
+
+    private fun observeHueGroups(source: TimerActionSource) {
         viewModelScope.launch {
-            manageHueUseCase.getStartGroups().distinctUntilChanged().collect { groups ->
+            manageHueUseCase.observeGroups(source).distinctUntilChanged().collect { groups ->
                 if (groups.isEmpty()) {
-                    manageTimerActionsUseCase.setHueLights(TimerActionSource.START, false)
-                    pendingHueActivations[TimerActionSource.START] = false
-                } else if (pendingHueActivations[TimerActionSource.START] == true) {
-                    manageTimerActionsUseCase.setHueLights(TimerActionSource.START, true)
-                    pendingHueActivations[TimerActionSource.START] = false
-                }
-            }
-        }
-        viewModelScope.launch {
-            manageHueUseCase.getEndGroups().distinctUntilChanged().collect { groups ->
-                if (groups.isEmpty()) {
-                    manageTimerActionsUseCase.setHueLights(TimerActionSource.END, false)
-                    pendingHueActivations[TimerActionSource.END] = false
-                } else if (pendingHueActivations[TimerActionSource.END] == true) {
-                    manageTimerActionsUseCase.setHueLights(TimerActionSource.END, true)
-                    pendingHueActivations[TimerActionSource.END] = false
+                    manageTimerActionsUseCase.updateAction(TimerActionType.HUE_LIGHTS, source, false)
+                    pendingHueActivations[source] = false
+                } else if (pendingHueActivations[source] == true) {
+                    manageTimerActionsUseCase.updateAction(TimerActionType.HUE_LIGHTS, source, true)
+                    pendingHueActivations[source] = false
                 }
             }
         }
@@ -110,38 +106,29 @@ class TimerViewModel(
 
     fun onAction(action: Action) {
         when (action) {
-            is Action.ToggleAdjustVolume -> toggleAdjustVolume(action.source, action.enabled)
+            is Action.ToggleAction -> toggleAction(action.type, action.source, action.enabled)
             is Action.SetVolumeLevel -> setVolumeLevel(action.source, action.level)
-            is Action.ToggleDnd -> toggleDnd(action.enabled)
-            is Action.ToggleHueLights -> toggleHueLights(action.source, action.enabled)
             is Action.OpenHueSettings -> viewModelScope.launch {
                 pendingHueActivations[action.source] = true
                 _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(action.source)) 
             }
-            is Action.ToggleStopMedia -> toggleStopMedia(action.enabled)
-            is Action.ToggleScreenOff -> toggleScreenOff(action.enabled)
-            is Action.ToggleBluetooth -> toggleBluetooth(action.enabled)
             is Action.SetRemainingTime -> setRemainingTime(action.millis)
             is Action.StartTimer -> startTimer(action.millis)
             is Action.StopTimer -> stopTimer()
             is Action.TogglePauseResume -> togglePauseResume()
             is Action.RefreshAdminStatus -> {
-                val permissions = checkTimerPermissionsUseCase()
-                _permissionsFlow.value = permissions
+                val permissions = refreshPermissions()
                 if (permissions.isDeviceAdminEnabled && action.autoEnable) {
-                    toggleScreenOff(true)
+                    toggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.END, true)
                 }
             }
             is Action.RefreshDndStatus -> {
-                val permissions = checkTimerPermissionsUseCase()
-                _permissionsFlow.value = permissions
+                val permissions = refreshPermissions()
                 if (permissions.hasNotificationAccess && action.autoEnable) {
-                    toggleDnd(true)
+                    toggleAction(TimerActionType.DND, TimerActionSource.START, true)
                 }
             }
-            is Action.RefreshPermissions -> {
-                _permissionsFlow.value = checkTimerPermissionsUseCase()
-            }
+            is Action.RefreshPermissions -> refreshPermissions()
             is Action.OnResume -> onResume()
             is Action.AddMinutes -> addMinutes(action.minutes)
             is Action.SetQuickLaunchApp -> setQuickLaunchApp(action.index, action.packageName)
@@ -155,6 +142,12 @@ class TimerViewModel(
         }
     }
 
+    private fun refreshPermissions(): ActionPermissions {
+        val permissions = checkTimerPermissionsUseCase()
+        _permissionsFlow.value = permissions
+        return permissions
+    }
+
     private fun setMediaVolume(level: Int, flags: Int) {
         setMediaVolumeUseCase(level, flags)
     }
@@ -165,51 +158,23 @@ class TimerViewModel(
         }
     }
 
-    private fun toggleAdjustVolume(source: TimerActionSource, enabled: Boolean) {
+    private fun toggleAction(type: TimerActionType, source: TimerActionSource, enabled: Boolean) {
         viewModelScope.launch {
-            manageTimerActionsUseCase.setAdjustVolume(source, enabled)
+            if (type == TimerActionType.HUE_LIGHTS && enabled && !manageHueUseCase.isConfigured(source)) {
+                pendingHueActivations[source] = true
+                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(source))
+            } else {
+                if (type == TimerActionType.HUE_LIGHTS && !enabled) {
+                    pendingHueActivations[source] = false
+                }
+                manageTimerActionsUseCase.updateAction(type, source, enabled)
+            }
         }
     }
 
     private fun setVolumeLevel(source: TimerActionSource, level: Int?) {
         viewModelScope.launch {
             manageTimerActionsUseCase.setVolumeLevel(source, level)
-        }
-    }
-
-    private fun toggleDnd(enabled: Boolean) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setStartEnableDnd(enabled)
-        }
-    }
-
-    private fun toggleHueLights(source: TimerActionSource, enabled: Boolean) {
-        viewModelScope.launch {
-            if (enabled && !manageHueUseCase.isConfigured(source)) {
-                pendingHueActivations[source] = true
-                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(source))
-            } else {
-                if (!enabled) pendingHueActivations[source] = false
-                manageTimerActionsUseCase.setHueLights(source, enabled)
-            }
-        }
-    }
-
-    private fun toggleStopMedia(enabled: Boolean) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setEndStopMedia(enabled)
-        }
-    }
-
-    private fun toggleScreenOff(enabled: Boolean) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setEndTurnOffScreen(enabled)
-        }
-    }
-
-    private fun toggleBluetooth(enabled: Boolean) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setEndTurnOffBluetooth(enabled)
         }
     }
 
