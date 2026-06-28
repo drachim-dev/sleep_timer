@@ -18,6 +18,7 @@ ktor = "3.5.0"
 revenuecat = "10.10.0"
 confettikit = "0.8.0"
 play-services-ads = "25.4.0"
+play-review = "2.0.2"
 coreSplashScreen = "1.2.0"
 
 [libraries]
@@ -50,6 +51,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 revenuecat-purchases = { group = "com.revenuecat.purchases", name = "purchases", version.ref = "revenuecat" }
 confettikit = { group = "io.github.vinceglb", name = "confettikit", version.ref = "confettikit" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "play-services-ads" }
+play-review = { group = "com.google.android.play", name = "review-ktx", version.ref = "play-review" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashScreen" }
 
 [plugins]

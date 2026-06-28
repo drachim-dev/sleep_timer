@@ -23,4 +23,8 @@ class UpdateSettingsUseCase(private val repository: SettingsRepository) {
     suspend fun setExtendOnShakeMinutes(minutes: Int) {
         repository.setExtendOnShakeMinutes(minutes)
     }
+
+    suspend fun setLastReviewTimestamp(timestamp: Long) {
+        repository.setLastReviewTimestamp(timestamp)
+    }
 }

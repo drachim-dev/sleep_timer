@@ -28,6 +28,8 @@ fun Context.findActivity(): Activity {
     throw IllegalStateException("Must only be called in the context of an Activity")
 }
 
+fun Long.toDays(): Long = this / (1000 * 60 * 60 * 24)
+
 val Any.TAG: String
     get() {
         val tag = javaClass.simpleName
@@ -85,7 +87,7 @@ inline fun <T1, T2, T3, T4, T5, T6, T7, R> combine(
  */
 fun <T> ViewModel.launchLoading(
     loadingState: MutableStateFlow<Boolean>,
-    minDuration: Duration = Constants.MinLoadingDuration,
+    minDuration: Duration = Constants.MIN_LOADING_DURATION,
     previousJob: Job? = null,
     block: suspend CoroutineScope.() -> T,
     onSuccess: (T) -> Unit
@@ -103,7 +105,7 @@ fun <T> ViewModel.launchLoading(
  */
 fun <T> CoroutineScope.launchLoading(
     loadingState: MutableStateFlow<Boolean>,
-    minDuration: Duration = Constants.MinLoadingDuration,
+    minDuration: Duration = Constants.MIN_LOADING_DURATION,
     previousJob: Job? = null,
     block: suspend CoroutineScope.() -> T,
     onSuccess: (T) -> Unit

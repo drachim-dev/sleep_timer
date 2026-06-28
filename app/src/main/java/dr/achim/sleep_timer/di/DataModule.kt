@@ -9,6 +9,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.os.Build
 import android.net.nsd.NsdManager
+import dr.achim.sleep_timer.common.ReviewManager
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.AdManager
 import dr.achim.sleep_timer.data.AudioRepositoryImpl
@@ -86,6 +87,7 @@ val dataModule = module {
     single<TimerActionExecutor>()
     single<TimerController>()
     single<UiMessageManager>()
+    single<ReviewManager>()
     single<AdManager>()
     single<BillingRepository>()
 }

@@ -129,6 +129,7 @@ dependencies {
     implementation(libs.revenuecat.purchases)
     implementation(libs.confettikit)
     implementation(libs.play.services.ads)
+    implementation(libs.play.review)
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.ktor.client.core)

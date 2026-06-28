@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -45,6 +46,7 @@ class SettingsRepository(private val context: Context) {
         private val HUE_END_GROUPS_KEY = stringSetPreferencesKey("pref_key_hue_end_groups")
 
         private val TIMER_START_COUNT_KEY = intPreferencesKey("pref_key_timer_start_count")
+        private val LAST_REVIEW_TIMESTAMP_KEY = longPreferencesKey("pref_key_last_review_timestamp")
 
         /**
          * Default values
@@ -160,6 +162,10 @@ class SettingsRepository(private val context: Context) {
 
     val timerStartCount: Flow<Int> = context.settingsDataStore.data.map { preferences ->
         preferences[TIMER_START_COUNT_KEY] ?: 0
+    }
+
+    val lastReviewTimestamp: Flow<Long> = context.settingsDataStore.data.map { preferences ->
+        preferences[LAST_REVIEW_TIMESTAMP_KEY] ?: 0L
     }
 
     suspend fun setFirstLaunchCompleted() {
@@ -302,6 +308,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun setHueEndGroups(groups: Set<String>) {
         context.settingsDataStore.edit { preferences ->
             preferences[HUE_END_GROUPS_KEY] = groups
+        }
+    }
+
+    suspend fun setLastReviewTimestamp(timestamp: Long) {
+        context.settingsDataStore.edit { preferences ->
+            preferences[LAST_REVIEW_TIMESTAMP_KEY] = timestamp
         }
     }
 

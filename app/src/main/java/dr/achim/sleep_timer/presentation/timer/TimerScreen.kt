@@ -87,6 +87,8 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.R
+import dr.achim.sleep_timer.common.ReviewManager
+import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.domain.model.AppCategory
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.model.HueActionSource
@@ -106,6 +108,7 @@ import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
 import dr.achim.sleep_timer.ui.theme.RedAccent
 import dr.achim.sleep_timer.ui.theme.dimens
+import org.koin.compose.koinInject
 import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 
 @Composable
@@ -117,16 +120,20 @@ fun TimerScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val reviewManager = koinInject<ReviewManager>()
 
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(Action.RefreshPermissions)
+        viewModel.onAction(Action.OnResume)
         onPauseOrDispose { }
     }
 
     LaunchedEffect(Unit) {
-        viewModel.navEvents.collect { event ->
+        viewModel.uiEvents.collect { event ->
             when (event) {
-                is TimerNavEvent.NavigateToRoomSelection -> onNavigateToRoomSelection(event.source)
+                is TimerUiEvent.NavigateToRoomSelection -> onNavigateToRoomSelection(event.source)
+                TimerUiEvent.RequestReview -> reviewManager.tryShowReview(context.findActivity())
             }
         }
     }

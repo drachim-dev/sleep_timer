@@ -66,7 +66,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.BuildConfig
 import dr.achim.sleep_timer.R
-import dr.achim.sleep_timer.common.Constants.ExtendOnShakeSteps
+import dr.achim.sleep_timer.common.Constants.EXTEND_ON_SHAKE_STEPS
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.model.Product
 import dr.achim.sleep_timer.model.PurchaseEvent
@@ -274,7 +274,7 @@ fun SettingsScreenContent(
                         onCheckedChange = { onAction(SettingsUiAction.SetExtendOnShake(it)) }
                     )
                     AnimatedVisibility(extendOnShake) {
-                        val currentIndex = ExtendOnShakeSteps.indexOf(extendOnShakeMinutes).coerceAtLeast(0)
+                        val currentIndex = EXTEND_ON_SHAKE_STEPS.indexOf(extendOnShakeMinutes).coerceAtLeast(0)
                         SettingsSliderItem(
                             title = pluralStringResource(
                                 R.plurals.settings_extend_on_shake_minutes_title,
@@ -283,11 +283,11 @@ fun SettingsScreenContent(
                             ),
                             value = currentIndex.toFloat(),
                             onValueChange = { index ->
-                                val minutes = ExtendOnShakeSteps[index.toInt()]
+                                val minutes = EXTEND_ON_SHAKE_STEPS[index.toInt()]
                                 onAction(SettingsUiAction.SetExtendOnShakeMinutes(minutes))
                             },
-                            valueRange = 0f..(ExtendOnShakeSteps.size - 1).toFloat(),
-                            steps = ExtendOnShakeSteps.size - 2
+                            valueRange = 0f..(EXTEND_ON_SHAKE_STEPS.size - 1).toFloat(),
+                            steps = EXTEND_ON_SHAKE_STEPS.size - 2
                         )
                     }
                 }

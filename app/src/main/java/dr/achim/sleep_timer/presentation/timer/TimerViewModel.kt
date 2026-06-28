@@ -25,8 +25,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 
-sealed class TimerNavEvent {
-    data class NavigateToRoomSelection(val source: HueActionSource) : TimerNavEvent()
+sealed interface TimerUiEvent {
+    data class NavigateToRoomSelection(val source: HueActionSource) : TimerUiEvent
+    object RequestReview : TimerUiEvent
 }
 
 class TimerViewModel(
@@ -47,8 +48,8 @@ class TimerViewModel(
     private var isPendingStartHueActivation = false
     private var isPendingEndHueActivation = false
 
-    private val _navEvents = Channel<TimerNavEvent>()
-    val navEvents = _navEvents.receiveAsFlow()
+    private val _uiEvents = Channel<TimerUiEvent>()
+    val uiEvents = _uiEvents.receiveAsFlow()
 
     val uiState: StateFlow<TimerUiState> = combine(
         getTimerStatusUseCase.timerState,
@@ -67,7 +68,9 @@ class TimerViewModel(
             hasNotificationAccess = permissions.hasNotificationAccess,
             hasNearbyPermission = permissions.hasNearbyPermission,
             glowEnabled = settings.glowEffectEnabled,
-            glowIntensity = settings.glowIntensity
+            glowIntensity = settings.glowIntensity,
+            timerStartCount = settings.timerStartCount,
+            lastReviewTimestamp = settings.lastReviewTimestamp
         )
     }.stateIn(
         scope = viewModelScope,
@@ -108,7 +111,7 @@ class TimerViewModel(
             is Action.ToggleHueLights -> toggleHueLights(action.enabled)
             is Action.ToggleEndHueLights -> toggleEndHueLights(action.enabled)
             is Action.OpenHueSettings -> viewModelScope.launch { 
-                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(action.source)) 
+                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(action.source)) 
             }
             is Action.ToggleStopMedia -> toggleStopMedia(action.enabled)
             is Action.ToggleEndVolume -> toggleEndVolume(action.enabled)
@@ -136,9 +139,16 @@ class TimerViewModel(
             is Action.RefreshPermissions -> {
                 _permissionsFlow.value = checkTimerPermissionsUseCase()
             }
+            is Action.OnResume -> onResume()
             is Action.AddMinutes -> addMinutes(action.minutes)
             is Action.SetQuickLaunchApp -> setQuickLaunchApp(action.index, action.packageName)
             is Action.SetMediaVolume -> setMediaVolume(action.level, action.flags)
+        }
+    }
+
+    private fun onResume() {
+        viewModelScope.launch {
+            _uiEvents.send(TimerUiEvent.RequestReview)
         }
     }
 
@@ -174,7 +184,7 @@ class TimerViewModel(
         viewModelScope.launch {
             if (enabled && !manageHueUseCase.isConfigured(HueActionSource.START)) {
                 isPendingStartHueActivation = true
-                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(HueActionSource.START))
+                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(HueActionSource.START))
             } else {
                 if (!enabled) isPendingStartHueActivation = false
                 manageTimerActionsUseCase.setStartHueLights(enabled)
@@ -186,7 +196,7 @@ class TimerViewModel(
         viewModelScope.launch {
             if (enabled && !manageHueUseCase.isConfigured(HueActionSource.END)) {
                 isPendingEndHueActivation = true
-                _navEvents.send(TimerNavEvent.NavigateToRoomSelection(HueActionSource.END))
+                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(HueActionSource.END))
             } else {
                 if (!enabled) isPendingEndHueActivation = false
                 manageTimerActionsUseCase.setEndHueLights(enabled)

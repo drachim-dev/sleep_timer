@@ -3,7 +3,6 @@ package dr.achim.sleep_timer.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dr.achim.sleep_timer.common.combine
-import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
 import dr.achim.sleep_timer.domain.usecase.GetLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.GetQuickTimesUseCase
@@ -18,14 +17,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    getQuickTimesUseCase: GetQuickTimesUseCase,
-    private val updateQuickTimeUseCase: UpdateQuickTimeUseCase,
     getLastSelectedMinutesUseCase: GetLastSelectedMinutesUseCase,
-    private val updateLastSelectedMinutesUseCase: UpdateLastSelectedMinutesUseCase,
+    getQuickTimesUseCase: GetQuickTimesUseCase,
     getSettingsUseCase: GetSettingsUseCase,
     getTimerStatusUseCase: GetTimerStatusUseCase,
-    private val controlTimerUseCase: ControlTimerUseCase,
-    private val settingsRepository: SettingsRepository
+    private val updateQuickTimeUseCase: UpdateQuickTimeUseCase,
+    private val updateLastSelectedMinutesUseCase: UpdateLastSelectedMinutesUseCase,
+    private val controlTimerUseCase: ControlTimerUseCase
 ) : ViewModel() {
 
     private val _showNotificationRationale = MutableStateFlow(false)
@@ -36,17 +34,16 @@ class HomeViewModel(
         getQuickTimesUseCase(),
         getLastSelectedMinutesUseCase(),
         getTimerStatusUseCase.timerState,
-        settingsRepository.timerStartCount,
         _showNotificationRationale,
         _showNotificationSettingsPrompt
-    ) { settings, quickTimes, lastMinutes, timerState, startCount, showRationale, showSettings ->
+    ) { settings, quickTimes, lastMinutes, timerState, showRationale, showSettings ->
         HomeUiState(
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
             quickTimes = quickTimes,
             lastSelectedMinutes = lastMinutes,
             timerState = timerState,
-            timerStartCount = startCount,
+            timerStartCount = settings.timerStartCount,
             showNotificationRationale = showRationale,
             showNotificationSettingsPrompt = showSettings
         )
