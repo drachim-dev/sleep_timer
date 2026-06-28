@@ -236,7 +236,7 @@ fun HomeScreenContent(
                     onProgressChange = { newProgress ->
                         if (uiState.timerState !is TimerState.Idle) return@CircularTimer
                         coroutineScope.launch {
-                            val snappedProgress = newProgress.coerceAtLeast(0.01f)
+                            val snappedProgress = newProgress.coerceAtLeast(1/60f) // at least 1 min
                             selectedMinutes.snapTo(snappedProgress)
                             onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
                         }
@@ -245,18 +245,18 @@ fun HomeScreenContent(
                 ) {
                     if (isIdle) {
                         val totalMinutes = (selectedMinutes.value * 60).toInt()
-                        val hours = totalMinutes / 60
-                        val minutes = totalMinutes % 60
+                        val displayMinutes = if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
+                        val displayHours = if (totalMinutes == 0) 0 else (totalMinutes - 1) / 60
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = stringResource(R.string.home_time_minutes_only, minutes),
+                                text = stringResource(R.string.home_time_minutes_only, displayMinutes),
                                 maxLines = 1,
                                 autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
                             )
-                            if (hours > 0) {
+                            if (displayHours > 0) {
                                 Text(
-                                    text = "+ ${hours}h",
+                                    text = "+ ${displayHours}h",
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.displaySmall,
                                     maxLines = 1
