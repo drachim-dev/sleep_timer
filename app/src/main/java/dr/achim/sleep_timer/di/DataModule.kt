@@ -5,10 +5,10 @@ import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.hardware.SensorManager
 import android.media.AudioManager
+import android.net.nsd.NsdManager
+import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.os.Build
-import android.net.nsd.NsdManager
 import dr.achim.sleep_timer.common.ReviewManager
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.AdManager
@@ -26,6 +26,7 @@ import dr.achim.sleep_timer.domain.repository.QuickLaunchRepository
 import dr.achim.sleep_timer.domain.repository.TimerRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -61,6 +62,11 @@ private fun provideNsdManager(context: Context) =
     context.getSystemService(Context.NSD_SERVICE) as NsdManager
 
 private fun provideHttpClient() = HttpClient(OkHttp) {
+    install(HttpTimeout) {
+        requestTimeoutMillis = 15_000
+        connectTimeoutMillis = 15_000
+        socketTimeoutMillis = 15_000
+    }
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true

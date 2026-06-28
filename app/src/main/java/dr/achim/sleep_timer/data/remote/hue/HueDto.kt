@@ -14,8 +14,8 @@ data class HueBridge(
 data class HueGroup(
     val id: String = "",
     val name: String,
-    val type: HueGroupType,
-    val lights: List<String> = emptyList()
+    val type: HueGroupType = HueGroupType.UNKNOWN,
+    val lights: List<String> = emptyList(),
 )
 
 @Serializable
@@ -36,8 +36,11 @@ enum class HueGroupType {
     ZONE,
 
     @SerialName("Entertainment")
-    ENTERTAINMENT
+    ENTERTAINMENT,
+
+    UNKNOWN
 }
+
 
 @Serializable
 internal data class HuePairingRequest(val devicetype: String)
