@@ -3,6 +3,11 @@ workflows:
     name: Deploy
     max_build_duration: 30
     instance_type: mac_mini_m2
+    inputs:
+      version_name:
+        description: Version name for this build
+        type: string
+        default: "2.0.0"
     environment:
       java: 21
       android_signing:
@@ -27,7 +32,7 @@ workflows:
           else
               UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
           fi
-          ./gradlew bundleRelease -PversionCode=$UPDATED_BUILD_NUMBER -PversionName=1.2.$UPDATED_BUILD_NUMBER
+          ./gradlew bundleRelease -PversionCode=$UPDATED_BUILD_NUMBER -PversionName=${{ inputs.version_name }}
     artifacts:
       - app/build/outputs/**/*.aab
       - app/build/outputs/**/mapping.txt
