@@ -141,6 +141,10 @@
     <string name="hue_room_selection_loading">Lade Räume…</string>
     <string name="hue_room_selection_no_rooms">Keine Räume gefunden</string>
     <string name="hue_room_selection_no_rooms_sub">Stelle sicher, dass deine Hue Bridge korrekt konfiguriert ist und Räume oder Zonen enthält.</string>
+    <plurals name="hue_room_selection_light_count">
+        <item quantity="one">%d Lampe</item>
+        <item quantity="other">%d Lampen</item>
+    </plurals>
 
     <!-- Onboarding -->
     <string name="onboarding_music_title">Hör deine Lieblingsmusik</string>

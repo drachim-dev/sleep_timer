@@ -447,7 +447,7 @@ private fun StartActionsRow(
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
         onClick = {
             if (hasNearbyPermission) {
-                onAction(Action.ToggleHueLights(!timerActions.startActions.hueLights))
+                onAction(Action.ToggleHueLights(HueActionSource.START, !timerActions.startActions.hueLights))
             } else {
                 onAction(Action.OpenHueSettings(HueActionSource.START))
             }
@@ -515,7 +515,7 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.endActions.hueLights,
-        onClick = { onAction(Action.ToggleEndHueLights(!timerActions.endActions.hueLights)) },
+        onClick = { onAction(Action.ToggleHueLights(HueActionSource.END, !timerActions.endActions.hueLights)) },
         onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.END)) }
     ) */
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {

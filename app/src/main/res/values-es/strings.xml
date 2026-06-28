@@ -143,6 +143,11 @@
     <string name="hue_room_selection_loading">Obteniendo habitaciones…</string>
     <string name="hue_room_selection_no_rooms">No se encontraron habitaciones</string>
     <string name="hue_room_selection_no_rooms_sub">Asegúrate de que tu puente Hue esté configurado correctamente y contenga habitaciones o zonas.</string>
+    <plurals name="hue_room_selection_light_count">
+        <item quantity="one">%d luz</item>
+        <item quantity="many">%d luces</item>
+        <item quantity="other">%d luces</item>
+    </plurals>
 
     <!-- Onboarding -->
     <string name="onboarding_music_title">Escucha tu música favorita</string>

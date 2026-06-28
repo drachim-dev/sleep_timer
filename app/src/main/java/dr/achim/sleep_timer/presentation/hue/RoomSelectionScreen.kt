@@ -25,12 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
+import dr.achim.sleep_timer.data.remote.hue.HueGroupType
 import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.ui.components.DefaultButton
 import dr.achim.sleep_timer.ui.components.EmptyState
@@ -177,10 +179,26 @@ private fun RoomItem(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lightCount = group.lights.size
     SwitchListItem(
         checked = checked,
         onCheckedChange = { onToggle() },
-        modifier = modifier
+        modifier = modifier,
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.ic_light_group),
+                contentDescription = null
+            )
+        },
+        supportingContent = {
+            Text(
+                pluralStringResource(
+                    R.plurals.hue_room_selection_light_count,
+                    lightCount,
+                    lightCount
+                )
+            )
+        }
     ) {
         Text(group.name)
     }
@@ -193,9 +211,9 @@ private fun RoomSelectionContentPreview() {
         RoomSelectionContent(
             uiState = RoomSelectionUiState.Success(
                 groups = listOf(
-                    HueGroup(id = "1", name = "Living Room", type = "Room"),
-                    HueGroup(id = "2", name = "Bedroom", type = "Room"),
-                    HueGroup(id = "3", name = "Kitchen", type = "Room")
+                    HueGroup(id = "1", name = "Living Room", type = HueGroupType.ROOM, lights = listOf("1", "2")),
+                    HueGroup(id = "2", name = "Bedroom", type = HueGroupType.ROOM, lights = listOf("3")),
+                    HueGroup(id = "3", name = "Kitchen", type = HueGroupType.ROOM, lights = listOf("4", "5", "6"))
                 ),
                 selectedGroups = setOf("1", "2"),
                 source = HueActionSource.START

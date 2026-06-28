@@ -85,19 +85,16 @@ class TimerActionExecutor(
     }
 
     private suspend fun turnOffHueLights(ip: String, user: String, groups: Set<String>) {
-        if (groups.isNotEmpty()) {
-            groups.forEach { groupId ->
-                hueRepository.turnOffGroup(ip, user, groupId)
-            }
-        } else {
-            hueRepository.turnOffLights(ip, user)
+        groups.forEach { groupId ->
+            hueRepository.turnOffGroup(ip, user, groupId)
         }
     }
 
     private fun turnOffBluetooth() {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             try {
-                val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                val bluetoothManager =
+                    context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                 val bluetoothAdapter = bluetoothManager.adapter
                 if (bluetoothAdapter?.isEnabled == true) {
                     @Suppress("DEPRECATION")

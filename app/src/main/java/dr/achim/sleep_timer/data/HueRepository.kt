@@ -8,6 +8,7 @@ import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.data.remote.hue.HueConfig
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
+import dr.achim.sleep_timer.data.remote.hue.HueGroupType
 import dr.achim.sleep_timer.data.remote.hue.HuePairingRequest
 import dr.achim.sleep_timer.data.remote.hue.HuePairingResponse
 import dr.achim.sleep_timer.data.remote.hue.HueStateRequest
@@ -177,14 +178,11 @@ class HueRepository(
         settingsRepository.clearHueBridgeSettings()
     }
 
-    suspend fun turnOffLights(ip: String, username: String) {
-        // Turning off all lights in group 0 (all lights)
-        turnOffGroup(ip, username, "0")
-    }
-
     suspend fun fetchGroups(ip: String, username: String): List<HueGroup> = try {
         val response: Map<String, HueGroup> = client.get("http://$ip/api/$username/groups").body()
         response.map { it.value.copy(id = it.key) }
+            .filterNot { it.type == HueGroupType.ENTERTAINMENT }
+            .sortedWith(compareBy<HueGroup> { it.type }.thenBy { it.name })
     } catch (_: Exception) {
         emptyList()
     }

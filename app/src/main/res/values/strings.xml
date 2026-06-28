@@ -144,6 +144,10 @@
     <string name="hue_room_selection_loading">Fetching rooms…</string>
     <string name="hue_room_selection_no_rooms">No rooms found</string>
     <string name="hue_room_selection_no_rooms_sub">Make sure your Hue Bridge is configured correctly and contains rooms or zones.</string>
+    <plurals name="hue_room_selection_light_count">
+        <item quantity="one">%d light</item>
+        <item quantity="other">%d lights</item>
+    </plurals>
 
     <!-- Onboarding -->
     <string name="onboarding_music_title">Listen to your music</string>

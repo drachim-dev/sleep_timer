@@ -19,6 +19,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,8 +46,7 @@ class TimerViewModel(
     private val _permissionsFlow = MutableStateFlow(checkTimerPermissionsUseCase())
     private val _quickLaunchApps = MutableStateFlow<List<QuickLaunchApp>>(emptyList())
 
-    private var isPendingStartHueActivation = false
-    private var isPendingEndHueActivation = false
+    private val pendingHueActivations = mutableMapOf<HueActionSource, Boolean>()
 
     private val _uiEvents = Channel<TimerUiEvent>()
     val uiEvents = _uiEvents.receiveAsFlow()
@@ -86,18 +86,24 @@ class TimerViewModel(
         }
 
         viewModelScope.launch {
-            manageHueUseCase.getStartGroups().collect { groups ->
-                if (isPendingStartHueActivation && groups.isNotEmpty()) {
-                    manageTimerActionsUseCase.setStartHueLights(true)
-                    isPendingStartHueActivation = false
+            manageHueUseCase.getStartGroups().distinctUntilChanged().collect { groups ->
+                if (groups.isEmpty()) {
+                    manageTimerActionsUseCase.setHueLights(HueActionSource.START, false)
+                    pendingHueActivations[HueActionSource.START] = false
+                } else if (pendingHueActivations[HueActionSource.START] == true) {
+                    manageTimerActionsUseCase.setHueLights(HueActionSource.START, true)
+                    pendingHueActivations[HueActionSource.START] = false
                 }
             }
         }
         viewModelScope.launch {
-            manageHueUseCase.getEndGroups().collect { groups ->
-                if (isPendingEndHueActivation && groups.isNotEmpty()) {
-                    manageTimerActionsUseCase.setEndHueLights(true)
-                    isPendingEndHueActivation = false
+            manageHueUseCase.getEndGroups().distinctUntilChanged().collect { groups ->
+                if (groups.isEmpty()) {
+                    manageTimerActionsUseCase.setHueLights(HueActionSource.END, false)
+                    pendingHueActivations[HueActionSource.END] = false
+                } else if (pendingHueActivations[HueActionSource.END] == true) {
+                    manageTimerActionsUseCase.setHueLights(HueActionSource.END, true)
+                    pendingHueActivations[HueActionSource.END] = false
                 }
             }
         }
@@ -108,9 +114,9 @@ class TimerViewModel(
             is Action.ToggleStartVolume -> toggleStartVolume(action.enabled)
             is Action.SetStartVolumeLevel -> setStartVolumeLevel(action.level)
             is Action.ToggleDnd -> toggleDnd(action.enabled)
-            is Action.ToggleHueLights -> toggleHueLights(action.enabled)
-            is Action.ToggleEndHueLights -> toggleEndHueLights(action.enabled)
-            is Action.OpenHueSettings -> viewModelScope.launch { 
+            is Action.ToggleHueLights -> toggleHueLights(action.source, action.enabled)
+            is Action.OpenHueSettings -> viewModelScope.launch {
+                pendingHueActivations[action.source] = true
                 _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(action.source)) 
             }
             is Action.ToggleStopMedia -> toggleStopMedia(action.enabled)
@@ -180,26 +186,14 @@ class TimerViewModel(
         }
     }
 
-    private fun toggleHueLights(enabled: Boolean) {
+    private fun toggleHueLights(source: HueActionSource, enabled: Boolean) {
         viewModelScope.launch {
-            if (enabled && !manageHueUseCase.isConfigured(HueActionSource.START)) {
-                isPendingStartHueActivation = true
-                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(HueActionSource.START))
+            if (enabled && !manageHueUseCase.isConfigured(source)) {
+                pendingHueActivations[source] = true
+                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(source))
             } else {
-                if (!enabled) isPendingStartHueActivation = false
-                manageTimerActionsUseCase.setStartHueLights(enabled)
-            }
-        }
-    }
-
-    private fun toggleEndHueLights(enabled: Boolean) {
-        viewModelScope.launch {
-            if (enabled && !manageHueUseCase.isConfigured(HueActionSource.END)) {
-                isPendingEndHueActivation = true
-                _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(HueActionSource.END))
-            } else {
-                if (!enabled) isPendingEndHueActivation = false
-                manageTimerActionsUseCase.setEndHueLights(enabled)
+                if (!enabled) pendingHueActivations[source] = false
+                manageTimerActionsUseCase.setHueLights(source, enabled)
             }
         }
     }

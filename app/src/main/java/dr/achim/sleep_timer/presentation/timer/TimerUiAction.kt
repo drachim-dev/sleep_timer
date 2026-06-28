@@ -6,8 +6,7 @@ sealed interface TimerUiAction {
     data class ToggleStartVolume(val enabled: Boolean) : TimerUiAction
     data class SetStartVolumeLevel(val level: Int?) : TimerUiAction
     data class ToggleDnd(val enabled: Boolean) : TimerUiAction
-    data class ToggleHueLights(val enabled: Boolean) : TimerUiAction
-    data class ToggleEndHueLights(val enabled: Boolean) : TimerUiAction
+    data class ToggleHueLights(val source: HueActionSource, val enabled: Boolean) : TimerUiAction
     data class OpenHueSettings(val source: HueActionSource) : TimerUiAction
     data class ToggleStopMedia(val enabled: Boolean) : TimerUiAction
     data class ToggleEndVolume(val enabled: Boolean) : TimerUiAction

@@ -2,11 +2,11 @@ package dr.achim.sleep_timer.domain.usecase
 
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.EndActions
+import dr.achim.sleep_timer.model.HueActionSource
 import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.model.TimerActions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 
 enum class VolumeType { START, END }
 
@@ -65,8 +65,11 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
         settingsRepository.setStartEnableDnd(enabled)
     }
 
-    suspend fun setStartHueLights(enabled: Boolean) {
-        settingsRepository.setStartHueLights(enabled)
+    suspend fun setHueLights(source: HueActionSource, enabled: Boolean) {
+        when (source) {
+            HueActionSource.START -> settingsRepository.setStartHueLights(enabled)
+            HueActionSource.END -> settingsRepository.setEndHueLights(enabled)
+        }
     }
 
     suspend fun setEndStopMedia(enabled: Boolean) {
@@ -83,9 +86,5 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
 
     suspend fun setEndTurnOffBluetooth(enabled: Boolean) {
         settingsRepository.setEndTurnOffBluetooth(enabled)
-    }
-
-    suspend fun setEndHueLights(enabled: Boolean) {
-        settingsRepository.setEndHueLights(enabled)
     }
 }
