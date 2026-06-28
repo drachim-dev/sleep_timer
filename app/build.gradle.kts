@@ -41,25 +41,27 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        fun getProperty(name: String, default: String): String {
-            return if (System.getenv(name) != null) {
-                System.getenv(name)
-            } else {
-                val localProperties = Properties().apply {
-                    val localPropertiesFile = rootProject.file("local.properties")
-                    if (localPropertiesFile.exists()) {
-                        load(FileInputStream(localPropertiesFile))
-                    }
-                }
-                localProperties.getProperty(name, default)
+        val localPropertiesFile = rootProject.file("local.properties")
+        val localProperties = Properties().apply {
+            if (localPropertiesFile.exists()) {
+                FileInputStream(localPropertiesFile).use { load(it) }
             }
         }
 
-        val revenueCatKey = getProperty("REVENUECAT_KEY", "")
+        fun getProperty(name: String): String {
+            return System.getenv(name)
+                ?: if (localPropertiesFile.exists()) {
+                    localProperties.getProperty(name) ?: error("Property '$name' not found in local.properties")
+                } else {
+                    error("local.properties file not found")
+                }
+        }
+
+        val revenueCatKey = getProperty("REVENUECAT_KEY")
         buildConfigField("String", "REVENUECAT_KEY", "\"${revenueCatKey}\"")
 
-        val admobAppId = getProperty("ADMOB_APP_ID", "")
-        val admobInterstitialUnitId = getProperty("ADMOB_INTERSTITIAL_UNIT_ID", "")
+        val admobAppId = getProperty("ADMOB_APP_ID")
+        val admobInterstitialUnitId = getProperty("ADMOB_INTERSTITIAL_UNIT_ID")
 
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
         buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"${admobInterstitialUnitId}\"")
