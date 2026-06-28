@@ -12,8 +12,7 @@ import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageQuickLaunchUseCase
 import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.domain.usecase.SetMediaVolumeUseCase
-import dr.achim.sleep_timer.domain.usecase.VolumeType
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.TimerState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,7 @@ import org.koin.core.annotation.InjectedParam
 import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 
 sealed interface TimerUiEvent {
-    data class NavigateToRoomSelection(val source: HueActionSource) : TimerUiEvent
+    data class NavigateToRoomSelection(val source: TimerActionSource) : TimerUiEvent
     object RequestReview : TimerUiEvent
 }
 
@@ -46,7 +45,7 @@ class TimerViewModel(
     private val _permissionsFlow = MutableStateFlow(checkTimerPermissionsUseCase())
     private val _quickLaunchApps = MutableStateFlow<List<QuickLaunchApp>>(emptyList())
 
-    private val pendingHueActivations = mutableMapOf<HueActionSource, Boolean>()
+    private val pendingHueActivations = mutableMapOf<TimerActionSource, Boolean>()
 
     private val _uiEvents = Channel<TimerUiEvent>()
     val uiEvents = _uiEvents.receiveAsFlow()
@@ -88,22 +87,22 @@ class TimerViewModel(
         viewModelScope.launch {
             manageHueUseCase.getStartGroups().distinctUntilChanged().collect { groups ->
                 if (groups.isEmpty()) {
-                    manageTimerActionsUseCase.setHueLights(HueActionSource.START, false)
-                    pendingHueActivations[HueActionSource.START] = false
-                } else if (pendingHueActivations[HueActionSource.START] == true) {
-                    manageTimerActionsUseCase.setHueLights(HueActionSource.START, true)
-                    pendingHueActivations[HueActionSource.START] = false
+                    manageTimerActionsUseCase.setHueLights(TimerActionSource.START, false)
+                    pendingHueActivations[TimerActionSource.START] = false
+                } else if (pendingHueActivations[TimerActionSource.START] == true) {
+                    manageTimerActionsUseCase.setHueLights(TimerActionSource.START, true)
+                    pendingHueActivations[TimerActionSource.START] = false
                 }
             }
         }
         viewModelScope.launch {
             manageHueUseCase.getEndGroups().distinctUntilChanged().collect { groups ->
                 if (groups.isEmpty()) {
-                    manageTimerActionsUseCase.setHueLights(HueActionSource.END, false)
-                    pendingHueActivations[HueActionSource.END] = false
-                } else if (pendingHueActivations[HueActionSource.END] == true) {
-                    manageTimerActionsUseCase.setHueLights(HueActionSource.END, true)
-                    pendingHueActivations[HueActionSource.END] = false
+                    manageTimerActionsUseCase.setHueLights(TimerActionSource.END, false)
+                    pendingHueActivations[TimerActionSource.END] = false
+                } else if (pendingHueActivations[TimerActionSource.END] == true) {
+                    manageTimerActionsUseCase.setHueLights(TimerActionSource.END, true)
+                    pendingHueActivations[TimerActionSource.END] = false
                 }
             }
         }
@@ -111,8 +110,8 @@ class TimerViewModel(
 
     fun onAction(action: Action) {
         when (action) {
-            is Action.ToggleStartVolume -> toggleStartVolume(action.enabled)
-            is Action.SetStartVolumeLevel -> setStartVolumeLevel(action.level)
+            is Action.ToggleAdjustVolume -> toggleAdjustVolume(action.source, action.enabled)
+            is Action.SetVolumeLevel -> setVolumeLevel(action.source, action.level)
             is Action.ToggleDnd -> toggleDnd(action.enabled)
             is Action.ToggleHueLights -> toggleHueLights(action.source, action.enabled)
             is Action.OpenHueSettings -> viewModelScope.launch {
@@ -120,8 +119,6 @@ class TimerViewModel(
                 _uiEvents.send(TimerUiEvent.NavigateToRoomSelection(action.source)) 
             }
             is Action.ToggleStopMedia -> toggleStopMedia(action.enabled)
-            is Action.ToggleEndVolume -> toggleEndVolume(action.enabled)
-            is Action.SetEndVolumeLevel -> setEndVolumeLevel(action.level)
             is Action.ToggleScreenOff -> toggleScreenOff(action.enabled)
             is Action.ToggleBluetooth -> toggleBluetooth(action.enabled)
             is Action.SetRemainingTime -> setRemainingTime(action.millis)
@@ -168,15 +165,15 @@ class TimerViewModel(
         }
     }
 
-    private fun toggleStartVolume(enabled: Boolean) {
+    private fun toggleAdjustVolume(source: TimerActionSource, enabled: Boolean) {
         viewModelScope.launch {
-            manageTimerActionsUseCase.setStartAdjustVolume(enabled)
+            manageTimerActionsUseCase.setAdjustVolume(source, enabled)
         }
     }
 
-    private fun setStartVolumeLevel(level: Int?) {
+    private fun setVolumeLevel(source: TimerActionSource, level: Int?) {
         viewModelScope.launch {
-            manageTimerActionsUseCase.setVolumeLevel(VolumeType.START, level)
+            manageTimerActionsUseCase.setVolumeLevel(source, level)
         }
     }
 
@@ -186,7 +183,7 @@ class TimerViewModel(
         }
     }
 
-    private fun toggleHueLights(source: HueActionSource, enabled: Boolean) {
+    private fun toggleHueLights(source: TimerActionSource, enabled: Boolean) {
         viewModelScope.launch {
             if (enabled && !manageHueUseCase.isConfigured(source)) {
                 pendingHueActivations[source] = true
@@ -201,18 +198,6 @@ class TimerViewModel(
     private fun toggleStopMedia(enabled: Boolean) {
         viewModelScope.launch {
             manageTimerActionsUseCase.setEndStopMedia(enabled)
-        }
-    }
-
-    private fun toggleEndVolume(enabled: Boolean) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setEndAdjustVolume(enabled)
-        }
-    }
-
-    private fun setEndVolumeLevel(level: Int?) {
-        viewModelScope.launch {
-            manageTimerActionsUseCase.setVolumeLevel(VolumeType.END, level)
         }
     }
 

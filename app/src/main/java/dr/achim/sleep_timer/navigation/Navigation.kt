@@ -28,7 +28,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.SettingsRepository
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.presentation.home.HomeScreen
 import dr.achim.sleep_timer.presentation.hue.HueDiscoveryScreen
 import dr.achim.sleep_timer.presentation.hue.RoomSelectionScreen
@@ -64,10 +64,10 @@ object CreditsKey : NavKey
 object FaqKey : NavKey
 
 @Serializable
-data class HueDiscoveryKey(val source: HueActionSource) : NavKey
+data class HueDiscoveryKey(val source: TimerActionSource) : NavKey
 
 @Serializable
-data class RoomSelectionKey(val source: HueActionSource) : NavKey
+data class RoomSelectionKey(val source: TimerActionSource) : NavKey
 
 
 @Composable

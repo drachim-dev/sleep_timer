@@ -91,7 +91,7 @@ import dr.achim.sleep_timer.common.ReviewManager
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.domain.model.AppCategory
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
@@ -114,7 +114,7 @@ import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 @Composable
 fun TimerScreen(
     onBack: () -> Unit,
-    onNavigateToRoomSelection: (HueActionSource) -> Unit,
+    onNavigateToRoomSelection: (TimerActionSource) -> Unit,
     onNavigateToSettings: (String) -> Unit,
     viewModel: TimerViewModel,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -169,8 +169,8 @@ private fun TimerScreenContent(
         VolumeSliderDialog(
             initialValue = uiState.timerActions.startActions.volumeLevel,
             onConfirm = { level ->
-                onAction(Action.SetStartVolumeLevel(level))
-                onAction(Action.ToggleStartVolume(true))
+                onAction(Action.SetVolumeLevel(TimerActionSource.START, level))
+                onAction(Action.ToggleAdjustVolume(TimerActionSource.START, true))
                 showStartVolumeDialog = false
             },
             onValueChange = { level ->
@@ -184,8 +184,8 @@ private fun TimerScreenContent(
         VolumeSliderDialog(
             initialValue = uiState.timerActions.endActions.volumeLevel,
             onConfirm = { level ->
-                onAction(Action.SetEndVolumeLevel(level))
-                onAction(Action.ToggleEndVolume(true))
+                onAction(Action.SetVolumeLevel(TimerActionSource.END, level))
+                onAction(Action.ToggleAdjustVolume(TimerActionSource.END, true))
                 showEndVolumeDialog = false
             },
             onValueChange = { level ->
@@ -435,7 +435,7 @@ private fun StartActionsRow(
             if (timerActions.startActions.volumeLevel == null && !timerActions.startActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleStartVolume(!timerActions.startActions.adjustVolume))
+                onAction(Action.ToggleAdjustVolume(TimerActionSource.START, !timerActions.startActions.adjustVolume))
             }
         },
         onLongClick = onVolumeLongClick
@@ -447,12 +447,12 @@ private fun StartActionsRow(
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
         onClick = {
             if (hasNearbyPermission) {
-                onAction(Action.ToggleHueLights(HueActionSource.START, !timerActions.startActions.hueLights))
+                onAction(Action.ToggleHueLights(TimerActionSource.START, !timerActions.startActions.hueLights))
             } else {
-                onAction(Action.OpenHueSettings(HueActionSource.START))
+                onAction(Action.OpenHueSettings(TimerActionSource.START))
             }
         },
-        onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.START)) }
+        onLongClick = { onAction(Action.OpenHueSettings(TimerActionSource.START)) }
     )
     ActionToggle(
         painter = painterResource(if (timerActions.startActions.enableDnd) R.drawable.ic_dnd_on else R.drawable.ic_dnd_off),
@@ -492,7 +492,7 @@ private fun EndActionsRow(
             if (timerActions.endActions.volumeLevel == null && !timerActions.endActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleEndVolume(!timerActions.endActions.adjustVolume))
+                onAction(Action.ToggleAdjustVolume(TimerActionSource.END, !timerActions.endActions.adjustVolume))
             }
         },
         onLongClick = onVolumeLongClick
@@ -515,8 +515,8 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.hueLights) R.drawable.ic_lights_off else R.drawable.ic_lights_on),
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.endActions.hueLights,
-        onClick = { onAction(Action.ToggleHueLights(HueActionSource.END, !timerActions.endActions.hueLights)) },
-        onLongClick = { onAction(Action.OpenHueSettings(HueActionSource.END)) }
+        onClick = { onAction(Action.ToggleHueLights(TimerActionSource.END, !timerActions.endActions.hueLights)) },
+        onLongClick = { onAction(Action.OpenHueSettings(TimerActionSource.END)) }
     ) */
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         ActionToggle(

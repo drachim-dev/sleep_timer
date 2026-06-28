@@ -4,7 +4,7 @@ import dr.achim.sleep_timer.data.HueRepository
 import dr.achim.sleep_timer.data.LinkResult
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import kotlinx.coroutines.flow.firstOrNull
 
 class ManageHueUseCase(
@@ -35,14 +35,14 @@ class ManageHueUseCase(
 
     fun getNearbyPermissions() = timerController.getNearbyPermissions()
 
-    suspend fun isConfigured(source: HueActionSource): Boolean {
+    suspend fun isConfigured(source: TimerActionSource): Boolean {
         val ip = hueRepository.getPairedIp().firstOrNull()
         val user = hueRepository.getPairedUser().firstOrNull()
         if (ip == null || user == null) return false
 
         val groups = when (source) {
-            HueActionSource.START -> hueRepository.getStartGroups().firstOrNull()
-            HueActionSource.END -> hueRepository.getEndGroups().firstOrNull()
+            TimerActionSource.START -> hueRepository.getStartGroups().firstOrNull()
+            TimerActionSource.END -> hueRepository.getEndGroups().firstOrNull()
         }
         return groups?.isNotEmpty() == true
     }

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dr.achim.sleep_timer.common.launchLoading
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,19 +17,19 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 
 sealed interface RoomSelectionUiState {
-    val source: HueActionSource
+    val source: TimerActionSource
 
-    data class Loading(override val source: HueActionSource) : RoomSelectionUiState
+    data class Loading(override val source: TimerActionSource) : RoomSelectionUiState
     data class Success(
         val groups: List<HueGroup>,
         val selectedGroups: Set<String>,
-        override val source: HueActionSource
+        override val source: TimerActionSource
     ) : RoomSelectionUiState
 }
 
 class RoomSelectionViewModel(
     private val manageHueUseCase: ManageHueUseCase,
-    @InjectedParam private val source: HueActionSource
+    @InjectedParam private val source: TimerActionSource
 ) : ViewModel() {
 
     private val _selectedGroups = MutableStateFlow<Set<String>>(emptySet())
@@ -94,8 +94,8 @@ class RoomSelectionViewModel(
                 }
 
                 val initial = when (source) {
-                    HueActionSource.START -> manageHueUseCase.getStartGroups().firstOrNull()
-                    HueActionSource.END -> manageHueUseCase.getEndGroups().firstOrNull()
+                    TimerActionSource.START -> manageHueUseCase.getStartGroups().firstOrNull()
+                    TimerActionSource.END -> manageHueUseCase.getEndGroups().firstOrNull()
                 }
                 val initialSelected = initial.orEmpty()
                 fetchedGroups to initialSelected
@@ -119,8 +119,8 @@ class RoomSelectionViewModel(
     private fun save() {
         viewModelScope.launch {
             when (source) {
-                HueActionSource.START -> manageHueUseCase.setStartGroups(_selectedGroups.value)
-                HueActionSource.END -> manageHueUseCase.setEndGroups(_selectedGroups.value)
+                TimerActionSource.START -> manageHueUseCase.setStartGroups(_selectedGroups.value)
+                TimerActionSource.END -> manageHueUseCase.setEndGroups(_selectedGroups.value)
             }
         }
     }

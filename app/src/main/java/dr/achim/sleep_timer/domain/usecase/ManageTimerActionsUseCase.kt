@@ -2,13 +2,11 @@ package dr.achim.sleep_timer.domain.usecase
 
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.EndActions
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.model.TimerActions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-
-enum class VolumeType { START, END }
 
 class ManageTimerActionsUseCase(private val settingsRepository: SettingsRepository) {
 
@@ -50,34 +48,33 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
         }
     }
 
-    suspend fun setVolumeLevel(type: VolumeType, level: Int?) {
-        when (type) {
-            VolumeType.START -> settingsRepository.setStartVolumeLevel(level)
-            VolumeType.END -> settingsRepository.setEndVolumeLevel(level)
+    suspend fun setAdjustVolume(source: TimerActionSource, enabled: Boolean) {
+        when (source) {
+            TimerActionSource.START -> settingsRepository.setStartAdjustVolume(enabled)
+            TimerActionSource.END -> settingsRepository.setEndAdjustVolume(enabled)
         }
     }
 
-    suspend fun setStartAdjustVolume(enabled: Boolean) {
-        settingsRepository.setStartAdjustVolume(enabled)
+    suspend fun setVolumeLevel(source: TimerActionSource, level: Int?) {
+        when (source) {
+            TimerActionSource.START -> settingsRepository.setStartVolumeLevel(level)
+            TimerActionSource.END -> settingsRepository.setEndVolumeLevel(level)
+        }
     }
 
     suspend fun setStartEnableDnd(enabled: Boolean) {
         settingsRepository.setStartEnableDnd(enabled)
     }
 
-    suspend fun setHueLights(source: HueActionSource, enabled: Boolean) {
+    suspend fun setHueLights(source: TimerActionSource, enabled: Boolean) {
         when (source) {
-            HueActionSource.START -> settingsRepository.setStartHueLights(enabled)
-            HueActionSource.END -> settingsRepository.setEndHueLights(enabled)
+            TimerActionSource.START -> settingsRepository.setStartHueLights(enabled)
+            TimerActionSource.END -> settingsRepository.setEndHueLights(enabled)
         }
     }
 
     suspend fun setEndStopMedia(enabled: Boolean) {
         settingsRepository.setEndStopMedia(enabled)
-    }
-
-    suspend fun setEndAdjustVolume(enabled: Boolean) {
-        settingsRepository.setEndAdjustVolume(enabled)
     }
 
     suspend fun setEndTurnOffScreen(enabled: Boolean) {

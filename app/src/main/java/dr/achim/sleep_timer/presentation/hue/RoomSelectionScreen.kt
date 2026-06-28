@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.remote.hue.HueGroup
 import dr.achim.sleep_timer.data.remote.hue.HueGroupType
-import dr.achim.sleep_timer.model.HueActionSource
+import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.ui.components.DefaultButton
 import dr.achim.sleep_timer.ui.components.EmptyState
 import dr.achim.sleep_timer.ui.components.FullScreenLoadingState
@@ -44,7 +44,7 @@ import dr.achim.sleep_timer.ui.theme.dimens
 @Composable
 fun RoomSelectionScreen(
     onBack: () -> Unit,
-    onNavigateToDiscovery: (HueActionSource) -> Unit,
+    onNavigateToDiscovery: (TimerActionSource) -> Unit,
     viewModel: RoomSelectionViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -216,7 +216,7 @@ private fun RoomSelectionContentPreview() {
                     HueGroup(id = "3", name = "Kitchen", type = HueGroupType.ROOM, lights = listOf("4", "5", "6"))
                 ),
                 selectedGroups = setOf("1", "2"),
-                source = HueActionSource.START
+                source = TimerActionSource.START
             ),
             onBack = {},
             onToggle = {},

@@ -9,7 +9,7 @@ data class TimerActions(
 )
 
 @Serializable
-enum class HueActionSource {
+enum class TimerActionSource {
     START, END
 }
 
