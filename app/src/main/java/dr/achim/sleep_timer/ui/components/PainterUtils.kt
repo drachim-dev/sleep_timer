@@ -3,7 +3,6 @@ package dr.achim.sleep_timer.ui.components
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.PixelFormat
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -160,8 +159,7 @@ private fun Drawable.applyMonochromeMask(color: Color) {
  * be used as an alpha mask — a luminance-based matrix tint should be used instead.
  */
 private fun Drawable.shouldUseLuminanceTint(): Boolean {
-    return opacity == PixelFormat.OPAQUE
-            || this is BitmapDrawable
+    return this is BitmapDrawable
             || this is NinePatchDrawable
             || this is ColorDrawable
 }
