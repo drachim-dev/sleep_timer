@@ -12,6 +12,7 @@ import android.hardware.SensorManager
 import android.media.AudioAttributes
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -53,6 +54,9 @@ class TimerService : LifecycleService() {
     private val timerActionExecutor: TimerActionExecutor by inject()
     private var timerJob: Job? = null
     private lateinit var shakeDetector: ShakeDetector
+
+    private var targetTimeMillis: Long = 0L
+    private var isFinishing = false
 
     private val settingsFlow = getSettingsUseCase().stateIn(
         scope = lifecycleScope,
@@ -165,6 +169,7 @@ class TimerService : LifecycleService() {
     }
 
     private fun startTimer(durationMillis: Long) {
+        isFinishing = false
         timerJob?.cancel()
         timerRepository.setTotalTime(durationMillis)
         timerRepository.setRemainingTime(durationMillis)
@@ -177,18 +182,24 @@ class TimerService : LifecycleService() {
             timerActionExecutor.applyStartActions(actions.startActions)
         }
 
+        targetTimeMillis = SystemClock.elapsedRealtime() + durationMillis
         scheduleAlarm(durationMillis)
 
         ensureForeground()
 
         timerJob = lifecycleScope.launch {
-            while (timerRepository.timerState.value.remainingTimeMillis > 0) {
-                delay(1.seconds)
-                if (timerRepository.timerState.value !is TimerState.Paused) {
-                    val newRemaining = timerRepository.timerState.value.remainingTimeMillis - 1000
-                    timerRepository.setRemainingTime(maxOf(0, newRemaining))
+            while (true) {
+                if (timerRepository.timerState.value is TimerState.Running) {
+                    val remaining = targetTimeMillis - SystemClock.elapsedRealtime()
+                    if (remaining <= 0) {
+                        timerRepository.setRemainingTime(0)
+                        onTimerFinished()
+                        break
+                    }
+                    timerRepository.setRemainingTime(remaining)
                     updateNotification()
                 }
+                delay(1.seconds)
             }
         }
     }
@@ -201,7 +212,9 @@ class TimerService : LifecycleService() {
 
     private fun resumeTimer() {
         timerRepository.setPaused(false)
-        scheduleAlarm(timerRepository.timerState.value.remainingTimeMillis)
+        val remaining = timerRepository.timerState.value.remainingTimeMillis
+        targetTimeMillis = SystemClock.elapsedRealtime() + remaining
+        scheduleAlarm(remaining)
         updateNotification()
     }
 
@@ -217,6 +230,7 @@ class TimerService : LifecycleService() {
         timerRepository.setRemainingTime(newRemaining)
 
         if (timerRepository.timerState.value !is TimerState.Paused) {
+            targetTimeMillis = SystemClock.elapsedRealtime() + newRemaining
             scheduleAlarm(newRemaining)
         }
         updateNotification()
@@ -266,6 +280,8 @@ class TimerService : LifecycleService() {
     }
 
     private fun onTimerFinished() {
+        if (isFinishing) return
+        isFinishing = true
         stopTimer()
         lifecycleScope.launch {
             timerActionExecutor.applyEndActions(currentActions.endActions)
@@ -280,18 +296,18 @@ class TimerService : LifecycleService() {
         val pendingIntent = PendingIntent.getBroadcast(
             this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val triggerAtMillis = System.currentTimeMillis() + remainingMillis
+        val triggerAtMillis = SystemClock.elapsedRealtime() + remainingMillis
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             // Fallback to non-exact if permission is not granted
             alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 triggerAtMillis,
                 pendingIntent
             )
         } else {
             alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 triggerAtMillis,
                 pendingIntent
             )
