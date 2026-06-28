@@ -7,4 +7,5 @@
 -->
 <full-backup-content>
     <include domain="file" path="datastore"/>
+    <include domain="sharedpref" path="FlutterSharedPreferences.xml"/>
 </full-backup-content>

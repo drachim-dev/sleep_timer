@@ -6,8 +6,10 @@
 <data-extraction-rules>
     <cloud-backup>
         <include domain="file" path="datastore"/>
+        <include domain="sharedpref" path="FlutterSharedPreferences.xml"/>
     </cloud-backup>
     <device-transfer>
         <include domain="file" path="datastore"/>
+        <include domain="sharedpref" path="FlutterSharedPreferences.xml"/>
     </device-transfer>
 </data-extraction-rules>
