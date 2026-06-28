@@ -25,8 +25,11 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.m3.style.m3VariantColors
+import com.mikepenz.aboutlibraries.ui.compose.m3.style.m3VariantTextStyles
 import com.mikepenz.aboutlibraries.ui.compose.variant.LibraryDetailMode
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.ui.components.SectionTitle
@@ -102,6 +105,11 @@ fun CreditsScreen(
             libraries = libraries,
             modifier = Modifier.fillMaxSize(),
             detailMode = LibraryDetailMode.Sheet,
+            variantColors = LibraryDefaults.m3VariantColors(rowBackground = MaterialTheme.colorScheme.background),
+            variantTextStyles = LibraryDefaults.m3VariantTextStyles(
+                nameTextStyle = MaterialTheme.typography.titleSmall,
+                authorTextStyle = MaterialTheme.typography.bodySmall
+            ),
             contentPadding = innerPadding + PaddingValues(vertical = AppTheme.dimens.spacingMedium),
             header = {
                 item {
@@ -172,9 +180,9 @@ fun CreditItem(
 ) {
     ListItem(
         onClick = { onClick(credit) },
-        supportingContent = { Text(text = credit.url) },
+        supportingContent = { Text(text = credit.url, style = MaterialTheme.typography.bodySmall) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     ) {
-        Text(text = credit.title)
+        Text(text = credit.title, style = MaterialTheme.typography.titleSmall)
     }
 }
