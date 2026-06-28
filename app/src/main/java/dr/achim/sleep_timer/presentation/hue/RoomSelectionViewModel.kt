@@ -10,7 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -58,19 +57,6 @@ class RoomSelectionViewModel(
         initialValue = RoomSelectionUiState.Loading(source)
     )
 
-    init {
-        viewModelScope.launch {
-            combine(
-                manageHueUseCase.getPairedIp(),
-                manageHueUseCase.getPairedUser()
-            ) { ip, user -> ip to user }
-                .distinctUntilChanged()
-                .collect {
-                    loadData()
-                }
-        }
-    }
-
     fun onAction(action: RoomSelectionUiAction) {
         when (action) {
             is RoomSelectionUiAction.ToggleGroup -> toggleGroup(action.groupId)
@@ -79,22 +65,21 @@ class RoomSelectionViewModel(
         }
     }
 
-    private fun loadData() {
+    private fun loadData(ip: String? = null, user: String? = null) {
         loadJob = launchLoading(
             loadingState = _isLoading,
             previousJob = loadJob,
             block = {
-                val ip = manageHueUseCase.getPairedIp().firstOrNull()
-                val user = manageHueUseCase.getPairedUser().firstOrNull()
+                val currentIp = ip ?: manageHueUseCase.getPairedIp().firstOrNull()
+                val currentUser = user ?: manageHueUseCase.getPairedUser().firstOrNull()
 
-                val fetchedGroups = if (ip != null && user != null) {
-                    manageHueUseCase.fetchGroups(ip, user)
+                val fetchedGroups = if (currentIp != null && currentUser != null) {
+                    manageHueUseCase.fetchGroups(currentIp, currentUser)
                 } else {
                     emptyList()
                 }
 
-                val initial = manageHueUseCase.getGroups(source).firstOrNull()
-                val initialSelected = initial.orEmpty()
+                val initialSelected = manageHueUseCase.getGroups(source).firstOrNull().orEmpty()
                 fetchedGroups to initialSelected
             },
             onSuccess = { (fetchedGroups, initialSelected) ->
