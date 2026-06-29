@@ -35,7 +35,7 @@
     <string name="settings_like_app_title">Gefällt dir die App?</string>
     <string name="settings_like_app_subtitle">Jede Bewertung hilft mir weiter</string>
     <string name="settings_like_app_trailing">Gratis</string>
-    <string name="settings_remove_ads_trailing">Bereits gekauft</string>
+    <string name="settings_already_purchased">Gekauft</string>
     <string name="settings_section_advanced">Fortgeschrittene Funktionen</string>
     <string name="settings_device_admin_title">Erweiterte Gerätefunktionen</string>
     <string name="settings_device_admin_subtitle">Ermöglicht das Ausschalten des Displays. Vorm Deinstallieren deaktivieren.</string>

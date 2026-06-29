@@ -1,7 +1,6 @@
 package dr.achim.sleep_timer.presentation.settings
 
 import android.app.Activity
-import com.revenuecat.purchases.models.StoreProduct
 import dr.achim.sleep_timer.model.ThemeMode
 
 sealed interface SettingsUiAction {
@@ -14,5 +13,5 @@ sealed interface SettingsUiAction {
     data class SetGlowIntensity(val intensity: Float) : SettingsUiAction
     data class SetExtendOnShake(val enabled: Boolean) : SettingsUiAction
     data class SetExtendOnShakeMinutes(val minutes: Int) : SettingsUiAction
-    data class PurchaseProduct(val activity: Activity, val product: StoreProduct) : SettingsUiAction
+    data class PurchaseProduct(val activity: Activity, val productId: String) : SettingsUiAction
 }

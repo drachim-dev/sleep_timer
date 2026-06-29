@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -158,7 +159,10 @@ fun SettingsScreenContent(
     LaunchedEffect(highlight) {
         if (highlight != null) {
             delay(500.milliseconds)
-            scrollState.animateScrollTo(scrollState.maxValue, animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
+            scrollState.animateScrollTo(
+                value = scrollState.maxValue,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+            )
         }
     }
 
@@ -274,7 +278,9 @@ fun SettingsScreenContent(
                         onCheckedChange = { onAction(SettingsUiAction.SetExtendOnShake(it)) }
                     )
                     AnimatedVisibility(extendOnShake) {
-                        val currentIndex = EXTEND_ON_SHAKE_STEPS.indexOf(extendOnShakeMinutes).coerceAtLeast(0)
+                        val currentIndex = EXTEND_ON_SHAKE_STEPS
+                            .indexOf(extendOnShakeMinutes)
+                            .coerceAtLeast(0)
                         SettingsSliderItem(
                             title = pluralStringResource(
                                 R.plurals.settings_extend_on_shake_minutes_title,
@@ -293,6 +299,7 @@ fun SettingsScreenContent(
                 }
 
                 SettingsSection(
+                    modifier = Modifier.animateContentSize(),
                     title = { SectionTitle(stringResource(R.string.settings_section_support_me)) }
                 ) {
                     SettingsItem(
@@ -311,8 +318,7 @@ fun SettingsScreenContent(
                     )
 
                     productUiModels.forEach { uiModel ->
-                        val product = uiModel.product
-                        val icon = when (product.id) {
+                        val icon = when (uiModel.id) {
                             Product.Donation.id -> R.drawable.ic_coffee
                             Product.RemoveAds.id -> R.drawable.ic_ad_off
                             else -> null
@@ -321,12 +327,14 @@ fun SettingsScreenContent(
                         icon?.let {
                             SettingsItem(
                                 painter = painterResource(icon),
-                                title = uiModel.product.title,
-                                subtitle = uiModel.product.description,
-                                trailingText = if (uiModel.isPurchased) stringResource(R.string.settings_remove_ads_trailing) else product.price.formatted,
+                                title = uiModel.title,
+                                subtitle = uiModel.description,
+                                trailingText = if (uiModel.isPurchased) stringResource(R.string.settings_already_purchased) else uiModel.price,
                                 trailingColor = Color(0xFF81C784),
                                 onClick = {
-                                    onAction(SettingsUiAction.PurchaseProduct(activity, product))
+                                    if(!uiModel.isPurchased) {
+                                        onAction(SettingsUiAction.PurchaseProduct(activity, uiModel.id))
+                                    }
                                 }
                             )
                         }
@@ -431,8 +439,8 @@ fun Confetti(modifier: Modifier, onAnimationCompleted: () -> Unit) {
 }
 
 @Composable
-fun SettingsSection(title: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
-    Column {
+fun SettingsSection(modifier: Modifier = Modifier, title: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = modifier) {
         title()
         Column(
             modifier = Modifier.clip(MaterialTheme.shapes.large),
@@ -468,33 +476,33 @@ fun ThemeSelectionDialog(
                 ThemeMode.entries
                     .filter { it != ThemeMode.DYNAMIC || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S }
                     .forEach { mode ->
-                    val label = when (mode) {
-                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
-                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
-                        ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
-                        ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
-                    }
+                        val label = when (mode) {
+                            ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
+                            ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
+                            ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
+                            ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
+                        }
 
-                    val interactionSource = remember { MutableInteractionSource() }
-                    ListItem(
-                        modifier = Modifier.selectable(
-                            selected = currentThemeMode == mode,
-                            onClick = { onThemeModeSelected(mode) },
-                            role = Role.RadioButton,
-                            interactionSource = interactionSource,
-                            indication = ripple()
-                        ),
-                        headlineContent = { Text(text = label) },
-                        leadingContent = {
-                            RadioButton(
+                        val interactionSource = remember { MutableInteractionSource() }
+                        ListItem(
+                            modifier = Modifier.selectable(
                                 selected = currentThemeMode == mode,
-                                onClick = null,
-                                interactionSource = interactionSource
-                            )
-                        },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-                    )
-                }
+                                onClick = { onThemeModeSelected(mode) },
+                                role = Role.RadioButton,
+                                interactionSource = interactionSource,
+                                indication = ripple()
+                            ),
+                            headlineContent = { Text(text = label) },
+                            leadingContent = {
+                                RadioButton(
+                                    selected = currentThemeMode == mode,
+                                    onClick = null,
+                                    interactionSource = interactionSource
+                                )
+                            },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                        )
+                    }
 
                 Spacer(modifier = Modifier.height(AppTheme.dimens.spacingMedium))
                 TextButton(

@@ -33,7 +33,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class StoreProductUiModel(
-    val product: StoreProduct,
+    val id: String,
+    val title: String,
+    val description: String,
+    val price: String,
     val isPurchased: Boolean
 )
 
@@ -95,31 +98,43 @@ class SettingsViewModel(
             initialValue = AppSettings().extendOnShakeMinutes
         )
 
-    private val _isDeviceAdminEnabled = MutableStateFlow(checkTimerPermissionsUseCase().isDeviceAdminEnabled)
+    private val _isDeviceAdminEnabled =
+        MutableStateFlow(checkTimerPermissionsUseCase().isDeviceAdminEnabled)
     val isDeviceAdminEnabled: StateFlow<Boolean> = _isDeviceAdminEnabled.asStateFlow()
 
-    private val _hasNotificationAccess = MutableStateFlow(checkTimerPermissionsUseCase().hasNotificationAccess)
+    private val _hasNotificationAccess =
+        MutableStateFlow(checkTimerPermissionsUseCase().hasNotificationAccess)
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
 
     private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
 
-    val productUiModels: StateFlow<List<StoreProductUiModel>> = combine(_products, billingRepository.customerInfo) { products, info ->
-        products.map { product ->
-            val productType = Product.entries.find { it.id == product.id }
-            val isConsumable = productType?.isConsumable ?: false
+    val productUiModels: StateFlow<List<StoreProductUiModel>> =
+        combine(_products, billingRepository.customerInfo) { products, info ->
+            products.map { product ->
+                val productType = Product.entries.find { it.id == product.id }
+                val isConsumable = productType?.isConsumable ?: false
 
-            val isPurchased = when (product.id) {
-                Product.RemoveAds.id -> info?.entitlements?.get(Entitlement.Pro.id)?.isActive == true
-                else -> info?.allPurchasedProductIds?.contains(product.id) == true && !isConsumable
+                val isPurchased = when (product.id) {
+                    Product.RemoveAds.id -> info?.entitlements?.get(Entitlement.Pro.id)?.isActive == true
+                    else -> info?.allPurchasedProductIds?.contains(product.id) == true && !isConsumable
+                }
+
+                val skuTitleAppNameRegex = """(?> \(.+?\))$""".toRegex()
+                val formattedTitle = product.title.replace(skuTitleAppNameRegex, "")
+
+                StoreProductUiModel(
+                    id = product.id,
+                    title = formattedTitle,
+                    description = product.description,
+                    price = product.price.formatted,
+                    isPurchased = isPurchased
+                )
             }
-
-            StoreProductUiModel(product, isPurchased)
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = emptyList()
-    )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     init {
         loadProducts()
@@ -149,11 +164,12 @@ class SettingsViewModel(
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
             is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
-            is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.product)
+            is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.productId)
         }
     }
 
-    private fun purchaseProduct(activity: Activity, product: StoreProduct) {
+    private fun purchaseProduct(activity: Activity, productId: String) {
+        val product = _products.value.find { it.id == productId } ?: return
         Purchases.sharedInstance.purchaseWith(
             PurchaseParams.Builder(activity, product).build(),
             onError = { error, _ ->

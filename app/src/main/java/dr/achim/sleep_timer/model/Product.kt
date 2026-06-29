@@ -1,7 +1,7 @@
 package dr.achim.sleep_timer.model
 
 enum class Product(val id: String, val isConsumable: Boolean) {
-    Donation("donation", isConsumable = true),
+    Donation("donate", isConsumable = true),
     RemoveAds("remove_ads", isConsumable = false);
 }
 

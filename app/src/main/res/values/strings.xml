@@ -38,7 +38,7 @@
     <string name="settings_like_app_title">Do you like the app?</string>
     <string name="settings_like_app_subtitle">Please write a review or rate the app</string>
     <string name="settings_like_app_trailing">Free</string>
-    <string name="settings_remove_ads_trailing">Already purchased</string>
+    <string name="settings_already_purchased">Purchased</string>
     <string name="settings_section_advanced">Advanced</string>
     <string name="settings_device_admin_title">Device admin</string>
     <string name="settings_device_admin_subtitle">Required to turn screen off. Disable before uninstall</string>
