@@ -216,12 +216,7 @@ class SettingsRepository(context: Context) {
     }
 
     val extendOnShakeMinutes: Flow<Int> = dataStore.data.map { preferences ->
-        val value = preferences.asMap()[EXTEND_BY_SHAKE_MINUTES_KEY]
-        when (value) {
-            is Int -> value
-            is Long -> value.toInt()
-            else -> DEFAULT_EXTEND_ON_SHAKE_MINUTES
-        }
+        preferences[EXTEND_BY_SHAKE_MINUTES_KEY] ?: DEFAULT_EXTEND_ON_SHAKE_MINUTES
     }
 
     val quickLaunchApp1: Flow<String?> = dataStore.data.map { preferences ->
@@ -233,12 +228,7 @@ class SettingsRepository(context: Context) {
     }
 
     val startVolumeLevel: Flow<Int?> = dataStore.data.map { preferences ->
-        val value = preferences.asMap()[START_VOLUME_LEVEL_KEY]
-        when (value) {
-            is Int -> value
-            is Long -> value.toInt()
-            else -> null
-        }
+        preferences[START_VOLUME_LEVEL_KEY]
     }
 
     val startAdjustVolume: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -254,12 +244,7 @@ class SettingsRepository(context: Context) {
     }
 
     val endVolumeLevel: Flow<Int?> = dataStore.data.map { preferences ->
-        val value = preferences.asMap()[END_VOLUME_LEVEL_KEY]
-        when (value) {
-            is Int -> value
-            is Long -> value.toInt()
-            else -> null
-        }
+        preferences[END_VOLUME_LEVEL_KEY]
     }
 
     val endAdjustVolume: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -299,12 +284,7 @@ class SettingsRepository(context: Context) {
     }
 
     val timerStartCount: Flow<Int> = dataStore.data.map { preferences ->
-        val value = preferences.asMap()[TIMER_START_COUNT_KEY]
-        when (value) {
-            is Int -> value
-            is Long -> value.toInt()
-            else -> 0
-        }
+        preferences[TIMER_START_COUNT_KEY] ?: 0
     }
 
     val lastReviewTimestamp: Flow<Long> = dataStore.data.map { preferences ->

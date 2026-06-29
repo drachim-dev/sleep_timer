@@ -87,12 +87,7 @@ class QuickTimesRepository(context: Context) {
     }
 
     val lastSelectedMinutes: Flow<Int> = dataStore.data.map { preferences ->
-        val value = preferences.asMap()[LAST_SELECTED_MINUTES_KEY]
-        when (value) {
-            is Int -> value
-            is Long -> value.toInt()
-            else -> DEFAULT_SELECTED_MINUTES
-        }
+        preferences[LAST_SELECTED_MINUTES_KEY] ?: DEFAULT_SELECTED_MINUTES
     }
 
     suspend fun updateQuickTime(index: Int, minutes: Int) {
