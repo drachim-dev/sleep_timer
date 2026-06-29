@@ -81,7 +81,7 @@ android {
                     if (keystoreFile.exists()) {
                         load(FileInputStream(keystoreFile))
                     } else {
-                        println("Warning: keystore.properties file not found")
+                        error("keystore.properties file not found")
                     }
                 }
 
