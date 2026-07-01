@@ -180,7 +180,7 @@ fun HomeScreenContent(
 
     LaunchedEffect(uiState.lastSelectedMinutes) {
         if ((selectedMinutes.value * 60).toInt() != uiState.lastSelectedMinutes) {
-            selectedMinutes.snapTo(uiState.lastSelectedMinutes / 60f)
+            selectedMinutes.animateTo(uiState.lastSelectedMinutes / 60f)
         }
     }
 
@@ -197,9 +197,7 @@ fun HomeScreenContent(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            HomeTopBar(onNavigateToSettings)
-        },
+        topBar = { HomeTopBar(onNavigateToSettings) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
