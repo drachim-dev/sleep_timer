@@ -153,7 +153,7 @@
     <string name="onboarding_sleep_desc">Stelle einfach den Timer ein und entspanne dich. Die App kümmert sich um den Rest.</string>
     <string name="onboarding_automate_title">Automatisiere deine Routinen</string>
     <string name="onboarding_automate_desc">Schalte automatisch dein Licht aus, senke die Lautstärke oder aktiviere Nicht stören.</string>
-    <string name="onboarding_interruption_title">Keine Unterbrechungen</string>
+    <string name="onboarding_interruption_title">Bleib ungestört</string>
     <string name="onboarding_interruption_desc">Der Timer stoppt deine Medien und kann sogar dein Display ausschalten, um Akku zu sparen.</string>
     <string name="onboarding_get_started">Loslegen</string>
     <string name="onboarding_skip">Überspringen</string>
