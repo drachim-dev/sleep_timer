@@ -37,7 +37,7 @@ class HomeViewModel(
         _showNotificationRationale,
         _showNotificationSettingsPrompt
     ) { settings, quickTimes, lastMinutes, timerState, showRationale, showSettings ->
-        HomeUiState(
+        HomeUiState.Content(
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
             quickTimes = quickTimes,
@@ -50,7 +50,7 @@ class HomeViewModel(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = HomeUiState()
+        initialValue = HomeUiState.Loading
     )
 
     fun onAction(action: HomeUiAction) {

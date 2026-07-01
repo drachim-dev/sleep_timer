@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -115,37 +116,49 @@ fun HomeScreen(
     val isProUser = LocalIsPro.current
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(isProUser, uiState.timerStartCount) {
-        if (!isProUser) {
-            adManager.mayPreload()
-        }
-    }
-
-    HomeScreenContent(
-        uiState = uiState,
-        onNavigateToTimer = {
-            coroutineScope.launch {
-                val selectedMinutes = if (uiState.timerState is TimerState.Idle) uiState.lastSelectedMinutes else null
-                if (adManager.shouldShowAd(isProUser)) {
-                    adManager.showAd(activity) {
-                        onNavigateToTimer(selectedMinutes)
-                    }
-                } else {
-                    onNavigateToTimer(selectedMinutes)
+    AnimatedContent(uiState) { uiState ->
+        when (uiState) {
+            is HomeUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularWavyProgressIndicator()
                 }
             }
-        },
-        onNavigateToSettings = onNavigateToSettings,
-        onAction = viewModel::onAction,
-        onHasNotificationPermission = viewModel::hasNotificationPermission,
-        snackbarHostState = snackbarHostState
-    )
+            is HomeUiState.Content -> {
+                LaunchedEffect(isProUser, uiState.timerStartCount) {
+                    if (!isProUser) {
+                        adManager.mayPreload()
+                    }
+                }
+
+                HomeScreenContent(
+                    uiState = uiState,
+                    onNavigateToTimer = {
+                        coroutineScope.launch {
+                            val selectedMinutes =
+                                if (uiState.timerState is TimerState.Idle) uiState.lastSelectedMinutes else null
+                            if (adManager.shouldShowAd(isProUser)) {
+                                adManager.showAd(activity) {
+                                    onNavigateToTimer(selectedMinutes)
+                                }
+                            } else {
+                                onNavigateToTimer(selectedMinutes)
+                            }
+                        }
+                    },
+                    onNavigateToSettings = onNavigateToSettings,
+                    onAction = viewModel::onAction,
+                    onHasNotificationPermission = viewModel::hasNotificationPermission,
+                    snackbarHostState = snackbarHostState
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
-    uiState: HomeUiState,
+    uiState: HomeUiState.Content,
     onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onAction: (HomeUiAction) -> Unit,
@@ -234,7 +247,8 @@ fun HomeScreenContent(
                     onProgressChange = { newProgress ->
                         if (uiState.timerState !is TimerState.Idle) return@CircularTimer
                         coroutineScope.launch {
-                            val snappedProgress = newProgress.coerceAtLeast(1/60f) // at least 1 min
+                            val snappedProgress =
+                                newProgress.coerceAtLeast(1 / 60f) // at least 1 min
                             selectedMinutes.snapTo(snappedProgress)
                             onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
                         }
@@ -243,12 +257,16 @@ fun HomeScreenContent(
                 ) {
                     if (isIdle) {
                         val totalMinutes = (selectedMinutes.value * 60).toInt()
-                        val displayMinutes = if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
+                        val displayMinutes =
+                            if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
                         val displayHours = if (totalMinutes == 0) 0 else (totalMinutes - 1) / 60
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = stringResource(R.string.home_time_minutes_only, displayMinutes),
+                                text = stringResource(
+                                    R.string.home_time_minutes_only,
+                                    displayMinutes
+                                ),
                                 maxLines = 1,
                                 autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
                             )
@@ -639,7 +657,7 @@ fun QuickTimeEditSheetPreview() {
 fun HomeScreenPreview() {
     AppTheme {
         HomeScreenContent(
-            uiState = HomeUiState(
+            uiState = HomeUiState.Content(
                 quickTimes = listOf(15, 30, 45, 60, -1),
                 lastSelectedMinutes = 50,
                 timerState = TimerState.Idle()
