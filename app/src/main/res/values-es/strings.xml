@@ -19,9 +19,10 @@
     <string name="settings_section_appearance">Apariencia</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_mode_system">Predeterminado del sistema</string>
-    <string name="settings_theme_mode_light">Claro</string>
-    <string name="settings_theme_mode_dark">Oscuro</string>
-    <string name="settings_theme_mode_dynamic">Dinámico</string>
+    <string name="settings_theme_mode_light_orange">Claro Naranja</string>
+    <string name="settings_theme_mode_dark_orange">Oscuro Naranja</string>
+    <string name="settings_theme_mode_dynamic_light">Dinámico Claro</string>
+    <string name="settings_theme_mode_dynamic_dark">Dinámico Oscuro</string>
     <string name="settings_glow_effect_title">Efecto de brillo del temporizador</string>
     <string name="settings_glow_effect_subtitle">Muestra un efecto de brillo alrededor de la barra de progreso</string>
     <string name="settings_glow_intensity_title">Intensidad del brillo</string>

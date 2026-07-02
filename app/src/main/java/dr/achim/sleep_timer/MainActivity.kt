@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themeMode by settingsRepository.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+            val themeMode by settingsRepository.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.default)
             val isPro by billingRepository.isPro.collectAsStateWithLifecycle(initialValue = false)
 
             val initialBackStack by produceState<List<NavKey>?>(initialValue = null) {

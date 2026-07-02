@@ -29,7 +29,6 @@ private val Context.settingsDataStore: DataStore<Preferences> by preferencesData
                 sharedPreferencesName = "FlutterSharedPreferences",
                 keysToMigrate = setOf(
                     "flutter.pref_key_first_launch",
-                    "flutter.pref_key_theme_mode",
                     "flutter.pref_key_glow",
                     "flutter.pref_key_extend_by_shake",
                     "flutter.pref_key_default_extend_time_by_shake",
@@ -186,17 +185,13 @@ class SettingsRepository(context: Context) {
 
     val themeMode: Flow<ThemeMode> = dataStore.data.map { preferences ->
         val savedTheme = preferences[THEME_MODE_KEY]
-        val defaultTheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ThemeMode.DYNAMIC
-        } else {
-            ThemeMode.SYSTEM
-        }
+        val defaultTheme = ThemeMode.default
         try {
             val theme = if (savedTheme != null) ThemeMode.valueOf(savedTheme) else defaultTheme
-            if (theme == ThemeMode.DYNAMIC && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                ThemeMode.SYSTEM
-            } else {
+            if (Build.VERSION.SDK_INT >= theme.minSdk) {
                 theme
+            } else {
+                defaultTheme
             }
         } catch (_: IllegalArgumentException) {
             defaultTheme

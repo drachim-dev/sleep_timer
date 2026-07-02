@@ -22,9 +22,10 @@
     <string name="settings_section_appearance">Appearance</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_mode_system">System default</string>
-    <string name="settings_theme_mode_light">Light</string>
-    <string name="settings_theme_mode_dark">Dark</string>
-    <string name="settings_theme_mode_dynamic">Dynamic</string>
+    <string name="settings_theme_mode_light_orange">Light Orange</string>
+    <string name="settings_theme_mode_dark_orange">Dark Orange</string>
+    <string name="settings_theme_mode_dynamic_light">Dynamic Light</string>
+    <string name="settings_theme_mode_dynamic_dark">Dynamic Dark</string>
     <string name="settings_glow_effect_title">Timer glow effect</string>
     <string name="settings_glow_effect_subtitle">Shows a glow effect around the timers progress bar</string>
     <string name="settings_glow_intensity_title">Glow intensity</string>

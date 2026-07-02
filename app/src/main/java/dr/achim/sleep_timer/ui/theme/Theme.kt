@@ -45,17 +45,18 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun AppTheme(
-    themeMode: ThemeMode = ThemeMode.SYSTEM,
+    themeMode: ThemeMode = ThemeMode.default,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
-        ThemeMode.SYSTEM, ThemeMode.DYNAMIC -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LightDynamic,
+        ThemeMode.LightOrange -> false
+        ThemeMode.DarkDynamic,
+        ThemeMode.DarkOrange -> true
     }
 
-    val dynamicColor = themeMode == ThemeMode.DYNAMIC
-
+    val dynamicColor = themeMode in listOf(ThemeMode.SYSTEM, ThemeMode.LightDynamic, ThemeMode.DarkDynamic)
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -77,9 +78,7 @@ fun AppTheme(
         }
     }
 
-    CompositionLocalProvider(
-        LocalDimens provides Dimens()
-    ) {
+    CompositionLocalProvider(LocalDimens provides Dimens()) {
         MaterialExpressiveTheme(
             colorScheme = colorScheme,
             motionScheme = MotionScheme.expressive(),

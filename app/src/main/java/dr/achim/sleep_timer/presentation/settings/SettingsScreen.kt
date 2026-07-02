@@ -243,12 +243,7 @@ fun SettingsScreenContent(
                     SettingsItem(
                         painter = painterResource(R.drawable.ic_palette),
                         title = stringResource(R.string.settings_theme_title),
-                        subtitle = when (themeMode) {
-                            ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
-                            ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
-                            ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
-                            ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
-                        },
+                        subtitle = stringResource(themeMode.displayName),
                         onClick = { showThemeDialog = true }
                     )
                     SettingsSwitchItem(
@@ -474,15 +469,8 @@ fun ThemeSelectionDialog(
                 )
 
                 ThemeMode.entries
-                    .filter { it != ThemeMode.DYNAMIC || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S }
+                    .filter { Build.VERSION.SDK_INT >= it.minSdk }
                     .forEach { mode ->
-                        val label = when (mode) {
-                            ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_mode_system)
-                            ThemeMode.LIGHT -> stringResource(R.string.settings_theme_mode_light)
-                            ThemeMode.DARK -> stringResource(R.string.settings_theme_mode_dark)
-                            ThemeMode.DYNAMIC -> stringResource(R.string.settings_theme_mode_dynamic)
-                        }
-
                         val interactionSource = remember { MutableInteractionSource() }
                         ListItem(
                             modifier = Modifier.selectable(
@@ -492,7 +480,7 @@ fun ThemeSelectionDialog(
                                 interactionSource = interactionSource,
                                 indication = ripple()
                             ),
-                            headlineContent = { Text(text = label) },
+                            headlineContent = { Text(text = stringResource(mode.displayName)) },
                             leadingContent = {
                                 RadioButton(
                                     selected = currentThemeMode == mode,
@@ -606,7 +594,7 @@ private fun Preview() {
             onBack = {},
             onNavigateToCredits = {},
             onNavigateToFaq = {},
-            themeMode = ThemeMode.DARK,
+            themeMode = ThemeMode.DarkOrange,
             glowEnabled = false,
             glowIntensity = 0f,
             extendOnShake = false,

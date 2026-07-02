@@ -19,9 +19,10 @@
     <string name="settings_section_appearance">Erscheinungsbild</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_mode_system">System</string>
-    <string name="settings_theme_mode_light">Hell</string>
-    <string name="settings_theme_mode_dark">Dunkel</string>
-    <string name="settings_theme_mode_dynamic">Dynamisch</string>
+    <string name="settings_theme_mode_light_orange">Hell Orange</string>
+    <string name="settings_theme_mode_dark_orange">Dunkel Orange</string>
+    <string name="settings_theme_mode_dynamic_light">Dynamisch Hell</string>
+    <string name="settings_theme_mode_dynamic_dark">Dynamisch Dunkel</string>
     <string name="settings_glow_effect_title">Timer Leuchteffekt</string>
     <string name="settings_glow_effect_subtitle">Zeigt einen Leuchteffekt rund um den Fortschrittsbalken des Timers</string>
     <string name="settings_glow_intensity_title">Leuchtintensität</string>
