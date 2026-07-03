@@ -66,7 +66,7 @@ class HueRepository(
     }
 
     suspend fun discoverBridgeByIp(ip: String): HueBridge? = try {
-        val response = client.get("http://$ip/api/config")
+        val response = client.get("http://${ip.toHueDomain()}/api/config")
         if (response.status == HttpStatusCode.OK) {
             val config: HueConfig = response.body()
             HueBridge(
@@ -155,10 +155,11 @@ class HueRepository(
     } ?: emptyList()
 
     suspend fun link(bridge: HueBridge): LinkResult = try {
-        val response: List<HuePairingResponse> = client.post("http://${bridge.ipAddress}/api") {
-            contentType(ContentType.Application.Json)
-            setBody(HuePairingRequest(DEVICE_TYPE))
-        }.body()
+        val response: List<HuePairingResponse> =
+            client.post("http://${bridge.ipAddress.toHueDomain()}/api") {
+                contentType(ContentType.Application.Json)
+                setBody(HuePairingRequest(DEVICE_TYPE))
+            }.body()
 
         val first = response.firstOrNull()
         when {
@@ -179,7 +180,8 @@ class HueRepository(
     }
 
     suspend fun fetchGroups(ip: String, username: String): List<HueGroup> = try {
-        val response: Map<String, HueGroup> = client.get("http://$ip/api/$username/groups").body()
+        val response: Map<String, HueGroup> =
+            client.get("http://${ip.toHueDomain()}/api/$username/groups").body()
         response.map { it.value.copy(id = it.key) }
             .filterNot { it.type == HueGroupType.ENTERTAINMENT }
             .sortedWith(compareBy<HueGroup> { it.type }.thenBy { it.name })
@@ -188,13 +190,15 @@ class HueRepository(
     }
 
     suspend fun turnOffGroup(ip: String, username: String, groupId: String) = try {
-        client.put("http://$ip/api/$username/groups/$groupId/action") {
+        client.put("http://${ip.toHueDomain()}/api/$username/groups/$groupId/action") {
             contentType(ContentType.Application.Json)
             setBody(HueStateRequest(on = false))
         }
     } catch (e: Exception) {
         Log.e(TAG, e.message ?: "Error turning off group")
     }
+
+    private fun String.toHueDomain(): String = "${this.replace(".", "-")}.local.hue.bridge"
 
     fun getPairedIp() = settingsRepository.hueBridgeIp
     fun getPairedUser() = settingsRepository.hueApiUser

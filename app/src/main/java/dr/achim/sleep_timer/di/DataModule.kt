@@ -30,10 +30,12 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okhttp3.Dns
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.bind
 import org.koin.plugin.module.dsl.create
 import org.koin.plugin.module.dsl.single
+import java.net.InetAddress
 
 private fun provideNotificationManager(context: Context) =
     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -61,7 +63,22 @@ private fun provideVibrator(context: Context): Vibrator {
 private fun provideNsdManager(context: Context) =
     context.getSystemService(Context.NSD_SERVICE) as NsdManager
 
+private class HueDns : Dns {
+    override fun lookup(hostname: String): List<InetAddress> {
+        if (hostname.endsWith(".local.hue.bridge")) {
+            val ipPart = hostname.removeSuffix(".local.hue.bridge").replace("-", ".")
+            return listOf(InetAddress.getByName(ipPart))
+        }
+        return Dns.SYSTEM.lookup(hostname)
+    }
+}
+
 private fun provideHttpClient() = HttpClient(OkHttp) {
+    engine {
+        config {
+            dns(HueDns())
+        }
+    }
     install(HttpTimeout) {
         requestTimeoutMillis = 15_000
         connectTimeoutMillis = 15_000
