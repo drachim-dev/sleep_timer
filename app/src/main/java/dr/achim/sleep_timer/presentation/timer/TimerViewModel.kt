@@ -52,16 +52,16 @@ class TimerViewModel(
     private val _uiEvents = Channel<TimerUiEvent>()
     val uiEvents = _uiEvents.receiveAsFlow()
 
+    val timerState: StateFlow<TimerState> = getTimerStatusUseCase.timerState
+
     val uiState: StateFlow<TimerUiState> = combine(
-        getTimerStatusUseCase.timerState,
         getTimerStatusUseCase.observeTimerActions(),
         manageQuickLaunchUseCase.getSelectedApps(),
         _permissionsFlow,
         _quickLaunchApps,
         getSettingsUseCase()
-    ) { timerState, timerActions, selectedApps, permissions, apps, settings ->
+    ) { timerActions, selectedApps, permissions, apps, settings ->
         TimerUiState(
-            timerState = timerState,
             timerActions = timerActions,
             quickLaunchApps = apps,
             selectedApps = selectedApps,
@@ -191,7 +191,7 @@ class TimerViewModel(
     }
 
     private fun togglePauseResume() {
-        when (uiState.value.timerState) {
+        when (timerState.value) {
             is TimerState.Idle -> return
             is TimerState.Running -> controlTimerUseCase.pause()
             is TimerState.Paused -> controlTimerUseCase.resume()
@@ -199,7 +199,7 @@ class TimerViewModel(
     }
 
     private fun addMinutes(minutes: Long) {
-        when (val state = uiState.value.timerState) {
+        when (val state = timerState.value) {
             is TimerState.Idle -> startTimer(minutes * 60 * 1000)
             else -> {
                 val newTime = state.remainingTimeMillis + (minutes * 60 * 1000)

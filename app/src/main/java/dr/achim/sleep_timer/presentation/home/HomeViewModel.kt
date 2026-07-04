@@ -10,6 +10,7 @@ import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateQuickTimeUseCase
+import dr.achim.sleep_timer.model.TimerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,20 +30,20 @@ class HomeViewModel(
     private val _showNotificationRationale = MutableStateFlow(false)
     private val _showNotificationSettingsPrompt = MutableStateFlow(false)
 
+    val timerState: StateFlow<TimerState> = getTimerStatusUseCase.timerState
+
     val uiState: StateFlow<HomeUiState> = combine(
         getSettingsUseCase(),
         getQuickTimesUseCase(),
         getLastSelectedMinutesUseCase(),
-        getTimerStatusUseCase.timerState,
         _showNotificationRationale,
         _showNotificationSettingsPrompt
-    ) { settings, quickTimes, lastMinutes, timerState, showRationale, showSettings ->
+    ) { settings, quickTimes, lastMinutes, showRationale, showSettings ->
         HomeUiState.Content(
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
             quickTimes = quickTimes,
             lastSelectedMinutes = lastMinutes,
-            timerState = timerState,
             timerStartCount = settings.timerStartCount,
             showNotificationRationale = showRationale,
             showNotificationSettingsPrompt = showSettings

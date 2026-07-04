@@ -121,6 +121,7 @@ fun TimerScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val timerState by viewModel.timerState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val reviewManager = koinInject<ReviewManager>()
 
@@ -144,6 +145,7 @@ fun TimerScreen(
         onAction = viewModel::onAction,
         onNavigateToSettings = onNavigateToSettings,
         uiState = uiState,
+        timerState = timerState,
         snackbarHostState = snackbarHostState
     )
 }
@@ -155,6 +157,7 @@ private fun TimerScreenContent(
     onAction: (Action) -> Unit,
     onNavigateToSettings: (String) -> Unit,
     uiState: TimerUiState,
+    timerState: TimerState,
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
@@ -223,7 +226,7 @@ private fun TimerScreenContent(
         )
     }
 
-    val isRunning = uiState.timerState is TimerState.Running
+    val isRunning = timerState is TimerState.Running
     val fabColor by animateColorAsState(
         targetValue = if (isRunning) RedAccent else OrangeAccent,
         label = "fabColor"
@@ -280,10 +283,10 @@ private fun TimerScreenContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    when (uiState.timerState) {
+                    when (timerState) {
                         is TimerState.Idle -> {
-                            val millis = if (uiState.timerState.remainingTimeMillis > 0)
-                                uiState.timerState.remainingTimeMillis
+                            val millis = if (timerState.remainingTimeMillis > 0)
+                                timerState.remainingTimeMillis
                             else 20 * 60 * 1000L
                             onAction(Action.StartTimer(millis))
                         }
@@ -311,7 +314,7 @@ private fun TimerScreenContent(
                 )
                 Spacer(Modifier.width(AppTheme.dimens.spacingNormal))
                 Text(
-                    text = when (uiState.timerState) {
+                    text = when (timerState) {
                         is TimerState.Idle -> stringResource(R.string.timer_start)
                         is TimerState.Paused -> stringResource(R.string.timer_resume)
                         is TimerState.Running -> stringResource(R.string.timer_pause)
@@ -334,7 +337,7 @@ private fun TimerScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularTimer(
-                progress = uiState.timerState.progress,
+                progress = timerState.progress,
                 glowEnabled = uiState.glowEnabled,
                 glowIntensity = uiState.glowIntensity,
                 interactive = false,
@@ -362,7 +365,7 @@ private fun TimerScreenContent(
                 }
             ) {
                 Text(
-                    text = uiState.timerState.formattedTime,
+                    text = timerState.formattedTime,
                     maxLines = 1,
                     autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
                 )
@@ -538,6 +541,7 @@ fun TimerScreenPreview() {
             onAction = {},
             onNavigateToSettings = {},
             uiState = TimerUiState(),
+            timerState = TimerState.Idle(),
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

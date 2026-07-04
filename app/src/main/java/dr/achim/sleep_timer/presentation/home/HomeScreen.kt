@@ -113,6 +113,7 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val timerState by viewModel.timerState.collectAsStateWithLifecycle()
     val activity = LocalContext.current.findActivity()
     val isProUser = LocalIsPro.current
     val coroutineScope = rememberCoroutineScope()
@@ -138,10 +139,11 @@ fun HomeScreen(
 
             HomeScreenContent(
                 uiState = state,
+                timerState = timerState,
                 onNavigateToTimer = {
                     coroutineScope.launch {
                         val selectedMinutes =
-                            if (state.timerState is TimerState.Idle) state.lastSelectedMinutes else null
+                            if (timerState is TimerState.Idle) state.lastSelectedMinutes else null
                         if (adManager.shouldShowAd(isProUser)) {
                             adManager.showAd(activity) {
                                 onNavigateToTimer(selectedMinutes)
@@ -164,6 +166,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     uiState: HomeUiState.Content,
+    timerState: TimerState,
     onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onAction: (HomeUiAction) -> Unit,
@@ -213,6 +216,8 @@ fun HomeScreenContent(
         )
     }
 
+    val isIdle = timerState is TimerState.Idle
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopBar(onNavigateToSettings) },
@@ -221,7 +226,7 @@ fun HomeScreenContent(
         floatingActionButton = {
             InitialAnimation {
                 HomeFab(
-                    timerState = uiState.timerState,
+                    isIdle = isIdle,
                     onNavigateToTimer = {
                         if (onHasNotificationPermission()) {
                             onNavigateToTimer()
@@ -242,15 +247,14 @@ fun HomeScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val isIdle = uiState.timerState is TimerState.Idle
-            AnimatedContent(isIdle, label = "timerContent") { isIdle ->
+            AnimatedContent(isIdle, label = "timerContent") { idle ->
                 CircularTimer(
-                    progress = if (isIdle) selectedMinutes.value else uiState.timerState.progress,
+                    progress = if (idle) selectedMinutes.value else timerState.progress,
                     glowEnabled = uiState.glowEnabled,
                     glowIntensity = uiState.glowIntensity,
-                    interactive = isIdle,
+                    interactive = idle,
                     onProgressChange = { newProgress ->
-                        if (uiState.timerState !is TimerState.Idle) return@CircularTimer
+                        if (timerState !is TimerState.Idle) return@CircularTimer
                         coroutineScope.launch {
                             val snappedProgress =
                                 newProgress.coerceAtLeast(1 / 60f) // at least 1 min
@@ -260,7 +264,7 @@ fun HomeScreenContent(
                     },
                     modifier = Modifier.safeSharedElement(SharedElementKey.CircularTimer)
                 ) {
-                    if (isIdle) {
+                    if (idle) {
                         val totalMinutes = (selectedMinutes.value * 60).toInt()
                         val displayMinutes =
                             if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
@@ -286,7 +290,7 @@ fun HomeScreenContent(
                         }
                     } else {
                         Text(
-                            text = uiState.timerState.formattedTime,
+                            text = timerState.formattedTime,
                             maxLines = 1,
                             autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
                         )
@@ -415,11 +419,11 @@ private fun HomeTopBar(onNavigateToSettings: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeFab(
-    timerState: TimerState,
+    isIdle: Boolean,
     onNavigateToTimer: () -> Unit,
     onStopTimer: () -> Unit
 ) {
-    if (timerState is TimerState.Idle) {
+    if (isIdle) {
         ExtendedFloatingActionButton(
             onClick = onNavigateToTimer,
             shape = MaterialTheme.shapes.extraLarge,
@@ -665,8 +669,9 @@ fun HomeScreenPreview() {
             uiState = HomeUiState.Content(
                 quickTimes = listOf(15, 30, 45, 60, -1),
                 lastSelectedMinutes = 50,
-                timerState = TimerState.Idle()
+                timerStartCount = 0
             ),
+            timerState = TimerState.Idle(),
             onNavigateToTimer = {},
             onNavigateToSettings = {},
             onAction = {},
