@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import dr.achim.sleep_timer.data.BillingRepository
+import dr.achim.sleep_timer.data.GoogleMobileAdsConsentManager
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.ThemeMode
 import dr.achim.sleep_timer.navigation.HomeKey
@@ -30,11 +31,22 @@ val LocalIsPro = compositionLocalOf { false }
 class MainActivity : ComponentActivity() {
     private val settingsRepository: SettingsRepository by inject()
     private val billingRepository: BillingRepository by inject()
+    private val googleMobileAdsConsentManager: GoogleMobileAdsConsentManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        googleMobileAdsConsentManager.gatherConsent(this) {
+            googleMobileAdsConsentManager.initializeMobileAdsSdk()
+        }
+
+        if (googleMobileAdsConsentManager.canRequestAds) {
+            googleMobileAdsConsentManager.initializeMobileAdsSdk()
+        }
+
         setContent {
             val themeMode by settingsRepository.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.default)
             val isPro by billingRepository.isPro.collectAsStateWithLifecycle(initialValue = false)
@@ -48,12 +60,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            splashScreen.setKeepOnScreenCondition {
+                initialBackStack == null
+            }
+
             initialBackStack?.let { backStack ->
                 AppTheme(themeMode = themeMode) {
                     SharedTransitionLayout {
                         CompositionLocalProvider(
                             LocalSharedTransitionScope provides this,
-                            LocalIsPro provides isPro
+                            LocalIsPro provides isPro,
                         ) {
                             Navigation(
                                 initialBackStack = backStack,

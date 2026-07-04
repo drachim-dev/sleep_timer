@@ -47,6 +47,7 @@
     <string name="settings_section_other">Otro</string>
     <string name="settings_faq_title">FAQ</string>
     <string name="settings_credits_title">Créditos</string>
+    <string name="settings_privacy_options_title">Opciones de privacidad</string>
 
     <string name="faq_title">Preguntas frecuentes</string>
     <string name="faq_timer_no_alarm_title">El temporizador no funciona a veces</string>

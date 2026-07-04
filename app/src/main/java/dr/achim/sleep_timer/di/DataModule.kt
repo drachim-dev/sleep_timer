@@ -14,6 +14,7 @@ import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.AdManager
 import dr.achim.sleep_timer.data.AudioRepositoryImpl
 import dr.achim.sleep_timer.data.BillingRepository
+import dr.achim.sleep_timer.data.GoogleMobileAdsConsentManager
 import dr.achim.sleep_timer.data.HueRepository
 import dr.achim.sleep_timer.data.QuickLaunchRepositoryImpl
 import dr.achim.sleep_timer.data.QuickTimesRepository
@@ -113,4 +114,5 @@ val dataModule = module {
     single<ReviewManager>()
     single<AdManager>()
     single<BillingRepository>()
+    single<GoogleMobileAdsConsentManager>()
 }

@@ -12,6 +12,7 @@ import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.purchases.purchaseWith
 import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.data.BillingRepository
+import dr.achim.sleep_timer.data.GoogleMobileAdsConsentManager
 import dr.achim.sleep_timer.data.TimerController
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
@@ -42,6 +43,7 @@ data class StoreProductUiModel(
 
 class SettingsViewModel(
     private val timerController: TimerController,
+    private val googleMobileAdsConsentManager: GoogleMobileAdsConsentManager,
     billingRepository: BillingRepository,
     getSettingsUseCase: GetSettingsUseCase,
     private val updateSettingsUseCase: UpdateSettingsUseCase,
@@ -106,6 +108,9 @@ class SettingsViewModel(
         MutableStateFlow(checkTimerPermissionsUseCase().hasNotificationAccess)
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
 
+    val isPrivacyOptionsRequired: Boolean
+        get() = googleMobileAdsConsentManager.isPrivacyOptionsRequired
+
     private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
 
     val productUiModels: StateFlow<List<StoreProductUiModel>> =
@@ -165,6 +170,15 @@ class SettingsViewModel(
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
             is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
             is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.productId)
+            is SettingsUiAction.ShowPrivacyOptions -> showPrivacyOptions(action.activity)
+        }
+    }
+
+    private fun showPrivacyOptions(activity: Activity) {
+        googleMobileAdsConsentManager.showPrivacyOptionsForm(activity) { error ->
+            if (error != null) {
+                Log.e(TAG, "Privacy options form error: ${error.message}")
+            }
         }
     }
 

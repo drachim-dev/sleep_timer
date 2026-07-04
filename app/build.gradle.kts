@@ -64,6 +64,7 @@ android {
         val admobInterstitialUnitId = getProperty("ADMOB_INTERSTITIAL_UNIT_ID")
 
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        buildConfigField("String", "ADMOB_APP_ID", "\"${admobAppId}\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"${admobInterstitialUnitId}\"")
     }
 
@@ -106,6 +107,11 @@ android {
     }
 }
 
+configurations.configureEach {
+    exclude(group = "com.google.android.gms", module = "play-services-ads")
+    exclude(group = "com.google.android.gms", module = "play-services-ads-lite")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -129,7 +135,8 @@ dependencies {
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.revenuecat.purchases)
     implementation(libs.confettikit)
-    implementation(libs.play.services.ads)
+    implementation(libs.ads.mobile.sdk)
+    implementation(libs.play.services.ads.ump)
     implementation(libs.play.review)
     implementation(libs.androidx.core.splashscreen)
 

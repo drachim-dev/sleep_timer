@@ -8,7 +8,6 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -118,47 +117,45 @@ fun HomeScreen(
     val isProUser = LocalIsPro.current
     val coroutineScope = rememberCoroutineScope()
 
-    Crossfade(uiState) { uiState ->
-        when (uiState) {
-            is HomeUiState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularWavyProgressIndicator()
+    when (val state = uiState) {
+        is HomeUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularWavyProgressIndicator()
+            }
+        }
+
+        is HomeUiState.Content -> {
+            LaunchedEffect(isProUser, state.timerStartCount) {
+                if (!isProUser) {
+                    adManager.mayPreload()
                 }
             }
 
-            is HomeUiState.Content -> {
-                LaunchedEffect(isProUser, uiState.timerStartCount) {
-                    if (!isProUser) {
-                        adManager.mayPreload()
-                    }
-                }
-
-                HomeScreenContent(
-                    uiState = uiState,
-                    onNavigateToTimer = {
-                        coroutineScope.launch {
-                            val selectedMinutes =
-                                if (uiState.timerState is TimerState.Idle) uiState.lastSelectedMinutes else null
-                            if (adManager.shouldShowAd(isProUser)) {
-                                adManager.showAd(activity) {
-                                    onNavigateToTimer(selectedMinutes)
-                                }
-                            } else {
+            HomeScreenContent(
+                uiState = state,
+                onNavigateToTimer = {
+                    coroutineScope.launch {
+                        val selectedMinutes =
+                            if (state.timerState is TimerState.Idle) state.lastSelectedMinutes else null
+                        if (adManager.shouldShowAd(isProUser)) {
+                            adManager.showAd(activity) {
                                 onNavigateToTimer(selectedMinutes)
                             }
+                        } else {
+                            onNavigateToTimer(selectedMinutes)
                         }
-                    },
-                    onNavigateToSettings = onNavigateToSettings,
-                    onAction = viewModel::onAction,
-                    onHasNotificationPermission = viewModel::hasNotificationPermission,
-                    snackbarHostState = snackbarHostState
-                )
-            }
+                    }
+                },
+                onNavigateToSettings = onNavigateToSettings,
+                onAction = viewModel::onAction,
+                onHasNotificationPermission = viewModel::hasNotificationPermission,
+                snackbarHostState = snackbarHostState
+            )
         }
     }
 }

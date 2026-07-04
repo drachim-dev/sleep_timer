@@ -105,6 +105,7 @@ fun SettingsScreen(
     val isDeviceAdminEnabled by viewModel.isDeviceAdminEnabled.collectAsStateWithLifecycle()
     val hasNotificationAccess by viewModel.hasNotificationAccess.collectAsStateWithLifecycle()
     val productUiModels by viewModel.productUiModels.collectAsStateWithLifecycle()
+    val isPrivacyOptionsRequired = viewModel.isPrivacyOptionsRequired
 
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(SettingsUiAction.RefreshDeviceAdminStatus)
@@ -127,6 +128,7 @@ fun SettingsScreen(
         snackbarHostState = snackbarHostState,
         purchaseEvents = viewModel.events,
         productUiModels = productUiModels,
+        isPrivacyOptionsRequired = isPrivacyOptionsRequired,
     )
 }
 
@@ -150,7 +152,8 @@ fun SettingsScreenContent(
     highlight: String?,
     snackbarHostState: SnackbarHostState,
     purchaseEvents: Flow<PurchaseEvent>,
-    productUiModels: List<StoreProductUiModel>
+    productUiModels: List<StoreProductUiModel>,
+    isPrivacyOptionsRequired: Boolean
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
@@ -399,6 +402,13 @@ fun SettingsScreenContent(
                         title = stringResource(R.string.settings_credits_title),
                         onClick = onNavigateToCredits
                     )
+                    if (isPrivacyOptionsRequired) {
+                        SettingsItem(
+                            painter = painterResource(R.drawable.ic_shield_person),
+                            title = stringResource(R.string.settings_privacy_options_title),
+                            onClick = { onAction(SettingsUiAction.ShowPrivacyOptions(activity)) }
+                        )
+                    }
                 }
             }
         }
@@ -605,7 +615,8 @@ private fun Preview() {
             highlight = null,
             snackbarHostState = remember { SnackbarHostState() },
             purchaseEvents = emptyFlow(),
-            productUiModels = emptyList()
+            productUiModels = emptyList(),
+            isPrivacyOptionsRequired = false
         )
     }
 }

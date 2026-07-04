@@ -1,19 +1,18 @@
 package dr.achim.sleep_timer.data
 
 import android.app.Activity
-import android.content.Context
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
 import dr.achim.sleep_timer.BuildConfig
 import kotlinx.coroutines.flow.firstOrNull
 
 class AdManager(
-    private val context: Context,
     private val settingsRepository: SettingsRepository,
+    private val consentManager: GoogleMobileAdsConsentManager,
 ) {
     companion object {
         private const val INTERSTITIAL_AD_UNIT_ID = BuildConfig.ADMOB_INTERSTITIAL_UNIT_ID
@@ -23,20 +22,19 @@ class AdManager(
     private var interstitialAd: InterstitialAd? = null
 
     private fun loadAd() {
+        if (!consentManager.canRequestAds) return
         if (INTERSTITIAL_AD_UNIT_ID.isEmpty()) return
         if (interstitialAd != null) return
 
-        val adRequest = AdRequest.Builder().build()
+        val adRequest = AdRequest.Builder(INTERSTITIAL_AD_UNIT_ID).build()
         InterstitialAd.load(
-            context,
-            INTERSTITIAL_AD_UNIT_ID,
             adRequest,
-            object : InterstitialAdLoadCallback() {
+            object : AdLoadCallback<InterstitialAd> {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     interstitialAd = ad
                 }
 
-                override fun onAdFailedToLoad(error: LoadAdError) {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
                     interstitialAd = null
                 }
             }
@@ -54,7 +52,7 @@ class AdManager(
     }
 
     suspend fun shouldShowAd(isProUser: Boolean): Boolean {
-        if (isProUser) {
+        if (isProUser || !consentManager.canRequestAds) {
             interstitialAd = null
             settingsRepository.incrementAndGetTimerStartCount()
             return false
@@ -70,15 +68,21 @@ class AdManager(
     }
 
     fun showAd(activity: Activity, onAdClosed: () -> Unit) {
+        if (!consentManager.canRequestAds) {
+            interstitialAd = null
+            onAdClosed()
+            return
+        }
+
         val ad = interstitialAd
         if (ad != null) {
-            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            ad.adEventCallback = object : InterstitialAdEventCallback {
                 override fun onAdDismissedFullScreenContent() {
                     interstitialAd = null
                     onAdClosed()
                 }
 
-                override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     interstitialAd = null
                     onAdClosed()
                 }

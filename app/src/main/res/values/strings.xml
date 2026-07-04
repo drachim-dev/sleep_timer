@@ -49,6 +49,7 @@
     <string name="settings_section_other">Other</string>
     <string name="settings_faq_title">FAQ</string>
     <string name="settings_credits_title">Credits</string>
+    <string name="settings_privacy_options_title">Privacy settings</string>
 
     <string name="faq_title">Frequently asked questions</string>
     <string name="faq_timer_no_alarm_title">Timer doesn’t work sometimes</string>
