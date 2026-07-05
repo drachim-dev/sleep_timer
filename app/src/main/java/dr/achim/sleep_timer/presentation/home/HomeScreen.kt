@@ -10,7 +10,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
@@ -69,7 +71,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -91,7 +95,6 @@ import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
 import dr.achim.sleep_timer.ui.components.DefaultButton
-import dr.achim.sleep_timer.ui.components.InitialAnimation
 import dr.achim.sleep_timer.ui.components.TimeButton
 import dr.achim.sleep_timer.ui.dashedBorder
 import dr.achim.sleep_timer.ui.safeSharedElement
@@ -99,9 +102,11 @@ import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
 import dr.achim.sleep_timer.ui.theme.RedAccent
 import dr.achim.sleep_timer.ui.theme.dimens
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun HomeScreen(
@@ -220,19 +225,18 @@ fun HomeScreenContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            InitialAnimation {
-                HomeFab(
-                    isIdle = isIdle,
-                    onNavigateToTimer = {
-                        if (onHasNotificationPermission()) {
-                            onNavigateToTimer()
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                    },
-                    onStopTimer = { onAction(HomeUiAction.StopTimer) }
-                )
-            }
+            HomeFab(
+                isIdle = isIdle,
+                onNavigateToTimer = {
+                    if (onHasNotificationPermission()) {
+                        onNavigateToTimer()
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                },
+                onStopTimer = { onAction(HomeUiAction.StopTimer) }
+            )
+
         },
     ) { innerPadding ->
         Column(
@@ -419,11 +423,38 @@ private fun HomeFab(
     onNavigateToTimer: () -> Unit,
     onStopTimer: () -> Unit
 ) {
+    var fabVisible by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (fabVisible) 1f else 0.6f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "fabScale"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (fabVisible) 1f else 0f,
+        animationSpec = tween(),
+        label = "fabAlpha"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(150.milliseconds)
+        fabVisible = true
+    }
+
     if (isIdle) {
         ExtendedFloatingActionButton(
             onClick = onNavigateToTimer,
             shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier.safeSharedElement(SharedElementKey.Fab)
+            modifier = Modifier
+                .safeSharedElement(SharedElementKey.Fab)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                    compositingStrategy = CompositingStrategy.ModulateAlpha
+                }
         ) {
             Icon(painterResource(R.drawable.ic_moon_stars), contentDescription = null)
             Spacer(Modifier.width(AppTheme.dimens.spacingNormal))
