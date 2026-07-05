@@ -163,7 +163,6 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
     uiState: HomeUiState.Content,
@@ -387,7 +386,6 @@ fun HomeScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar(onNavigateToSettings: () -> Unit) {
     CenterAlignedTopAppBar(
@@ -416,7 +414,6 @@ private fun HomeTopBar(onNavigateToSettings: () -> Unit) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeFab(
     isIdle: Boolean,

@@ -26,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -135,7 +134,6 @@ fun SettingsScreen(
 const val SETTING_ADMIN = "admin"
 const val SETTING_DND = "dnd"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
     onBack: () -> Unit,
@@ -330,8 +328,13 @@ fun SettingsScreenContent(
                                 trailingText = if (uiModel.isPurchased) stringResource(R.string.settings_already_purchased) else uiModel.price,
                                 trailingColor = Color(0xFF81C784),
                                 onClick = {
-                                    if(!uiModel.isPurchased) {
-                                        onAction(SettingsUiAction.PurchaseProduct(activity, uiModel.id))
+                                    if (!uiModel.isPurchased) {
+                                        onAction(
+                                            SettingsUiAction.PurchaseProduct(
+                                                activity,
+                                                uiModel.id
+                                            )
+                                        )
                                     }
                                 }
                             )
@@ -444,7 +447,11 @@ fun Confetti(modifier: Modifier, onAnimationCompleted: () -> Unit) {
 }
 
 @Composable
-fun SettingsSection(modifier: Modifier = Modifier, title: @Composable () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun SettingsSection(
+    modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column(modifier = modifier) {
         title()
         Column(
@@ -490,7 +497,6 @@ fun ThemeSelectionDialog(
                                 interactionSource = interactionSource,
                                 indication = ripple()
                             ),
-                            headlineContent = { Text(text = stringResource(mode.displayName)) },
                             leadingContent = {
                                 RadioButton(
                                     selected = currentThemeMode == mode,
@@ -499,7 +505,9 @@ fun ThemeSelectionDialog(
                                 )
                             },
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-                        )
+                        ) {
+                            Text(text = stringResource(mode.displayName))
+                        }
                     }
 
                 Spacer(modifier = Modifier.height(AppTheme.dimens.spacingMedium))
@@ -548,7 +556,6 @@ fun SettingsItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SettingsSwitchItem(
     painter: Painter,
@@ -583,7 +590,10 @@ fun SettingsSliderItem(
     steps: Int = 0
 ) {
     ListItem(
-        headlineContent = { Text(text = title) },
+        modifier = Modifier,
+        leadingContent = null,
+        trailingContent = null,
+        overlineContent = null,
         supportingContent = {
             Slider(
                 value = value,
@@ -592,7 +602,9 @@ fun SettingsSliderItem(
                 steps = steps
             )
         },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+        elevation = ListItemDefaults.elevation(),
+        content = { Text(text = title) },
     )
 }
 

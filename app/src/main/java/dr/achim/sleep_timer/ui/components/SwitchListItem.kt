@@ -4,7 +4,6 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +22,6 @@ import androidx.compose.ui.state.ToggleableState
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SwitchListItem(
     checked: Boolean,

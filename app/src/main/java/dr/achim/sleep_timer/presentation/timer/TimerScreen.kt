@@ -150,7 +150,6 @@ fun TimerScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
