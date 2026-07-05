@@ -84,7 +84,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.data.AdManager
@@ -115,7 +114,6 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val timerState by viewModel.timerState.collectAsStateWithLifecycle()
     val activity = LocalContext.current.findActivity()
-    val isProUser = LocalIsPro.current
     val coroutineScope = rememberCoroutineScope()
 
     when (val state = uiState) {
@@ -131,10 +129,8 @@ fun HomeScreen(
         }
 
         is HomeUiState.Content -> {
-            LaunchedEffect(isProUser, state.timerStartCount) {
-                if (!isProUser) {
-                    adManager.mayPreload()
-                }
+            LaunchedEffect(state.timerStartCount) {
+                adManager.mayPreload()
             }
 
             HomeScreenContent(
@@ -144,7 +140,7 @@ fun HomeScreen(
                     coroutineScope.launch {
                         val selectedMinutes =
                             if (timerState is TimerState.Idle) state.lastSelectedMinutes else null
-                        if (adManager.shouldShowAd(isProUser)) {
+                        if (adManager.shouldShowAd()) {
                             adManager.showAd(activity) {
                                 onNavigateToTimer(selectedMinutes)
                             }

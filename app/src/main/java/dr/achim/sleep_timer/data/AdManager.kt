@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.firstOrNull
 
 class AdManager(
     private val settingsRepository: SettingsRepository,
+    private val billingRepository: BillingRepository,
     private val consentManager: GoogleMobileAdsConsentManager,
 ) {
     companion object {
@@ -21,8 +22,11 @@ class AdManager(
 
     private var interstitialAd: InterstitialAd? = null
 
+    private val canShowAds: Boolean
+        get() = consentManager.canRequestAds && !billingRepository.isPro.value
+
     private fun loadAd() {
-        if (!consentManager.canRequestAds) return
+        if (!canShowAds) return
         if (INTERSTITIAL_AD_UNIT_ID.isEmpty()) return
         if (interstitialAd != null) return
 
@@ -43,7 +47,7 @@ class AdManager(
 
     suspend fun mayPreload(): Boolean {
         val isNextAdTurn = isNextAdTurn()
-        
+
         if (isNextAdTurn) {
             loadAd()
         }
@@ -51,8 +55,8 @@ class AdManager(
         return isNextAdTurn
     }
 
-    suspend fun shouldShowAd(isProUser: Boolean): Boolean {
-        if (isProUser || !consentManager.canRequestAds) {
+    suspend fun shouldShowAd(): Boolean {
+        if (!canShowAds) {
             interstitialAd = null
             settingsRepository.incrementAndGetTimerStartCount()
             return false
@@ -61,14 +65,14 @@ class AdManager(
         val count = settingsRepository.incrementAndGetTimerStartCount()
         return count > 0 && count % AD_FREQUENCY == 0
     }
-    
-    private suspend fun isNextAdTurn() : Boolean {
+
+    private suspend fun isNextAdTurn(): Boolean {
         val count = settingsRepository.timerStartCount.firstOrNull() ?: 0
         return (count + 1) % AD_FREQUENCY == 0
     }
 
     fun showAd(activity: Activity, onAdClosed: () -> Unit) {
-        if (!consentManager.canRequestAds) {
+        if (!canShowAds) {
             interstitialAd = null
             onAdClosed()
             return

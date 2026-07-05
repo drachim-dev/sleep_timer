@@ -9,106 +9,99 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
 import com.google.android.ump.UserMessagingPlatform
 import dr.achim.sleep_timer.BuildConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
-/**
- * The Google Mobile Ads SDK provides the User Messaging Platform (UMP) SDK to help you manage ads
- * consent. For more information, see [Help users manage their privacy](https://developers.google.com/admob/android/privacy).
- */
+sealed class AdsInitState {
+    object NotStarted : AdsInitState()
+    object CheckingPro : AdsInitState()
+    object GatheringConsent : AdsInitState()
+    object Initializing : AdsInitState()
+    object Ready : AdsInitState()
+    object SkippedPro : AdsInitState()
+    data class Failed(val reason: String) : AdsInitState()
+}
+
 class GoogleMobileAdsConsentManager(
     private val context: Context,
     private val billingRepository: BillingRepository
 ) {
-    private val consentInformation: ConsentInformation =
-        UserMessagingPlatform.getConsentInformation(context)
+    private val consentInformation = UserMessagingPlatform.getConsentInformation(context)
 
-    /** Interface definition for a callback to be invoked when consent gathering is complete. */
-    fun interface OnConsentGatheringCompleteListener {
-        fun consentGatheringComplete(error: FormError?)
-    }
+    private val _state = MutableStateFlow<AdsInitState>(AdsInitState.NotStarted)
+    val state: StateFlow<AdsInitState> = _state.asStateFlow()
 
-    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
-
-    /**
-     * Helper variable to determine if the app can request ads.
-     */
+    /** True only once consent is granted AND the Ads SDK has actually been initialized. */
     val canRequestAds: Boolean
-        get() = consentInformation.canRequestAds()
+        get() = _state.value == AdsInitState.Ready
 
-    /**
-     * Helper variable to determine if the privacy options form is required.
-     */
     val isPrivacyOptionsRequired: Boolean
-        get() =
-            consentInformation.privacyOptionsRequirementStatus ==
+        get() = consentInformation.privacyOptionsRequirementStatus ==
                 ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
 
-    /**
-     * Helper method to call the UMP SDK methods to request consent information and load/show a
-     * consent form if necessary.
-     */
-    fun gatherConsent(
-        activity: Activity,
-        onConsentGatheringCompleteListener: OnConsentGatheringCompleteListener,
-    ) {
-        val params = ConsentRequestParameters.Builder().build()
+    suspend fun initialize(activity: Activity) {
+        if (_state.value == AdsInitState.Ready || _state.value == AdsInitState.SkippedPro) return
 
-        // Requesting an update to consent information should be called on every app launch.
-        consentInformation.requestConsentInfoUpdate(
-            activity,
-            params,
-            {
-                loadAndShowConsentFormIfRequired(activity, onConsentGatheringCompleteListener)
-            },
-            { requestConsentError ->
-                onConsentGatheringCompleteListener.consentGatheringComplete(requestConsentError)
-            }
-        )
-    }
-
-    private fun loadAndShowConsentFormIfRequired(
-        activity: Activity,
-        onConsentGatheringCompleteListener: OnConsentGatheringCompleteListener,
-    ) {
-        UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { formError ->
-            onConsentGatheringCompleteListener.consentGatheringComplete(formError)
-        }
-    }
-
-    /**
-     * Helper method to call the UMP SDK method to show the privacy options form.
-     */
-    fun showPrivacyOptionsForm(
-        activity: Activity,
-        onConsentFormDismissedListener: (error: FormError?) -> Unit
-    ) {
-        UserMessagingPlatform.showPrivacyOptionsForm(activity, onConsentFormDismissedListener)
-    }
-
-    /**
-     * Initializes the Google Mobile Ads SDK if the user is not a Pro user and has given consent.
-     */
-    fun initializeMobileAdsSdk() {
-        if (!canRequestAds) {
+        _state.value = AdsInitState.CheckingPro
+        if (billingRepository.awaitIsPro()) {
+            _state.value = AdsInitState.SkippedPro
             return
         }
 
-        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+        _state.value = AdsInitState.GatheringConsent
+        val consentError = gatherConsent(activity)
+        if (consentError != null) {
+            _state.value = AdsInitState.Failed(consentError.message)
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            if (!billingRepository.isPro.first()) {
-                // Initialize the Google Mobile Ads SDK.
-                val initConfig = InitializationConfig.Builder(BuildConfig.ADMOB_APP_ID).build()
-                MobileAds.initialize(context, initConfig)
+        if (!consentInformation.canRequestAds()) {
+            _state.value = AdsInitState.Failed("Consent not granted")
+            return
+        }
+
+        _state.value = AdsInitState.Initializing
+        val initConfig = InitializationConfig.Builder(BuildConfig.ADMOB_APP_ID).build()
+        MobileAds.initialize(context, initConfig)
+        _state.value = AdsInitState.Ready
+    }
+
+    /** Wire to a "Privacy Options" row in Settings — the GDPR consent-revocation link. */
+    fun showPrivacyOptionsForm(activity: Activity, onDismissed: (FormError?) -> Unit = {}) {
+        UserMessagingPlatform.showPrivacyOptionsForm(activity) { formError ->
+            onDismissed(formError)
+            _state.value = if (consentInformation.canRequestAds()) {
+                AdsInitState.Ready
             } else {
-                isMobileAdsInitializeCalled.set(false)
+                AdsInitState.Failed("Consent revoked")
             }
         }
     }
+
+    private suspend fun gatherConsent(activity: Activity): FormError? {
+        val updateError = requestConsentInfoUpdate(activity)
+        if (updateError != null) return updateError
+        return loadAndShowConsentFormIfRequired(activity)
+    }
+
+    private suspend fun requestConsentInfoUpdate(activity: Activity): FormError? =
+        suspendCancellableCoroutine { cont ->
+            val params = ConsentRequestParameters.Builder().build()
+            consentInformation.requestConsentInfoUpdate(
+                activity,
+                params,
+                { cont.resume(null) },
+                { error -> cont.resume(error) }
+            )
+        }
+
+    private suspend fun loadAndShowConsentFormIfRequired(activity: Activity): FormError? =
+        suspendCancellableCoroutine { cont ->
+            UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { error ->
+                cont.resume(error)
+            }
+        }
 }
