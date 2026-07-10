@@ -169,7 +169,11 @@ class SettingsViewModel(
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
             is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
-            is SettingsUiAction.PurchaseProduct -> purchaseProduct(action.activity, action.productId)
+            is SettingsUiAction.PurchaseProduct -> purchaseProduct(
+                action.activity,
+                action.productId
+            )
+
             is SettingsUiAction.ShowPrivacyOptions -> showPrivacyOptions(action.activity)
         }
     }
@@ -186,7 +190,9 @@ class SettingsViewModel(
         val product = _products.value.find { it.id == productId } ?: return
         Purchases.sharedInstance.purchaseWith(
             PurchaseParams.Builder(activity, product).build(),
-            onError = { error, _ ->
+            onError = { error, userCancelled ->
+                if (userCancelled) return@purchaseWith
+
                 Log.e(TAG, "Code ${error.code}: ${error.message}")
                 sendEvent(PurchaseEvent.PurchaseAborted)
             },
