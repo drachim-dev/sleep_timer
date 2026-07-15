@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,15 +83,19 @@ fun CreditsScreen(
     val libraries by produceLibraries(R.raw.aboutlibraries)
     val uriHandler = LocalUriHandler.current
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = { Text(stringResource(R.string.settings_credits_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painterResource(R.drawable.ic_arrow_back),
+                            painter = painterResource(R.drawable.ic_arrow_back),
                             contentDescription = stringResource(R.string.settings_back_description)
                         )
                     }

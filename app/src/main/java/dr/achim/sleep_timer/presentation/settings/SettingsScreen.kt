@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -210,21 +211,28 @@ fun SettingsScreenContent(
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBar(
+                    scrollBehavior = scrollBehavior,
                     title = { Text(stringResource(R.string.settings_title)) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
-                                painterResource(R.drawable.ic_arrow_back),
+                                painter = painterResource(R.drawable.ic_arrow_back),
                                 contentDescription = stringResource(R.string.settings_back_description)
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    )
                 )
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
