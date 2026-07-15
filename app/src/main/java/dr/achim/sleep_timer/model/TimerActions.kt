@@ -28,6 +28,7 @@ data class StartActions(
     val adjustVolume: Boolean = false,
     val volumeLevel: Int? = null,
     val enableDnd: Boolean = false,
+    val turnOffScreen: Boolean = false,
     val hueLights: Boolean = false
 )
 

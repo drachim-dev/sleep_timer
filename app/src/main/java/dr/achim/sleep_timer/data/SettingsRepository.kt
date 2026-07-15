@@ -155,6 +155,7 @@ class SettingsRepository(context: Context) {
         private val START_ADJUST_VOLUME_KEY = booleanPreferencesKey("pref_key_start_adjust_volume")
         private val START_ENABLE_DND_KEY = booleanPreferencesKey("pref_key_start_enable_dnd")
         private val START_HUE_LIGHTS_KEY = booleanPreferencesKey("pref_key_start_hue_lights")
+        private val START_TURN_OFF_SCREEN_KEY = booleanPreferencesKey("pref_key_start_turn_off_screen")
         private val END_VOLUME_LEVEL_KEY = intPreferencesKey("pref_key_volume_end_level")
         private val END_ADJUST_VOLUME_KEY = booleanPreferencesKey("pref_key_end_adjust_volume")
         private val END_STOP_MEDIA_KEY = booleanPreferencesKey("pref_key_end_stop_media")
@@ -236,6 +237,10 @@ class SettingsRepository(context: Context) {
 
     val startHueLights: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[START_HUE_LIGHTS_KEY] ?: false
+    }
+
+    val startTurnOffScreen: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[START_TURN_OFF_SCREEN_KEY] ?: false
     }
 
     val endVolumeLevel: Flow<Int?> = dataStore.data.map { preferences ->
@@ -367,6 +372,12 @@ class SettingsRepository(context: Context) {
     suspend fun setStartHueLights(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[START_HUE_LIGHTS_KEY] = enabled
+        }
+    }
+
+    suspend fun setStartTurnOffScreen(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[START_TURN_OFF_SCREEN_KEY] = enabled
         }
     }
 

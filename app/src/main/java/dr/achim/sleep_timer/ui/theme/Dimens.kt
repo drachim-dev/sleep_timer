@@ -18,7 +18,6 @@ data class Dimens(
     val pageIndicator: Dp = 8.dp,
     val timeButtonSize: Dp = 64.dp,
     val quickTimeAddIconSize: Dp = 32.dp,
-    val actionToggleIconSize: Dp = 32.dp,
 
     val timerDiameter: Dp = 280.dp,
     val timerStrokeWidthDefault: Dp = 8.dp,
@@ -28,10 +27,12 @@ data class Dimens(
     val timerSizeCollapsed: Dp = 150.dp,
 
     val quickLaunchItemWidth: Dp = 72.dp,
-    val quickLaunchItemHeight: Dp = 80.dp,
     val quickLaunchAppIconSize: Dp = 48.dp,
     val quickLaunchIconSize: Dp = 24.dp,
-    val quickLaunchCardWidth: Dp = 96.dp,
+
+    val actionToggleWidth: Dp = 82.dp,
+    val actionToggleHeight: Dp = 76.dp,
+    val actionToggleIconSize: Dp = 32.dp,
 
     val borderThickness: Dp = 2.dp,
     val dashLength: Dp = 8.dp,

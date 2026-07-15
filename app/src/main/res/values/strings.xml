@@ -93,7 +93,7 @@
     <string name="timer_section_end_actions">When time is up</string>
     <string name="timer_action_volume">Volume</string>
     <string name="timer_action_hue_lights">Hue lights</string>
-    <string name="timer_action_dnd">Do not disturb</string>
+    <string name="timer_action_dnd">DND</string>
     <string name="timer_action_media">Media</string>
     <string name="timer_action_screen">Screen</string>
     <string name="timer_action_bluetooth">Bluetooth</string>

@@ -16,10 +16,13 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalFlexBoxApi
+import androidx.compose.foundation.layout.FlexBox
+import androidx.compose.foundation.layout.FlexBoxScope
+import androidx.compose.foundation.layout.FlexJustifyContent
+import androidx.compose.foundation.layout.FlexWrap
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -75,6 +78,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -150,6 +154,7 @@ fun TimerScreen(
     )
 }
 
+@OptIn(ExperimentalFlexBoxApi::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
@@ -247,15 +252,19 @@ private fun TimerScreenContent(
                     }
                 },
                 actions = {
-                    val progress by LocalNavAnimatedContentScope.current.transition.animateFloat(
-                        transitionSpec = {
-                            spring(
-                                dampingRatio = Spring.DampingRatioHighBouncy,
-                                stiffness = Spring.StiffnessMedium
-                            )
-                        }
-                    ) { state ->
-                        if (state == EnterExitState.Visible) 1f else 0f
+                    val progress = if (LocalInspectionMode.current) {
+                        1f
+                    } else {
+                        LocalNavAnimatedContentScope.current.transition.animateFloat(
+                            transitionSpec = {
+                                spring(
+                                    dampingRatio = Spring.DampingRatioHighBouncy,
+                                    stiffness = Spring.StiffnessMedium
+                                )
+                            }
+                        ) { state ->
+                            if (state == EnterExitState.Visible) 1f else 0f
+                        }.value
                     }
                     IconButton(
                         onClick = {
@@ -399,6 +408,7 @@ private fun TimerScreenContent(
                     timerActions = uiState.timerActions,
                     hasDndPermission = uiState.hasNotificationAccess,
                     hasNearbyPermission = uiState.hasNearbyPermission,
+                    isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
                     onAction = onAction,
                     onVolumeLongClick = { showStartVolumeDialog = true },
                     onNavigateToSettings = onNavigateToSettings
@@ -425,6 +435,7 @@ private fun StartActionsRow(
     timerActions: TimerActions,
     hasDndPermission: Boolean,
     hasNearbyPermission: Boolean,
+    isDeviceAdminEnabled: Boolean,
     onAction: (Action) -> Unit,
     onVolumeLongClick: () -> Unit,
     onNavigateToSettings: (String) -> Unit
@@ -467,6 +478,19 @@ private fun StartActionsRow(
                 onAction(Action.ToggleAction(TimerActionType.DND, TimerActionSource.START, !timerActions.startActions.enableDnd))
             } else {
                 onNavigateToSettings(SETTING_DND)
+            }
+        }
+    )
+    ActionToggle(
+        painter = painterResource(if (timerActions.startActions.turnOffScreen) R.drawable.ic_screen_off else R.drawable.ic_screen_on),
+        label = stringResource(R.string.timer_action_screen),
+        active = timerActions.startActions.turnOffScreen,
+        warning = timerActions.startActions.turnOffScreen && !isDeviceAdminEnabled,
+        onClick = {
+            if (isDeviceAdminEnabled) {
+                onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.START, !timerActions.startActions.turnOffScreen))
+            } else {
+                onNavigateToSettings(SETTING_ADMIN)
             }
         }
     )
@@ -564,14 +588,25 @@ fun TimeAdjustmentRow(
     }
 }
 
+@OptIn(ExperimentalFlexBoxApi::class)
 @Composable
-private fun TimerSection(title: @Composable () -> Unit, content: @Composable RowScope.() -> Unit) {
+private fun TimerSection(
+    title: @Composable () -> Unit,
+    content: @Composable FlexBoxScope.() -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         title()
-        FlowRow(
+
+        val columnMinSpacing = AppTheme.dimens.spacingNormal
+        val rowMinSpacing = AppTheme.dimens.spacingMedium
+        FlexBox(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingNormal),
+            config = {
+                wrap(FlexWrap.Wrap)
+                columnGap(columnMinSpacing)
+                rowGap(rowMinSpacing)
+                justifyContent(FlexJustifyContent.SpaceEvenly)
+            },
             content = content
         )
     }
@@ -713,7 +748,7 @@ fun ActionToggle(
 
     Surface(
         modifier = Modifier
-            .size(AppTheme.dimens.quickLaunchCardWidth, AppTheme.dimens.quickLaunchItemHeight)
+            .size(AppTheme.dimens.actionToggleWidth, AppTheme.dimens.actionToggleHeight)
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
                 onClick = onClick,

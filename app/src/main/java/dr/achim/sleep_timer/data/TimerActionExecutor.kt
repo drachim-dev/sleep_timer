@@ -37,6 +37,16 @@ class TimerActionExecutor(
             }
         }
 
+        if (actions.turnOffScreen) {
+            if (devicePolicyManager.isAdminActive(adminComponent)) {
+                try {
+                    devicePolicyManager.lockNow()
+                } catch (_: SecurityException) {
+                    // Permission might have been revoked just now
+                }
+            }
+        }
+
         if (actions.hueLights) {
             val ip = settingsRepository.hueBridgeIp.firstOrNull()
             val user = settingsRepository.hueApiUser.firstOrNull()

@@ -1,5 +1,6 @@
 package dr.achim.sleep_timer.domain.usecase
 
+import dr.achim.sleep_timer.common.combine
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.EndActions
 import dr.achim.sleep_timer.model.StartActions
@@ -16,31 +17,33 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
             settingsRepository.startAdjustVolume,
             settingsRepository.startVolumeLevel,
             settingsRepository.startEnableDnd,
+            settingsRepository.startTurnOffScreen,
             settingsRepository.startHueLights
-        ) { adjust, level, dnd, hue ->
+        ) { adjustVolume, volumeLevel, dnd, turnOffScreen, turnOffLights ->
             StartActions(
-                adjustVolume = adjust,
-                volumeLevel = level,
+                adjustVolume = adjustVolume,
+                volumeLevel = volumeLevel,
                 enableDnd = dnd,
-                hueLights = hue
+                turnOffScreen = turnOffScreen,
+                hueLights = turnOffLights
             )
         }
 
-        val endActionsFlow = combine<Any?, EndActions>(
+        val endActionsFlow = combine(
             settingsRepository.endStopMedia,
             settingsRepository.endAdjustVolume,
             settingsRepository.endVolumeLevel,
             settingsRepository.endTurnOffScreen,
             settingsRepository.endTurnOffBluetooth,
             settingsRepository.endHueLights
-        ) { flows ->
+        ) { stopMedia, adjustVolume, volumeLevel, turnOffScreen, turnOffBluetooth, turnOffLights ->
             EndActions(
-                stopMedia = flows[0] as Boolean,
-                adjustVolume = flows[1] as Boolean,
-                volumeLevel = flows[2] as Int?,
-                turnOffScreen = flows[3] as Boolean,
-                turnOffBluetooth = flows[4] as Boolean,
-                hueLights = flows[5] as Boolean
+                stopMedia = stopMedia,
+                adjustVolume = adjustVolume,
+                volumeLevel = volumeLevel,
+                turnOffScreen = turnOffScreen,
+                turnOffBluetooth = turnOffBluetooth,
+                hueLights = turnOffLights
             )
         }
 
@@ -56,8 +59,8 @@ class ManageTimerActionsUseCase(private val settingsRepository: SettingsReposito
                     TimerActionType.ADJUST_VOLUME -> settingsRepository.setStartAdjustVolume(enabled)
                     TimerActionType.HUE_LIGHTS -> settingsRepository.setStartHueLights(enabled)
                     TimerActionType.DND -> settingsRepository.setStartEnableDnd(enabled)
+                    TimerActionType.TURN_OFF_SCREEN -> settingsRepository.setStartTurnOffScreen(enabled)
                     TimerActionType.STOP_MEDIA -> {}
-                    TimerActionType.TURN_OFF_SCREEN -> {}
                     TimerActionType.TURN_OFF_BLUETOOTH -> {}
                 }
             }

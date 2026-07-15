@@ -2,7 +2,6 @@ package dr.achim.sleep_timer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dr.achim.sleep_timer.common.combine
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
 import dr.achim.sleep_timer.domain.usecase.GetLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.GetQuickTimesUseCase
@@ -14,6 +13,7 @@ import dr.achim.sleep_timer.model.TimerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
