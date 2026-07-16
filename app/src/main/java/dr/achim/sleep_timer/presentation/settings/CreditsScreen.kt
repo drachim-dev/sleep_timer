@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +32,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.style.m3VariantTextStyles
 import com.mikepenz.aboutlibraries.ui.compose.variant.LibraryDetailMode
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.ui.components.SectionTitle
+import dr.achim.sleep_timer.ui.rememberCustomTabLauncher
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
 
@@ -81,7 +81,7 @@ fun CreditsScreen(
     onBack: () -> Unit
 ) {
     val libraries by produceLibraries(R.raw.aboutlibraries)
-    val uriHandler = LocalUriHandler.current
+    val customTabLauncher = rememberCustomTabLauncher()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -118,7 +118,7 @@ fun CreditsScreen(
                 item {
                     CreditsHeader(
                         onCreditClick = { credit ->
-                            uriHandler.openUri(credit.url)
+                            customTabLauncher(credit.url)
                         }
                     )
                 }
