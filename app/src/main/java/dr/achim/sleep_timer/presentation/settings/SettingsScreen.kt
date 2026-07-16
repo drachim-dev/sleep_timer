@@ -197,11 +197,13 @@ fun SettingsScreenContent(
 
     var showConfetti by remember { mutableStateOf(false) }
     val purchaseErrorMessage = stringResource(R.string.error_purchase_failure)
+    val purchaseSuccessMessage = stringResource(R.string.settings_purchase_success)
     LaunchedEffect(Unit) {
         purchaseEvents.collectLatest {
             when (it) {
                 PurchaseEvent.PurchaseComplete -> {
                     showConfetti = true
+                    snackbarHostState.showSnackbar(purchaseSuccessMessage)
                 }
 
                 PurchaseEvent.PurchaseAborted -> {
