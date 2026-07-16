@@ -251,8 +251,7 @@ fun HomeScreenContent(
                             selectedMinutes.snapTo(snappedProgress)
                             onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
                         }
-                    },
-                    modifier = Modifier.safeSharedElement(SharedElementKey.CircularTimer)
+                    }
                 ) {
                     if (idle) {
                         val totalMinutes = (selectedMinutes.value * 60).toInt()

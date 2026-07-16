@@ -35,6 +35,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import dr.achim.sleep_timer.ui.SharedElementKey
+import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
 import kotlin.math.atan2
@@ -77,7 +79,8 @@ fun CircularTimer(
                 AppTheme.dimens.timerDiameter
             }
 
-        val strokeWidth: Dp = if (interactive) AppTheme.dimens.timerStrokeWidthInteractive else AppTheme.dimens.timerStrokeWidthDefault
+        val strokeWidth: Dp =
+            if (interactive) AppTheme.dimens.timerStrokeWidthInteractive else AppTheme.dimens.timerStrokeWidthDefault
         val strokeWidthPx = with(density) { strokeWidth.toPx() }
         val innerSquareSide = (diameter - strokeWidth) * 0.7071f
 
@@ -145,13 +148,16 @@ fun CircularTimer(
                 glowColor = glowColor,
                 showHandle = showHandle,
                 handleScale = handleScale,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .safeSharedElement(key = SharedElementKey.CircularTimer),
             )
 
             Box(
                 modifier = Modifier
                     .size(innerSquareSide)
-                    .padding(AppTheme.dimens.spacingSmall),
+                    .padding(AppTheme.dimens.spacingSmall)
+                    .safeSharedElement(key = SharedElementKey.TimerText),
                 contentAlignment = Alignment.Center
             ) {
                 CompositionLocalProvider(

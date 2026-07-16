@@ -1,7 +1,10 @@
 package dr.achim.sleep_timer.ui
 
+import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SharedTransitionDefaults
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
@@ -11,7 +14,13 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 
 @Composable
-fun Modifier.safeSharedElement(key: Any): Modifier {
+fun Modifier.safeSharedElement(
+    key: Any,
+    boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
+    placeholderSize: SharedTransitionScope.PlaceholderSize = SharedTransitionScope.PlaceholderSize.ContentSize,
+    renderInOverlayDuringTransition: Boolean = true,
+    zIndexInOverlay: Float = 0f,
+): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
 
@@ -19,16 +28,26 @@ fun Modifier.safeSharedElement(key: Any): Modifier {
         with(sharedTransitionScope) {
             sharedElement(
                 sharedContentState = rememberSharedContentState(key = key),
-                animatedVisibilityScope = animatedVisibilityScope
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = boundsTransform,
+                placeholderSize = placeholderSize,
+                renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+                zIndexInOverlay = zIndexInOverlay,
             )
         }
     } else this
 }
 
 @Composable
-fun Modifier.safeSharedBounds(key: Any,
+fun Modifier.safeSharedBounds(
+    key: Any,
     enter: EnterTransition = fadeIn(),
     exit: ExitTransition = fadeOut(),
+    boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
+    placeholderSize: SharedTransitionScope.PlaceholderSize = SharedTransitionScope.PlaceholderSize.ContentSize,
+    resizeMode: SharedTransitionScope.ResizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+    renderInOverlayDuringTransition: Boolean = true,
+    zIndexInOverlay: Float = 0f,
 ): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
@@ -39,7 +58,12 @@ fun Modifier.safeSharedBounds(key: Any,
                 sharedContentState = rememberSharedContentState(key = key),
                 animatedVisibilityScope = animatedVisibilityScope,
                 enter = enter,
-                exit = exit
+                exit = exit,
+                boundsTransform = boundsTransform,
+                placeholderSize = placeholderSize,
+                resizeMode = resizeMode,
+                renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+                zIndexInOverlay = zIndexInOverlay,
             )
         }
     } else this
@@ -49,5 +73,6 @@ enum class SharedElementKey {
     Fab,
     FabTrailing,
     CircularTimer,
+    TimerText,
     ActionButtonGearToCross
 }

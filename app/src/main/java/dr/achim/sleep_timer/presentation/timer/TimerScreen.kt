@@ -350,11 +350,10 @@ private fun TimerScreenContent(
                 interactive = false,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .safeSharedElement(SharedElementKey.CircularTimer)
-                    .let {
+                    .let { modifier ->
                         val expandedSize = AppTheme.dimens.timerSizeExpanded
                         val collapsedSize = AppTheme.dimens.timerSizeCollapsed
-                        it.layout { measurable, _ ->
+                        modifier.layout { measurable, _ ->
                             val fraction = (scrollState.value / 400f).coerceIn(0f, 1f)
                             val sizeDp = lerp(expandedSize, collapsedSize, fraction)
                             val sizePx = sizeDp.roundToPx()
