@@ -458,7 +458,7 @@ private fun StartActionsRow(
         active = timerActions.startActions.hueLights,
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
         onClick = {
-            if (hasNearbyPermission) {
+            if (hasNearbyPermission || timerActions.startActions.hueLights) {
                 onAction(Action.ToggleAction(TimerActionType.HUE_LIGHTS, TimerActionSource.START, !timerActions.startActions.hueLights))
             } else {
                 onAction(Action.OpenHueSettings(TimerActionSource.START))
@@ -472,12 +472,13 @@ private fun StartActionsRow(
         active = timerActions.startActions.enableDnd,
         warning = timerActions.startActions.enableDnd && !hasDndPermission,
         onClick = {
-            if (hasDndPermission) {
+            if (hasDndPermission || timerActions.startActions.enableDnd) {
                 onAction(Action.ToggleAction(TimerActionType.DND, TimerActionSource.START, !timerActions.startActions.enableDnd))
             } else {
                 onNavigateToSettings(SETTING_DND)
             }
-        }
+        },
+        onLongClick = { onNavigateToSettings(SETTING_DND) }
     )
     ActionToggle(
         painter = painterResource(if (timerActions.startActions.turnOffScreen) R.drawable.ic_screen_off else R.drawable.ic_screen_on),
@@ -485,12 +486,13 @@ private fun StartActionsRow(
         active = timerActions.startActions.turnOffScreen,
         warning = timerActions.startActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
-            if (isDeviceAdminEnabled) {
+            if (isDeviceAdminEnabled || timerActions.startActions.turnOffScreen) {
                 onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.START, !timerActions.startActions.turnOffScreen))
             } else {
                 onNavigateToSettings(SETTING_ADMIN)
             }
-        }
+        },
+        onLongClick = { onNavigateToSettings(SETTING_ADMIN) }
     )
 }
 
@@ -528,12 +530,13 @@ private fun EndActionsRow(
         active = timerActions.endActions.turnOffScreen,
         warning = timerActions.endActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
-            if (isDeviceAdminEnabled) {
+            if (isDeviceAdminEnabled || timerActions.endActions.turnOffScreen) {
                 onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.END, !timerActions.endActions.turnOffScreen))
             } else {
                 onNavigateToSettings(SETTING_ADMIN)
             }
-        }
+        },
+        onLongClick = { onNavigateToSettings(SETTING_ADMIN) }
     )
     // Implement when dimming lights is available
     /* ActionToggle(
