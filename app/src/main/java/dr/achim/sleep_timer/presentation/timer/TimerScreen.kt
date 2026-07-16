@@ -92,7 +92,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.ReviewManager
-import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.domain.model.AppCategory
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.model.TimerActionSource
@@ -139,7 +138,7 @@ fun TimerScreen(
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is TimerUiEvent.NavigateToRoomSelection -> onNavigateToRoomSelection(event.source)
-                TimerUiEvent.RequestReview -> reviewManager.tryShowReview(context.findActivity())
+                TimerUiEvent.RequestReview -> reviewManager.tryShowReview(context)
             }
         }
     }

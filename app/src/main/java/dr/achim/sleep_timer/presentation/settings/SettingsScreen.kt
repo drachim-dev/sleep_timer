@@ -155,7 +155,6 @@ fun SettingsScreenContent(
     isPrivacyOptionsRequired: Boolean
 ) {
     val context = LocalContext.current
-    val activity = remember(context) { context.findActivity() }
     val scrollState = rememberScrollState()
 
     LaunchedEffect(highlight) {
@@ -341,7 +340,7 @@ fun SettingsScreenContent(
                                     if (!uiModel.isPurchased) {
                                         onAction(
                                             SettingsUiAction.PurchaseProduct(
-                                                activity,
+                                                context.findActivity(),
                                                 uiModel.id
                                             )
                                         )
@@ -419,7 +418,7 @@ fun SettingsScreenContent(
                         SettingsItem(
                             painter = painterResource(R.drawable.ic_shield_person),
                             title = stringResource(R.string.settings_privacy_options_title),
-                            onClick = { onAction(SettingsUiAction.ShowPrivacyOptions(activity)) }
+                            onClick = { onAction(SettingsUiAction.ShowPrivacyOptions(context.findActivity())) }
                         )
                     }
                 }

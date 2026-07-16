@@ -178,7 +178,8 @@ class SettingsViewModel(
         }
     }
 
-    private fun showPrivacyOptions(activity: Activity) {
+    private fun showPrivacyOptions(activity: Activity?) {
+        if (activity == null) return
         googleMobileAdsConsentManager.showPrivacyOptionsForm(activity) { error ->
             if (error != null) {
                 Log.e(TAG, "Privacy options form error: ${error.message}")
@@ -186,7 +187,8 @@ class SettingsViewModel(
         }
     }
 
-    private fun purchaseProduct(activity: Activity, productId: String) {
+    private fun purchaseProduct(activity: Activity?, productId: String) {
+        if (activity == null) return
         val product = _products.value.find { it.id == productId } ?: return
         Purchases.sharedInstance.purchaseWith(
             PurchaseParams.Builder(activity, product).build(),

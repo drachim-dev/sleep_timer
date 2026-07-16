@@ -85,11 +85,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
-import dr.achim.sleep_timer.common.findActivity
+import dr.achim.sleep_timer.common.shouldShowRationale
 import dr.achim.sleep_timer.data.AdManager
 import dr.achim.sleep_timer.model.TimerState
 import dr.achim.sleep_timer.ui.SharedElementKey
@@ -118,7 +117,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val timerState by viewModel.timerState.collectAsStateWithLifecycle()
-    val activity = LocalContext.current.findActivity()
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     when (val state = uiState) {
@@ -145,11 +144,7 @@ fun HomeScreen(
                     coroutineScope.launch {
                         val selectedMinutes =
                             if (timerState is TimerState.Idle) state.lastSelectedMinutes else null
-                        if (adManager.shouldShowAd()) {
-                            adManager.showAd(activity) {
-                                onNavigateToTimer(selectedMinutes)
-                            }
-                        } else {
+                        adManager.showAd(context) {
                             onNavigateToTimer(selectedMinutes)
                         }
                     }
@@ -174,7 +169,6 @@ fun HomeScreenContent(
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
-    val activity = context.findActivity()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -182,10 +176,7 @@ fun HomeScreenContent(
                 onNavigateToTimer()
             } else {
                 val showRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        activity,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    )
+                    context.shouldShowRationale(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
                     false
                 }

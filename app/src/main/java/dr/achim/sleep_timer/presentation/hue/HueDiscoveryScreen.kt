@@ -57,6 +57,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.findActivity
+import dr.achim.sleep_timer.common.shouldShowRationale
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.ui.components.EmptyState
 import dr.achim.sleep_timer.ui.components.FullScreenLoadingState
@@ -80,10 +81,7 @@ fun HueDiscoveryScreen(
         if (results.all { it.value }) {
             viewModel.onAction(HueDiscoveryUiAction.PermissionGranted)
         } else {
-            val activity = context.findActivity()
-            val shouldShowRationale = permissions.any { permission ->
-                ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
-            }
+            val shouldShowRationale = permissions.any { context.shouldShowRationale(it) }
             viewModel.onAction(HueDiscoveryUiAction.PermissionDenied(shouldShowRationale))
         }
     }

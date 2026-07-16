@@ -15,7 +15,8 @@ class ReviewManager(
 ) {
     private val manager = ReviewManagerFactory.create(context)
 
-    suspend fun tryShowReview(activity: Activity) {
+    suspend fun tryShowReview(context: Context) {
+        val activity = context.findActivity() ?: return
         if (shouldShowReview()) {
             launchReviewFlow(activity)
             settingsRepository.setLastReviewTimestamp(System.currentTimeMillis())

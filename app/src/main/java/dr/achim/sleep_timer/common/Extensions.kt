@@ -3,6 +3,7 @@ package dr.achim.sleep_timer.common
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -19,13 +20,18 @@ import kotlin.time.Duration
 /**
  * Find the closest Activity in a given Context.
  */
-fun Context.findActivity(): Activity {
+fun Context.findActivity(): Activity? {
     var context = this
     while (context is ContextWrapper) {
         if (context is Activity) return context
         context = context.baseContext
     }
-    throw IllegalStateException("Must only be called in the context of an Activity")
+    return null
+}
+
+fun Context.shouldShowRationale(permission: String): Boolean {
+    val activity = findActivity() ?: return false
+    return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
 }
 
 fun Long.toDays(): Long = this / (1000 * 60 * 60 * 24)

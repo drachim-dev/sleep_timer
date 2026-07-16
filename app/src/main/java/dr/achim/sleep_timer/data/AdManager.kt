@@ -1,6 +1,7 @@
 package dr.achim.sleep_timer.data
 
 import android.app.Activity
+import android.content.Context
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
@@ -8,6 +9,7 @@ import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
 import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
 import dr.achim.sleep_timer.BuildConfig
+import dr.achim.sleep_timer.common.findActivity
 import kotlinx.coroutines.flow.firstOrNull
 
 class AdManager(
@@ -71,15 +73,16 @@ class AdManager(
         return (count + 1) % AD_FREQUENCY == 0
     }
 
-    fun showAd(activity: Activity, onAdClosed: () -> Unit) {
+    fun showAd(context: Context, onAdClosed: () -> Unit) {
         if (!canShowAds) {
             interstitialAd = null
             onAdClosed()
             return
         }
 
+        val activity = context.findActivity()
         val ad = interstitialAd
-        if (ad != null) {
+        if (ad != null && activity != null) {
             ad.adEventCallback = object : InterstitialAdEventCallback {
                 override fun onAdDismissedFullScreenContent() {
                     interstitialAd = null
