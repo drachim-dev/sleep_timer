@@ -100,6 +100,22 @@ class SettingsViewModel(
             initialValue = AppSettings().extendOnShakeMinutes
         )
 
+    val lightsOffDelay: StateFlow<Boolean> = settings
+        .map { it.lightsOffDelay }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AppSettings().lightsOffDelay
+        )
+
+    val lightsOffDelaySeconds: StateFlow<Int> = settings
+        .map { it.lightsOffDelaySeconds }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AppSettings().lightsOffDelaySeconds
+        )
+
     private val _isDeviceAdminEnabled =
         MutableStateFlow(checkTimerPermissionsUseCase().isDeviceAdminEnabled)
     val isDeviceAdminEnabled: StateFlow<Boolean> = _isDeviceAdminEnabled.asStateFlow()
@@ -169,6 +185,8 @@ class SettingsViewModel(
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
             is SettingsUiAction.SetExtendOnShake -> setExtendOnShake(action.enabled)
             is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
+            is SettingsUiAction.SetLightsOffDelay -> setLightsOffDelay(action.enabled)
+            is SettingsUiAction.SetLightsOffDelaySeconds -> setLightsOffDelaySeconds(action.seconds)
             is SettingsUiAction.PurchaseProduct -> purchaseProduct(
                 action.activity,
                 action.productId
@@ -252,6 +270,18 @@ class SettingsViewModel(
     private fun setExtendOnShakeMinutes(minutes: Int) {
         viewModelScope.launch {
             updateSettingsUseCase.setExtendOnShakeMinutes(minutes)
+        }
+    }
+
+    private fun setLightsOffDelay(enabled: Boolean) {
+        viewModelScope.launch {
+            updateSettingsUseCase.setLightsOffDelay(enabled)
+        }
+    }
+
+    private fun setLightsOffDelaySeconds(seconds: Int) {
+        viewModelScope.launch {
+            updateSettingsUseCase.setLightsOffDelaySeconds(seconds)
         }
     }
 

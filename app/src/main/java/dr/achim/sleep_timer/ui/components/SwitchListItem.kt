@@ -32,6 +32,7 @@ fun SwitchListItem(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     highlightedContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     highlighted: Boolean = false,
+    enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -57,6 +58,7 @@ fun SwitchListItem(
                 role = Role.Switch
                 toggleableState = ToggleableState(checked)
             },
+        enabled = enabled,
         interactionSource = interactionSource,
         leadingContent = leadingContent,
         supportingContent = supportingContent,
@@ -64,10 +66,14 @@ fun SwitchListItem(
             Switch(
                 checked = checked,
                 onCheckedChange = null,
-                interactionSource = interactionSource
+                interactionSource = interactionSource,
+                enabled = enabled
             )
         },
-        colors = ListItemDefaults.colors(containerColor = animatableColor.value),
+        colors = ListItemDefaults.colors(
+            containerColor = animatableColor.value,
+            disabledContainerColor = animatableColor.value,
+        ),
         content = content
     )
 }

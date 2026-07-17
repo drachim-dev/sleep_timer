@@ -52,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -66,13 +67,17 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.BuildConfig
+import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.Constants.EXTEND_ON_SHAKE_STEPS
+import dr.achim.sleep_timer.common.Constants.LIGHTS_OFF_DELAY_STEPS
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.model.Product
 import dr.achim.sleep_timer.model.PurchaseEvent
 import dr.achim.sleep_timer.model.ThemeMode
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
+import dr.achim.sleep_timer.service.FeatureFlag
+import dr.achim.sleep_timer.ui.components.DiagonalRibbon
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.SwitchListItem
 import dr.achim.sleep_timer.ui.theme.AppTheme
@@ -102,6 +107,8 @@ fun SettingsScreen(
     val glowIntensity by viewModel.glowIntensity.collectAsStateWithLifecycle()
     val extendOnShake by viewModel.extendOnShake.collectAsStateWithLifecycle()
     val extendOnShakeMinutes by viewModel.extendOnShakeMinutes.collectAsStateWithLifecycle()
+    val lightsOffDelay by viewModel.lightsOffDelay.collectAsStateWithLifecycle()
+    val lightsOffDelaySeconds by viewModel.lightsOffDelaySeconds.collectAsStateWithLifecycle()
     val isDeviceAdminEnabled by viewModel.isDeviceAdminEnabled.collectAsStateWithLifecycle()
     val hasNotificationAccess by viewModel.hasNotificationAccess.collectAsStateWithLifecycle()
     val productUiModels by viewModel.productUiModels.collectAsStateWithLifecycle()
@@ -121,6 +128,8 @@ fun SettingsScreen(
         glowIntensity = glowIntensity,
         extendOnShake = extendOnShake,
         extendOnShakeMinutes = extendOnShakeMinutes,
+        lightsOffDelay = lightsOffDelay,
+        lightsOffDelaySeconds = lightsOffDelaySeconds,
         isDeviceAdminEnabled = isDeviceAdminEnabled,
         hasNotificationAccess = hasNotificationAccess,
         onAction = viewModel::onAction,
@@ -145,6 +154,8 @@ fun SettingsScreenContent(
     glowIntensity: Float,
     extendOnShake: Boolean,
     extendOnShakeMinutes: Int,
+    lightsOffDelay: Boolean,
+    lightsOffDelaySeconds: Int,
     isDeviceAdminEnabled: Boolean,
     hasNotificationAccess: Boolean,
     onAction: (SettingsUiAction) -> Unit,
@@ -300,6 +311,38 @@ fun SettingsScreenContent(
                             valueRange = 0f..(EXTEND_ON_SHAKE_STEPS.size - 1).toFloat(),
                             steps = EXTEND_ON_SHAKE_STEPS.size - 2
                         )
+                    }
+
+                    if (FeatureFlag.DelayLightsOff.enabled) {
+                        SettingsSwitchItem(
+                            painter = painterResource(R.drawable.ic_more_time),
+                            title = stringResource(R.string.settings_lights_off_delay_title),
+                            subtitle = stringResource(R.string.settings_lights_off_delay_subtitle),
+                            checked = lightsOffDelay,
+                            isProFeature = true,
+                            onCheckedChange = { onAction(SettingsUiAction.SetLightsOffDelay(it)) }
+                        )
+
+                        AnimatedVisibility(lightsOffDelay) {
+                            val currentDelayIndex = LIGHTS_OFF_DELAY_STEPS
+                                .indexOf(lightsOffDelaySeconds)
+                                .coerceAtLeast(0)
+                            SettingsSliderItem(
+                                title = pluralStringResource(
+                                    R.plurals.settings_lights_off_delay_seconds_title,
+                                    lightsOffDelaySeconds,
+                                    lightsOffDelaySeconds
+                                ),
+                                value = currentDelayIndex.toFloat(),
+                                onValueChange = { index ->
+                                    val seconds = LIGHTS_OFF_DELAY_STEPS[index.toInt()]
+                                    onAction(SettingsUiAction.SetLightsOffDelaySeconds(seconds))
+                                },
+                                isProFeature = true,
+                                valueRange = 0f..(LIGHTS_OFF_DELAY_STEPS.size - 1).toFloat(),
+                                steps = LIGHTS_OFF_DELAY_STEPS.size - 2
+                            )
+                        }
                     }
                 }
 
@@ -572,21 +615,30 @@ private fun SettingsSwitchItem(
     subtitle: String? = null,
     checked: Boolean,
     highlighted: Boolean = false,
+    isProFeature: Boolean = false,
+    enabled: Boolean = !isProFeature || LocalIsPro.current,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    SwitchListItem(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        highlighted = highlighted,
-        supportingContent = subtitle?.let { { Text(text = it) } },
-        leadingContent = {
-            Icon(
-                painter = painter,
-                contentDescription = null,
-            )
+    Box(modifier = Modifier.clipToBounds()) {
+        SwitchListItem(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled,
+            highlighted = highlighted,
+            supportingContent = subtitle?.let { { Text(text = it) } },
+            leadingContent = {
+                Icon(
+                    painter = painter,
+                    contentDescription = null,
+                )
+            }
+        ) {
+            Text(text = title)
         }
-    ) {
-        Text(text = title)
+
+        if (isProFeature && !LocalIsPro.current) {
+            DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
+        }
     }
 }
 
@@ -595,26 +647,38 @@ fun SettingsSliderItem(
     title: String,
     value: Float,
     onValueChange: (Float) -> Unit,
+    isProFeature: Boolean = false,
+    enabled: Boolean = !isProFeature || LocalIsPro.current,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0
 ) {
-    ListItem(
-        modifier = Modifier,
-        leadingContent = null,
-        trailingContent = null,
-        overlineContent = null,
-        supportingContent = {
-            Slider(
-                value = value,
-                onValueChange = onValueChange,
-                valueRange = valueRange,
-                steps = steps
+    Box(modifier = Modifier.clipToBounds()) {
+        ListItem(
+            enabled = enabled,
+            supportingContent = {
+                Slider(
+                    value = value,
+                    onValueChange = onValueChange,
+                    enabled = enabled,
+                    valueRange = valueRange,
+                    steps = steps
+                )
+            },
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ),
+        ) {
+            Text(
+                text = title,
+                color = if (enabled) Color.Unspecified else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             )
-        },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        elevation = ListItemDefaults.elevation(),
-        content = { Text(text = title) },
-    )
+        }
+
+        if (isProFeature && !LocalIsPro.current) {
+            DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
+        }
+    }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF0F0D13)
@@ -630,6 +694,8 @@ private fun Preview() {
             glowIntensity = 0f,
             extendOnShake = false,
             extendOnShakeMinutes = 15,
+            lightsOffDelay = false,
+            lightsOffDelaySeconds = 0,
             isDeviceAdminEnabled = false,
             hasNotificationAccess = false,
             onAction = {},

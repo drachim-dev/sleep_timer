@@ -6,6 +6,8 @@ data class AppSettings(
     val glowIntensity: Float = 20f,
     val extendOnShake: Boolean = false,
     val extendOnShakeMinutes: Int = 15,
+    val lightsOffDelay: Boolean = false,
+    val lightsOffDelaySeconds: Int = 0,
     val timerStartCount: Int = 0,
     val lastReviewTimestamp: Long = 0L
 )

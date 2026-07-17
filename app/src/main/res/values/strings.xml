@@ -35,6 +35,12 @@
         <item quantity="one">Extend by %d minute</item>
         <item quantity="other">Extend by %d minutes</item>
     </plurals>
+    <string name="settings_lights_off_delay_title">Delay lights off action</string>
+    <string name="settings_lights_off_delay_subtitle">Get additional time to prepare for bed</string>
+    <plurals name="settings_lights_off_delay_seconds_title">
+        <item quantity="one">Delay by %d second</item>
+        <item quantity="other">Delay by %d seconds</item>
+    </plurals>
     <string name="settings_section_support_me">Support me</string>
     <string name="settings_like_app_title">Do you like the app?</string>
     <string name="settings_like_app_subtitle">Please write a review or rate the app</string>
@@ -164,4 +170,6 @@
     <string name="onboarding_get_started">Get Started</string>
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
+
+    <string name="common_pro">Pro</string>
 </resources>

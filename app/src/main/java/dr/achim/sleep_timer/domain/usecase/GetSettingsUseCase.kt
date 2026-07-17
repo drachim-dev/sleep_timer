@@ -12,15 +12,19 @@ class GetSettingsUseCase(private val repository: SettingsRepository) {
         repository.glowIntensity,
         repository.extendOnShake,
         repository.extendOnShakeMinutes,
+        repository.lightsOffDelay,
+        repository.lightsOffDelaySeconds,
         repository.timerStartCount,
         repository.lastReviewTimestamp
-    ) { themeMode, glowEnabled, intensity, extendOnShake, extendOnShakeMinutes, timerStartCount, lastReviewTimestamp ->
+    ) { themeMode, glowEnabled, intensity, extendOnShake, extendOnShakeMinutes, lightsOffDelay, lightsOffDelaySeconds, timerStartCount, lastReviewTimestamp ->
         AppSettings(
             themeMode = themeMode,
             glowEffectEnabled = glowEnabled,
             glowIntensity = intensity,
             extendOnShake = extendOnShake,
             extendOnShakeMinutes = extendOnShakeMinutes,
+            lightsOffDelay = lightsOffDelay,
+            lightsOffDelaySeconds = lightsOffDelaySeconds,
             timerStartCount = timerStartCount,
             lastReviewTimestamp = lastReviewTimestamp
         )

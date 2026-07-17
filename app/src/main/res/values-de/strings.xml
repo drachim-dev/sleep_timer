@@ -32,6 +32,12 @@
         <item quantity="one">um %d Minute</item>
         <item quantity="other">um %d Minuten</item>
     </plurals>
+    <string name="settings_lights_off_delay_title">Verzögere Hue Lampen Aktion</string>
+    <string name="settings_lights_off_delay_subtitle">Nutze etwas zusätzliche Zeit, um dich bettfertig zu machen</string>
+    <plurals name="settings_lights_off_delay_seconds_title">
+        <item quantity="one">um %d Sekunde</item>
+        <item quantity="other">um %d Sekunden</item>
+    </plurals>
     <string name="settings_section_support_me">Unterstütze mich</string>
     <string name="settings_like_app_title">Gefällt dir die App?</string>
     <string name="settings_like_app_subtitle">Jede Bewertung hilft mir weiter</string>
@@ -161,4 +167,6 @@
     <string name="onboarding_get_started">Loslegen</string>
     <string name="onboarding_skip">Überspringen</string>
     <string name="onboarding_next">Weiter</string>
+
+    <string name="common_pro">Pro</string>
 </resources>

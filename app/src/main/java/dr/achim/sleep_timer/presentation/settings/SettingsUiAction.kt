@@ -13,6 +13,8 @@ sealed interface SettingsUiAction {
     data class SetGlowIntensity(val intensity: Float) : SettingsUiAction
     data class SetExtendOnShake(val enabled: Boolean) : SettingsUiAction
     data class SetExtendOnShakeMinutes(val minutes: Int) : SettingsUiAction
+    data class SetLightsOffDelay(val enabled: Boolean) : SettingsUiAction
+    data class SetLightsOffDelaySeconds(val seconds: Int) : SettingsUiAction
     data class PurchaseProduct(val activity: Activity?, val productId: String) : SettingsUiAction
     data class ShowPrivacyOptions(val activity: Activity?) : SettingsUiAction
 }

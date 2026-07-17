@@ -149,6 +149,8 @@ class SettingsRepository(context: Context) {
         private val GLOW_INTENSITY_KEY = floatPreferencesKey("pref_key_glow_intensity")
         private val EXTEND_BY_SHAKE_KEY = booleanPreferencesKey("pref_key_extend_by_shake")
         private val EXTEND_BY_SHAKE_MINUTES_KEY = intPreferencesKey("pref_key_default_extend_time_by_shake")
+        private val LIGHTS_OFF_DELAY_KEY = booleanPreferencesKey("pref_key_lights_off_delay")
+        private val LIGHTS_OFF_DELAY_SECONDS_KEY = intPreferencesKey("pref_key_lights_off_delay_seconds")
         private val QUICK_LAUNCH_APP_1_KEY = stringPreferencesKey("pref_key_quick_launch_app_1")
         private val QUICK_LAUNCH_APP_2_KEY = stringPreferencesKey("pref_key_quick_launch_app_2")
         private val START_VOLUME_LEVEL_KEY = intPreferencesKey("pref_key_volume_level")
@@ -178,6 +180,8 @@ class SettingsRepository(context: Context) {
         private const val DEFAULT_GLOW_INTENSITY = 40f
         private const val DEFAULT_EXTEND_ON_SHAKE = false
         private const val DEFAULT_EXTEND_ON_SHAKE_MINUTES = 15
+        private const val DEFAULT_LIGHTS_OFF_DELAY = false
+        private const val DEFAULT_LIGHTS_OFF_DELAY_SECONDS = 0
     }
 
     val isFirstLaunch: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -213,6 +217,14 @@ class SettingsRepository(context: Context) {
 
     val extendOnShakeMinutes: Flow<Int> = dataStore.data.map { preferences ->
         preferences[EXTEND_BY_SHAKE_MINUTES_KEY] ?: DEFAULT_EXTEND_ON_SHAKE_MINUTES
+    }
+
+    val lightsOffDelay: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[LIGHTS_OFF_DELAY_KEY] ?: DEFAULT_LIGHTS_OFF_DELAY
+    }
+
+    val lightsOffDelaySeconds: Flow<Int> = dataStore.data.map { preferences ->
+        preferences[LIGHTS_OFF_DELAY_SECONDS_KEY] ?: DEFAULT_LIGHTS_OFF_DELAY_SECONDS
     }
 
     val quickLaunchApp1: Flow<String?> = dataStore.data.map { preferences ->
@@ -324,6 +336,18 @@ class SettingsRepository(context: Context) {
     suspend fun setExtendOnShakeMinutes(minutes: Int) {
         dataStore.edit { preferences ->
             preferences[EXTEND_BY_SHAKE_MINUTES_KEY] = minutes
+        }
+    }
+
+    suspend fun setLightsOffDelay(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[LIGHTS_OFF_DELAY_KEY] = enabled
+        }
+    }
+
+    suspend fun setLightsOffDelaySeconds(seconds: Int) {
+        dataStore.edit { preferences ->
+            preferences[LIGHTS_OFF_DELAY_SECONDS_KEY] = seconds
         }
     }
 
