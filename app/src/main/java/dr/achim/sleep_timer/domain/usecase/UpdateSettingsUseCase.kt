@@ -31,8 +31,4 @@ class UpdateSettingsUseCase(private val repository: SettingsRepository) {
     suspend fun setLightsOffDelaySeconds(seconds: Int) {
         repository.setLightsOffDelaySeconds(seconds)
     }
-
-    suspend fun setLastReviewTimestamp(timestamp: Long) {
-        repository.setLastReviewTimestamp(timestamp)
-    }
 }
