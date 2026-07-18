@@ -81,6 +81,7 @@ import dr.achim.sleep_timer.ui.components.DiagonalRibbon
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.SwitchListItem
 import dr.achim.sleep_timer.ui.theme.AppTheme
+import dr.achim.sleep_timer.ui.theme.GreenAccent
 import dr.achim.sleep_timer.ui.theme.dimens
 import io.github.vinceglb.confettikit.compose.ConfettiKit
 import io.github.vinceglb.confettikit.core.Party
@@ -355,6 +356,7 @@ fun SettingsScreenContent(
                         title = stringResource(R.string.settings_like_app_title),
                         subtitle = stringResource(R.string.settings_like_app_subtitle),
                         trailingText = stringResource(R.string.settings_like_app_trailing),
+                        trailingColor = GreenAccent,
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW).apply {
                                 data =
@@ -378,7 +380,7 @@ fun SettingsScreenContent(
                                 title = uiModel.title,
                                 subtitle = uiModel.description,
                                 trailingText = if (uiModel.isPurchased) stringResource(R.string.settings_already_purchased) else uiModel.price,
-                                trailingColor = Color(0xFF81C784),
+                                trailingColor = if (uiModel.isPurchased) GreenAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = {
                                     if (!uiModel.isPurchased) {
                                         onAction(
@@ -581,7 +583,7 @@ fun SettingsItem(
     title: String,
     subtitle: String? = null,
     trailingText: String? = null,
-    trailingColor: Color = Color.LightGray,
+    trailingColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     onClick: () -> Unit
 ) {
     ListItem(

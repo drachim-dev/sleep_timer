@@ -17,3 +17,4 @@ val OnPeach = Color(0xFF431200)
 
 val RedAccent = Color(0xFFE53935)
 val OrangeAccent = Color(0xFFFB8C00)
+val GreenAccent = Color(0xFF2E7D32)
