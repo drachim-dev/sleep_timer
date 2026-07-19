@@ -538,7 +538,7 @@ private fun QuickTimeButtons(
                             .dashedBorder(
                                 AppTheme.dimens.borderThickness,
                                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                                MaterialTheme.shapes.medium,
+                                MaterialTheme.shapes.small,
                                 AppTheme.dimens.dashLength,
                                 AppTheme.dimens.dashGap
                             ),

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
@@ -138,18 +139,16 @@ private fun RoomSelectionContent(
                     verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingExtraExtraSmall)
                 ) {
                     itemsIndexed(uiState.groups, key = { _, group -> group.id }) { index, group ->
-                        val cornerRadius = AppTheme.dimens.spacingMedium
-                        val lastIndex = index == uiState.groups.lastIndex
                         val shape = when {
-                            uiState.groups.size == 1 -> RoundedCornerShape(cornerRadius)
-                            index == 0 -> RoundedCornerShape(
-                                topStart = cornerRadius,
-                                topEnd = cornerRadius
+                            uiState.groups.size == 1 -> MaterialTheme.shapes.large
+                            index == 0 -> MaterialTheme.shapes.medium.copy(
+                                bottomStart = CornerSize(0.dp),
+                                bottomEnd = CornerSize(0.dp)
                             )
 
-                            lastIndex -> RoundedCornerShape(
-                                bottomStart = cornerRadius,
-                                bottomEnd = cornerRadius
+                            index == uiState.groups.lastIndex -> MaterialTheme.shapes.large.copy(
+                                topStart = CornerSize(0.dp),
+                                topEnd = CornerSize(0.dp)
                             )
 
                             else -> RectangleShape

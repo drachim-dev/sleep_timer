@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -34,6 +33,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,7 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +59,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
@@ -527,6 +525,7 @@ fun ThemeSelectionDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(AppTheme.dimens.spacingMedium),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Column(
                 modifier = Modifier
@@ -543,14 +542,12 @@ fun ThemeSelectionDialog(
                     .filter { Build.VERSION.SDK_INT >= it.minSdk }
                     .forEach { mode ->
                         val interactionSource = remember { MutableInteractionSource() }
-                        ListItem(
-                            modifier = Modifier.selectable(
-                                selected = currentThemeMode == mode,
-                                onClick = { onThemeModeSelected(mode) },
-                                role = Role.RadioButton,
-                                interactionSource = interactionSource,
-                                indication = ripple()
-                            ),
+
+                        SegmentedListItem(
+                            selected = currentThemeMode == mode,
+                            onClick = { onThemeModeSelected(mode) },
+                            shapes = ListItemDefaults.shapes(),
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                             leadingContent = {
                                 RadioButton(
                                     selected = currentThemeMode == mode,
@@ -558,7 +555,7 @@ fun ThemeSelectionDialog(
                                     interactionSource = interactionSource
                                 )
                             },
-                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                            interactionSource = interactionSource
                         ) {
                             Text(text = stringResource(mode.displayName))
                         }
