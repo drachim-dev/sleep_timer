@@ -24,14 +24,15 @@ import androidx.compose.foundation.layout.FlexWrap
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -153,7 +154,7 @@ fun TimerScreen(
     )
 }
 
-@OptIn(ExperimentalFlexBoxApi::class)
+@OptIn(ExperimentalFlexBoxApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
@@ -282,7 +283,8 @@ private fun TimerScreenContent(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                windowInsets = WindowInsets.statusBars
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -335,53 +337,55 @@ private fun TimerScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .systemBarsPadding()
-                .displayCutoutPadding()
+                .navigationBarsPadding()
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = AppTheme.dimens.spacingMedium)
+                .padding(top = AppTheme.dimens.spacingNormal)
                 .padding(bottom = AppTheme.dimens.spacingLarge + fabHeightDp),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularTimer(
-                progress = timerState.progress,
-                glowEnabled = uiState.glowEnabled,
-                glowIntensity = uiState.glowIntensity,
-                interactive = false,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .let { modifier ->
-                        val expandedSize = AppTheme.dimens.timerSizeExpanded
-                        val collapsedSize = AppTheme.dimens.timerSizeCollapsed
-                        modifier.layout { measurable, _ ->
-                            val fraction = (scrollState.value / 400f).coerceIn(0f, 1f)
-                            val sizeDp = lerp(expandedSize, collapsedSize, fraction)
-                            val sizePx = sizeDp.roundToPx()
+            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingSmall)) {
+                CircularTimer(
+                    progress = timerState.progress,
+                    glowEnabled = uiState.glowEnabled,
+                    glowIntensity = uiState.glowIntensity,
+                    interactive = false,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .let { modifier ->
+                            val expandedSize = AppTheme.dimens.timerSizeExpanded
+                            val collapsedSize = AppTheme.dimens.timerSizeCollapsed
+                            modifier.layout { measurable, _ ->
+                                val fraction = (scrollState.value / 400f).coerceIn(0f, 1f)
+                                val sizeDp = lerp(expandedSize, collapsedSize, fraction)
+                                val sizePx = sizeDp.roundToPx()
 
-                            val placeable =
-                                measurable.measure(Constraints.fixed(sizePx, sizePx))
-                            layout(sizePx, sizePx) {
-                                placeable.placeRelative(0, 0)
+                                val placeable =
+                                    measurable.measure(Constraints.fixed(sizePx, sizePx))
+                                layout(sizePx, sizePx) {
+                                    placeable.placeRelative(0, 0)
+                                }
                             }
-                        }
-                    },
-                onProgressChange = { newProgress ->
-                    val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
-                    onAction(Action.SetRemainingTime(totalMillis))
+                        },
+                    onProgressChange = { newProgress ->
+                        val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
+                        onAction(Action.SetRemainingTime(totalMillis))
+                    }
+                ) {
+                    Text(
+                        text = timerState.formattedTime,
+                        maxLines = 1,
+                        autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                    )
                 }
-            ) {
-                Text(
-                    text = timerState.formattedTime,
-                    maxLines = 1,
-                    autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+
+                TimeAdjustmentRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    times = listOf(1, 5, 20),
+                    onClick = { onAction(Action.AddMinutes(it.toLong())) }
                 )
             }
-
-            TimeAdjustmentRow(
-                modifier = Modifier.fillMaxWidth(),
-                times = listOf(1, 5, 20),
-                onClick = { onAction(Action.AddMinutes(it.toLong())) }
-            )
 
             TimerSection(
                 title = { SectionTitle(stringResource(R.string.timer_quick_launch_title)) }
@@ -447,7 +451,13 @@ private fun StartActionsRow(
             if (timerActions.startActions.volumeLevel == null && !timerActions.startActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.START, !timerActions.startActions.adjustVolume))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.ADJUST_VOLUME,
+                        TimerActionSource.START,
+                        !timerActions.startActions.adjustVolume
+                    )
+                )
             }
         },
         onLongClick = onVolumeLongClick
@@ -459,7 +469,13 @@ private fun StartActionsRow(
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
         onClick = {
             if (hasNearbyPermission || timerActions.startActions.hueLights) {
-                onAction(Action.ToggleAction(TimerActionType.HUE_LIGHTS, TimerActionSource.START, !timerActions.startActions.hueLights))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.HUE_LIGHTS,
+                        TimerActionSource.START,
+                        !timerActions.startActions.hueLights
+                    )
+                )
             } else {
                 onAction(Action.OpenHueSettings(TimerActionSource.START))
             }
@@ -473,7 +489,13 @@ private fun StartActionsRow(
         warning = timerActions.startActions.enableDnd && !hasDndPermission,
         onClick = {
             if (hasDndPermission || timerActions.startActions.enableDnd) {
-                onAction(Action.ToggleAction(TimerActionType.DND, TimerActionSource.START, !timerActions.startActions.enableDnd))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.DND,
+                        TimerActionSource.START,
+                        !timerActions.startActions.enableDnd
+                    )
+                )
             } else {
                 onNavigateToSettings(SETTING_DND)
             }
@@ -487,7 +509,13 @@ private fun StartActionsRow(
         warning = timerActions.startActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
             if (isDeviceAdminEnabled || timerActions.startActions.turnOffScreen) {
-                onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.START, !timerActions.startActions.turnOffScreen))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.TURN_OFF_SCREEN,
+                        TimerActionSource.START,
+                        !timerActions.startActions.turnOffScreen
+                    )
+                )
             } else {
                 onNavigateToSettings(SETTING_ADMIN)
             }
@@ -508,7 +536,15 @@ private fun EndActionsRow(
         painter = painterResource(if (timerActions.endActions.stopMedia) R.drawable.ic_media_off else R.drawable.ic_media_on),
         label = stringResource(R.string.timer_action_media),
         active = timerActions.endActions.stopMedia,
-        onClick = { onAction(Action.ToggleAction(TimerActionType.STOP_MEDIA, TimerActionSource.END, !timerActions.endActions.stopMedia)) }
+        onClick = {
+            onAction(
+                Action.ToggleAction(
+                    TimerActionType.STOP_MEDIA,
+                    TimerActionSource.END,
+                    !timerActions.endActions.stopMedia
+                )
+            )
+        }
     )
     ActionToggle(
         painter = painterResource(if (timerActions.endActions.volumeLevel == 0) R.drawable.ic_volume_mute else R.drawable.ic_volume_down),
@@ -519,7 +555,13 @@ private fun EndActionsRow(
             if (timerActions.endActions.volumeLevel == null && !timerActions.endActions.adjustVolume) {
                 onVolumeLongClick()
             } else {
-                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.END, !timerActions.endActions.adjustVolume))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.ADJUST_VOLUME,
+                        TimerActionSource.END,
+                        !timerActions.endActions.adjustVolume
+                    )
+                )
             }
         },
         onLongClick = onVolumeLongClick
@@ -531,7 +573,13 @@ private fun EndActionsRow(
         warning = timerActions.endActions.turnOffScreen && !isDeviceAdminEnabled,
         onClick = {
             if (isDeviceAdminEnabled || timerActions.endActions.turnOffScreen) {
-                onAction(Action.ToggleAction(TimerActionType.TURN_OFF_SCREEN, TimerActionSource.END, !timerActions.endActions.turnOffScreen))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.TURN_OFF_SCREEN,
+                        TimerActionSource.END,
+                        !timerActions.endActions.turnOffScreen
+                    )
+                )
             } else {
                 onNavigateToSettings(SETTING_ADMIN)
             }
@@ -551,7 +599,15 @@ private fun EndActionsRow(
             painter = painterResource(if (timerActions.endActions.turnOffBluetooth) R.drawable.ic_bluetooth_off else R.drawable.ic_bluetooth_on),
             label = stringResource(R.string.timer_action_bluetooth),
             active = timerActions.endActions.turnOffBluetooth,
-            onClick = { onAction(Action.ToggleAction(TimerActionType.TURN_OFF_BLUETOOTH, TimerActionSource.END, !timerActions.endActions.turnOffBluetooth)) }
+            onClick = {
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.TURN_OFF_BLUETOOTH,
+                        TimerActionSource.END,
+                        !timerActions.endActions.turnOffBluetooth
+                    )
+                )
+            }
         )
     }
 }
