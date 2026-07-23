@@ -1,5 +1,6 @@
 package dr.achim.sleep_timer.ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -16,14 +17,13 @@ import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 @Composable
 fun Modifier.safeSharedElement(
     key: Any,
+    animatedVisibilityScope: AnimatedVisibilityScope? = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current,
     boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
     placeholderSize: SharedTransitionScope.PlaceholderSize = SharedTransitionScope.PlaceholderSize.ContentSize,
     renderInOverlayDuringTransition: Boolean = true,
     zIndexInOverlay: Float = 0f,
 ): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
-    val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
-
     return if (sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
             sharedElement(
@@ -43,6 +43,7 @@ fun Modifier.safeSharedBounds(
     key: Any,
     enter: EnterTransition = fadeIn(),
     exit: ExitTransition = fadeOut(),
+    animatedVisibilityScope: AnimatedVisibilityScope? = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current,
     boundsTransform: BoundsTransform = SharedTransitionDefaults.BoundsTransform,
     placeholderSize: SharedTransitionScope.PlaceholderSize = SharedTransitionScope.PlaceholderSize.ContentSize,
     resizeMode: SharedTransitionScope.ResizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
@@ -50,7 +51,6 @@ fun Modifier.safeSharedBounds(
     zIndexInOverlay: Float = 0f,
 ): Modifier {
     val sharedTransitionScope = LocalSharedTransitionScope.current
-    val animatedVisibilityScope = if (LocalInspectionMode.current) null else LocalNavAnimatedContentScope.current
 
     return if (sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
@@ -73,6 +73,7 @@ enum class SharedElementKey {
     Fab,
     FabTrailing,
     CircularTimer,
+    TimerTextBox,
     TimerText,
     ActionButtonGearToCross
 }

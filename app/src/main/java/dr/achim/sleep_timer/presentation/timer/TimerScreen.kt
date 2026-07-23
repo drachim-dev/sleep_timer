@@ -3,6 +3,7 @@ package dr.achim.sleep_timer.presentation.timer
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -12,6 +13,7 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,23 +27,24 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -50,7 +53,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
@@ -58,7 +60,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -75,7 +76,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -85,9 +85,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -103,11 +101,13 @@ import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
 import dr.achim.sleep_timer.presentation.settings.SETTING_DND
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.components.CircularTimer
+import dr.achim.sleep_timer.ui.components.CollapsingScaffold
 import dr.achim.sleep_timer.ui.components.QuickLaunchAppItem
 import dr.achim.sleep_timer.ui.components.QuickLaunchItem
 import dr.achim.sleep_timer.ui.components.QuickLaunchPlaceholder
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.TimeButton
+import dr.achim.sleep_timer.ui.components.rememberCollapsingHeaderState
 import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.OrangeAccent
@@ -154,7 +154,7 @@ fun TimerScreen(
     )
 }
 
-@OptIn(ExperimentalFlexBoxApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFlexBoxApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
@@ -165,7 +165,7 @@ private fun TimerScreenContent(
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
+    val expandedTimerSize = AppTheme.dimens.timerSizeExpanded
 
     var showQuickLaunchSheet by remember { mutableStateOf(false) }
     var selectingIndex by remember { mutableIntStateOf(-1) }
@@ -237,12 +237,22 @@ private fun TimerScreenContent(
     )
     var fabHeight by remember { mutableIntStateOf(0) }
     val fabHeightDp = with(LocalDensity.current) { fabHeight.toDp() + 16.dp }
+    val listState = rememberLazyListState()
 
-    Scaffold(
+    CollapsingScaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {},
+        state = rememberCollapsingHeaderState(maxHeaderHeight = expandedTimerSize, listState = listState),
+        topBar = { isCollapsed ->
+            CenterAlignedTopAppBar(
+                title = {
+                    AnimatedVisibility(visible = isCollapsed) {
+                        Text(
+                            text = timerState.formattedTime,
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.safeSharedElement(SharedElementKey.TimerText, animatedVisibilityScope = this),
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -283,7 +293,11 @@ private fun TimerScreenContent(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background.copy(
+                        alpha = if (isCollapsed) 1f else 0f
+                    )
+                ),
                 windowInsets = WindowInsets.statusBars
             )
         },
@@ -331,64 +345,61 @@ private fun TimerScreenContent(
                     style = MaterialTheme.typography.titleLarge
                 )
             }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .navigationBarsPadding()
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = AppTheme.dimens.spacingMedium)
-                .padding(top = AppTheme.dimens.spacingNormal)
-                .padding(bottom = AppTheme.dimens.spacingLarge + fabHeightDp),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingSmall)) {
-                CircularTimer(
-                    progress = timerState.progress,
-                    glowEnabled = uiState.glowEnabled,
-                    glowIntensity = uiState.glowIntensity,
-                    interactive = false,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .let { modifier ->
-                            val expandedSize = AppTheme.dimens.timerSizeExpanded
-                            val collapsedSize = AppTheme.dimens.timerSizeCollapsed
-                            modifier.layout { measurable, _ ->
-                                val fraction = (scrollState.value / 400f).coerceIn(0f, 1f)
-                                val sizeDp = lerp(expandedSize, collapsedSize, fraction)
-                                val sizePx = sizeDp.roundToPx()
-
-                                val placeable =
-                                    measurable.measure(Constraints.fixed(sizePx, sizePx))
-                                layout(sizePx, sizePx) {
-                                    placeable.placeRelative(0, 0)
-                                }
-                            }
-                        },
-                    onProgressChange = { newProgress ->
-                        val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
-                        onAction(Action.SetRemainingTime(totalMillis))
-                    }
-                ) {
+        },
+        collapsingHeader = { _, isCollapsed ->
+            CircularTimer(
+                progress = timerState.progress,
+                glowEnabled = uiState.glowEnabled,
+                glowIntensity = uiState.glowIntensity,
+                interactive = false,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+                    .size(expandedTimerSize),
+                onProgressChange = { newProgress ->
+                    val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
+                    onAction(Action.SetRemainingTime(totalMillis))
+                }
+            ) {
+                AnimatedVisibility(!isCollapsed) {
                     Text(
                         text = timerState.formattedTime,
                         maxLines = 1,
-                        autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                        autoSize = TextAutoSize.StepBased(maxFontSize = MaterialTheme.typography.displayLarge.fontSize),
+                        style = LocalTextStyle.current,
+                        modifier = Modifier.safeSharedElement(SharedElementKey.TimerText, animatedVisibilityScope = this),
                     )
                 }
-
-                TimeAdjustmentRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    times = listOf(1, 5, 20),
-                    onClick = { onAction(Action.AddMinutes(it.toLong())) }
-                )
             }
+        },
 
+    ) { innerPadding ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                bottom = AppTheme.dimens.spacingLarge + fabHeightDp,
+                top = AppTheme.dimens.spacingNormal
+            ) + innerPadding,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingNormal),
+        ) {
+        stickyHeader {
+            TimeAdjustmentRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(bottom = AppTheme.dimens.spacingSmall)
+                    .padding(horizontal = AppTheme.dimens.spacingMedium),
+                times = listOf(1, 5, 20),
+                onClick = { onAction(Action.AddMinutes(it.toLong())) }
+            )
+        }
+
+        item {
             TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_quick_launch_title)) }
+                title = { SectionTitle(stringResource(R.string.timer_quick_launch_title)) },
+                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
             ) {
                 QuickLaunchRow(
                     selectedApps = uiState.selectedApps,
@@ -402,9 +413,12 @@ private fun TimerScreenContent(
                     }
                 )
             }
+        }
 
+        item {
             TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_section_start_actions)) }
+                title = { SectionTitle(stringResource(R.string.timer_section_start_actions)) },
+                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
             ) {
                 StartActionsRow(
                     timerActions = uiState.timerActions,
@@ -416,9 +430,12 @@ private fun TimerScreenContent(
                     onNavigateToSettings = onNavigateToSettings
                 )
             }
+        }
 
+        item {
             TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) }
+                title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) },
+                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
             ) {
                 EndActionsRow(
                     timerActions = uiState.timerActions,
@@ -428,6 +445,7 @@ private fun TimerScreenContent(
                     onNavigateToSettings = onNavigateToSettings
                 )
             }
+        }
         }
     }
 }
@@ -612,7 +630,7 @@ private fun EndActionsRow(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0F0D13)
+@Preview(showBackground = true, backgroundColor = 0xFF0F0D13, heightDp = 500)
 @Composable
 fun TimerScreenPreview() {
     AppTheme {
@@ -649,9 +667,10 @@ fun TimeAdjustmentRow(
 @Composable
 private fun TimerSection(
     title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable FlexBoxScope.() -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         title()
 
         val columnMinSpacing = AppTheme.dimens.spacingNormal

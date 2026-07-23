@@ -157,7 +157,7 @@ fun CircularTimer(
                 modifier = Modifier
                     .size(innerSquareSide)
                     .padding(AppTheme.dimens.spacingSmall)
-                    .safeSharedElement(key = SharedElementKey.TimerText),
+                    .safeSharedElement(key = SharedElementKey.TimerTextBox),
                 contentAlignment = Alignment.Center
             ) {
                 CompositionLocalProvider(
