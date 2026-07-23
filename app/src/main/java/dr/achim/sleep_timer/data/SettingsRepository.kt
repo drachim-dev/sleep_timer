@@ -181,7 +181,7 @@ class SettingsRepository(context: Context) {
         private const val DEFAULT_EXTEND_ON_SHAKE = false
         private const val DEFAULT_EXTEND_ON_SHAKE_MINUTES = 15
         private const val DEFAULT_LIGHTS_OFF_DELAY = false
-        private const val DEFAULT_LIGHTS_OFF_DELAY_SECONDS = 0
+        private const val DEFAULT_LIGHTS_OFF_DELAY_SECONDS = 5
     }
 
     val isFirstLaunch: Flow<Boolean> = dataStore.data.map { preferences ->
