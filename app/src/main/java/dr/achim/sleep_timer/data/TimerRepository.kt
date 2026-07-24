@@ -10,6 +10,9 @@ class TimerRepositoryImpl : TimerRepository {
     private val _timerState = MutableStateFlow<TimerState>(TimerState.Idle())
     override val timerState: StateFlow<TimerState> = _timerState.asStateFlow()
 
+    private val _lightsOffDelayProgress = MutableStateFlow(0f)
+    override val lightsOffDelayProgress: StateFlow<Float> = _lightsOffDelayProgress.asStateFlow()
+
     override fun setRemainingTime(millis: Long) {
         val current = _timerState.value
         _timerState.value = when (current) {
@@ -46,5 +49,9 @@ class TimerRepositoryImpl : TimerRepository {
             is TimerState.Running -> current.copy(totalTimeMillis = millis)
             is TimerState.Paused -> current.copy(totalTimeMillis = millis)
         }
+    }
+
+    override fun setLightsOffDelayProgress(progress: Float) {
+        _lightsOffDelayProgress.value = progress
     }
 }

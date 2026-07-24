@@ -10,9 +10,7 @@ import dr.achim.sleep_timer.domain.repository.AudioRepository
 import dr.achim.sleep_timer.model.EndActions
 import dr.achim.sleep_timer.model.StartActions
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
-import kotlin.time.Duration.Companion.seconds
 
 class TimerActionExecutor(
     private val context: Context,
@@ -55,12 +53,19 @@ class TimerActionExecutor(
             val groups = settingsRepository.hueStartGroups.firstOrNull() ?: emptySet()
             if (ip != null && user != null) {
                 val lightsOffDelay = settingsRepository.lightsOffDelay.firstOrNull() ?: false
-                val delaySeconds = settingsRepository.lightsOffDelaySeconds.firstOrNull() ?: 0
-                if (lightsOffDelay && delaySeconds > 0) {
-                    delay(delaySeconds.seconds)
+                if (!lightsOffDelay) {
+                    turnOffHueLights(ip, user, groups)
                 }
-                turnOffHueLights(ip, user, groups)
             }
+        }
+    }
+
+    suspend fun applyHueStartActions() {
+        val ip = settingsRepository.hueBridgeIp.firstOrNull()
+        val user = settingsRepository.hueApiUser.firstOrNull()
+        val groups = settingsRepository.hueStartGroups.firstOrNull() ?: emptySet()
+        if (ip != null && user != null) {
+            turnOffHueLights(ip, user, groups)
         }
     }
 

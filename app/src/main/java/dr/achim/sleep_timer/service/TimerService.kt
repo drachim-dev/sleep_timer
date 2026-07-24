@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class TimerService : LifecycleService() {
@@ -53,6 +54,7 @@ class TimerService : LifecycleService() {
     private val timerRepository: TimerRepository by inject()
     private val timerActionExecutor: TimerActionExecutor by inject()
     private var timerJob: Job? = null
+    private var lightsOffDelayJob: Job? = null
     private lateinit var shakeDetector: ShakeDetector
 
     private var targetTimeMillis: Long = 0L
@@ -171,6 +173,8 @@ class TimerService : LifecycleService() {
     private fun startTimer(durationMillis: Long) {
         isFinishing = false
         timerJob?.cancel()
+        lightsOffDelayJob?.cancel()
+        timerRepository.setLightsOffDelayProgress(0f)
         timerRepository.setTotalTime(durationMillis)
         timerRepository.setRemainingTime(durationMillis)
         timerRepository.setRunning(true)
@@ -180,6 +184,10 @@ class TimerService : LifecycleService() {
             val actions = manageTimerActionsUseCase.observeTimerActions().first()
             currentActions = actions
             timerActionExecutor.applyStartActions(actions.startActions)
+
+            if (actions.startActions.hueLights && settingsFlow.value.lightsOffDelay) {
+                startLightsOffDelay(settingsFlow.value.lightsOffDelaySeconds)
+            }
         }
 
         targetTimeMillis = SystemClock.elapsedRealtime() + durationMillis
@@ -274,9 +282,36 @@ class TimerService : LifecycleService() {
 
     private fun stopTimer() {
         timerJob?.cancel()
+        lightsOffDelayJob?.cancel()
+        timerRepository.setLightsOffDelayProgress(0f)
         timerRepository.setRunning(false)
         timerRepository.setRemainingTime(0)
         cancelAlarm()
+    }
+
+    private fun startLightsOffDelay(delaySeconds: Int) {
+        lightsOffDelayJob?.cancel()
+        if (delaySeconds <= 0) {
+            lifecycleScope.launch {
+                timerActionExecutor.applyHueStartActions()
+            }
+            return
+        }
+
+        lightsOffDelayJob = lifecycleScope.launch {
+            val totalSeconds = delaySeconds.toDouble()
+            var remainingSeconds = totalSeconds
+
+            while (remainingSeconds > 0) {
+                if (timerRepository.timerState.value is TimerState.Running) {
+                    remainingSeconds -= 0.1
+                    timerRepository.setLightsOffDelayProgress((remainingSeconds / totalSeconds).toFloat().coerceIn(0f, 1f))
+                }
+                delay(100.milliseconds)
+            }
+            timerRepository.setLightsOffDelayProgress(0f)
+            timerActionExecutor.applyHueStartActions()
+        }
     }
 
     private fun onTimerFinished() {

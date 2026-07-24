@@ -12,6 +12,7 @@ data class TimerUiState(
     val hasNearbyPermission: Boolean = false,
     val glowEnabled: Boolean = false,
     val glowIntensity: Float = 0f,
+    val lightsOffDelayProgress: Float = 0f,
     val timerStartCount: Int = 0,
     val lastReviewTimestamp: Long = 0L
 )

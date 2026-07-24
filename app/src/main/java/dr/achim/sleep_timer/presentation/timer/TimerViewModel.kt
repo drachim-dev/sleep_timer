@@ -2,6 +2,7 @@ package dr.achim.sleep_timer.presentation.timer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dr.achim.sleep_timer.common.combine
 import dr.achim.sleep_timer.domain.model.QuickLaunchApp
 import dr.achim.sleep_timer.domain.usecase.CheckTimerPermissionsUseCase
 import dr.achim.sleep_timer.domain.usecase.ControlTimerUseCase
@@ -19,7 +20,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -59,8 +59,9 @@ class TimerViewModel(
         manageQuickLaunchUseCase.getSelectedApps(),
         _permissionsFlow,
         _quickLaunchApps,
-        getSettingsUseCase()
-    ) { timerActions, selectedApps, permissions, apps, settings ->
+        getSettingsUseCase(),
+        getTimerStatusUseCase.lightsOffDelayProgress
+    ) { timerActions, selectedApps, permissions, apps, settings, lightsOffDelayProgress ->
         TimerUiState(
             timerActions = timerActions,
             quickLaunchApps = apps,
@@ -70,6 +71,7 @@ class TimerViewModel(
             hasNearbyPermission = permissions.hasNearbyPermission,
             glowEnabled = settings.glowEffectEnabled,
             glowIntensity = settings.glowIntensity,
+            lightsOffDelayProgress = lightsOffDelayProgress,
             timerStartCount = settings.timerStartCount,
             lastReviewTimestamp = settings.lastReviewTimestamp
         )

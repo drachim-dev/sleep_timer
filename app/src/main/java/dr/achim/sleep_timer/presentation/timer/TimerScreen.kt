@@ -49,6 +49,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -428,6 +429,7 @@ private fun TimerScreenContent(
                         hasDndPermission = uiState.hasNotificationAccess,
                         hasNearbyPermission = uiState.hasNearbyPermission,
                         isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
+                        lightsOffDelayProgress = uiState.lightsOffDelayProgress,
                         onAction = onAction,
                         onVolumeLongClick = { showStartVolumeDialog = true },
                         onNavigateToSettings = onNavigateToSettings
@@ -459,6 +461,7 @@ private fun StartActionsRow(
     hasDndPermission: Boolean,
     hasNearbyPermission: Boolean,
     isDeviceAdminEnabled: Boolean,
+    lightsOffDelayProgress: Float,
     onAction: (Action) -> Unit,
     onVolumeLongClick: () -> Unit,
     onNavigateToSettings: (String) -> Unit
@@ -488,6 +491,7 @@ private fun StartActionsRow(
         label = stringResource(R.string.timer_action_hue_lights),
         active = timerActions.startActions.hueLights,
         warning = timerActions.startActions.hueLights && !hasNearbyPermission,
+        progress = lightsOffDelayProgress,
         onClick = {
             if (hasNearbyPermission || timerActions.startActions.hueLights) {
                 onAction(
@@ -822,7 +826,8 @@ fun ActionToggle(
     active: Boolean,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
-    warning: Boolean = false
+    warning: Boolean = false,
+    progress: Float = 0f
 ) {
     val containerColor by animateColorAsState(
         when {
@@ -852,24 +857,38 @@ fun ActionToggle(
         shape = MaterialTheme.shapes.medium,
         color = containerColor,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = if (warning) painterResource(R.drawable.ic_warning) else painter,
-                contentDescription = null,
-                tint = contentColor,
-                modifier = Modifier.size(AppTheme.dimens.actionToggleIconSize)
-            )
+        Box {
+            if (progress > 0f) {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .align(Alignment.BottomCenter),
+                    color = contentColor,
+                    trackColor = Color.Transparent,
+                )
+            }
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = if (warning) painterResource(R.drawable.ic_warning) else painter,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(AppTheme.dimens.actionToggleIconSize)
+                )
 
-            Spacer(Modifier.height(AppTheme.dimens.spacingSmall))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = contentColor,
-                textAlign = TextAlign.Center
-            )
+                Spacer(Modifier.height(AppTheme.dimens.spacingSmall))
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = contentColor,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }

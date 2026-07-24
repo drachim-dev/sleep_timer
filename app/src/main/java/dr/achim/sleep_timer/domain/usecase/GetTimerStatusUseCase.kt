@@ -11,5 +11,6 @@ class GetTimerStatusUseCase(
     timerRepository: TimerRepository
 ) {
     val timerState: StateFlow<TimerState> = timerRepository.timerState
+    val lightsOffDelayProgress: StateFlow<Float> = timerRepository.lightsOffDelayProgress
     fun observeTimerActions(): Flow<TimerActions> = manageTimerActionsUseCase.observeTimerActions()
 }
