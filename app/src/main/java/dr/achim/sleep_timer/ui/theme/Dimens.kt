@@ -19,7 +19,7 @@ data class Dimens(
     val timeButtonSize: Dp = 64.dp,
     val quickTimeAddIconSize: Dp = 32.dp,
 
-    val timerDiameter: Dp = 280.dp,
+    val timerDiameter: Dp = 320.dp,
     val timerStrokeWidthDefault: Dp = 8.dp,
     val timerStrokeWidthInteractive: Dp = 14.dp,
     val timerHandleRadius: Dp = 14.dp,

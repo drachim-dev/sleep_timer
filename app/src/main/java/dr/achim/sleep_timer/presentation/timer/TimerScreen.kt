@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -249,7 +248,10 @@ private fun TimerScreenContent(
                         Text(
                             text = timerState.formattedTime,
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.safeSharedElement(SharedElementKey.TimerText, animatedVisibilityScope = this),
+                            modifier = Modifier.safeSharedElement(
+                                SharedElementKey.TimerText,
+                                animatedVisibilityScope = this
+                            ),
                         )
                     }
                 },
@@ -353,9 +355,8 @@ private fun TimerScreenContent(
                 glowIntensity = uiState.glowIntensity,
                 interactive = false,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-                    .size(expandedTimerSize),
+                    .size(expandedTimerSize)
+                    .align(Alignment.Center),
                 onProgressChange = { newProgress ->
                     val totalMillis = (newProgress * 60 * 60 * 1000).toLong()
                     onAction(Action.SetRemainingTime(totalMillis))
@@ -367,12 +368,14 @@ private fun TimerScreenContent(
                         maxLines = 1,
                         autoSize = TextAutoSize.StepBased(maxFontSize = MaterialTheme.typography.displayLarge.fontSize),
                         style = LocalTextStyle.current,
-                        modifier = Modifier.safeSharedElement(SharedElementKey.TimerText, animatedVisibilityScope = this),
+                        modifier = Modifier.safeSharedElement(
+                            SharedElementKey.TimerText,
+                            animatedVisibilityScope = this
+                        ),
                     )
                 }
             }
-        },
-
+        }
     ) { innerPadding ->
         LazyColumn(
             state = listState,
@@ -382,70 +385,70 @@ private fun TimerScreenContent(
                 top = AppTheme.dimens.spacingNormal
             ) + innerPadding,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingNormal),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingLarge),
         ) {
-        stickyHeader {
-            TimeAdjustmentRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(bottom = AppTheme.dimens.spacingSmall)
-                    .padding(horizontal = AppTheme.dimens.spacingMedium),
-                times = listOf(1, 5, 20),
-                onClick = { onAction(Action.AddMinutes(it.toLong())) }
-            )
-        }
-
-        item {
-            TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_quick_launch_title)) },
-                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
-            ) {
-                QuickLaunchRow(
-                    selectedApps = uiState.selectedApps,
-                    onPinApp = { index ->
-                        selectingIndex = index
-                        showQuickLaunchSheet = true
-                    },
-                    onShowAll = {
-                        selectingIndex = -1
-                        showQuickLaunchSheet = true
-                    }
+            stickyHeader {
+                TimeAdjustmentRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(bottom = AppTheme.dimens.spacingSmall)
+                        .padding(horizontal = AppTheme.dimens.spacingMedium),
+                    times = listOf(1, 5, 20),
+                    onClick = { onAction(Action.AddMinutes(it.toLong())) }
                 )
             }
-        }
 
-        item {
-            TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_section_start_actions)) },
-                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
-            ) {
-                StartActionsRow(
-                    timerActions = uiState.timerActions,
-                    hasDndPermission = uiState.hasNotificationAccess,
-                    hasNearbyPermission = uiState.hasNearbyPermission,
-                    isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
-                    onAction = onAction,
-                    onVolumeLongClick = { showStartVolumeDialog = true },
-                    onNavigateToSettings = onNavigateToSettings
-                )
+            item {
+                TimerSection(
+                    title = { SectionTitle(stringResource(R.string.timer_quick_launch_title)) },
+                    modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
+                ) {
+                    QuickLaunchRow(
+                        selectedApps = uiState.selectedApps,
+                        onPinApp = { index ->
+                            selectingIndex = index
+                            showQuickLaunchSheet = true
+                        },
+                        onShowAll = {
+                            selectingIndex = -1
+                            showQuickLaunchSheet = true
+                        }
+                    )
+                }
             }
-        }
 
-        item {
-            TimerSection(
-                title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) },
-                modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
-            ) {
-                EndActionsRow(
-                    timerActions = uiState.timerActions,
-                    isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
-                    onAction = onAction,
-                    onVolumeLongClick = { showEndVolumeDialog = true },
-                    onNavigateToSettings = onNavigateToSettings
-                )
+            item {
+                TimerSection(
+                    title = { SectionTitle(stringResource(R.string.timer_section_start_actions)) },
+                    modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
+                ) {
+                    StartActionsRow(
+                        timerActions = uiState.timerActions,
+                        hasDndPermission = uiState.hasNotificationAccess,
+                        hasNearbyPermission = uiState.hasNearbyPermission,
+                        isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
+                        onAction = onAction,
+                        onVolumeLongClick = { showStartVolumeDialog = true },
+                        onNavigateToSettings = onNavigateToSettings
+                    )
+                }
             }
-        }
+
+            item {
+                TimerSection(
+                    title = { SectionTitle(stringResource(R.string.timer_section_end_actions)) },
+                    modifier = Modifier.padding(horizontal = AppTheme.dimens.spacingMedium)
+                ) {
+                    EndActionsRow(
+                        timerActions = uiState.timerActions,
+                        isDeviceAdminEnabled = uiState.isDeviceAdminEnabled,
+                        onAction = onAction,
+                        onVolumeLongClick = { showEndVolumeDialog = true },
+                        onNavigateToSettings = onNavigateToSettings
+                    )
+                }
+            }
         }
     }
 }
@@ -630,7 +633,22 @@ private fun EndActionsRow(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0F0D13, heightDp = 500)
+@Preview(showBackground = true, backgroundColor = 0xFF0F0D13, showSystemUi = true, heightDp = 800)
+@Composable
+fun TimerScreenPreviewLarge() {
+    AppTheme {
+        TimerScreenContent(
+            onBack = {},
+            onAction = {},
+            onNavigateToSettings = {},
+            uiState = TimerUiState(),
+            timerState = TimerState.Idle(),
+            snackbarHostState = remember { SnackbarHostState() }
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0F0D13, showSystemUi = true, heightDp = 500)
 @Composable
 fun TimerScreenPreview() {
     AppTheme {

@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,8 +82,14 @@ fun CollapsingScaffold(
             contentColor = contentColor,
             contentWindowInsets = contentWindowInsets,
         ) { innerPadding ->
+            val statusBarsTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
             Box(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
-                content(innerPadding)
+                content(
+                    PaddingValues(
+                        top = state.maxHeaderHeight + statusBarsTop - innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+                )
             }
         }
 
@@ -89,6 +97,7 @@ fun CollapsingScaffold(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
                 .height(state.maxHeaderHeight)
                 .graphicsLayer {
                     val currentOffset = state.scrollOffsetProvider()
