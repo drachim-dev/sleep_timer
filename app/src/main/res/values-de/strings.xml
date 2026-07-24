@@ -73,7 +73,7 @@
     <string name="home_title">Sleep Timer</string>
     <string name="home_settings_description">Einstellungen</string>
     <string name="home_start_timer">Timer starten</string>
-    <string name="home_show_timer">Timer anzeigen</string>
+    <string name="home_show_timer">Zum Timer</string>
     <string name="home_quick_time_dialog_title">Zeitslot festlegen</string>
     <string name="home_quick_time_unit_min">min</string>
     <string name="home_quick_time_save">Speichern</string>

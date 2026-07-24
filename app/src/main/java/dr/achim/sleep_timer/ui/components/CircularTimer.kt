@@ -1,6 +1,12 @@
 package dr.achim.sleep_timer.ui.components
 
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
@@ -26,8 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,6 +43,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import dr.achim.sleep_timer.ui.SharedElementKey
 import dr.achim.sleep_timer.ui.safeSharedElement
 import dr.achim.sleep_timer.ui.theme.AppTheme
@@ -82,7 +91,14 @@ fun CircularTimer(
         val strokeWidth: Dp =
             if (interactive) AppTheme.dimens.timerStrokeWidthInteractive else AppTheme.dimens.timerStrokeWidthDefault
         val strokeWidthPx = with(density) { strokeWidth.toPx() }
-        val innerSquareSide = (diameter - strokeWidth) * 0.7071f
+
+        val glowRadiusPx = if (glowEnabled) glowIntensity else 0f
+        val waveAmplitudePx = with(density) { 4.dp.toPx() }
+        val insetPx = strokeWidthPx / 2 + maxOf(glowRadiusPx, waveAmplitudePx)
+
+        val diameterPx = with(density) { diameter.toPx() }
+        val currentInnerRadiusPx = (diameterPx / 2) - insetPx
+        val innerSquareSide = with(density) { (currentInnerRadiusPx * 2 * 0.7071f).toDp() }
 
         Box(
             modifier = Modifier
@@ -95,11 +111,11 @@ fun CircularTimer(
                                     val down = awaitFirstDown()
                                     val center = Offset(size.width / 2f, size.height / 2f)
                                     val radius = size.width / 2f
-                                    val innerRadius = (size.width - strokeWidthPx) / 2f
+                                    val innerRadiusLimit = (size.width - strokeWidthPx) / 2f - maxOf(glowRadiusPx, waveAmplitudePx)
 
                                     val distanceFromCenter = (down.position - center).getDistance()
                                     val isOnTrack =
-                                        distanceFromCenter in (innerRadius - strokeWidthPx)..(radius + strokeWidthPx)
+                                        distanceFromCenter in (innerRadiusLimit - strokeWidthPx)..(radius)
 
                                     if (isOnTrack) {
                                         isPressed = true
@@ -150,6 +166,7 @@ fun CircularTimer(
                 handleScale = handleScale,
                 modifier = Modifier
                     .fillMaxSize()
+                    .graphicsLayer(clip = false)
                     .safeSharedElement(key = SharedElementKey.CircularTimer),
             )
 
@@ -186,14 +203,51 @@ private fun CircularTimerTrack(
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val handleRadiusDp = AppTheme.dimens.timerHandleRadius
 
+    val infiniteTransition = rememberInfiniteTransition(label = "wavyTransition")
+    val phase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 2f * Math.PI.toFloat(),
+        animationSpec = InfiniteRepeatableSpec(
+            animation = tween(4_000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "phase"
+    )
+
     Canvas(modifier = modifier) {
         val strokeWidthPx = strokeWidth.toPx()
-        val innerRadius = (size.minDimension - strokeWidthPx) / 2
+        val glowRadius = if (glowEnabled) glowIntensity else 0f
+        val waveAmplitude = 4.dp.toPx()
+
+        // Ensure the glow and wavy animations don't get clipped by adding an inset.
+        val inset = strokeWidthPx / 2 + maxOf(glowRadius, waveAmplitude)
+        val innerRadius = (size.minDimension / 2) - inset
         val center = Offset(size.width / 2, size.height / 2)
 
-        // Background Track
+        val arcSize = Size(innerRadius * 2, innerRadius * 2)
+        val arcTopLeft = Offset(center.x - innerRadius, center.y - innerRadius)
+
+        // Background Wavy Track
+        val waveCount = 12
+        val path = Path()
+        for (i in 0..360) {
+            val angleRad = Math.toRadians(i.toDouble()).toFloat()
+            val currentRadius = innerRadius + waveAmplitude * sin(waveCount * angleRad + phase)
+            val x = center.x + currentRadius * cos(angleRad)
+            val y = center.y + currentRadius * sin(angleRad)
+            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+        path.close()
+
+        drawPath(
+            path = path,
+            color = surfaceVariant.copy(alpha = 0.2f),
+            style = Stroke(width = strokeWidthPx)
+        )
+
+        // Background Track (Standard)
         drawCircle(
-            color = surfaceVariant.copy(alpha = 0.3f),
+            color = surfaceVariant.copy(alpha = 0.1f),
             radius = innerRadius,
             center = center,
             style = Stroke(width = strokeWidthPx)
@@ -214,10 +268,10 @@ private fun CircularTimerTrack(
                 }
 
                 drawArc(
-                    strokeWidthPx / 2,
-                    strokeWidthPx / 2,
-                    size.width - strokeWidthPx / 2,
-                    size.height - strokeWidthPx / 2,
+                    arcTopLeft.x,
+                    arcTopLeft.y,
+                    arcTopLeft.x + arcSize.width,
+                    arcTopLeft.y + arcSize.height,
                     -90f,
                     sweepAngle,
                     false,
@@ -232,8 +286,8 @@ private fun CircularTimerTrack(
             startAngle = -90f,
             sweepAngle = sweepAngle,
             useCenter = false,
-            topLeft = Offset(strokeWidthPx / 2, strokeWidthPx / 2),
-            size = Size(size.width - strokeWidthPx, size.height - strokeWidthPx),
+            topLeft = arcTopLeft,
+            size = arcSize,
             style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
         )
 

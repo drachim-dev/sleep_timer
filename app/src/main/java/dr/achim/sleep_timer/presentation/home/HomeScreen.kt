@@ -8,14 +8,20 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -237,7 +243,19 @@ fun HomeScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            AnimatedContent(isIdle, label = "timerContent") { idle ->
+            AnimatedContent(
+                targetState = isIdle,
+                label = "timerContent",
+                transitionSpec = {
+                    (fadeIn(animationSpec = tween(400, delayMillis = 100)) + scaleIn(
+                        initialScale = 0.8f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )).togetherWith(fadeOut(animationSpec = tween(200)))
+                }
+            ) { idle ->
                 CircularTimer(
                     progress = if (idle) selectedMinutes.value else timerState.progress,
                     glowEnabled = uiState.glowEnabled,
@@ -259,16 +277,36 @@ fun HomeScreenContent(
                             if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
                         val displayHours = if (totalMinutes == 0) 0 else (totalMinutes - 1) / 60
 
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            modifier = Modifier.animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                ),
+                                alignment = Alignment.Center
+                            ),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_moon_stars),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            )
+                            Spacer(Modifier.height(AppTheme.dimens.spacingExtraSmall))
                             Text(
                                 text = stringResource(
                                     R.string.home_time_minutes_only,
                                     displayMinutes
                                 ),
                                 maxLines = 1,
-                                autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                                autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize),
                             )
-                            if (displayHours > 0) {
+                            AnimatedVisibility(
+                                visible = displayHours > 0,
+                                enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                                exit = fadeOut()
+                            ) {
                                 Text(
                                     text = "+ ${displayHours}h",
                                     color = MaterialTheme.colorScheme.primary,

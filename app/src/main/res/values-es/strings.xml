@@ -75,7 +75,7 @@
     <string name="home_title">Sleep Timer</string>
     <string name="home_settings_description">Ajustes</string>
     <string name="home_start_timer">Iniciar</string>
-    <string name="home_show_timer">Ver temporizador</string>
+    <string name="home_show_timer">Ver temp.</string>
     <string name="home_quick_time_dialog_title">Establecer franja horaria</string>
     <string name="home_quick_time_unit_min">min</string>
     <string name="home_quick_time_save">Guardar</string>
