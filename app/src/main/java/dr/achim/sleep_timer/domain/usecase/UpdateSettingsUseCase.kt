@@ -3,7 +3,9 @@ package dr.achim.sleep_timer.domain.usecase
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.ThemeMode
 
-class UpdateSettingsUseCase(private val repository: SettingsRepository) {
+class UpdateSettingsUseCase(
+    private val repository: SettingsRepository
+) {
     suspend fun setThemeMode(themeMode: ThemeMode) {
         repository.setThemeMode(themeMode)
     }

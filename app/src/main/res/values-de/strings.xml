@@ -168,5 +168,11 @@
     <string name="onboarding_skip">Überspringen</string>
     <string name="onboarding_next">Weiter</string>
 
+    <!-- Tile -->
+    <string name="tile_label">Sleep Timer</string>
+    <string name="tile_description">Schnellstart für den Sleep Timer</string>
+    <string name="settings_tile_request_title">Als Schnellzugriff hinzufügen</string>
+    <string name="settings_tile_request_subtitle">Füge eine Verknüpfung zu deinen Schnelleinstellungen hinzu</string>
+
     <string name="common_pro">Pro</string>
 </resources>

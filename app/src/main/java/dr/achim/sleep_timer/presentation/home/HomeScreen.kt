@@ -481,7 +481,13 @@ private fun HomeFab(
                     compositingStrategy = CompositingStrategy.ModulateAlpha
                 }
         ) {
-            Icon(painterResource(R.drawable.ic_moon_stars), contentDescription = null)
+            Icon(
+                painter = rememberAnimatedVectorPainter(
+                    AnimatedImageVector.animatedVectorResource(R.drawable.avd_play_to_pause),
+                    false
+                ),
+                contentDescription = null
+            )
             Spacer(Modifier.width(AppTheme.dimens.spacingNormal))
             Text(
                 stringResource(R.string.home_start_timer),

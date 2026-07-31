@@ -171,5 +171,11 @@
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
 
+    <!-- Tile -->
+    <string name="tile_label">Sleep Timer</string>
+    <string name="tile_description">Quickly start the sleep timer</string>
+    <string name="settings_tile_request_title">Add Quick Settings Tile</string>
+    <string name="settings_tile_request_subtitle">Add a shortcut to your Quick Settings to quickly start the timer</string>
+
     <string name="common_pro">Pro</string>
 </resources>

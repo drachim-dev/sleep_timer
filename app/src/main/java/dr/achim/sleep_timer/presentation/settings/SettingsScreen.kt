@@ -1,8 +1,10 @@
 package dr.achim.sleep_timer.presentation.settings
 
+import android.app.StatusBarManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -75,6 +77,7 @@ import dr.achim.sleep_timer.model.PurchaseEvent
 import dr.achim.sleep_timer.model.ThemeMode
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
 import dr.achim.sleep_timer.service.FeatureFlag
+import dr.achim.sleep_timer.service.TimerTileService
 import dr.achim.sleep_timer.ui.components.DiagonalRibbon
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.components.SwitchListItem
@@ -343,6 +346,25 @@ fun SettingsScreenContent(
                             )
                         }
                     }
+
+                    if (FeatureFlag.QuickSettingsTile.enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val tileLabel = stringResource(R.string.tile_label)
+                        SettingsItem(
+                            painter = painterResource(R.drawable.ic_moon_stars),
+                            title = stringResource(R.string.settings_tile_request_title),
+                            subtitle = stringResource(R.string.settings_tile_request_subtitle),
+                            isProFeature = true,
+                            onClick = {
+                                val statusBarManager = context.getSystemService(StatusBarManager::class.java)
+                                statusBarManager?.requestAddTileService(
+                                    ComponentName(context, TimerTileService::class.java),
+                                    tileLabel,
+                                    Icon.createWithResource(context, R.drawable.ic_moon_stars),
+                                    context.mainExecutor
+                                ) { }
+                            }
+                        )
+                    }
                 }
 
                 SettingsSection(
@@ -579,31 +601,43 @@ fun SettingsItem(
     painter: Painter,
     title: String,
     subtitle: String? = null,
+    isProFeature: Boolean = false,
+    enabled: Boolean = !isProFeature || LocalIsPro.current,
     trailingText: String? = null,
     trailingColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     onClick: () -> Unit
 ) {
-    ListItem(
-        onClick = onClick,
-        supportingContent = subtitle?.let { { Text(text = it) } },
-        leadingContent = {
-            Icon(
-                painter = painter,
-                contentDescription = null,
-            )
-        },
-        trailingContent = trailingText?.let {
-            {
-                Text(
-                    text = it,
-                    color = trailingColor,
-                    style = MaterialTheme.typography.bodyMedium
+    Box(modifier = Modifier.clipToBounds()) {
+        ListItem(
+            onClick = onClick,
+            enabled = enabled,
+            supportingContent = subtitle?.let { { Text(text = it) } },
+            leadingContent = {
+                Icon(
+                    painter = painter,
+                    contentDescription = null,
                 )
-            }
-        },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-    ) {
-        Text(text = title)
+            },
+            trailingContent = trailingText?.let {
+                {
+                    Text(
+                        text = it,
+                        color = trailingColor,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            },
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            )
+        ) {
+            Text(text = title)
+        }
+
+        if (isProFeature && !LocalIsPro.current) {
+            DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
+        }
     }
 }
 

@@ -22,6 +22,7 @@ import dr.achim.sleep_timer.navigation.HomeKey
 import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 import dr.achim.sleep_timer.navigation.Navigation
 import dr.achim.sleep_timer.navigation.OnboardingKey
+import dr.achim.sleep_timer.navigation.SettingsKey
 import dr.achim.sleep_timer.navigation.TimerKey
 import dr.achim.sleep_timer.service.TimerService
 import dr.achim.sleep_timer.ui.theme.AppTheme
@@ -54,6 +55,7 @@ class MainActivity : ComponentActivity() {
 
             initialBackStack = when {
                 intent?.action == TimerService.ACTION_OPEN_TIMER -> listOf(HomeKey, TimerKey(null))
+                intent?.action == ACTION_UPGRADE_PRO -> listOf(HomeKey, SettingsKey())
                 isFirstLaunch -> listOf(OnboardingKey)
                 else -> listOf(HomeKey)
             }
@@ -85,5 +87,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val ACTION_UPGRADE_PRO = "dr.achim.sleep_timer.ACTION_UPGRADE_PRO"
     }
 }

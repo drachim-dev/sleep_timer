@@ -5,7 +5,9 @@ import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.AppSettings
 import kotlinx.coroutines.flow.Flow
 
-class GetSettingsUseCase(private val repository: SettingsRepository) {
+class GetSettingsUseCase(
+    private val repository: SettingsRepository
+) {
     operator fun invoke(): Flow<AppSettings> = combine(
         repository.themeMode,
         repository.glowEffectEnabled,
