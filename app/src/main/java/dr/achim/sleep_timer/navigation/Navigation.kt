@@ -76,7 +76,11 @@ fun Navigation(
     sharedTransitionScope: SharedTransitionScope? = null
 ) {
     val backStack = rememberNavBackStack(*initialBackStack.toTypedArray())
-    val onBack = dropUnlessResumed { backStack.removeLastOrNull() }
+    val onBack = dropUnlessResumed {
+        if (backStack.size > 1) {
+            backStack.removeLastOrNull()
+        }
+    }
     val settingsRepository = koinInject<SettingsRepository>()
     val uiMessageManager = koinInject<UiMessageManager>()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -91,6 +95,7 @@ fun Navigation(
 
     NavDisplay(
         backStack = backStack,
+        onBack = onBack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
