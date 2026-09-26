@@ -4,7 +4,7 @@
     <!-- Pre-granted on Android 13+ (API 33+) for timer apps -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
-    <!-- Pre-granted on install on Android 12 (API 31-32) -->
+    <!-- Pre-granted on Android 12 (API 31-32) -->
     <uses-permission
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" />
