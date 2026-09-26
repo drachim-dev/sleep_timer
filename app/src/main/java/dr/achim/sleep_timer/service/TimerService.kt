@@ -159,13 +159,6 @@ class TimerService : LifecycleService() {
             ACTION_EXTEND_20 -> {
                 extendTimer(20)
             }
-
-            ACTION_FINISH -> {
-                // Ensure service is in foreground if triggered while app/service is killed
-                // and to guarantee completion of end actions without system throttling.
-                ensureForeground()
-                onTimerFinished()
-            }
         }
         return START_NOT_STICKY
     }
@@ -333,20 +326,29 @@ class TimerService : LifecycleService() {
         )
         val triggerAtMillis = SystemClock.elapsedRealtime() + remainingMillis
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-            // Fallback to non-exact if permission is not granted
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
-            )
-        } else {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                triggerAtMillis,
-                pendingIntent
-            )
+        val canScheduleExact =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                alarmManager.canScheduleExactAlarms()
+
+        if (canScheduleExact) {
+            try {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent
+                )
+                return
+            } catch (_: SecurityException) {
+                // Permission may have been revoked between the check and the call.
+            }
         }
+
+        // Non-exact fallback.
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            triggerAtMillis,
+            pendingIntent
+        )
     }
 
     private fun cancelAlarm() {
@@ -472,7 +474,6 @@ class TimerService : LifecycleService() {
         const val ACTION_EXTEND_5 = "ACTION_EXTEND_5"
         const val ACTION_EXTEND_20 = "ACTION_EXTEND_20"
         const val ACTION_OPEN_TIMER = "ACTION_OPEN_TIMER"
-        const val ACTION_FINISH = "ACTION_FINISH"
         const val EXTRA_DURATION_MILLIS = "EXTRA_DURATION_MILLIS"
     }
 }
