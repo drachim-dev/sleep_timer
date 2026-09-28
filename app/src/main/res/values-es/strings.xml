@@ -12,6 +12,7 @@
 
     <!-- Errors -->
     <string name="error_purchase_failure">Hubo un problema al procesar tu pedido</string>
+    <string name="error_restore_failure">No se pudo restaurar la compra</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Ajustes</string>
@@ -45,6 +46,8 @@
     <string name="settings_like_app_subtitle">Agradezco cualquier valoración</string>
     <string name="settings_like_app_trailing">Gratis</string>
     <string name="settings_already_purchased">Ya comprado</string>
+    <string name="settings_restore_purchases">Restaurar compra</string>
+    <string name="settings_restore_success">Compra restaurada con éxito</string>
     <string name="settings_purchase_success">¡Gracias por su apoyo! ✨🙏</string>
     <string name="settings_section_advanced">Avanzado</string>
     <string name="settings_device_admin_title">Administrador del dispositivo</string>
@@ -177,6 +180,21 @@
     <string name="tile_description">Inicio rápido para el temporizador</string>
     <string name="settings_tile_request_title">Añadir mosaico de ajustes rápidos</string>
     <string name="settings_tile_request_subtitle">Añade un acceso directo a tus ajustes rápidos</string>
+
+    <!-- Paywall -->
+    <string name="paywall_title_part_1">Duerme mejor.</string>
+    <string name="paywall_title_part_2">Desbloquea más.</string>
+    <string name="paywall_subtitle">Actualiza a Pro y mejora\ntu experiencia con el temporizador.</string>
+    <string name="paywall_feature_no_ads_title">Sin anuncios</string>
+    <string name="paywall_feature_no_ads_description">Disfruta de una experiencia tranquila y sin distracciones.</string>
+    <string name="paywall_feature_quick_settings_tile_title">Mosaico de ajustes rápidos</string>
+    <string name="paywall_feature_quick_settings_tile_description">Inicia tu temporizador directamente desde los ajustes rápidos.</string>
+    <string name="paywall_feature_lights_off_delay_title">Retrasar el apagado de las luces</string>
+    <string name="paywall_feature_lights_off_delay_description">Añade un retraso antes de apagar las luces para relajarte a tu propio ritmo.</string>
+    <string name="paywall_feature_auto_open_app_title">Abrir app automáticamente</string>
+    <string name="paywall_feature_auto_open_app_description">Abre automáticamente tu aplicación favorita cuando se inicie el temporizador.</string>
+    <string name="paywall_purchase_title">Desbloquear Pro</string>
+    <string name="paywall_purchase_subtitle">Compra única</string>
 
     <string name="common_pro">Pro</string>
 </resources>

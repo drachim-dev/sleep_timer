@@ -12,13 +12,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalFlexBoxApi
 import androidx.compose.foundation.layout.FlexBox
 import androidx.compose.foundation.layout.FlexBoxScope
 import androidx.compose.foundation.layout.FlexJustifyContent
@@ -89,6 +87,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.ReviewManager
 import dr.achim.sleep_timer.domain.model.AppCategory
@@ -97,6 +96,7 @@ import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.TimerActionType
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
+import dr.achim.sleep_timer.navigation.LocalPaywallController
 import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
 import dr.achim.sleep_timer.presentation.settings.SETTING_DND
 import dr.achim.sleep_timer.ui.SharedElementKey
@@ -154,7 +154,6 @@ fun TimerScreen(
     )
 }
 
-@OptIn(ExperimentalFlexBoxApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
@@ -165,6 +164,8 @@ private fun TimerScreenContent(
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
+    val isPro = LocalIsPro.current
+    val paywallController = LocalPaywallController.current
     val expandedTimerSize = AppTheme.dimens.timerSizeExpanded
 
     var showQuickLaunchSheet by remember { mutableStateOf(false) }
@@ -408,12 +409,20 @@ private fun TimerScreenContent(
                     QuickLaunchRow(
                         selectedApps = uiState.selectedApps,
                         onPinApp = { index ->
-                            selectingIndex = index
-                            showQuickLaunchSheet = true
+                            if (isPro) {
+                                selectingIndex = index
+                                showQuickLaunchSheet = true
+                            } else {
+                                paywallController.show()
+                            }
                         },
                         onShowAll = {
-                            selectingIndex = -1
-                            showQuickLaunchSheet = true
+                            if (isPro) {
+                                selectingIndex = -1
+                                showQuickLaunchSheet = true
+                            } else {
+                                paywallController.show()
+                            }
                         }
                     )
                 }
@@ -685,7 +694,6 @@ fun TimeAdjustmentRow(
     }
 }
 
-@OptIn(ExperimentalFlexBoxApi::class)
 @Composable
 private fun TimerSection(
     title: @Composable () -> Unit,
@@ -818,7 +826,6 @@ fun QuickLaunchBottomSheet(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActionToggle(
     painter: Painter,

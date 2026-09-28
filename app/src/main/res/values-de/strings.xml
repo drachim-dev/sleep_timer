@@ -12,6 +12,7 @@
 
     <!-- Errors -->
     <string name="error_purchase_failure">Es gab ein Problem bei der Bearbeitung deiner Bestellung</string>
+    <string name="error_restore_failure">Kauf konnte nicht wiederhergestellt werden</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Einstellungen</string>
@@ -43,6 +44,8 @@
     <string name="settings_like_app_subtitle">Jede Bewertung hilft mir weiter</string>
     <string name="settings_like_app_trailing">Gratis</string>
     <string name="settings_already_purchased">Gekauft</string>
+    <string name="settings_restore_purchases">Kauf wiederherstellen</string>
+    <string name="settings_restore_success">Kauf erfolgreich wiederhergestellt</string>
     <string name="settings_purchase_success">Vielen Dank für deine Unterstützung! ✨🙏</string>
     <string name="settings_section_advanced">Fortgeschrittene Funktionen</string>
     <string name="settings_device_admin_title">Erweiterte Gerätefunktionen</string>
@@ -173,6 +176,21 @@
     <string name="tile_description">Schnellstart für den Sleep Timer</string>
     <string name="settings_tile_request_title">Als Schnellzugriff hinzufügen</string>
     <string name="settings_tile_request_subtitle">Füge eine Verknüpfung zu deinen Schnelleinstellungen hinzu</string>
+
+    <!-- Paywall -->
+    <string name="paywall_title_part_1">Besser schlafen.</string>
+    <string name="paywall_title_part_2">Mehr erreichen.</string>
+    <string name="paywall_subtitle">Hole dir Pro und verbessere\ndein Sleep Timer-Erlebnis.</string>
+    <string name="paywall_feature_no_ads_title">Keine Werbung</string>
+    <string name="paywall_feature_no_ads_description">Genieße ein ruhiges, ablenkungsfreies Erlebnis.</string>
+    <string name="paywall_feature_quick_settings_tile_title">Quick Settings</string>
+    <string name="paywall_feature_quick_settings_tile_description">Starte deinen Sleep Timer direkt aus den Schnelleinstellungen.</string>
+    <string name="paywall_feature_lights_off_delay_title">Verzögere Lampen Aktion</string>
+    <string name="paywall_feature_lights_off_delay_description">Füge eine Verzögerung vor dem Ausschalten der Lampen hinzu, falls du etwas extra Zeit brauchst.</string>
+    <string name="paywall_feature_auto_open_app_title">App automatisch öffnen</string>
+    <string name="paywall_feature_auto_open_app_description">Öffne deine Lieblings-App automatisch beim Starten des Timers.</string>
+    <string name="paywall_purchase_title">Pro freischalten</string>
+    <string name="paywall_purchase_subtitle">Einmaliger Kauf</string>
 
     <string name="common_pro">Pro</string>
 </resources>

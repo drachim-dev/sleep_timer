@@ -12,12 +12,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
@@ -26,6 +29,7 @@ import androidx.navigation3.runtime.metadata
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dr.achim.sleep_timer.common.UiMessage
 import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.SettingsRepository
 import dr.achim.sleep_timer.model.TimerActionSource
@@ -33,6 +37,7 @@ import dr.achim.sleep_timer.presentation.home.HomeScreen
 import dr.achim.sleep_timer.presentation.hue.HueDiscoveryScreen
 import dr.achim.sleep_timer.presentation.hue.RoomSelectionScreen
 import dr.achim.sleep_timer.presentation.onboarding.OnboardingScreen
+import dr.achim.sleep_timer.presentation.paywall.PaywallSheet
 import dr.achim.sleep_timer.presentation.settings.CreditsScreen
 import dr.achim.sleep_timer.presentation.settings.FaqScreen
 import dr.achim.sleep_timer.presentation.settings.SettingsScreen
@@ -45,11 +50,20 @@ import org.koin.core.parameter.parametersOf
 
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }
 
+val LocalPaywallController = compositionLocalOf { PaywallController {} }
+
+fun interface PaywallController {
+    fun show()
+}
+
 @Serializable
 object OnboardingKey : NavKey
 
 @Serializable
 object HomeKey : NavKey
+
+@Serializable
+object PaywallKey : NavKey
 
 @Serializable
 data class TimerKey(val minutes: Int?) : NavKey
@@ -64,15 +78,18 @@ object CreditsKey : NavKey
 object FaqKey : NavKey
 
 @Serializable
-data class HueDiscoveryKey(val source: TimerActionSource) : NavKey
+object HueDiscoveryKey : NavKey
 
 @Serializable
 data class RoomSelectionKey(val source: TimerActionSource) : NavKey
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(
     initialBackStack: List<NavKey> = listOf(HomeKey),
+    openPaywallEvent: Boolean = false,
+    onOpenPaywallHandled: () -> Unit = {},
     sharedTransitionScope: SharedTransitionScope? = null
 ) {
     val backStack = rememberNavBackStack(*initialBackStack.toTypedArray())
@@ -81,134 +98,154 @@ fun Navigation(
             backStack.removeLastOrNull()
         }
     }
+    val context = LocalContext.current
     val settingsRepository = koinInject<SettingsRepository>()
     val uiMessageManager = koinInject<UiMessageManager>()
     val snackbarHostState = remember { SnackbarHostState() }
+    val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         uiMessageManager.messages.collect { message ->
-            snackbarHostState.showSnackbar(message)
+            val text = when (message) {
+                is UiMessage.Dynamic -> message.value
+                is UiMessage.Resource -> context.resources.getString(message.resId, *message.args.toTypedArray())
+            }
+            snackbarHostState.showSnackbar(text)
         }
     }
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = onBack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        sharedTransitionScope = sharedTransitionScope,
-        predictivePopTransitionSpec = {
-            ContentTransform(
-                fadeIn(
-                    spring(
-                        dampingRatio = 1.0f,
-                        stiffness = 1600.0f,
+    LaunchedEffect(openPaywallEvent) {
+        if (openPaywallEvent) {
+            if (backStack.lastOrNull() != PaywallKey) {
+                backStack += PaywallKey
+            }
+            onOpenPaywallHandled()
+        }
+    }
+
+    CompositionLocalProvider(LocalPaywallController provides PaywallController { backStack += PaywallKey }) {
+        NavDisplay(
+            backStack = backStack,
+            onBack = onBack,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            sceneStrategies = listOf(bottomSheetStrategy),
+            sharedTransitionScope = sharedTransitionScope,
+            predictivePopTransitionSpec = {
+                ContentTransform(
+                    fadeIn(
+                        spring(
+                            dampingRatio = 1.0f,
+                            stiffness = 1600.0f,
+                        )
+                    ),
+                    fadeOut(),
+                )
+            },
+            entryProvider = entryProvider {
+                entry<OnboardingKey> {
+                    OnboardingScreen(
+                        onComplete = {
+                            scope.launch {
+                                settingsRepository.setFirstLaunchCompleted()
+                                backStack.clear()
+                                backStack += HomeKey
+                            }
+                        }
                     )
-                ),
-                fadeOut(),
-            )
-        },
-        entryProvider = entryProvider {
-            entry<OnboardingKey> {
-                OnboardingScreen(
-                    onComplete = {
-                        scope.launch {
-                            settingsRepository.setFirstLaunchCompleted()
-                            backStack.clear()
-                            backStack += HomeKey
+                }
+                entry<HomeKey> {
+                    HomeScreen(
+                        onNavigateToTimer = { minutes ->
+                            backStack += TimerKey(minutes)
+                        },
+                        onNavigateToSettings = dropUnlessResumed {
+                            backStack += SettingsKey()
+                        },
+                        snackbarHostState = snackbarHostState
+                    )
+                }
+                entry<TimerKey>(
+                    metadata = metadata {
+                        put(NavDisplay.TransitionKey) {
+                            slideInVertically(initialOffsetY = { it }) + fadeIn() togetherWith ExitTransition.KeepUntilTransitionsFinished
+                        }
+                        put(NavDisplay.PopTransitionKey) {
+                            EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
+                        }
+                        put(NavDisplay.PredictivePopTransitionKey) {
+                            EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         }
                     }
-                )
-            }
-            entry<HomeKey> {
-                HomeScreen(
-                    onNavigateToTimer = { minutes ->
-                        backStack += TimerKey(minutes)
-                    },
-                    onNavigateToSettings = dropUnlessResumed {
-                        backStack += SettingsKey()
-                    },
-                    snackbarHostState = snackbarHostState
-                )
-            }
-            entry<TimerKey>(
-                metadata = metadata {
-                    put(NavDisplay.TransitionKey) {
-                        slideInVertically(initialOffsetY = { it }) + fadeIn() togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                    put(NavDisplay.PopTransitionKey) {
-                        EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
-                    }
-                    put(NavDisplay.PredictivePopTransitionKey) {
-                        EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
-                    }
+                ) { key ->
+                    TimerScreen(
+                        onBack = onBack,
+                        onNavigateToRoomSelection = { source ->
+                            backStack += RoomSelectionKey(source)
+                        },
+                        onNavigateToSettings = { highlight ->
+                            backStack += SettingsKey(highlight)
+                        },
+                        viewModel = koinViewModel(parameters = { parametersOf(key.minutes) }),
+                        snackbarHostState = snackbarHostState
+                    )
                 }
-            ) { key ->
-                TimerScreen(
-                    onBack = onBack,
-                    onNavigateToRoomSelection = { source ->
-                        backStack += RoomSelectionKey(source)
-                    },
-                    onNavigateToSettings = { highlight ->
-                        backStack += SettingsKey(highlight)
-                    },
-                    viewModel = koinViewModel(parameters = { parametersOf(key.minutes) }),
-                    snackbarHostState = snackbarHostState
-                )
-            }
-            entry<SettingsKey>(
-                metadata = metadata {
-                    put(NavDisplay.TransitionKey) {
-                        slideInHorizontally(initialOffsetX = { it }) togetherWith slideOutHorizontally(
-                            targetOffsetX = { -it })
+                entry<SettingsKey>(
+                    metadata = metadata {
+                        put(NavDisplay.TransitionKey) {
+                            slideInHorizontally(initialOffsetX = { it }) togetherWith slideOutHorizontally(
+                                targetOffsetX = { -it })
+                        }
+                        put(NavDisplay.PopTransitionKey) {
+                            slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(
+                                targetOffsetX = { it })
+                        }
+                        put(NavDisplay.PredictivePopTransitionKey) {
+                            slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(
+                                targetOffsetX = { it })
+                        }
                     }
-                    put(NavDisplay.PopTransitionKey) {
-                        slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(
-                            targetOffsetX = { it })
-                    }
-                    put(NavDisplay.PredictivePopTransitionKey) {
-                        slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(
-                            targetOffsetX = { it })
-                    }
+                ) { key ->
+                    SettingsScreen(
+                        onBack = onBack,
+                        onNavigateToCredits = {
+                            backStack += CreditsKey
+                        },
+                        onNavigateToFaq = {
+                            backStack += FaqKey
+                        },
+                        highlight = key.highlight,
+                        snackbarHostState = snackbarHostState
+                    )
                 }
-            ) { key ->
-                SettingsScreen(
-                    onBack = onBack,
-                    onNavigateToCredits = {
-                        backStack += CreditsKey
-                    },
-                    onNavigateToFaq = {
-                        backStack += FaqKey
-                    },
-                    highlight = key.highlight,
-                    snackbarHostState = snackbarHostState
-                )
+                entry<FaqKey> {
+                    FaqScreen(onBack = onBack)
+                }
+                entry<CreditsKey> {
+                    CreditsScreen(onBack = onBack)
+                }
+                entry<HueDiscoveryKey> {
+                    HueDiscoveryScreen(onBack = onBack)
+                }
+                entry<RoomSelectionKey> { key ->
+                    RoomSelectionScreen(
+                        onBack = onBack,
+                        onNavigateToDiscovery = {
+                            backStack += HueDiscoveryKey
+                        },
+                        viewModel = koinViewModel(parameters = { parametersOf(key.source) })
+                    )
+                }
+                entry<PaywallKey>(metadata = BottomSheetSceneStrategy.bottomSheet()) { _ ->
+                    PaywallSheet(
+                        onBack = onBack,
+                    )
+                }
             }
-            entry<FaqKey> {
-                FaqScreen(onBack = onBack)
-            }
-            entry<CreditsKey> {
-                CreditsScreen(onBack = onBack)
-            }
-            entry<HueDiscoveryKey> { key ->
-                HueDiscoveryScreen(
-                    onBack = onBack,
-                    viewModel = koinViewModel(parameters = { parametersOf(key.source) })
-                )
-            }
-            entry<RoomSelectionKey> { key ->
-                RoomSelectionScreen(
-                    onBack = onBack,
-                    onNavigateToDiscovery = { source ->
-                        backStack += HueDiscoveryKey(source)
-                    },
-                    viewModel = koinViewModel(parameters = { parametersOf(key.source) })
-                )
-            }
-        }
-    )
+        )
+    }
 }

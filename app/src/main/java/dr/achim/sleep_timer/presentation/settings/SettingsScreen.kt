@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -75,6 +74,7 @@ import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.model.Product
 import dr.achim.sleep_timer.model.PurchaseEvent
 import dr.achim.sleep_timer.model.ThemeMode
+import dr.achim.sleep_timer.navigation.LocalPaywallController
 import dr.achim.sleep_timer.receiver.SleepTimerAdminReceiver
 import dr.achim.sleep_timer.service.FeatureFlag
 import dr.achim.sleep_timer.service.TimerTileService
@@ -196,6 +196,8 @@ fun SettingsScreenContent(
 
     var showThemeDialog by rememberSaveable { mutableStateOf(false) }
 
+    val isPro = LocalIsPro.current
+    val paywallController = LocalPaywallController.current
     if (showThemeDialog) {
         ThemeSelectionDialog(
             currentThemeMode = themeMode,
@@ -208,19 +210,18 @@ fun SettingsScreenContent(
     }
 
     var showConfetti by remember { mutableStateOf(false) }
-    val purchaseErrorMessage = stringResource(R.string.error_purchase_failure)
-    val purchaseSuccessMessage = stringResource(R.string.settings_purchase_success)
+    // snackbar messages are being handled by viewModel
     LaunchedEffect(Unit) {
         purchaseEvents.collectLatest {
             when (it) {
-                PurchaseEvent.PurchaseComplete -> {
+                PurchaseEvent.PurchaseComplete,
+                PurchaseEvent.RestoreSuccess -> {
                     showConfetti = true
-                    snackbarHostState.showSnackbar(purchaseSuccessMessage)
                 }
 
-                PurchaseEvent.PurchaseAborted -> {
-                    snackbarHostState.showSnackbar(purchaseErrorMessage)
-                }
+                PurchaseEvent.PurchaseAborted,
+                PurchaseEvent.PurchaseError,
+                PurchaseEvent.RestoreError -> {}
             }
         }
     }
@@ -322,7 +323,13 @@ fun SettingsScreenContent(
                             subtitle = stringResource(R.string.settings_lights_off_delay_subtitle),
                             checked = lightsOffDelay,
                             isProFeature = true,
-                            onCheckedChange = { onAction(SettingsUiAction.SetLightsOffDelay(it)) }
+                            onCheckedChange = {
+                                if (!isPro) {
+                                    paywallController.show()
+                                } else {
+                                    onAction(SettingsUiAction.SetLightsOffDelay(it))
+                                }
+                            }
                         )
 
                         AnimatedVisibility(lightsOffDelay) {
@@ -337,8 +344,12 @@ fun SettingsScreenContent(
                                 ),
                                 value = currentDelayIndex.toFloat(),
                                 onValueChange = { index ->
-                                    val seconds = LIGHTS_OFF_DELAY_STEPS[index.toInt()]
-                                    onAction(SettingsUiAction.SetLightsOffDelaySeconds(seconds))
+                                    if (!isPro) {
+                                        paywallController.show()
+                                    } else {
+                                        val seconds = LIGHTS_OFF_DELAY_STEPS[index.toInt()]
+                                        onAction(SettingsUiAction.SetLightsOffDelaySeconds(seconds))
+                                    }
                                 },
                                 isProFeature = true,
                                 valueRange = 0f..(LIGHTS_OFF_DELAY_STEPS.size - 1).toFloat(),
@@ -355,13 +366,18 @@ fun SettingsScreenContent(
                             subtitle = stringResource(R.string.settings_tile_request_subtitle),
                             isProFeature = true,
                             onClick = {
-                                val statusBarManager = context.getSystemService(StatusBarManager::class.java)
-                                statusBarManager?.requestAddTileService(
-                                    ComponentName(context, TimerTileService::class.java),
-                                    tileLabel,
-                                    Icon.createWithResource(context, R.drawable.ic_moon_stars),
-                                    context.mainExecutor
-                                ) { }
+                                if (!isPro) {
+                                    paywallController.show()
+                                } else {
+                                    val statusBarManager =
+                                        context.getSystemService(StatusBarManager::class.java)
+                                    statusBarManager?.requestAddTileService(
+                                        ComponentName(context, TimerTileService::class.java),
+                                        tileLabel,
+                                        Icon.createWithResource(context, R.drawable.ic_moon_stars),
+                                        context.mainExecutor
+                                    ) { }
+                                }
                             }
                         )
                     }
@@ -414,6 +430,12 @@ fun SettingsScreenContent(
                             )
                         }
                     }
+
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_restore),
+                        title = stringResource(R.string.settings_restore_purchases),
+                        onClick = { onAction(SettingsUiAction.RestorePurchases) }
+                    )
                 }
 
                 SettingsSection(
@@ -595,18 +617,18 @@ fun ThemeSelectionDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsItem(
     painter: Painter,
     title: String,
     subtitle: String? = null,
     isProFeature: Boolean = false,
-    enabled: Boolean = !isProFeature || LocalIsPro.current,
+    enabled: Boolean = true,
     trailingText: String? = null,
     trailingColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     onClick: () -> Unit
 ) {
+    val isPro = LocalIsPro.current
     Box(modifier = Modifier.clipToBounds()) {
         ListItem(
             onClick = onClick,
@@ -635,7 +657,7 @@ fun SettingsItem(
             Text(text = title)
         }
 
-        if (isProFeature && !LocalIsPro.current) {
+        if (isProFeature && !isPro) {
             DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
         }
     }
@@ -649,9 +671,10 @@ private fun SettingsSwitchItem(
     checked: Boolean,
     highlighted: Boolean = false,
     isProFeature: Boolean = false,
-    enabled: Boolean = !isProFeature || LocalIsPro.current,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val isPro = LocalIsPro.current
     Box(modifier = Modifier.clipToBounds()) {
         SwitchListItem(
             checked = checked,
@@ -669,7 +692,7 @@ private fun SettingsSwitchItem(
             Text(text = title)
         }
 
-        if (isProFeature && !LocalIsPro.current) {
+        if (isProFeature && !isPro) {
             DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
         }
     }
@@ -681,10 +704,11 @@ fun SettingsSliderItem(
     value: Float,
     onValueChange: (Float) -> Unit,
     isProFeature: Boolean = false,
-    enabled: Boolean = !isProFeature || LocalIsPro.current,
+    enabled: Boolean = true,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0
 ) {
+    val isPro = LocalIsPro.current
     Box(modifier = Modifier.clipToBounds()) {
         ListItem(
             enabled = enabled,
@@ -708,7 +732,7 @@ fun SettingsSliderItem(
             )
         }
 
-        if (isProFeature && !LocalIsPro.current) {
+        if (isProFeature && !isPro) {
             DiagonalRibbon { Text(stringResource(R.string.common_pro)) }
         }
     }

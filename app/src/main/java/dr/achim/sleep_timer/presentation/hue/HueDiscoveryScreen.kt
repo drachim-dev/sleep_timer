@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,11 +51,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
-import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.common.shouldShowRationale
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.ui.components.EmptyState
@@ -65,11 +62,12 @@ import dr.achim.sleep_timer.ui.components.LoadingIndicator
 import dr.achim.sleep_timer.ui.components.SectionTitle
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HueDiscoveryScreen(
     onBack: () -> Unit,
-    viewModel: HueDiscoveryViewModel
+    viewModel: HueDiscoveryViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -257,7 +255,6 @@ private fun HueDiscoveryContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SuccessContent(
     data: HueDiscoveryData,
@@ -311,7 +308,6 @@ private fun SuccessContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BridgeItem(bridge: HueBridge, isPaired: Boolean, onLink: () -> Unit, onUnlink: () -> Unit) {
     ListItem(

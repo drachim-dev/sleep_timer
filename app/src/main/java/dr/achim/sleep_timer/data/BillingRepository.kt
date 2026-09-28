@@ -1,10 +1,17 @@
 package dr.achim.sleep_timer.data
 
+import android.app.Activity
 import android.util.Log
 import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.ProductType
+import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
+import com.revenuecat.purchases.getProductsWith
 import com.revenuecat.purchases.interfaces.UpdatedCustomerInfoListener
+import com.revenuecat.purchases.models.StoreProduct
+import com.revenuecat.purchases.purchaseWith
+import com.revenuecat.purchases.restorePurchasesWith
 import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.model.Entitlement
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,4 +65,51 @@ class BillingRepository {
 
     suspend fun awaitIsPro(): Boolean =
         awaitCustomerInfo()?.entitlements?.get(Entitlement.Pro.id)?.isActive == true
+
+    suspend fun getProducts(productIds: List<String>, type: ProductType = ProductType.INAPP): List<StoreProduct> =
+        suspendCancellableCoroutine { cont ->
+            Purchases.sharedInstance.getProductsWith(
+                productIds = productIds,
+                type = type,
+                onError = { error ->
+                    Log.e(TAG, "Failed to get products: ${error.message}")
+                    if (cont.isActive) cont.resume(emptyList())
+                }
+            ) { storeProducts ->
+                if (cont.isActive) cont.resume(storeProducts)
+            }
+        }
+
+    suspend fun purchase(activity: Activity, product: StoreProduct): Result<Unit> =
+        suspendCancellableCoroutine { cont ->
+            Purchases.sharedInstance.purchaseWith(
+                PurchaseParams.Builder(activity, product).build(),
+                onError = { error, userCancelled ->
+                    if (userCancelled) {
+                        if (cont.isActive) cont.resume(Result.failure(Exception("User cancelled")))
+                    } else {
+                        Log.e(TAG, "Purchase failed: ${error.message}")
+                        if (cont.isActive) cont.resume(Result.failure(Exception(error.message)))
+                    }
+                },
+                onSuccess = { _, info ->
+                    updateInfo(info)
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+            )
+        }
+
+    suspend fun restorePurchases(): Result<CustomerInfo> =
+        suspendCancellableCoroutine { cont ->
+            Purchases.sharedInstance.restorePurchasesWith(
+                onError = { error ->
+                    Log.e(TAG, "Restore failed: ${error.message}")
+                    if (cont.isActive) cont.resume(Result.failure(Exception(error.message)))
+                },
+                onSuccess = { info ->
+                    updateInfo(info)
+                    if (cont.isActive) cont.resume(Result.success(info))
+                }
+            )
+        }
 }

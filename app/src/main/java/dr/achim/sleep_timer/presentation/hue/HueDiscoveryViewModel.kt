@@ -7,7 +7,6 @@ import dr.achim.sleep_timer.common.launchLoading
 import dr.achim.sleep_timer.data.LinkResult
 import dr.achim.sleep_timer.data.remote.hue.HueBridge
 import dr.achim.sleep_timer.domain.usecase.ManageHueUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +49,6 @@ class HueDiscoveryViewModel(private val manageHueUseCase: ManageHueUseCase) : Vi
 
     private var searchJob: Job? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val _pairedData = manageHueUseCase.getPairedIp().map { ip -> ip }
 
     val uiState = combine(

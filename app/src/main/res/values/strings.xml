@@ -15,6 +15,7 @@
 
     <!-- Errors -->
     <string name="error_purchase_failure">There was an issue processing your order</string>
+    <string name="error_restore_failure">Failed to restore purchase</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -46,6 +47,8 @@
     <string name="settings_like_app_subtitle">Please write a review or rate the app</string>
     <string name="settings_like_app_trailing">Free</string>
     <string name="settings_already_purchased">Purchased</string>
+    <string name="settings_restore_purchases">Restore purchase</string>
+    <string name="settings_restore_success">Purchase restored successfully</string>
     <string name="settings_purchase_success">Thank you for your support! ✨🙏</string>
     <string name="settings_section_advanced">Advanced</string>
     <string name="settings_device_admin_title">Device admin</string>
@@ -176,6 +179,21 @@
     <string name="tile_description">Quickly start the sleep timer</string>
     <string name="settings_tile_request_title">Add Quick Settings Tile</string>
     <string name="settings_tile_request_subtitle">Add a shortcut to your Quick Settings to quickly start the timer</string>
+
+    <!-- Paywall -->
+    <string name="paywall_title_part_1">Sleep better.</string>
+    <string name="paywall_title_part_2">Unlock more.</string>
+    <string name="paywall_subtitle">Upgrade to Pro and improve\nyour sleep timer experience.</string>
+    <string name="paywall_feature_no_ads_title">No ads</string>
+    <string name="paywall_feature_no_ads_description">Enjoy a calm, distraction-free experience.</string>
+    <string name="paywall_feature_quick_settings_tile_title">Quick Settings tile</string>
+    <string name="paywall_feature_quick_settings_tile_description">Start your sleep timer right from Quick Settings.</string>
+    <string name="paywall_feature_lights_off_delay_title">Delay lights off action</string>
+    <string name="paywall_feature_lights_off_delay_description">Add a delay before lights off to wind down at your own pace.</string>
+    <string name="paywall_feature_auto_open_app_title">Auto open app</string>
+    <string name="paywall_feature_auto_open_app_description">Automatically open your favorite app when the timer starts.</string>
+    <string name="paywall_purchase_title">Unlock Pro</string>
+    <string name="paywall_purchase_subtitle">One-time purchase</string>
 
     <string name="common_pro">Pro</string>
 </resources>

@@ -1,5 +1,6 @@
 package dr.achim.sleep_timer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,7 +23,7 @@ import dr.achim.sleep_timer.navigation.HomeKey
 import dr.achim.sleep_timer.navigation.LocalSharedTransitionScope
 import dr.achim.sleep_timer.navigation.Navigation
 import dr.achim.sleep_timer.navigation.OnboardingKey
-import dr.achim.sleep_timer.navigation.SettingsKey
+import dr.achim.sleep_timer.navigation.PaywallKey
 import dr.achim.sleep_timer.navigation.TimerKey
 import dr.achim.sleep_timer.service.TimerService
 import dr.achim.sleep_timer.ui.theme.AppTheme
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
     private val adsConsentManager: GoogleMobileAdsConsentManager by inject()
     private var isAppReady = false
     private var initialBackStack by mutableStateOf<List<NavKey>?>(null)
+    private var openPaywallEvent by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isAppReady }
@@ -55,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
             initialBackStack = when {
                 intent?.action == TimerService.ACTION_OPEN_TIMER -> listOf(HomeKey, TimerKey(null))
-                intent?.action == ACTION_UPGRADE_PRO -> listOf(HomeKey, SettingsKey())
+                intent?.action == ACTION_UPGRADE_PRO -> listOf(HomeKey, PaywallKey)
                 isFirstLaunch -> listOf(OnboardingKey)
                 else -> listOf(HomeKey)
             }
@@ -69,23 +71,33 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeMode by settingsRepository.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.default)
-            val isPro by billingRepository.isPro.collectAsStateWithLifecycle(initialValue = false)
+            val isProState by billingRepository.isPro.collectAsStateWithLifecycle(initialValue = false)
 
             initialBackStack?.let { backStack ->
                 AppTheme(themeMode = themeMode) {
                     SharedTransitionLayout {
                         CompositionLocalProvider(
                             LocalSharedTransitionScope provides this,
-                            LocalIsPro provides isPro,
+                            LocalIsPro provides isProState,
                         ) {
                             Navigation(
                                 initialBackStack = backStack,
+                                openPaywallEvent = openPaywallEvent,
+                                onOpenPaywallHandled = { openPaywallEvent = false },
                                 sharedTransitionScope = this
                             )
                         }
                     }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.action == ACTION_UPGRADE_PRO) {
+            openPaywallEvent = true
         }
     }
 

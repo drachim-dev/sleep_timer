@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularWavyProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoadingIndicator(
     text: String,

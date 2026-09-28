@@ -1,6 +1,5 @@
 package dr.achim.sleep_timer.data
 
-import android.app.Activity
 import android.content.Context
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.AdRequest

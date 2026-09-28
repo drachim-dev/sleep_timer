@@ -2,5 +2,8 @@ package dr.achim.sleep_timer.model
 
 enum class PurchaseEvent {
     PurchaseComplete,
-    PurchaseAborted, ;
+    PurchaseAborted,
+    PurchaseError,
+    RestoreSuccess,
+    RestoreError,
 }

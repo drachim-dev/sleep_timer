@@ -181,11 +181,9 @@ fun HomeScreenContent(
             if (isGranted) {
                 onNavigateToTimer()
             } else {
-                val showRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    context.shouldShowRationale(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    false
-                }
+                val showRationale =
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            context.shouldShowRationale(Manifest.permission.POST_NOTIFICATIONS)
                 onAction(HomeUiAction.NotificationPermissionDenied(showRationale))
             }
         }

@@ -1,6 +1,5 @@
 package dr.achim.sleep_timer.presentation.onboarding
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -74,7 +73,6 @@ private val onboardingPages = listOf(
     ),
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun OnboardingScreen(
     onComplete: () -> Unit

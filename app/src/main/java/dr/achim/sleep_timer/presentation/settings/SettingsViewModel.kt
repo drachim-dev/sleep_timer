@@ -4,13 +4,10 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revenuecat.purchases.ProductType
-import com.revenuecat.purchases.PurchaseParams
-import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.getProductsWith
 import com.revenuecat.purchases.models.StoreProduct
-import com.revenuecat.purchases.purchaseWith
+import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.TAG
+import dr.achim.sleep_timer.common.UiMessageManager
 import dr.achim.sleep_timer.data.BillingRepository
 import dr.achim.sleep_timer.data.GoogleMobileAdsConsentManager
 import dr.achim.sleep_timer.data.TimerController
@@ -44,10 +41,11 @@ data class StoreProductUiModel(
 class SettingsViewModel(
     private val timerController: TimerController,
     private val googleMobileAdsConsentManager: GoogleMobileAdsConsentManager,
-    billingRepository: BillingRepository,
+    private val billingRepository: BillingRepository,
     getSettingsUseCase: GetSettingsUseCase,
     private val updateSettingsUseCase: UpdateSettingsUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
+    private val uiMessageManager: UiMessageManager,
 ) : ViewModel() {
 
     private val eventChannel = Channel<PurchaseEvent>(Channel.BUFFERED)
@@ -116,70 +114,69 @@ class SettingsViewModel(
             initialValue = AppSettings().lightsOffDelaySeconds
         )
 
-    private val _isDeviceAdminEnabled =
-        MutableStateFlow(checkTimerPermissionsUseCase().isDeviceAdminEnabled)
+    private val _isDeviceAdminEnabled = MutableStateFlow(false)
     val isDeviceAdminEnabled: StateFlow<Boolean> = _isDeviceAdminEnabled.asStateFlow()
 
-    private val _hasNotificationAccess =
-        MutableStateFlow(checkTimerPermissionsUseCase().hasNotificationAccess)
+    private val _hasNotificationAccess = MutableStateFlow(false)
     val hasNotificationAccess: StateFlow<Boolean> = _hasNotificationAccess.asStateFlow()
+
+    private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
+    private val _purchasedProductIds = MutableStateFlow<Set<String>>(emptySet())
+
+    val productUiModels: StateFlow<List<StoreProductUiModel>> = combine(
+        _products,
+        _purchasedProductIds
+    ) { products, purchasedIds ->
+        products.map { product ->
+            StoreProductUiModel(
+                id = product.id,
+                title = product.name,
+                description = product.description,
+                price = product.price.formatted,
+                isPurchased = purchasedIds.contains(product.id)
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
 
     val isPrivacyOptionsRequired: Boolean
         get() = googleMobileAdsConsentManager.isPrivacyOptionsRequired
 
-    private val _products = MutableStateFlow<List<StoreProduct>>(emptyList())
-
-    val productUiModels: StateFlow<List<StoreProductUiModel>> =
-        combine(_products, billingRepository.customerInfo) { products, info ->
-            products.map { product ->
-                val productType = Product.entries.find { it.id == product.id }
-                val isConsumable = productType?.isConsumable ?: false
-
-                val isPurchased = when (product.id) {
-                    Product.RemoveAds.id -> info?.entitlements?.get(Entitlement.Pro.id)?.isActive == true
-                    else -> info?.allPurchasedProductIds?.contains(product.id) == true && !isConsumable
-                }
-
-                val skuTitleAppNameRegex = """(?> \(.+?\))$""".toRegex()
-                val formattedTitle = product.title.replace(skuTitleAppNameRegex, "")
-
-                StoreProductUiModel(
-                    id = product.id,
-                    title = formattedTitle,
-                    description = product.description,
-                    price = product.price.formatted,
-                    isPurchased = isPurchased
-                )
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
     init {
         loadProducts()
+        observePurchases()
     }
 
     private fun loadProducts() {
-        val productIdentifiers = Product.entries.map { it.id }
-        Purchases.sharedInstance.getProductsWith(
-            productIds = productIdentifiers,
-            type = ProductType.INAPP,
-            onError = { error ->
-                Log.e(TAG, "Code ${error.code}: ${error.message}")
+        viewModelScope.launch {
+            val productIds = listOf(
+                Product.Donation.id,
+                Product.RemoveAds.id
+            )
+            _products.value = billingRepository.getProducts(productIds)
+        }
+    }
+
+    private fun observePurchases() {
+        viewModelScope.launch {
+            billingRepository.customerInfo.collect { customerInfo ->
+                val purchased = mutableSetOf<String>()
+                if (customerInfo?.entitlements?.get(Entitlement.Pro.id)?.isActive == true) {
+                    purchased.add(Product.RemoveAds.id)
+                }
+                customerInfo?.nonSubscriptionTransactions?.forEach { transaction ->
+                    purchased.add(transaction.productIdentifier)
+                }
+                _purchasedProductIds.value = purchased
             }
-        ) { storeProducts ->
-            _products.value = storeProducts
         }
     }
 
     fun onAction(action: SettingsUiAction) {
         when (action) {
-            is SettingsUiAction.RefreshDeviceAdminStatus -> refreshDeviceAdminStatus()
-            is SettingsUiAction.RefreshDndStatus -> refreshDndStatus()
-            is SettingsUiAction.DisableDeviceAdmin -> disableDeviceAdmin()
-            is SettingsUiAction.DisableNotificationAccess -> disableNotificationAccess()
             is SettingsUiAction.SetThemeMode -> setThemeMode(action.themeMode)
             is SettingsUiAction.SetGlowEffectEnabled -> setGlowEffectEnabled(action.enabled)
             is SettingsUiAction.SetGlowIntensity -> setGlowIntensity(action.intensity)
@@ -187,12 +184,13 @@ class SettingsViewModel(
             is SettingsUiAction.SetExtendOnShakeMinutes -> setExtendOnShakeMinutes(action.minutes)
             is SettingsUiAction.SetLightsOffDelay -> setLightsOffDelay(action.enabled)
             is SettingsUiAction.SetLightsOffDelaySeconds -> setLightsOffDelaySeconds(action.seconds)
-            is SettingsUiAction.PurchaseProduct -> purchaseProduct(
-                action.activity,
-                action.productId
-            )
-
+            is SettingsUiAction.PurchaseProduct -> purchase(action.activity, action.productId)
+            SettingsUiAction.RestorePurchases -> restorePurchases()
             is SettingsUiAction.ShowPrivacyOptions -> showPrivacyOptions(action.activity)
+            SettingsUiAction.RefreshDeviceAdminStatus -> refreshDeviceAdminStatus()
+            is SettingsUiAction.RefreshDndStatus -> refreshDndStatus()
+            SettingsUiAction.DisableDeviceAdmin -> disableDeviceAdmin()
+            SettingsUiAction.DisableNotificationAccess -> disableNotificationAccess()
         }
     }
 
@@ -200,26 +198,47 @@ class SettingsViewModel(
         if (activity == null) return
         googleMobileAdsConsentManager.showPrivacyOptionsForm(activity) { error ->
             if (error != null) {
-                Log.e(TAG, "Privacy options form error: ${error.message}")
+                Log.e(TAG, "Failed to show privacy options: ${error.message}")
             }
         }
     }
 
-    private fun purchaseProduct(activity: Activity?, productId: String) {
+    fun purchase(activity: Activity?, productId: String) {
         if (activity == null) return
         val product = _products.value.find { it.id == productId } ?: return
-        Purchases.sharedInstance.purchaseWith(
-            PurchaseParams.Builder(activity, product).build(),
-            onError = { error, userCancelled ->
-                if (userCancelled) return@purchaseWith
 
-                Log.e(TAG, "Code ${error.code}: ${error.message}")
-                sendEvent(PurchaseEvent.PurchaseAborted)
-            },
-            onSuccess = { _, _ ->
-                sendEvent(PurchaseEvent.PurchaseComplete)
-            }
-        )
+        viewModelScope.launch {
+            billingRepository.purchase(activity, product)
+                .onSuccess {
+                    uiMessageManager.emitMessage(R.string.settings_purchase_success)
+                    sendEvent(PurchaseEvent.PurchaseComplete)
+                }
+                .onFailure { error ->
+                    if (error.message != "User cancelled") {
+                        uiMessageManager.emitMessage(R.string.error_purchase_failure)
+                        sendEvent(PurchaseEvent.PurchaseError)
+                    }
+                }
+        }
+    }
+
+    private fun restorePurchases() {
+        viewModelScope.launch {
+            billingRepository.restorePurchases()
+                .onSuccess { info ->
+                    if (info.entitlements[Entitlement.Pro.id]?.isActive == true) {
+                        uiMessageManager.emitMessage(R.string.settings_restore_success)
+                        sendEvent(PurchaseEvent.RestoreSuccess)
+                    } else {
+                        uiMessageManager.emitMessage(R.string.error_restore_failure)
+                        sendEvent(PurchaseEvent.RestoreError)
+                    }
+                }
+                .onFailure {
+                    uiMessageManager.emitMessage(R.string.error_restore_failure)
+                    sendEvent(PurchaseEvent.RestoreError)
+                }
+        }
     }
 
     private fun refreshDeviceAdminStatus(): Boolean {
