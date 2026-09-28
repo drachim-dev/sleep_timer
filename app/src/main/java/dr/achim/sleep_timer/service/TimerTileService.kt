@@ -1,5 +1,6 @@
 package dr.achim.sleep_timer.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
@@ -66,6 +67,8 @@ class TimerTileService : TileService() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     startActivityAndCollapse(pendingIntent)
                 } else {
+                    @SuppressLint("StartActivityAndCollapseDeprecated")
+                    @Suppress("Deprecation")
                     startActivityAndCollapse(intent)
                 }
                 return@launch

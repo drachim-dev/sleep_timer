@@ -53,6 +53,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Slider
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -921,13 +922,17 @@ fun VolumeSliderDialog(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(AppTheme.dimens.spacingMedium))
-                Slider(
+                val sliderState = rememberSliderState(
                     value = sliderValue,
+                    trackRange = 0f..100f
+                )
+                sliderState.value = sliderValue
+                Slider(
+                    state = sliderState,
                     onValueChange = {
                         sliderValue = it
                         onValueChange(it.toInt())
-                    },
-                    valueRange = 0f..100f
+                    }
                 )
             }
         },

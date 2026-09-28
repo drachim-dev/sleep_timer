@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -713,12 +714,16 @@ fun SettingsSliderItem(
         ListItem(
             enabled = enabled,
             supportingContent = {
-                Slider(
+                val sliderState = rememberSliderState(
                     value = value,
+                    steps = steps,
+                    trackRange = valueRange
+                )
+                sliderState.value = value
+                Slider(
+                    state = sliderState,
                     onValueChange = onValueChange,
-                    enabled = enabled,
-                    valueRange = valueRange,
-                    steps = steps
+                    enabled = enabled
                 )
             },
             colors = ListItemDefaults.colors(
