@@ -187,8 +187,8 @@
     <string name="paywall_feature_quick_settings_tile_description">Starte deinen Sleep Timer direkt aus den Schnelleinstellungen.</string>
     <string name="paywall_feature_lights_off_delay_title">Verzögere Lampen Aktion</string>
     <string name="paywall_feature_lights_off_delay_description">Füge eine Verzögerung vor dem Ausschalten der Lampen hinzu, falls du etwas extra Zeit brauchst.</string>
-    <string name="paywall_feature_auto_open_app_title">App automatisch öffnen</string>
-    <string name="paywall_feature_auto_open_app_description">Öffne deine Lieblings-App automatisch beim Starten des Timers.</string>
+
+
     <string name="paywall_purchase_title">Pro freischalten</string>
     <string name="paywall_purchase_subtitle">Einmaliger Kauf</string>
 

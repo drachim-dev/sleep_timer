@@ -176,11 +176,6 @@ private fun FeatureList() {
             title = stringResource(R.string.paywall_feature_lights_off_delay_title),
             description = stringResource(R.string.paywall_feature_lights_off_delay_description),
         )
-        FeatureItem(
-            icon = painterResource(R.drawable.ic_open_in_new),
-            title = stringResource(R.string.paywall_feature_auto_open_app_title),
-            description = stringResource(R.string.paywall_feature_auto_open_app_description),
-        )
     }
 }
 

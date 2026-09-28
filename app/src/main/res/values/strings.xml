@@ -190,8 +190,8 @@
     <string name="paywall_feature_quick_settings_tile_description">Start your sleep timer right from Quick Settings.</string>
     <string name="paywall_feature_lights_off_delay_title">Delay lights off action</string>
     <string name="paywall_feature_lights_off_delay_description">Add a delay before lights off to wind down at your own pace.</string>
-    <string name="paywall_feature_auto_open_app_title">Auto open app</string>
-    <string name="paywall_feature_auto_open_app_description">Automatically open your favorite app when the timer starts.</string>
+
+
     <string name="paywall_purchase_title">Unlock Pro</string>
     <string name="paywall_purchase_subtitle">One-time purchase</string>
 

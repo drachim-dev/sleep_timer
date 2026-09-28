@@ -191,8 +191,8 @@
     <string name="paywall_feature_quick_settings_tile_description">Inicia tu temporizador directamente desde los ajustes rápidos.</string>
     <string name="paywall_feature_lights_off_delay_title">Retrasar el apagado de las luces</string>
     <string name="paywall_feature_lights_off_delay_description">Añade un retraso antes de apagar las luces para relajarte a tu propio ritmo.</string>
-    <string name="paywall_feature_auto_open_app_title">Abrir app automáticamente</string>
-    <string name="paywall_feature_auto_open_app_description">Abre automáticamente tu aplicación favorita cuando se inicie el temporizador.</string>
+
+
     <string name="paywall_purchase_title">Desbloquear Pro</string>
     <string name="paywall_purchase_subtitle">Compra única</string>
 

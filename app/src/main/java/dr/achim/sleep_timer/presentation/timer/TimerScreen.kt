@@ -53,7 +53,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Slider
-import androidx.compose.material3.rememberSliderState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -61,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -88,7 +88,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.ReviewManager
 import dr.achim.sleep_timer.domain.model.AppCategory
@@ -97,7 +96,6 @@ import dr.achim.sleep_timer.model.TimerActionSource
 import dr.achim.sleep_timer.model.TimerActionType
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
-import dr.achim.sleep_timer.navigation.LocalPaywallController
 import dr.achim.sleep_timer.presentation.settings.SETTING_ADMIN
 import dr.achim.sleep_timer.presentation.settings.SETTING_DND
 import dr.achim.sleep_timer.ui.SharedElementKey
@@ -165,8 +163,6 @@ private fun TimerScreenContent(
     snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
-    val isPro = LocalIsPro.current
-    val paywallController = LocalPaywallController.current
     val expandedTimerSize = AppTheme.dimens.timerSizeExpanded
 
     var showQuickLaunchSheet by remember { mutableStateOf(false) }
@@ -180,7 +176,13 @@ private fun TimerScreenContent(
             initialValue = uiState.timerActions.startActions.volumeLevel,
             onConfirm = { level ->
                 onAction(Action.SetVolumeLevel(TimerActionSource.START, level))
-                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.START, true))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.ADJUST_VOLUME,
+                        TimerActionSource.START,
+                        true
+                    )
+                )
                 showStartVolumeDialog = false
             },
             onValueChange = { level ->
@@ -195,7 +197,13 @@ private fun TimerScreenContent(
             initialValue = uiState.timerActions.endActions.volumeLevel,
             onConfirm = { level ->
                 onAction(Action.SetVolumeLevel(TimerActionSource.END, level))
-                onAction(Action.ToggleAction(TimerActionType.ADJUST_VOLUME, TimerActionSource.END, true))
+                onAction(
+                    Action.ToggleAction(
+                        TimerActionType.ADJUST_VOLUME,
+                        TimerActionSource.END,
+                        true
+                    )
+                )
                 showEndVolumeDialog = false
             },
             onValueChange = { level ->
@@ -243,7 +251,10 @@ private fun TimerScreenContent(
 
     CollapsingScaffold(
         modifier = Modifier.fillMaxSize(),
-        state = rememberCollapsingHeaderState(maxHeaderHeight = expandedTimerSize, listState = listState),
+        state = rememberCollapsingHeaderState(
+            maxHeaderHeight = expandedTimerSize,
+            listState = listState
+        ),
         topBar = { isCollapsed ->
             CenterAlignedTopAppBar(
                 title = {
@@ -410,20 +421,12 @@ private fun TimerScreenContent(
                     QuickLaunchRow(
                         selectedApps = uiState.selectedApps,
                         onPinApp = { index ->
-                            if (isPro) {
-                                selectingIndex = index
-                                showQuickLaunchSheet = true
-                            } else {
-                                paywallController.show()
-                            }
+                            selectingIndex = index
+                            showQuickLaunchSheet = true
                         },
                         onShowAll = {
-                            if (isPro) {
-                                selectingIndex = -1
-                                showQuickLaunchSheet = true
-                            } else {
-                                paywallController.show()
-                            }
+                            selectingIndex = -1
+                            showQuickLaunchSheet = true
                         }
                     )
                 }
