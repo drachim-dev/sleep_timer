@@ -6,10 +6,17 @@ interface AudioRepository {
      * @param level Volume level in percent (0-100).
      * @param flags Optional flags for AudioManager.
      */
-    fun setMediaVolume(level: Int, flags: Int = 0)
+    fun setRelativeMediaVolume(level: Int, flags: Int = 0)
 
     /**
-     * Requests and immediately abandons audio focus to stop media playback.
+     * Fades out media volume, stops media playback by requesting audio focus,
+     * and restores the original volume.
+     *
+     * @param fadeDurationMillis Duration of the fade out in milliseconds.
      */
-    fun stopMedia()
+    suspend fun stopMedia(fadeDurationMillis: Long = DEFAULT_FADE_DURATION_MS)
+
+    companion object {
+        const val DEFAULT_FADE_DURATION_MS = 3_000L
+    }
 }

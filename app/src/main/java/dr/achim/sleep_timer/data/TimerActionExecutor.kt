@@ -25,7 +25,7 @@ class TimerActionExecutor(
     suspend fun applyStartActions(actions: StartActions) {
         if (actions.adjustVolume) {
             actions.volumeLevel?.let { level ->
-                audioRepository.setMediaVolume(level)
+                audioRepository.setRelativeMediaVolume(level)
             }
         }
 
@@ -76,9 +76,9 @@ class TimerActionExecutor(
 
         if (actions.adjustVolume) {
             actions.volumeLevel?.let { level ->
-                audioRepository.setMediaVolume(level)
+                audioRepository.setRelativeMediaVolume(level)
             } ?: run {
-                audioRepository.setMediaVolume(0)
+                audioRepository.setRelativeMediaVolume(0)
             }
         }
 
