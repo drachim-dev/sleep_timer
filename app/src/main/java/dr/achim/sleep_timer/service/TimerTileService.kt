@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
+import androidx.core.content.ContextCompat
+
 class TimerTileService : TileService() {
 
     private val timerRepository: TimerRepository by inject()
@@ -86,7 +88,7 @@ class TimerTileService : TileService() {
                     action = TimerService.ACTION_START
                     putExtra(TimerService.EXTRA_DURATION_MILLIS, minutes * 60 * 1000L)
                 }
-                startService(intent)
+                ContextCompat.startForegroundService(this@TimerTileService, intent)
             }
         }
     }

@@ -67,7 +67,7 @@ class TimerController(
             action = TimerService.ACTION_START
             putExtra(TimerService.EXTRA_DURATION_MILLIS, millis)
         }
-        context.startForegroundService(intent)
+        ContextCompat.startForegroundService(context, intent)
     }
 
     fun stopTimer() {
@@ -81,13 +81,13 @@ class TimerController(
         val intent = Intent(context, TimerService::class.java).apply {
             action = TimerService.ACTION_PAUSE
         }
-        context.startService(intent)
+        ContextCompat.startForegroundService(context, intent)
     }
 
     fun resumeTimer() {
         val intent = Intent(context, TimerService::class.java).apply {
             action = TimerService.ACTION_RESUME
         }
-        context.startService(intent)
+        ContextCompat.startForegroundService(context, intent)
     }
 }
