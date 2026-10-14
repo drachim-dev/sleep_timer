@@ -5,7 +5,10 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.hardware.Sensor
 import android.hardware.SensorManager
@@ -18,6 +21,8 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dr.achim.sleep_timer.MainActivity
@@ -31,16 +36,19 @@ import dr.achim.sleep_timer.domain.usecase.ManageTimerActionsUseCase
 import dr.achim.sleep_timer.model.AppSettings
 import dr.achim.sleep_timer.model.TimerActions
 import dr.achim.sleep_timer.model.TimerState
-import dr.achim.sleep_timer.receiver.TimerReceiver
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -53,6 +61,7 @@ class TimerService : LifecycleService() {
     private val vibrator: Vibrator by inject()
     private val timerRepository: TimerRepository by inject()
     private val timerActionExecutor: TimerActionExecutor by inject()
+
     private var timerJob: Job? = null
     private var lightsOffDelayJob: Job? = null
     private lateinit var shakeDetector: ShakeDetector
@@ -60,10 +69,27 @@ class TimerService : LifecycleService() {
     private var targetTimeMillis: Long = 0L
     private var isFinishing = false
 
+    private val alarmReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == ACTION_EXPIRED) {
+                onTimerFinished()
+            }
+        }
+    }
+
+    private val isTimerActive: Boolean
+        get() = timerRepository.timerState.value.isActive
+
     private val settingsFlow = getSettingsUseCase().stateIn(
         scope = lifecycleScope,
         started = SharingStarted.Eagerly,
         initialValue = AppSettings()
+    )
+
+    private val actionsFlow = manageTimerActionsUseCase.observeTimerActions().stateIn(
+        scope = lifecycleScope,
+        started = SharingStarted.Eagerly,
+        initialValue = TimerActions()
     )
 
     private val notificationManager by lazy {
@@ -74,8 +100,6 @@ class TimerService : LifecycleService() {
         getSystemService(ALARM_SERVICE) as AlarmManager
     }
 
-    private var currentActions: TimerActions = TimerActions()
-
     override fun onBind(intent: Intent): IBinder? {
         super.onBind(intent)
         return null
@@ -84,17 +108,35 @@ class TimerService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        observeTimerActions()
         setupShakeDetector()
+
+        lifecycleScope.launch {
+            timerRepository.timerState
+                .map { it.isActive }
+                .dropWhile { !it } // Ignore initial Idle state before ACTION_START runs
+                .distinctUntilChanged()
+                .collect { active ->
+                    if (active) {
+                        promoteToForeground()
+                    } else if (!isFinishing) {
+                        stopSelf()
+                    }
+                }
+        }
+
+        ContextCompat.registerReceiver(
+            this,
+            alarmReceiver,
+            IntentFilter(ACTION_EXPIRED),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun setupShakeDetector() {
-        shakeDetector = ShakeDetector(
-            onShakeDetected = {
-                extendTimer(settingsFlow.value.extendOnShakeMinutes)
-                vibrate()
-            },
-        )
+        shakeDetector = ShakeDetector {
+            extendTimer(settingsFlow.value.extendOnShakeMinutes)
+            vibrate()
+        }
 
         lifecycleScope.launch {
             combine(
@@ -123,59 +165,55 @@ class TimerService : LifecycleService() {
         }
     }
 
-    private fun observeTimerActions() {
-        lifecycleScope.launch {
-            manageTimerActionsUseCase.observeTimerActions().collect { actions ->
-                currentActions = actions
-            }
-        }
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        when (intent?.action) {
-            ACTION_START -> {
-                val durationMillis = intent.getLongExtra(EXTRA_DURATION_MILLIS, 0L)
-                startTimer(durationMillis)
-            }
 
-            ACTION_STOP -> {
-                stopTimer()
-                stopSelf()
-            }
-
-            ACTION_PAUSE -> {
-                pauseTimer()
-            }
-
-            ACTION_RESUME -> {
-                resumeTimer()
-            }
-
-            ACTION_EXTEND_5 -> {
-                extendTimer(5)
-            }
-
-            ACTION_EXTEND_20 -> {
-                extendTimer(20)
-            }
+        if (!promoteToForeground()) {
+            stopSelf()
+            return START_NOT_STICKY
         }
+
+        handleAction(intent)
+
+        if (!isTimerActive && !isFinishing) {
+            stopSelf()
+        }
+
         return START_NOT_STICKY
+    }
+
+    private fun handleAction(intent: Intent?) {
+        val action = intent?.action ?: return
+
+        when (action) {
+            ACTION_START -> {
+                val duration = intent.getLongExtra(EXTRA_DURATION_MILLIS, 0L)
+                if (duration > 0L) startTimer(duration)
+            }
+            ACTION_STOP -> stopTimer()
+            ACTION_PAUSE -> if (isTimerActive) pauseTimer()
+            ACTION_RESUME -> if (isTimerActive) resumeTimer()
+            ACTION_EXTEND_5 -> if (isTimerActive) extendTimer(5)
+            ACTION_EXTEND_20 -> if (isTimerActive) extendTimer(20)
+        }
     }
 
     private fun startTimer(durationMillis: Long) {
         isFinishing = false
         timerJob?.cancel()
         lightsOffDelayJob?.cancel()
+
         timerRepository.setLightsOffDelayProgress(0f)
         timerRepository.setTotalTime(durationMillis)
         timerRepository.setRemainingTime(durationMillis)
         timerRepository.setRunning(true)
 
+        targetTimeMillis = SystemClock.elapsedRealtime() + durationMillis
+        scheduleAlarm(durationMillis)
+        updateNotification()
+
         lifecycleScope.launch {
-            // Ensure actions are loaded from persistence before applying
             val actions = manageTimerActionsUseCase.observeTimerActions().first()
-            currentActions = actions
             timerActionExecutor.applyStartActions(actions.startActions)
 
             if (actions.startActions.hueLights && settingsFlow.value.lightsOffDelay) {
@@ -183,21 +221,16 @@ class TimerService : LifecycleService() {
             }
         }
 
-        targetTimeMillis = SystemClock.elapsedRealtime() + durationMillis
-        scheduleAlarm(durationMillis)
-
-        ensureForeground()
-
         timerJob = lifecycleScope.launch {
-            while (true) {
+            while (isActive) {
                 if (timerRepository.timerState.value is TimerState.Running) {
-                    val remaining = targetTimeMillis - SystemClock.elapsedRealtime()
-                    if (remaining <= 0) {
-                        timerRepository.setRemainingTime(0)
+                    val remaining = (targetTimeMillis - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+                    timerRepository.setRemainingTime(remaining)
+
+                    if (remaining == 0L) {
                         onTimerFinished()
                         break
                     }
-                    timerRepository.setRemainingTime(remaining)
                     updateNotification()
                 }
                 delay(1.seconds)
@@ -206,43 +239,51 @@ class TimerService : LifecycleService() {
     }
 
     private fun pauseTimer() {
+        if (timerRepository.timerState.value !is TimerState.Running) return
+
+        val exactRemaining = (targetTimeMillis - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+        timerRepository.setRemainingTime(exactRemaining)
         timerRepository.setPaused(true)
         cancelAlarm()
         updateNotification()
     }
 
     private fun resumeTimer() {
-        timerRepository.setPaused(false)
+        if (timerRepository.timerState.value !is TimerState.Paused) return
+
         val remaining = timerRepository.timerState.value.remainingTimeMillis
         targetTimeMillis = SystemClock.elapsedRealtime() + remaining
+        timerRepository.setPaused(false)
         scheduleAlarm(remaining)
         updateNotification()
     }
 
     private fun extendTimer(minutes: Int) {
-        val extraMillis = minutes * 60 * 1000L
-        val currentRemaining = timerRepository.timerState.value.remainingTimeMillis
-        val currentTotal = timerRepository.timerState.value.totalTimeMillis
+        val extraMillis = minutes * 60_000L
+        val state = timerRepository.timerState.value
+
+        val currentRemaining = if (state is TimerState.Running) {
+            (targetTimeMillis - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+        } else {
+            state.remainingTimeMillis
+        }
 
         val newRemaining = currentRemaining + extraMillis
-        val newTotal = currentTotal + extraMillis
+        val newTotal = state.totalTimeMillis + extraMillis
 
         timerRepository.setTotalTime(newTotal)
         timerRepository.setRemainingTime(newRemaining)
 
-        if (timerRepository.timerState.value !is TimerState.Paused) {
+        if (state is TimerState.Running) {
             targetTimeMillis = SystemClock.elapsedRealtime() + newRemaining
             scheduleAlarm(newRemaining)
         }
         updateNotification()
     }
 
-
     private fun vibrate() {
         val effect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            vibrator.areAllPrimitivesSupported(
-                VibrationEffect.Composition.PRIMITIVE_CLICK
-            )
+            vibrator.areAllPrimitivesSupported(VibrationEffect.Composition.PRIMITIVE_CLICK)
         ) {
             VibrationEffect.startComposition()
                 .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f)
@@ -272,35 +313,34 @@ class TimerService : LifecycleService() {
         }
     }
 
-
     private fun stopTimer() {
         timerJob?.cancel()
         lightsOffDelayJob?.cancel()
-        timerRepository.setLightsOffDelayProgress(0f)
-        timerRepository.setRunning(false)
-        timerRepository.setRemainingTime(0)
         cancelAlarm()
+        timerRepository.setLightsOffDelayProgress(0f)
+        timerRepository.setRemainingTime(0L)
+        timerRepository.setRunning(false)
     }
 
     private fun startLightsOffDelay(delaySeconds: Int) {
         lightsOffDelayJob?.cancel()
         if (delaySeconds <= 0) {
-            lifecycleScope.launch {
-                timerActionExecutor.applyHueStartActions()
-            }
+            lifecycleScope.launch { timerActionExecutor.applyHueStartActions() }
             return
         }
 
         lightsOffDelayJob = lifecycleScope.launch {
-            val totalSeconds = delaySeconds.toDouble()
-            var remainingSeconds = totalSeconds
+            val totalMillis = delaySeconds * 1000L
+            var remainingMillis = totalMillis
+            val stepMillis = 100L
 
-            while (remainingSeconds > 0) {
+            while (remainingMillis > 0 && isActive) {
                 if (timerRepository.timerState.value is TimerState.Running) {
-                    remainingSeconds -= 0.1
-                    timerRepository.setLightsOffDelayProgress((remainingSeconds / totalSeconds).toFloat().coerceIn(0f, 1f))
+                    remainingMillis = (remainingMillis - stepMillis).coerceAtLeast(0L)
+                    val progress = (remainingMillis.toFloat() / totalMillis).coerceIn(0f, 1f)
+                    timerRepository.setLightsOffDelayProgress(progress)
                 }
-                delay(100.milliseconds)
+                delay(stepMillis.milliseconds)
             }
             timerRepository.setLightsOffDelayProgress(0f)
             timerActionExecutor.applyHueStartActions()
@@ -310,24 +350,29 @@ class TimerService : LifecycleService() {
     private fun onTimerFinished() {
         if (isFinishing) return
         isFinishing = true
-        stopTimer()
+
         lifecycleScope.launch {
-            timerActionExecutor.applyEndActions(currentActions.endActions)
-            stopSelf()
+            withContext(NonCancellable) {
+                stopTimer()
+                timerActionExecutor.applyEndActions(actionsFlow.value.endActions)
+                ServiceCompat.stopForeground(this@TimerService, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
         }
     }
 
-    private fun scheduleAlarm(remainingMillis: Long) {
-        val intent = Intent(this, TimerReceiver::class.java).apply {
-            action = TimerReceiver.ACTION_TIMER_EXPIRED
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
+    private fun getAlarmPendingIntent(): PendingIntent {
+        val intent = Intent(ACTION_EXPIRED).setPackage(packageName)
+        return PendingIntent.getBroadcast(
             this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    private fun scheduleAlarm(remainingMillis: Long) {
+        val pendingIntent = getAlarmPendingIntent()
         val triggerAtMillis = SystemClock.elapsedRealtime() + remainingMillis
 
-        val canScheduleExact =
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+        val canScheduleExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
                 alarmManager.canScheduleExactAlarms()
 
         if (canScheduleExact) {
@@ -338,12 +383,11 @@ class TimerService : LifecycleService() {
                     pendingIntent
                 )
                 return
-            } catch (_: SecurityException) {
-                // Permission may have been revoked between the check and the call.
+            } catch (e: SecurityException) {
+                Log.w(TAG, "Exact alarm permission revoked, falling back to inexact alarm", e)
             }
         }
 
-        // Non-exact fallback.
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.ELAPSED_REALTIME_WAKEUP,
             triggerAtMillis,
@@ -352,13 +396,7 @@ class TimerService : LifecycleService() {
     }
 
     private fun cancelAlarm() {
-        val intent = Intent(this, TimerReceiver::class.java).apply {
-            action = TimerReceiver.ACTION_TIMER_EXPIRED
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.cancel(pendingIntent)
+        alarmManager.cancel(getAlarmPendingIntent())
     }
 
     private fun createNotificationChannel() {
@@ -370,63 +408,57 @@ class TimerService : LifecycleService() {
         notificationManager.createNotificationChannel(channel)
     }
 
+    private fun getForegroundServicePendingIntent(requestCode: Int, actionStr: String) =
+        PendingIntent.getForegroundService(
+            this,
+            requestCode,
+            Intent(this, TimerService::class.java).apply { action = actionStr },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
     private fun createNotification(content: String): Notification {
-        val intent = Intent(this, MainActivity::class.java).apply {
+        val openIntent = Intent(this, MainActivity::class.java).apply {
             action = ACTION_OPEN_TIMER
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val contentPendingIntent = PendingIntent.getActivity(
+            this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val isPaused = timerRepository.timerState.value is TimerState.Paused
         val pauseResumeAction = if (isPaused) {
-            val resumeIntent =
-                Intent(this, TimerService::class.java).apply { action = ACTION_RESUME }
-            val resumePendingIntent =
-                PendingIntent.getService(this, 2, resumeIntent, PendingIntent.FLAG_IMMUTABLE)
             NotificationCompat.Action.Builder(
                 android.R.drawable.ic_media_play,
                 getString(R.string.notification_action_resume),
-                resumePendingIntent
+                getForegroundServicePendingIntent(2, ACTION_RESUME)
             ).build()
         } else {
-            val pauseIntent = Intent(this, TimerService::class.java).apply { action = ACTION_PAUSE }
-            val pausePendingIntent =
-                PendingIntent.getService(this, 3, pauseIntent, PendingIntent.FLAG_IMMUTABLE)
             NotificationCompat.Action.Builder(
                 android.R.drawable.ic_media_pause,
                 getString(R.string.notification_action_pause),
-                pausePendingIntent
+                getForegroundServicePendingIntent(3, ACTION_PAUSE)
             ).build()
         }
 
-        val extend5Intent =
-            Intent(this, TimerService::class.java).apply { action = ACTION_EXTEND_5 }
-        val extend5PendingIntent =
-            PendingIntent.getService(this, 4, extend5Intent, PendingIntent.FLAG_IMMUTABLE)
         val extend5Action = NotificationCompat.Action.Builder(
             android.R.drawable.ic_input_add,
             getString(R.string.notification_action_extend_5),
-            extend5PendingIntent
+            getForegroundServicePendingIntent(4, ACTION_EXTEND_5)
         ).build()
 
-        val extend20Intent =
-            Intent(this, TimerService::class.java).apply { action = ACTION_EXTEND_20 }
-        val extend20PendingIntent =
-            PendingIntent.getService(this, 5, extend20Intent, PendingIntent.FLAG_IMMUTABLE)
         val extend20Action = NotificationCompat.Action.Builder(
             android.R.drawable.ic_input_add,
             getString(R.string.notification_action_extend_20),
-            extend20PendingIntent
+            getForegroundServicePendingIntent(5, ACTION_EXTEND_20)
         ).build()
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(content)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(contentPendingIntent)
             .setOngoing(true)
+            .setOnlyAlertOnce(true)
             .addAction(pauseResumeAction)
             .addAction(extend5Action)
             .addAction(extend20Action)
@@ -437,17 +469,21 @@ class TimerService : LifecycleService() {
         notificationManager.notify(NOTIFICATION_ID, createNotification(getNotificationContent()))
     }
 
-    private fun ensureForeground() {
-        val initialContent = getNotificationContent()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            startForeground(
-                NOTIFICATION_ID,
-                createNotification(initialContent),
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, createNotification(initialContent))
-        }
+    private fun promoteToForeground(): Boolean = try {
+        val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        } else 0
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            createNotification(getNotificationContent()),
+            type
+        )
+        true
+    } catch (e: Exception) {
+        Log.e(TAG, "Failed to promote to foreground", e)
+        false
     }
 
     private fun getNotificationContent(): String {
@@ -460,8 +496,10 @@ class TimerService : LifecycleService() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         sensorManager.unregisterListener(shakeDetector)
+        unregisterReceiver(alarmReceiver)
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        super.onDestroy()
     }
 
     companion object {
@@ -474,6 +512,7 @@ class TimerService : LifecycleService() {
         const val ACTION_EXTEND_5 = "ACTION_EXTEND_5"
         const val ACTION_EXTEND_20 = "ACTION_EXTEND_20"
         const val ACTION_OPEN_TIMER = "ACTION_OPEN_TIMER"
+        const val ACTION_EXPIRED = "ACTION_EXPIRED"
         const val EXTRA_DURATION_MILLIS = "EXTRA_DURATION_MILLIS"
     }
 }

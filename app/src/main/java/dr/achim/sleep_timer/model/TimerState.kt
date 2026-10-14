@@ -6,6 +6,9 @@ sealed interface TimerState {
     val remainingTimeMillis: Long
     val totalTimeMillis: Long
 
+    val isActive: Boolean
+        get() = this !is Idle
+
     val progress: Float
         get() = if (totalTimeMillis > 0) {
             (remainingTimeMillis.toFloat() / totalTimeMillis).coerceIn(0f, 1f)

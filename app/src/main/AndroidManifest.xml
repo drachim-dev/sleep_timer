@@ -67,14 +67,6 @@
         </service>
 
         <receiver
-            android:name=".receiver.TimerReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="dr.achim.sleep_timer.ACTION_TIMER_EXPIRED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
             android:name=".receiver.SleepTimerAdminReceiver"
             android:description="@string/settings_device_admin_description"
             android:exported="true"
