@@ -8,44 +8,69 @@ import android.util.Log
 import android.view.KeyEvent
 import dr.achim.sleep_timer.common.TAG
 import dr.achim.sleep_timer.domain.repository.AudioRepository
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
 class AudioRepositoryImpl(private val audioManager: AudioManager) : AudioRepository {
 
-companion object {
-    private val PAUSE_VERIFY_TIMEOUT = 1_500.milliseconds
-    private val AUDIO_FOCUS_SETTLE_DELAY = 1_500.milliseconds
-}
+    companion object {
+        private val PAUSE_VERIFY_TIMEOUT = 1_500.milliseconds
+        private val AUDIO_FOCUS_SETTLE_DELAY = 1_500.milliseconds
+        private val FOCUS_CHECK_DELAY = 200.milliseconds
+    }
+
+    private val stopMutex = Mutex()
 
     override fun setRelativeMediaVolume(level: Int, flags: Int) {
+        if (audioManager.isVolumeFixed) return
+
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val targetVolume = (maxVolume * level / 100f).toInt()
-        Log.d(TAG, "Setting media volume to $targetVolume ($level%)")
+        val clampedLevel = level.coerceIn(0, 100)
+        val targetVolume = (maxVolume * clampedLevel / 100f).roundToInt()
+        Log.d(TAG, "Setting media volume to $targetVolume ($clampedLevel%)")
         setAbsoluteMediaVolume(targetVolume, flags)
     }
 
-    override suspend fun stopMedia(fadeDurationMillis: Long) {
+    override suspend fun stopMedia(fadeDurationMillis: Long) = stopMutex.withLock {
         val originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         var focusRequest: AudioFocusRequest? = null
+        var stoppedSuccessfully = true
 
         try {
             fadeOut(originalVolume, fadeDurationMillis)
 
-            focusRequest = buildAlarmFocusRequest().also(::requestFocus)
-            if (!pauseUntilSilent()) {
+            focusRequest = buildMediaFocusRequest().also(::requestFocus)
+            stoppedSuccessfully = pauseUntilSilent()
+            if (!stoppedSuccessfully) {
                 Log.w(TAG, "Media still active after all pause attempts")
             }
             delay(AUDIO_FOCUS_SETTLE_DELAY)
         } finally {
-            restoreVolume(originalVolume)
-            abandonFocus(focusRequest)
+            withContext(NonCancellable) {
+                abandonFocus(focusRequest)
+                if (stoppedSuccessfully) {
+                    restoreVolume(originalVolume)
+                } else {
+                    Log.w(TAG, "Skipping volume restore because media did not stop")
+                }
+            }
         }
     }
 
-    /** Sends pause (then stop) and waits for the music stream to go idle, retrying a few times. */
+    /**
+     * Checks if audio focus already stopped playback, otherwise sends pause (then stop)
+     * and waits for the music stream to go idle.
+     */
     private suspend fun pauseUntilSilent(): Boolean {
+        delay(FOCUS_CHECK_DELAY)
+        if (!audioManager.isMusicActive) return true
+
         val keys = listOf(
             KeyEvent.KEYCODE_MEDIA_PAUSE,
             KeyEvent.KEYCODE_MEDIA_PAUSE,
@@ -74,13 +99,16 @@ companion object {
 
     /**
      * Steps the music volume down to 0 evenly over [durationMillis].
-     * With a 1s minimum and a typical max volume of 15-30, each step is
-     * at least ~30 ms, so the integer division can't collapse to zero.
      */
     private suspend fun fadeOut(originalVolume: Int, durationMillis: Long) {
-        if (originalVolume <= 0) return // already silent, nothing to fade
+        if (originalVolume <= 0 || audioManager.isVolumeFixed) return
 
-        val stepDelay = durationMillis / originalVolume
+        if (durationMillis <= 0L) {
+            setAbsoluteMediaVolume(0)
+            return
+        }
+
+        val stepDelay = (durationMillis / originalVolume).coerceAtLeast(1L)
         for (volume in (originalVolume - 1) downTo 0) {
             delay(stepDelay.milliseconds)
             setAbsoluteMediaVolume(volume)
@@ -96,17 +124,18 @@ companion object {
     }
 
     private fun restoreVolume(originalVolume: Int) {
-        if (originalVolume <= 0) return
+        if (originalVolume <= 0 || audioManager.isVolumeFixed) return
         Log.d(TAG, "Restoring media volume to $originalVolume")
+
         setAbsoluteMediaVolume(originalVolume)
     }
 
-    private fun buildAlarmFocusRequest(): AudioFocusRequest =
+    private fun buildMediaFocusRequest(): AudioFocusRequest =
         AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .build()
             )
             .build()
