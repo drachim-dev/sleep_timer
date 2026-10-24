@@ -66,7 +66,7 @@ object HomeKey : NavKey
 object PaywallKey : NavKey
 
 @Serializable
-data class TimerKey(val minutes: Int?) : NavKey
+object TimerKey : NavKey
 
 @Serializable
 data class SettingsKey(val highlight: String? = null) : NavKey
@@ -160,8 +160,8 @@ fun Navigation(
                 }
                 entry<HomeKey> {
                     HomeScreen(
-                        onNavigateToTimer = { minutes ->
-                            backStack += TimerKey(minutes)
+                        onNavigateToTimer = {
+                            backStack += TimerKey
                         },
                         onNavigateToSettings = dropUnlessResumed {
                             backStack += SettingsKey()
@@ -181,7 +181,7 @@ fun Navigation(
                             EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         }
                     }
-                ) { key ->
+                ) {
                     TimerScreen(
                         onBack = onBack,
                         onNavigateToRoomSelection = { source ->
@@ -190,7 +190,7 @@ fun Navigation(
                         onNavigateToSettings = { highlight ->
                             backStack += SettingsKey(highlight)
                         },
-                        viewModel = koinViewModel(parameters = { parametersOf(key.minutes) }),
+                        viewModel = koinViewModel(),
                         snackbarHostState = snackbarHostState
                     )
                 }

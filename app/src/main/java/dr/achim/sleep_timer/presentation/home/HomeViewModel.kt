@@ -56,6 +56,7 @@ class HomeViewModel(
 
     fun onAction(action: HomeUiAction) {
         when (action) {
+            is HomeUiAction.StartTimer -> startTimer(action.minutes)
             is HomeUiAction.UpdateQuickTime -> updateQuickTime(action.index, action.minutes)
             is HomeUiAction.UpdateLastSelectedMinutes -> updateLastSelectedMinutes(action.minutes)
             is HomeUiAction.StopTimer -> stopTimer()
@@ -69,6 +70,10 @@ class HomeViewModel(
                 _showNotificationSettingsPrompt.value = false
             }
         }
+    }
+
+    private fun startTimer(minutes: Int) {
+        controlTimerUseCase.start(minutes * 60 * 1000L)
     }
 
     private fun updateQuickTime(index: Int, minutes: Int) {

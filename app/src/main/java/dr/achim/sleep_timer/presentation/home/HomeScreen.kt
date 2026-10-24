@@ -115,7 +115,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun HomeScreen(
-    onNavigateToTimer: (Int?) -> Unit,
+    onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
     adManager: AdManager = koinInject(),
@@ -148,10 +148,12 @@ fun HomeScreen(
                 timerState = timerState,
                 onNavigateToTimer = {
                     coroutineScope.launch {
-                        val selectedMinutes =
-                            if (timerState is TimerState.Idle) state.lastSelectedMinutes else null
+                        val selectedMinutes = if (timerState is TimerState.Idle) state.lastSelectedMinutes else null
                         adManager.showAd(context) {
-                            onNavigateToTimer(selectedMinutes)
+                            if (selectedMinutes != null) {
+                                viewModel.onAction(HomeUiAction.StartTimer(selectedMinutes))
+                            }
+                            onNavigateToTimer()
                         }
                     }
                 },

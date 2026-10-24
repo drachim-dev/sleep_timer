@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
             val isFirstLaunch = isFirstLaunchDeferred.await()
 
             initialBackStack = when {
-                intent?.action == TimerService.ACTION_OPEN_TIMER -> listOf(HomeKey, TimerKey(null))
+                intent?.action == TimerService.ACTION_OPEN_TIMER -> listOf(HomeKey, TimerKey)
                 intent?.action == ACTION_UPGRADE_PRO -> listOf(HomeKey, PaywallKey)
                 isFirstLaunch -> listOf(OnboardingKey)
                 else -> listOf(HomeKey)

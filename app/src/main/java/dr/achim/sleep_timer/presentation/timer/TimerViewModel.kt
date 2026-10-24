@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.koin.core.annotation.InjectedParam
 import dr.achim.sleep_timer.presentation.timer.TimerUiAction as Action
 
 sealed interface TimerUiEvent {
@@ -40,8 +39,7 @@ class TimerViewModel(
     private val manageQuickLaunchUseCase: ManageQuickLaunchUseCase,
     private val checkTimerPermissionsUseCase: CheckTimerPermissionsUseCase,
     private val setMediaVolumeUseCase: SetMediaVolumeUseCase,
-    getSettingsUseCase: GetSettingsUseCase,
-    @InjectedParam minutes: Int?
+    getSettingsUseCase: GetSettingsUseCase
 ) : ViewModel() {
 
     private val _permissionsFlow = MutableStateFlow(checkTimerPermissionsUseCase())
@@ -83,10 +81,6 @@ class TimerViewModel(
 
     init {
         _quickLaunchApps.value = manageQuickLaunchUseCase.getApps()
-
-        if (minutes != null) {
-            startTimer(minutes * 60 * 1000L)
-        }
 
         observeHueGroups(TimerActionSource.START)
         observeHueGroups(TimerActionSource.END)
