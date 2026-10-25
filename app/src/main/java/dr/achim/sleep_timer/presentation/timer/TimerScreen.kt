@@ -17,6 +17,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalFlexBoxApi
 import androidx.compose.foundation.layout.FlexBox
 import androidx.compose.foundation.layout.FlexBoxScope
 import androidx.compose.foundation.layout.FlexJustifyContent
@@ -153,6 +154,7 @@ fun TimerScreen(
     )
 }
 
+@OptIn(ExperimentalFlexBoxApi::class)
 @Composable
 private fun TimerScreenContent(
     onBack: () -> Unit,
@@ -698,6 +700,7 @@ fun TimeAdjustmentRow(
     }
 }
 
+@OptIn(ExperimentalFlexBoxApi::class)
 @Composable
 private fun TimerSection(
     title: @Composable () -> Unit,

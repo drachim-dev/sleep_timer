@@ -86,7 +86,7 @@ class BillingRepository {
                 PurchaseParams.Builder(activity, product).build(),
                 onError = { error, userCancelled ->
                     if (userCancelled) {
-                        if (cont.isActive) cont.resume(Result.failure(Exception("User cancelled")))
+                        if (cont.isActive) cont.resume(Result.failure(Exception("User canceled")))
                     } else {
                         Log.e(TAG, "Purchase failed: ${error.message}")
                         if (cont.isActive) cont.resume(Result.failure(Exception(error.message)))
