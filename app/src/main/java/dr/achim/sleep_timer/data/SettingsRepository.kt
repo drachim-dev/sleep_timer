@@ -172,6 +172,7 @@ class SettingsRepository(context: Context) {
 
         private val TIMER_START_COUNT_KEY = intPreferencesKey("pref_key_timer_start_count")
         private val LAST_REVIEW_TIMESTAMP_KEY = longPreferencesKey("pref_key_last_review_timestamp")
+        private val SHOW_WHATS_NEW_PRO_KEY = booleanPreferencesKey("pref_key_show_whats_new_pro")
 
         /**
          * Default values
@@ -301,6 +302,16 @@ class SettingsRepository(context: Context) {
 
     val lastReviewTimestamp: Flow<Long> = dataStore.data.map { preferences ->
         preferences[LAST_REVIEW_TIMESTAMP_KEY] ?: 0L
+    }
+
+    val showWhatsNewPro: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[SHOW_WHATS_NEW_PRO_KEY] ?: true
+    }
+
+    suspend fun setShowWhatsNewPro(show: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOW_WHATS_NEW_PRO_KEY] = show
+        }
     }
 
     suspend fun setFirstLaunchCompleted() {

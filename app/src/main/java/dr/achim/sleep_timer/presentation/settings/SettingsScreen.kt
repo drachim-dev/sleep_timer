@@ -407,7 +407,7 @@ fun SettingsScreenContent(
                     productUiModels.forEach { uiModel ->
                         val icon = when (uiModel.id) {
                             Product.Donation.id -> R.drawable.ic_coffee
-                            Product.RemoveAds.id -> R.drawable.ic_ad_off
+                            Product.Pro.id -> R.drawable.ic_diamond
                             else -> null
                         }
 
@@ -420,30 +420,27 @@ fun SettingsScreenContent(
                                 trailingColor = if (uiModel.isPurchased) GreenAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                                 onClick = {
                                     if (!uiModel.isPurchased) {
-                                        onAction(
-                                            SettingsUiAction.PurchaseProduct(
-                                                context.findActivity(),
-                                                uiModel.id
+                                        if (uiModel.id == Product.Pro.id) {
+                                            paywallController.show()
+                                        } else {
+                                            onAction(
+                                                SettingsUiAction.PurchaseProduct(
+                                                    context.findActivity(),
+                                                    uiModel.id
+                                                )
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             )
                         }
                     }
-
-                    SettingsItem(
-                        painter = painterResource(R.drawable.ic_restore),
-                        title = stringResource(R.string.settings_restore_purchases),
-                        onClick = { onAction(SettingsUiAction.RestorePurchases) }
-                    )
                 }
 
                 SettingsSection(
                     title = { SectionTitle(stringResource(R.string.settings_section_advanced)) }
                 ) {
-                    val adminDescription =
-                        stringResource(R.string.settings_device_admin_description)
+                    val adminDescription = stringResource(R.string.settings_device_admin_description)
                     SettingsSwitchItem(
                         painter = painterResource(R.drawable.ic_device_admin),
                         title = stringResource(R.string.settings_device_admin_title),

@@ -38,6 +38,7 @@ import dr.achim.sleep_timer.presentation.hue.HueDiscoveryScreen
 import dr.achim.sleep_timer.presentation.hue.RoomSelectionScreen
 import dr.achim.sleep_timer.presentation.onboarding.OnboardingScreen
 import dr.achim.sleep_timer.presentation.paywall.PaywallSheet
+import dr.achim.sleep_timer.presentation.paywall.WhatsNewProScreen
 import dr.achim.sleep_timer.presentation.settings.CreditsScreen
 import dr.achim.sleep_timer.presentation.settings.FaqScreen
 import dr.achim.sleep_timer.presentation.settings.SettingsScreen
@@ -64,6 +65,9 @@ object HomeKey : NavKey
 
 @Serializable
 object PaywallKey : NavKey
+
+@Serializable
+object WhatsNewProKey : NavKey
 
 @Serializable
 object TimerKey : NavKey
@@ -166,6 +170,9 @@ fun Navigation(
                         onNavigateToSettings = dropUnlessResumed {
                             backStack += SettingsKey()
                         },
+                        onNavigateToWhatsNew = dropUnlessResumed {
+                            backStack += WhatsNewProKey
+                        },
                         snackbarHostState = snackbarHostState
                     )
                 }
@@ -241,8 +248,31 @@ fun Navigation(
                     )
                 }
                 entry<PaywallKey>(metadata = BottomSheetSceneStrategy.bottomSheet()) { _ ->
-                    PaywallSheet(
-                        onBack = onBack,
+                    PaywallSheet(onBack = onBack)
+                }
+                entry<WhatsNewProKey>(
+                    metadata = metadata {
+                        put(NavDisplay.TransitionKey) {
+                            slideInVertically(initialOffsetY = { it }) + fadeIn() togetherWith ExitTransition.KeepUntilTransitionsFinished
+                        }
+                        put(NavDisplay.PopTransitionKey) {
+                            EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
+                        }
+                        put(NavDisplay.PredictivePopTransitionKey) {
+                            EnterTransition.None togetherWith slideOutVertically(targetOffsetY = { it }) + fadeOut()
+                        }
+                    }
+                ) {
+                    WhatsNewProScreen(
+                        onBack = {
+                            scope.launch { settingsRepository.setShowWhatsNewPro(false) }
+                            onBack()
+                        },
+                        onExploreSettings = {
+                            scope.launch { settingsRepository.setShowWhatsNewPro(false) }
+                            backStack.removeLastOrNull()
+                            backStack += SettingsKey()
+                        }
                     )
                 }
             }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.ContextCompat
 import dr.achim.sleep_timer.MainActivity
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.data.BillingRepository
@@ -20,8 +21,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-
-import androidx.core.content.ContextCompat
 
 class TimerTileService : TileService() {
 

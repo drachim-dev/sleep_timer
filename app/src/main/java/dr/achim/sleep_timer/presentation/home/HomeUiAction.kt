@@ -7,4 +7,5 @@ sealed interface HomeUiAction {
     data object StopTimer : HomeUiAction
     data class NotificationPermissionDenied(val shouldShowRationale: Boolean) : HomeUiAction
     data object DismissPermissionPrompts : HomeUiAction
+    data object DismissWhatsNewBanner : HomeUiAction
 }

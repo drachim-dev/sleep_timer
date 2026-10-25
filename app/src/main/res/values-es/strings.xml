@@ -46,9 +46,6 @@
     <string name="settings_like_app_subtitle">Agradezco cualquier valoración</string>
     <string name="settings_like_app_trailing">Gratis</string>
     <string name="settings_already_purchased">Ya comprado</string>
-    <string name="settings_restore_purchases">Restaurar compra</string>
-    <string name="settings_restore_success">Compra restaurada con éxito</string>
-    <string name="settings_purchase_success">¡Gracias por su apoyo! ✨🙏</string>
     <string name="settings_section_advanced">Avanzado</string>
     <string name="settings_device_admin_title">Administrador del dispositivo</string>
     <string name="settings_device_admin_subtitle">Necesario para apagar la pantalla. Desactivar antes de desinstalar.</string>
@@ -184,7 +181,7 @@
     <!-- Paywall -->
     <string name="paywall_title_part_1">Duerme mejor.</string>
     <string name="paywall_title_part_2">Desbloquea más.</string>
-    <string name="paywall_subtitle">Actualiza a Pro y mejora\ntu experiencia con el temporizador.</string>
+    <string name="paywall_subtitle">¡Eliminar anuncios ahora es Sleep Timer Pro! Desbloquea una experiencia sin distracciones y nuevas funciones con una única compra.</string>
     <string name="paywall_feature_no_ads_title">Sin anuncios</string>
     <string name="paywall_feature_no_ads_description">Disfruta de una experiencia tranquila y sin distracciones.</string>
     <string name="paywall_feature_quick_settings_tile_title">Mosaico de ajustes rápidos</string>
@@ -192,9 +189,26 @@
     <string name="paywall_feature_lights_off_delay_title">Retrasar el apagado de las luces</string>
     <string name="paywall_feature_lights_off_delay_description">Añade un retraso antes de apagar las luces para relajarte a tu propio ritmo.</string>
 
-
     <string name="paywall_purchase_title">Desbloquear Pro</string>
     <string name="paywall_purchase_subtitle">Compra única</string>
 
+    <string name="paywall_restore_purchases">Restaurar compra</string>
+    <string name="paywall_restore_success">Compra restaurada con éxito</string>
+    <string name="paywall_purchase_success">¡Gracias por su apoyo! ✨🙏</string>
+
     <string name="common_pro">Pro</string>
+
+    <!-- What's New Pro -->
+    <string name="whats_new_banner_badge">NUEVO</string>
+    <string name="whats_new_banner_title">Presentamos Sleep Timer Pro</string>
+    <string name="whats_new_banner_subtitle">Sin anuncios, mosaico rápido, retraso de luces y más</string>
+    <string name="whats_new_banner_pro_title">¡Has sido actualizado a Pro!</string>
+    <string name="whats_new_banner_pro_subtitle">Toca para descubrir tus nuevas funciones</string>
+
+    <string name="whats_new_badge">Novedades</string>
+    <string name="whats_new_pro_title_part_1">¡Has sido</string>
+    <string name="whats_new_pro_title_part_2">actualizado a Pro!</string>
+    <string name="whats_new_pro_subtitle">¡Gracias por tu apoyo! Tu compra anterior para eliminar anuncios se ha actualizado automáticamente a Sleep Timer Pro sin costo adicional.</string>
+    <string name="whats_new_pro_cta_settings">Explorar en Ajustes</string>
+    <string name="whats_new_pro_cta_done">Entendido</string>
 </resources>

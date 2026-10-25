@@ -152,10 +152,7 @@ class SettingsViewModel(
 
     private fun loadProducts() {
         viewModelScope.launch {
-            val productIds = listOf(
-                Product.Donation.id,
-                Product.RemoveAds.id
-            )
+            val productIds = listOf(Product.Donation.id, Product.Pro.id)
             _products.value = billingRepository.getProducts(productIds)
         }
     }
@@ -165,7 +162,7 @@ class SettingsViewModel(
             billingRepository.customerInfo.collect { customerInfo ->
                 val purchased = mutableSetOf<String>()
                 if (customerInfo?.entitlements?.get(Entitlement.Pro.id)?.isActive == true) {
-                    purchased.add(Product.RemoveAds.id)
+                    purchased.add(Product.Pro.id)
                 }
                 customerInfo?.nonSubscriptionTransactions?.forEach { transaction ->
                     purchased.add(transaction.productIdentifier)
@@ -185,7 +182,6 @@ class SettingsViewModel(
             is SettingsUiAction.SetLightsOffDelay -> setLightsOffDelay(action.enabled)
             is SettingsUiAction.SetLightsOffDelaySeconds -> setLightsOffDelaySeconds(action.seconds)
             is SettingsUiAction.PurchaseProduct -> purchase(action.activity, action.productId)
-            SettingsUiAction.RestorePurchases -> restorePurchases()
             is SettingsUiAction.ShowPrivacyOptions -> showPrivacyOptions(action.activity)
             SettingsUiAction.RefreshDeviceAdminStatus -> refreshDeviceAdminStatus()
             is SettingsUiAction.RefreshDndStatus -> refreshDndStatus()
@@ -210,33 +206,14 @@ class SettingsViewModel(
         viewModelScope.launch {
             billingRepository.purchase(activity, product)
                 .onSuccess {
-                    uiMessageManager.emitMessage(R.string.settings_purchase_success)
+                    uiMessageManager.emitMessage(R.string.paywall_purchase_success)
                     sendEvent(PurchaseEvent.PurchaseComplete)
                 }
                 .onFailure { error ->
-                    if (error.message != "User cancelled") {
+                    if (error.message != "User canceled") {
                         uiMessageManager.emitMessage(R.string.error_purchase_failure)
                         sendEvent(PurchaseEvent.PurchaseError)
                     }
-                }
-        }
-    }
-
-    private fun restorePurchases() {
-        viewModelScope.launch {
-            billingRepository.restorePurchases()
-                .onSuccess { info ->
-                    if (info.entitlements[Entitlement.Pro.id]?.isActive == true) {
-                        uiMessageManager.emitMessage(R.string.settings_restore_success)
-                        sendEvent(PurchaseEvent.RestoreSuccess)
-                    } else {
-                        uiMessageManager.emitMessage(R.string.error_restore_failure)
-                        sendEvent(PurchaseEvent.RestoreError)
-                    }
-                }
-                .onFailure {
-                    uiMessageManager.emitMessage(R.string.error_restore_failure)
-                    sendEvent(PurchaseEvent.RestoreError)
                 }
         }
     }

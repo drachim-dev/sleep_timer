@@ -15,12 +15,14 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +39,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.TextAutoSize
@@ -50,6 +53,8 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -60,10 +65,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SplitButtonDefaults
 import androidx.compose.material3.SplitButtonLayout
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -89,10 +98,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dr.achim.sleep_timer.LocalIsPro
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.shouldShowRationale
 import dr.achim.sleep_timer.data.AdManager
@@ -117,6 +128,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun HomeScreen(
     onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToWhatsNew: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel(),
     adManager: AdManager = koinInject(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -158,6 +170,7 @@ fun HomeScreen(
                     }
                 },
                 onNavigateToSettings = onNavigateToSettings,
+                onNavigateToWhatsNew = onNavigateToWhatsNew,
                 onAction = viewModel::onAction,
                 onHasNotificationPermission = viewModel::hasNotificationPermission,
                 snackbarHostState = snackbarHostState
@@ -172,6 +185,7 @@ fun HomeScreenContent(
     timerState: TimerState,
     onNavigateToTimer: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToWhatsNew: () -> Unit = {},
     onAction: (HomeUiAction) -> Unit,
     onHasNotificationPermission: () -> Boolean,
     snackbarHostState: SnackbarHostState
@@ -214,6 +228,7 @@ fun HomeScreenContent(
     }
 
     val isIdle = timerState is TimerState.Idle
+    val isPro = LocalIsPro.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -238,118 +253,141 @@ fun HomeScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState()),
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            AnimatedContent(
-                targetState = isIdle,
-                label = "timerContent",
-                transitionSpec = {
-                    (fadeIn(animationSpec = tween(400, delayMillis = 100)) + scaleIn(
-                        initialScale = 0.8f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    )).togetherWith(fadeOut(animationSpec = tween(200)))
-                }
-            ) { idle ->
-                CircularTimer(
-                    progress = if (idle) selectedMinutes.value else timerState.progress,
-                    glowEnabled = uiState.glowEnabled,
-                    glowIntensity = uiState.glowIntensity,
-                    interactive = idle,
-                    onProgressChange = { newProgress ->
-                        if (timerState !is TimerState.Idle) return@CircularTimer
-                        coroutineScope.launch {
-                            val snappedProgress =
-                                newProgress.coerceAtLeast(1 / 60f) // at least 1 min
-                            selectedMinutes.snapTo(snappedProgress)
-                            onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
-                        }
-                    }
-                ) {
-                    if (idle) {
-                        val totalMinutes = (selectedMinutes.value * 60).toInt()
-                        val displayMinutes =
-                            if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
-                        val displayHours = if (totalMinutes == 0) 0 else (totalMinutes - 1) / 60
-
-                        Column(
-                            modifier = Modifier.animateContentSize(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioLowBouncy,
-                                    stiffness = Spring.StiffnessMediumLow
-                                ),
-                                alignment = Alignment.Center
-                            ),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_moon_stars),
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            )
-                            Spacer(Modifier.height(AppTheme.dimens.spacingExtraSmall))
-                            Text(
-                                text = stringResource(
-                                    R.string.home_time_minutes_only,
-                                    displayMinutes
-                                ),
-                                maxLines = 1,
-                                autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize),
-                            )
-                            AnimatedVisibility(
-                                visible = displayHours > 0,
-                                enter = fadeIn() + scaleIn(initialScale = 0.8f),
-                                exit = fadeOut()
-                            ) {
-                                Text(
-                                    text = "+ ${displayHours}h",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.displaySmall,
-                                    maxLines = 1
-                                )
-                            }
-                        }
-                    } else {
-                        Text(
-                            text = timerState.formattedTime,
-                            maxLines = 1,
-                            autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
-                        )
-                    }
-                }
+            AnimatedVisibility(
+                visible = uiState.showWhatsNewBanner,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                WhatsNewBanner(
+                    isPro = isPro,
+                    onClick = onNavigateToWhatsNew,
+                    onDismiss = { onAction(HomeUiAction.DismissWhatsNewBanner) },
+                    modifier = Modifier
+                        .padding(horizontal = AppTheme.dimens.spacingMedium)
+                        .padding(top = AppTheme.dimens.spacingExtraSmall, bottom = AppTheme.dimens.spacingSmall),
+                )
             }
 
-            Spacer(Modifier.heightIn(min = AppTheme.dimens.spacingHuge))
-
-            QuickTimeButtons(
-                quickTimes = uiState.quickTimes,
-                onQuickTimeClick = { mins ->
-                    coroutineScope.launch {
-                        selectedMinutes.animateTo(
-                            targetValue = mins / 60f,
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = AppTheme.dimens.spacingHuge),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                AnimatedContent(
+                    targetState = isIdle,
+                    label = "timerContent",
+                    transitionSpec = {
+                        (fadeIn(animationSpec = tween(400, delayMillis = 100)) + scaleIn(
+                            initialScale = 0.8f,
                             animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                dampingRatio = Spring.DampingRatioLowBouncy,
                                 stiffness = Spring.StiffnessMediumLow
                             )
-                        )
-                        onAction(HomeUiAction.UpdateLastSelectedMinutes(mins))
+                        )).togetherWith(fadeOut(animationSpec = tween(200)))
                     }
-                },
-                onQuickTimeLongClick = { index ->
-                    editingIndex = index
-                    showEditSheet = true
-                },
-                onAddClick = { index ->
-                    editingIndex = index
-                    showEditSheet = true
+                ) { idle ->
+                    CircularTimer(
+                        progress = if (idle) selectedMinutes.value else timerState.progress,
+                        glowEnabled = uiState.glowEnabled,
+                        glowIntensity = uiState.glowIntensity,
+                        interactive = idle,
+                        onProgressChange = { newProgress ->
+                            if (timerState !is TimerState.Idle) return@CircularTimer
+                            coroutineScope.launch {
+                                val snappedProgress =
+                                    newProgress.coerceAtLeast(1 / 60f) // at least 1 min
+                                selectedMinutes.snapTo(snappedProgress)
+                                onAction(HomeUiAction.UpdateLastSelectedMinutes((snappedProgress * 60).toInt()))
+                            }
+                        }
+                    ) {
+                        if (idle) {
+                            val totalMinutes = (selectedMinutes.value * 60).toInt()
+                            val displayMinutes =
+                                if (totalMinutes == 0) 0 else ((totalMinutes - 1) % 60) + 1
+                            val displayHours = if (totalMinutes == 0) 0 else (totalMinutes - 1) / 60
+
+                            Column(
+                                modifier = Modifier.animateContentSize(
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioLowBouncy,
+                                        stiffness = Spring.StiffnessMediumLow
+                                    ),
+                                    alignment = Alignment.Center
+                                ),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_moon_stars),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                )
+                                Spacer(Modifier.height(AppTheme.dimens.spacingExtraSmall))
+                                Text(
+                                    text = stringResource(
+                                        R.string.home_time_minutes_only,
+                                        displayMinutes
+                                    ),
+                                    maxLines = 1,
+                                    autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize),
+                                )
+                                AnimatedVisibility(
+                                    visible = displayHours > 0,
+                                    enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                                    exit = fadeOut()
+                                ) {
+                                    Text(
+                                        text = "+ ${displayHours}h",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.displaySmall,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = timerState.formattedTime,
+                                maxLines = 1,
+                                autoSize = TextAutoSize.StepBased(maxFontSize = LocalTextStyle.current.fontSize)
+                            )
+                        }
+                    }
                 }
-            )
+
+                Spacer(Modifier.heightIn(min = AppTheme.dimens.spacingExtraLarge))
+
+                QuickTimeButtons(
+                    quickTimes = uiState.quickTimes,
+                    onQuickTimeClick = { mins ->
+                        coroutineScope.launch {
+                            selectedMinutes.animateTo(
+                                targetValue = mins / 60f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
+                            onAction(HomeUiAction.UpdateLastSelectedMinutes(mins))
+                        }
+                    },
+                    onQuickTimeLongClick = { index ->
+                        editingIndex = index
+                        showEditSheet = true
+                    },
+                    onAddClick = { index ->
+                        editingIndex = index
+                        showEditSheet = true
+                    }
+                )
+            }
         }
     }
 
@@ -411,6 +449,87 @@ fun HomeScreenContent(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun WhatsNewBanner(
+    isPro: Boolean,
+    onClick: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val dismissState = rememberSwipeToDismissBoxState()
+
+    SwipeToDismissBox(
+        state = dismissState,
+        onDismiss = { value ->
+            if (value != SwipeToDismissBoxValue.Settled) {
+                onDismiss()
+            }
+        },
+        backgroundContent = {},
+        modifier = modifier,
+    ) {
+        ListItem(
+            onClick = onClick,
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            shapes = ListItemDefaults.shapes(MaterialTheme.shapes.extraLarge),
+            leadingContent = {
+                Surface(
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = CircleShape,
+                ) {
+                    Text(
+                        text = stringResource(R.string.whats_new_banner_badge),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        modifier = Modifier.padding(
+                            horizontal = AppTheme.dimens.spacingSmall,
+                            vertical = AppTheme.dimens.spacingExtraExtraSmall,
+                        ),
+                    )
+                }
+            },
+            supportingContent = {
+                Text(
+                    text = if (isPro) {
+                        stringResource(R.string.whats_new_banner_pro_subtitle)
+                    } else {
+                        stringResource(R.string.whats_new_banner_subtitle)
+                    },
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = AppTheme.dimens.spacingExtraSmall)
+                )
+            },
+            trailingContent = {
+                IconButton(onClick = onClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_forward),
+                        contentDescription = null,
+                    )
+                }
+            }
+        ) {
+            Text(
+                text = if (isPro) {
+                    stringResource(R.string.whats_new_banner_pro_title)
+                } else {
+                    stringResource(R.string.whats_new_banner_title)
+                },
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
@@ -727,7 +846,8 @@ fun HomeScreenPreview() {
             uiState = HomeUiState.Content(
                 quickTimes = listOf(15, 30, 45, 60, -1),
                 lastSelectedMinutes = 50,
-                timerStartCount = 0
+                timerStartCount = 0,
+                showWhatsNewBanner = true,
             ),
             timerState = TimerState.Idle(),
             onNavigateToTimer = {},

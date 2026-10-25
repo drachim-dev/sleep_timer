@@ -9,5 +9,6 @@ data class AppSettings(
     val lightsOffDelay: Boolean = false,
     val lightsOffDelaySeconds: Int = 0,
     val timerStartCount: Int = 0,
-    val lastReviewTimestamp: Long = 0L
+    val lastReviewTimestamp: Long = 0L,
+    val showWhatsNewPro: Boolean = true,
 )

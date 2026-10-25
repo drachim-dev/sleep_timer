@@ -16,6 +16,5 @@ sealed interface SettingsUiAction {
     data class SetLightsOffDelay(val enabled: Boolean) : SettingsUiAction
     data class SetLightsOffDelaySeconds(val seconds: Int) : SettingsUiAction
     data class PurchaseProduct(val activity: Activity?, val productId: String) : SettingsUiAction
-    object RestorePurchases : SettingsUiAction
     data class ShowPrivacyOptions(val activity: Activity?) : SettingsUiAction
 }

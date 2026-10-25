@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -23,7 +23,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dr.achim.sleep_timer.R
 import dr.achim.sleep_timer.common.findActivity
 import dr.achim.sleep_timer.model.PurchaseEvent
+import dr.achim.sleep_timer.presentation.settings.StoreProductUiModel
 import dr.achim.sleep_timer.ui.components.DiagonalRibbon
 import dr.achim.sleep_timer.ui.theme.AppTheme
 import dr.achim.sleep_timer.ui.theme.dimens
@@ -60,36 +60,20 @@ fun PaywallSheet(
     onBack: () -> Unit,
     viewModel: PaywallViewModel = koinViewModel(),
 ) {
-    val price by viewModel.price.collectAsStateWithLifecycle()
+    val product by viewModel.productUiModel.collectAsStateWithLifecycle()
     val context = LocalContext.current
-
     val sheetSnackbarHostState = remember { SnackbarHostState() }
 
-    val purchaseErrorMessage = stringResource(R.string.error_purchase_failure)
-    val restoreErrorMessage = stringResource(R.string.error_restore_failure)
-
-    // snackbar success messages are being handled by viewModel
-    LaunchedEffect(Unit) {
-        viewModel.events.collectLatest { event ->
-            when (event) {
-                PurchaseEvent.PurchaseComplete,
-                PurchaseEvent.RestoreSuccess ->
-                    onBack()
-
-                PurchaseEvent.PurchaseError,
-                PurchaseEvent.PurchaseAborted ->
-                    sheetSnackbarHostState.showSnackbar(purchaseErrorMessage)
-
-                PurchaseEvent.RestoreError ->
-                    sheetSnackbarHostState.showSnackbar(restoreErrorMessage)
-            }
-        }
-    }
+    ObservePaywallEvents(
+        viewModel = viewModel,
+        snackbarHostState = sheetSnackbarHostState,
+        onComplete = onBack,
+    )
 
     Box(modifier = Modifier.fillMaxWidth()) {
         PaywallSheetContent(
-            price = price,
-            onPurchase = { viewModel.purchase(context.findActivity()) },
+            product = product,
+            onPurchase = { id -> viewModel.purchase(context.findActivity(), id) },
             onRestore = viewModel::restorePurchases,
         )
 
@@ -103,23 +87,82 @@ fun PaywallSheet(
 }
 
 @Composable
-private fun PaywallSheetContent(
-    price: String,
-    onPurchase: () -> Unit,
+internal fun ObservePaywallEvents(
+    viewModel: PaywallViewModel,
+    snackbarHostState: SnackbarHostState,
+    onComplete: () -> Unit,
+) {
+    val purchaseErrorMessage = stringResource(R.string.error_purchase_failure)
+    val restoreErrorMessage = stringResource(R.string.error_restore_failure)
+
+    // snackbar success messages are being handled by viewModel
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                PurchaseEvent.PurchaseComplete,
+                PurchaseEvent.RestoreSuccess ->
+                    onComplete()
+
+                PurchaseEvent.PurchaseError,
+                PurchaseEvent.PurchaseAborted ->
+                    snackbarHostState.showSnackbar(purchaseErrorMessage)
+
+                PurchaseEvent.RestoreError ->
+                    snackbarHostState.showSnackbar(restoreErrorMessage)
+            }
+        }
+    }
+}
+
+@Composable
+internal fun PaywallSheetContent(
+    product: StoreProductUiModel?,
+    onPurchase: (id: String) -> Unit,
     onRestore: () -> Unit,
 ) {
-    Column(
+    PaywallBody(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
             .padding(bottom = AppTheme.dimens.spacingLarge)
             .padding(horizontal = AppTheme.dimens.spacingLarge),
     ) {
+        Spacer(modifier = Modifier.height(AppTheme.dimens.spacingExtraLarge))
+        PaywallPurchaseFooter(
+            product = product,
+            onPurchase = onPurchase,
+            onRestore = onRestore,
+        )
+    }
+}
+
+@Composable
+internal fun PaywallBody(
+    modifier: Modifier = Modifier,
+    header: @Composable () -> Unit = { PaywallHeader() },
+    content: @Composable () -> Unit = { FeatureList() },
+    bottomContent: @Composable (ColumnScope.() -> Unit)? = null,
+) {
+    Column(modifier = modifier) {
+        header()
+        Spacer(modifier = Modifier.height(AppTheme.dimens.spacingExtraLarge))
+        content()
+        bottomContent?.invoke(this)
+    }
+}
+
+@Composable
+internal fun PaywallHeader(
+    titlePart1: String = stringResource(R.string.paywall_title_part_1),
+    titlePart2: String = stringResource(R.string.paywall_title_part_2),
+    subtitle: String = stringResource(R.string.paywall_subtitle),
+) {
+    Column {
         Text(
             text = buildAnnotatedString {
-                appendLine(stringResource(R.string.paywall_title_part_1))
+                appendLine(titlePart1)
                 withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append(stringResource(R.string.paywall_title_part_2))
+                    append(titlePart2)
                 }
             },
             style = MaterialTheme.typography.displayMedium.copy(
@@ -130,28 +173,32 @@ private fun PaywallSheetContent(
         )
         Spacer(modifier = Modifier.height(AppTheme.dimens.spacingNormal))
         Text(
-            text = stringResource(R.string.paywall_subtitle),
+            text = subtitle,
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(AppTheme.dimens.spacingExtraLarge))
-
-        FeatureList()
-
-        Spacer(modifier = Modifier.height(AppTheme.dimens.spacingExtraLarge))
-
-        PurchaseCard(price, onPurchase)
+@Composable
+internal fun PaywallPurchaseFooter(
+    product: StoreProductUiModel?,
+    onPurchase: (id: String) -> Unit,
+    onRestore: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        PurchaseCard(product = product, onPurchase = onPurchase)
 
         Spacer(modifier = Modifier.height(AppTheme.dimens.spacingSmall))
 
-        TextButton(
-            onClick = onRestore,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        ) {
+        TextButton(onClick = onRestore) {
             Text(
-                text = stringResource(R.string.settings_restore_purchases),
+                text = stringResource(R.string.paywall_restore_purchases),
                 style = MaterialTheme.typography.labelLarge,
             )
         }
@@ -159,7 +206,7 @@ private fun PaywallSheetContent(
 }
 
 @Composable
-private fun FeatureList() {
+internal fun FeatureList() {
     Column(verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spacingMedium)) {
         FeatureItem(
             icon = painterResource(R.drawable.ic_ad_off),
@@ -229,19 +276,21 @@ private fun FeatureItem(
 }
 
 @Composable
-private fun PurchaseCard(price: String, onPurchase: () -> Unit) {
-    val isLoading = price.isEmpty()
+internal fun PurchaseCard(product: StoreProductUiModel?, onPurchase: (id: String) -> Unit) {
+    val isLoading = product == null || product.price.isEmpty()
     Button(
-        onClick = onPurchase,
-        enabled = !isLoading,
+        onClick = {
+            if (product != null) {
+                onPurchase(product.id)
+            }
+        },
+        enabled = !isLoading && !product.isPurchased,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
-        contentPadding = PaddingValues(AppTheme.dimens.spacingMedium),
+        contentPadding = ButtonDefaults.MediumContentPadding,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppTheme.dimens.spacingMedium),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -270,24 +319,18 @@ private fun PurchaseCard(price: String, onPurchase: () -> Unit) {
                     )
                 } else {
                     Text(
-                        text = price,
+                        text = product.price,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                         ),
                     )
                 }
                 Spacer(modifier = Modifier.width(AppTheme.dimens.spacingMedium))
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_forward),
-                        contentDescription = null,
-                        modifier = Modifier.padding(AppTheme.dimens.spacingNormal),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                    )
-                }
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_forward),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
             }
         }
     }
@@ -299,7 +342,13 @@ private fun Preview() {
     AppTheme {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
             PaywallSheetContent(
-                price = "$3.99",
+                product = StoreProductUiModel(
+                    id = "pro",
+                    title = "Sleep Timer Pro",
+                    description = "Unlock Pro",
+                    price = "$3.99",
+                    isPurchased = false,
+                ),
                 onPurchase = {},
                 onRestore = {},
             )

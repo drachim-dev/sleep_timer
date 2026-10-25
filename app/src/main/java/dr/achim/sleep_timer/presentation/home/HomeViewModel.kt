@@ -9,6 +9,7 @@ import dr.achim.sleep_timer.domain.usecase.GetSettingsUseCase
 import dr.achim.sleep_timer.domain.usecase.GetTimerStatusUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateLastSelectedMinutesUseCase
 import dr.achim.sleep_timer.domain.usecase.UpdateQuickTimeUseCase
+import dr.achim.sleep_timer.domain.usecase.UpdateSettingsUseCase
 import dr.achim.sleep_timer.model.TimerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,6 +25,7 @@ class HomeViewModel(
     getTimerStatusUseCase: GetTimerStatusUseCase,
     private val updateQuickTimeUseCase: UpdateQuickTimeUseCase,
     private val updateLastSelectedMinutesUseCase: UpdateLastSelectedMinutesUseCase,
+    private val updateSettingsUseCase: UpdateSettingsUseCase,
     private val controlTimerUseCase: ControlTimerUseCase
 ) : ViewModel() {
 
@@ -46,7 +48,8 @@ class HomeViewModel(
             lastSelectedMinutes = lastMinutes,
             timerStartCount = settings.timerStartCount,
             showNotificationRationale = showRationale,
-            showNotificationSettingsPrompt = showSettings
+            showNotificationSettingsPrompt = showSettings,
+            showWhatsNewBanner = settings.showWhatsNewPro,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -69,6 +72,14 @@ class HomeViewModel(
                 _showNotificationRationale.value = false
                 _showNotificationSettingsPrompt.value = false
             }
+
+            HomeUiAction.DismissWhatsNewBanner -> dismissWhatsNewBanner()
+        }
+    }
+
+    private fun dismissWhatsNewBanner() {
+        viewModelScope.launch {
+            updateSettingsUseCase.setShowWhatsNewPro(false)
         }
     }
 

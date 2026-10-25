@@ -33,4 +33,8 @@ class UpdateSettingsUseCase(
     suspend fun setLightsOffDelaySeconds(seconds: Int) {
         repository.setLightsOffDelaySeconds(seconds)
     }
+
+    suspend fun setShowWhatsNewPro(show: Boolean) {
+        repository.setShowWhatsNewPro(show)
+    }
 }

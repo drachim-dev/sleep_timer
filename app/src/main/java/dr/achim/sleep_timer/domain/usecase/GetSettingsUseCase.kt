@@ -17,8 +17,9 @@ class GetSettingsUseCase(
         repository.lightsOffDelay,
         repository.lightsOffDelaySeconds,
         repository.timerStartCount,
-        repository.lastReviewTimestamp
-    ) { themeMode, glowEnabled, intensity, extendOnShake, extendOnShakeMinutes, lightsOffDelay, lightsOffDelaySeconds, timerStartCount, lastReviewTimestamp ->
+        repository.lastReviewTimestamp,
+        repository.showWhatsNewPro,
+    ) { themeMode, glowEnabled, intensity, extendOnShake, extendOnShakeMinutes, lightsOffDelay, lightsOffDelaySeconds, timerStartCount, lastReviewTimestamp, showWhatsNewPro ->
         AppSettings(
             themeMode = themeMode,
             glowEffectEnabled = glowEnabled,
@@ -28,7 +29,8 @@ class GetSettingsUseCase(
             lightsOffDelay = lightsOffDelay,
             lightsOffDelaySeconds = lightsOffDelaySeconds,
             timerStartCount = timerStartCount,
-            lastReviewTimestamp = lastReviewTimestamp
+            lastReviewTimestamp = lastReviewTimestamp,
+            showWhatsNewPro = showWhatsNewPro,
         )
     }
 }

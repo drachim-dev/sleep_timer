@@ -9,6 +9,7 @@ sealed interface HomeUiState {
         val lastSelectedMinutes: Int = 0,
         val timerStartCount: Int = 0,
         val showNotificationRationale: Boolean = false,
-        val showNotificationSettingsPrompt: Boolean = false
+        val showNotificationSettingsPrompt: Boolean = false,
+        val showWhatsNewBanner: Boolean = false,
     ) : HomeUiState
 }
