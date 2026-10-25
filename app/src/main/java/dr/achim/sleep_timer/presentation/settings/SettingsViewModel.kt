@@ -127,15 +127,20 @@ class SettingsViewModel(
         _products,
         _purchasedProductIds
     ) { products, purchasedIds ->
-        products.map { product ->
-            StoreProductUiModel(
-                id = product.id,
-                title = product.name,
-                description = product.description,
-                price = product.price.formatted,
-                isPurchased = purchasedIds.contains(product.id)
-            )
-        }
+        products
+            .sortedBy { product ->
+                Product.entries.find { it.id == product.id }?.displayOrder ?: Int.MAX_VALUE
+            }
+            .map { product ->
+                val isConsumable = Product.entries.find { it.id == product.id }?.isConsumable == true
+                StoreProductUiModel(
+                    id = product.id,
+                    title = product.name,
+                    description = product.description,
+                    price = product.price.formatted,
+                    isPurchased = !isConsumable && purchasedIds.contains(product.id)
+                )
+            }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

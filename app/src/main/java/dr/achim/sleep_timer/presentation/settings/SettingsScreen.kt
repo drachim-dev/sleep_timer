@@ -388,22 +388,6 @@ fun SettingsScreenContent(
                     modifier = Modifier.animateContentSize(),
                     title = { SectionTitle(stringResource(R.string.settings_section_support_me)) }
                 ) {
-                    SettingsItem(
-                        painter = painterResource(R.drawable.ic_rate_review),
-                        title = stringResource(R.string.settings_like_app_title),
-                        subtitle = stringResource(R.string.settings_like_app_subtitle),
-                        trailingText = stringResource(R.string.settings_like_app_trailing),
-                        trailingColor = GreenAccent,
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                data =
-                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri()
-                                setPackage("com.android.vending")
-                            }
-                            context.startActivity(intent)
-                        }
-                    )
-
                     productUiModels.forEach { uiModel ->
                         val icon = when (uiModel.id) {
                             Product.Donation.id -> R.drawable.ic_coffee
@@ -435,6 +419,23 @@ fun SettingsScreenContent(
                             )
                         }
                     }
+
+                    SettingsItem(
+                        painter = painterResource(R.drawable.ic_rate_review),
+                        title = stringResource(R.string.settings_like_app_title),
+                        subtitle = stringResource(R.string.settings_like_app_subtitle),
+                        trailingText = stringResource(R.string.settings_like_app_trailing),
+                        trailingColor = GreenAccent,
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data =
+                                    "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}".toUri()
+                                setPackage("com.android.vending")
+                            }
+                            context.startActivity(intent)
+                        }
+                    )
+
                 }
 
                 SettingsSection(
